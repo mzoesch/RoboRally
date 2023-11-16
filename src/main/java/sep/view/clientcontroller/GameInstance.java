@@ -11,7 +11,7 @@ import org.json.JSONException;
 import sep.view.viewcontroller.ViewLauncher;
 
 /**
- * High-level manager object for an instance fo the running game. Spawned at game creation and not destroyed until
+ * High-level manager object for an instance of the running game. Spawned at game creation and not destroyed until
  * the game is killed. It implements relevant important methods that affect the game as a whole, such as connecting
  * to the server or shutting down.
  */
