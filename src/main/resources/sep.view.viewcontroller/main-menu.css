@@ -1,0 +1,21 @@
+#vbox-top-right {
+    -fx-alignment: top-right;
+    -fx-spacing: 16px;
+}
+
+#input-text-field {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+
+    -fx-pref-width: 200px;
+}
+
+#btn-container {
+    -fx-max-width: 400px;
+    -fx-padding: 100px 0px 0px 0px;
+}

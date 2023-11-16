@@ -1,0 +1,115 @@
+* {
+    -std-background-color: #2b2a33ff;
+
+    -primary-text-fill: #f5f5f5ff;
+    -text-fill-error: #ff000099;
+
+    -primary-btn-color: #0000ff99;
+    -primary-btn-color-hover: #0000ffcc;
+    -secondary-btn-color: #ffffff19;
+    -secondary-btn-color-hover: #ffffff33;
+    -danger-btn-color: #ffffff19;
+    -danger-btn-color-hover: #ff000033;
+}
+
+#master-container {
+    -fx-background-color: -std-background-color;
+    -fx-padding: 24px 24px 24px 24px;
+}
+
+/*#region Text*/
+
+.text-base-error,
+.text-base {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+}
+.text-base-error {
+    -fx-text-fill: -text-fill-error;
+}
+
+.text-xl-error,
+.text-xl {
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -primary-text-fill;
+}
+.text-xl-error {
+    -fx-text-fill: -text-fill-error;
+}
+
+.text-2xl-error,
+.text-2xl {
+    -fx-font-size: 48px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -primary-text-fill;
+}
+.text-2xl-error {
+    -fx-text-fill: -text-fill-error;
+}
+
+.text-4xl-error,
+.text-4xl {
+    -fx-font-size: 96px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -primary-text-fill;
+}
+.text-4xl-error {
+    -fx-text-fill: -text-fill-error;
+}
+
+/*#endregion Text*/
+
+/*#region Buttons*/
+
+.primary-btn {
+    -fx-background-color: -primary-btn-color;
+
+    -fx-text-fill: -primary-text-fill;
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+
+    -fx-padding: 16px 48px 16px 48px;
+    -fx-border-radius: 0px;
+}
+.primary-btn:hover {
+    -fx-background-color: -primary-btn-color-hover;
+}
+
+.secondary-btn-mini,
+.secondary-btn {
+    -fx-background-color: -secondary-btn-color;
+
+    -fx-text-fill: -primary-text-fill;
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+
+    -fx-padding: 16px 48px 16px 48px;
+    -fx-border-radius: 0px;
+}
+.secondary-btn-mini:hover,
+.secondary-btn:hover {
+    -fx-background-color: -secondary-btn-color-hover;
+}
+.secondary-btn-mini {
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+    -fx-padding: 8px 24px 8px 24px;
+}
+
+.danger-btn {
+    -fx-background-color: -danger-btn-color;
+
+    -fx-text-fill: -primary-text-fill;
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+
+    -fx-padding: 16px 48px 16px 48px;
+    -fx-border-radius: 0px;
+}
+.danger-btn:hover {
+    -fx-background-color: -danger-btn-color-hover;
+}
+
+/*#endregion Buttons*/

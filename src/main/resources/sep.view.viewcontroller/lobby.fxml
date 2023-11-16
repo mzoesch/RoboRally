@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane
+        id="master-container" stylesheets="@globals.css"
+        fx:controller="sep.view.scenecontrollers.LobbyJFXController"
+        xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+>
+    <children>
+        <Label
+                text="Lobby"
+                styleClass="text-2xl" alignment="CENTER"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+        />
+        <Label
+                text="Waiting for host to start game..."
+                styleClass="text-base" alignment="CENTER"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="70.0"
+        />
+        <Label
+                fx:id="sessionIDLabel"
+                styleClass="text-xl" alignment="TOP_RIGHT"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+        />
+        <AnchorPane
+                AnchorPane.leftAnchor="400.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="170.0" AnchorPane.bottomAnchor="100.0"
+        >
+            <VBox
+                    id="lobby-msg-container" stylesheets="@lobby.css"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+            >
+                <ScrollPane
+                        id="lobby-msg-scroll-pane" stylesheets="@lobby.css"
+                        fx:id="messageScrollPane"
+                >
+                </ScrollPane>
+                <HBox
+                        id="lobby-msg-input-container" stylesheets="@lobby.css"
+                >
+                    <TextField
+                            id="lobby-msg-text-field" stylesheets="@lobby.css"
+                            fx:id="messageField"
+                    />
+                    <Button
+                            text="submit"
+                            styleClass="secondary-btn-mini"
+                            onAction="#onSubmitMessageBtn"
+                    />
+                </HBox>
+            </VBox>
+        </AnchorPane>
+        <AnchorPane
+                id="current-players-container" stylesheets="@lobby.css"
+                AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="170.0" AnchorPane.bottomAnchor="100.0"
+        >
+            <Label
+                    text="Current Players"
+                    styleClass="text-xl" alignment="CENTER"
+            />
+            <VBox
+                    id="current-players-list-container" stylesheets="@lobby.css"
+                    fx:id="currentPlayersList"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" AnchorPane.bottomAnchor="0.0"
+            />
+        </AnchorPane>
+        <Button
+                text="Leave Lobby"
+                styleClass="danger-btn"
+                onAction="#onLeaveLobbyBtn"
+                AnchorPane.leftAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+        />
+        <Button
+                text="Start Game"
+                styleClass="primary-btn"
+                fx:id="startGameBtn"
+                onAction="#onStartGameBtn"
+                AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+        />
+    </children>
+</AnchorPane>
