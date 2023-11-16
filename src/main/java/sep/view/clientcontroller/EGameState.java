@@ -2,6 +2,11 @@ package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
 
+/**
+ * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
+ * Does not contain actual game logic. If the view needs to know something about the game, it will be stored here. This
+ * object is shared across all threads and should be automatically updated by the server listener.
+ */
 public enum EGameState
 {
     INSTANCE;

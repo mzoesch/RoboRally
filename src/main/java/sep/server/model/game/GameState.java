@@ -39,7 +39,7 @@ public class GameState
     }
 
     /**
-     * Should return a JSON object that represents the state of the game to sync to all clients.
+     * Should return a JSON object that represents the state of the game to replicate to all clients.
      * They will have to figure out how to interpret it and update the view accordingly.
      */
     public JSONObject getUpdatedState()

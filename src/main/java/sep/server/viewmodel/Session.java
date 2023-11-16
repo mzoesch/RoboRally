@@ -9,13 +9,15 @@ import java.util.UUID;
 
 /**
  * Handles how clients can join and leave a session, which of the clients is the current host and also how to
- * communicate with each other. For example, chat messages.
+ * communicate with each other. For example, chat messages. If a client disconnects mid-game, this class will handle
+ * that as well. (Wait for reconnection or replace that player by an AI. We will probably have to handle this later
+ * on in an upcoming milestone.)
  */
 public final class Session
 {
     private static final int SESSION_ID_LENGTH = 5;
 
-    /** May have more rights. */
+    /** May have more rights. (Initial game-start and change the config of it.) */
     private PlayerController hostPlayerController;
     private final ArrayList<PlayerController> playerControllers;
     private final String sessionID;
