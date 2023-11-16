@@ -7,10 +7,10 @@
 >
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>sep</groupId>
-    <artifactId>sep</artifactId>
+    <groupId>sep.view</groupId>
+    <artifactId>view</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>sep</name>
+    <name>view</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
