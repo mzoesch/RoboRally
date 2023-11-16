@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import javafx.scene.layout.Pane;
 import java.io.IOException;
 
+/**
+ * Object that handles the overall flow in the Graphical User Interface. It manages the loading of FXML files and
+ * the corresponding controllers, the activation of them and destruction.
+ */
 public class SceneController
 {
     public static final String WIN_TITLE = "CLIENT";

@@ -55,7 +55,7 @@ public class LobbyJFXController
         return !message.isEmpty() && message.length() <= ChatMessageModel.MAX_MESSAGE_LENGTH;
     }
 
-    /** Will add a new message to the scroll pane from another thread. */
+    /** Will add a new message to the active scroll pane from another thread. */
     public void addMessage(String caller, String message)
     {
         Platform.runLater(() ->
@@ -137,6 +137,7 @@ public class LobbyJFXController
         return;
     }
 
+    /** Will send the Post Login Confirmation to the server. */
     @FXML
     private void initialize()
     {

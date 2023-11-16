@@ -13,6 +13,10 @@ import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * We create a special object for listening to the server socket on a separate
+ * thread to avoid blocking the main thread of the application.
+ */
 public class ServerListener implements Runnable
 {
     /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */

@@ -10,6 +10,12 @@ public class Launcher
         throw new RuntimeException("This class cannot be instantiated.");
     }
 
+    /**
+     * This is the entry point of the client part of the application.
+     * The Game Instance is created here.
+     *
+     * @param args CMD arguments are ignored.
+     */
     public static void main(String[] args)
     {
         double t0 = System.currentTimeMillis();

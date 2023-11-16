@@ -10,6 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import java.io.IOException;
 
+/** JavaFX controller for the main menu screen. Handles session creation and joining. */
 public class MainMenuJFXController
 {
     @FXML private TextField playerNameField;
@@ -81,6 +82,7 @@ public class MainMenuJFXController
     @FXML
     private void initialize()
     {
+        // TODO Load the username from the last game session if available.
         return;
     }
 

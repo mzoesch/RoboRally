@@ -5,7 +5,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-
 public class ViewLauncher extends Application
 {
     /** This instance is only valid on the JFX thread. */

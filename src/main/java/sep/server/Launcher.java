@@ -13,7 +13,7 @@ public final class Launcher
     }
 
     /**
-     * This is the entry point of the Server part of the application.
+     * This is the entry point of the server part of the application.
      * The Server Instance is created here.
      *
      * @param args CMD arguments are ignored.

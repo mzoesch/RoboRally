@@ -11,6 +11,11 @@ import java.io.BufferedWriter;
 import java.util.concurrent.Executors;
 import java.io.OutputStreamWriter;
 
+/**
+ * Singleton object that holds all relevant information about the client's connection to the server and the game
+ * instance. This object is shared across all threads. It is used to communicate with the server and to store
+ * information that is persistent throughout the game's lifetime.
+ */
 public enum EClientInformation
 {
     INSTANCE;
@@ -69,6 +74,9 @@ public enum EClientInformation
         return true;
     }
 
+    /** Will block the main thread until a response from the server is received. Only use this method for the initial
+     * connection to the server. After that, use the {@link #listen()} method.
+     */
     public String waitForServerResponse() throws IOException
     {
         if (this.bufferedReader == null)
@@ -80,6 +88,10 @@ public enum EClientInformation
         return this.bufferedReader.readLine();
     }
 
+    /**
+     * Will create a new thread that will listen for server responses to not block the main thread.
+     * @see sep.view.clientcontroller.ServerListener
+     * */
     public void listen()
     {
         if (this.serverListener != null)
@@ -114,7 +126,6 @@ public enum EClientInformation
     {
         return stdServerErrPipeline;
     }
-
 
     public void setConnectedSessionID(String connectedLobbyID)
     {
