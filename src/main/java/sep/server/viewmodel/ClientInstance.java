@@ -1,6 +1,6 @@
 package sep.server.viewmodel;
 
-import sep.server.json.mainmenu.InitialClientConnection;
+import sep.server.json.mainmenu.InitialClientConnectionModel;
 import sep.server.json.DefaultClientRequestParser;
 import sep.server.model.EServerInformation;
 
@@ -15,6 +15,14 @@ import org.json.JSONObject;
 import org.json.JSONException;
 import java.net.SocketException;
 
+/**
+ * High-level manager object for a client connection to the server. A Client Instance is spawned at connection
+ * creation and not destroyed until the connection is closed. A Client Instance object will always create a new
+ * separate thread for itself to read and write to the client socket.
+ *
+ * <p> It implements high-level methods as, for example, sending and receiving messages from the client. It will
+ * also handle the initial connection handshake to register a client in a session.
+ */
 public final class ClientInstance implements Runnable
 {
     /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
@@ -28,6 +36,7 @@ public final class ClientInstance implements Runnable
 
     /** Must be crated to join a given session. */
     private PlayerController playerController;
+    /** If the client is registered in a session. */
     private boolean bIsRegistered;
 
     public ClientInstance(Socket socket) throws IOException
@@ -73,6 +82,12 @@ public final class ClientInstance implements Runnable
         return;
     }
 
+    /**
+     * Will try to register a client to a new or already existing session.
+     *
+     * @return             True if the client was successfully registered in a session, false otherwise.
+     * @throws IOException If the client connection was closed unexpectedly.
+     */
     private boolean registerClient() throws IOException
     {
         while (true)
@@ -95,11 +110,11 @@ public final class ClientInstance implements Runnable
                 return false;
             }
 
-            InitialClientConnection icc;
+            InitialClientConnectionModel icc;
             try
             {
                 // We need to do this because we already read the first character.
-                icc = new InitialClientConnection(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
+                icc = new InitialClientConnectionModel(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
             }
             catch (JSONException e)
             {
@@ -118,7 +133,7 @@ public final class ClientInstance implements Runnable
                     this.playerController.getSession().joinSession(this.playerController);
                     this.bIsRegistered = true;
 
-                    InitialClientConnection.sendPositive(this.bufferedWriter, sessionID);
+                    InitialClientConnectionModel.sendPositive(this.bufferedWriter, sessionID);
                     System.out.printf("[SERVER] Client %s is now registered in session %s.%n", this.socket.getInetAddress(), sessionID);
 
                     return true;
@@ -131,20 +146,20 @@ public final class ClientInstance implements Runnable
                     if (!EServerInformation.INSTANCE.isSessionIDValid(icc.getSessionID()))
                     {
                         System.out.printf("[SERVER] Client %s requested to join an invalid session %s.%n", this.socket.getInetAddress(), icc.getSessionID());
-                        InitialClientConnection.sendNegative(this.bufferedWriter, "ID does not exist.");
+                        InitialClientConnectionModel.sendNegative(this.bufferedWriter, "ID does not exist.");
                         return false;
                     }
                     if (Objects.requireNonNull(EServerInformation.INSTANCE.getSessionByID(icc.getSessionID())).isPlayerNameInSession(icc.getPlayerName()))
                     {
                         System.out.printf("[SERVER] Client %s requested to join a session with an invalid name.%n", this.socket.getInetAddress());
-                        InitialClientConnection.sendNegative(this.bufferedWriter, "Player name already exists.");
+                        InitialClientConnectionModel.sendNegative(this.bufferedWriter, "Player name already exists.");
                         return false;
                     }
                     this.playerController = ServerInstance.createNewPlayerController(this, icc.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(icc.getSessionID()));
                     this.playerController.getSession().joinSession(this.playerController);
                     this.bIsRegistered = true;
 
-                    InitialClientConnection.sendPositive(this.bufferedWriter, icc.getSessionID());
+                    InitialClientConnectionModel.sendPositive(this.bufferedWriter, icc.getSessionID());
                     System.out.printf("[SERVER] Client %s is now registered in session %s.$n", this.socket.getInetAddress(), icc.getSessionID());
 
                     return true;
@@ -178,7 +193,7 @@ public final class ClientInstance implements Runnable
             }
 
             // We need to do this because we already read the first character.
-            InitialClientConnection icc = new InitialClientConnection(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
+            InitialClientConnectionModel icc = new InitialClientConnectionModel(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
             return Objects.equals(icc.getConnectionMethod(), "postLoginConfirmation");
         }
         catch (IOException e)
@@ -264,6 +279,7 @@ public final class ClientInstance implements Runnable
         return;
     }
 
+    /** Life-cycle of a client connection. */
     @Override
     public void run()
     {

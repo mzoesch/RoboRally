@@ -4,6 +4,10 @@ import sep.server.viewmodel.PlayerController;
 
 import org.json.JSONObject;
 
+/**
+ * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
+ * Game Modes. It is persistent throughout the life-time of a session.
+ */
 public class GameState
 {
     private GameMode gameMode;

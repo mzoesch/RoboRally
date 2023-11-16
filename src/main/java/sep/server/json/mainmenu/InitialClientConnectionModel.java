@@ -5,11 +5,11 @@ import java.io.BufferedWriter;
 import org.json.JSONException;
 import java.io.IOException;
 
-public class InitialClientConnection
+public class InitialClientConnectionModel
 {
     private final JSONObject json;
 
-    public InitialClientConnection(JSONObject json)
+    public InitialClientConnectionModel(JSONObject json)
     {
         super();
         this.json = json;
@@ -40,7 +40,7 @@ public class InitialClientConnection
         response.put("connectionState", true);
         response.put("lobbyID", lobbyID);
 
-        InitialClientConnection.send(bufferedWriter, response);
+        InitialClientConnectionModel.send(bufferedWriter, response);
 
         return;
     }
@@ -51,7 +51,7 @@ public class InitialClientConnection
         response.put("connectionState", false);
         response.put("errorMessage", reason);
 
-        InitialClientConnection.send(bufferedWriter, response);
+        InitialClientConnectionModel.send(bufferedWriter, response);
 
         return;
     }

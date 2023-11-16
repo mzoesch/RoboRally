@@ -1,4 +1,5 @@
-module sep {
+module sep
+{
     requires javafx.controls;
     requires javafx.fxml;
     requires org.json;

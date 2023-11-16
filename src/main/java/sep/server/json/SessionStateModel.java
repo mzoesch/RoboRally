@@ -1,11 +1,8 @@
 package sep.server.json;
 
 import sep.server.viewmodel.ClientInstance;
-import sep.server.json.IJSONModel;
 
 import org.json.JSONObject;
-import sep.server.json.IJSONModel;
-
 import java.io.IOException;
 
 public class SessionStateModel implements IJSONModel

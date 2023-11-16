@@ -7,6 +7,10 @@ import sep.server.model.EServerInformation;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * Handles how clients can join and leave a session, which of the clients is the current host and also how to
+ * communicate with each other. For example, chat messages.
+ */
 public final class Session
 {
     private static final int SESSION_ID_LENGTH = 5;

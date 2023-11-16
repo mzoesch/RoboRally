@@ -8,6 +8,12 @@ import java.util.concurrent.ExecutorService;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
+/**
+ * The EServerInformation enum is a singleton class that represents the server itself. The EServerInstance is spawned
+ * at application startup by the Server Listener and is not destroyed until the application is killed. The
+ * EServerInstance can be created only once and is shared across all threads. It implements high-level logic for the
+ * server application, for example, connecting clients to existing session or creating new ones.
+ */
 public enum EServerInformation
 {
     INSTANCE;

@@ -3,6 +3,7 @@ package sep.server.json;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+// Do not convert to record just yet, as we will add more fields to this class.
 public class DefaultClientRequestParser
 {
     private final JSONObject request;

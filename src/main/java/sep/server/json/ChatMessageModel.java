@@ -1,7 +1,6 @@
 package sep.server.json;
 
 import sep.server.viewmodel.ClientInstance;
-import sep.server.json.IJSONModel;
 
 import org.json.JSONObject;
 import java.io.IOException;
