@@ -3,6 +3,7 @@ package sep.view.clientcontroller;
 import sep.view.json.mainmenu.CreateSessionModel;
 import sep.view.json.mainmenu.PostLoginConfirmationModel;
 import sep.view.json.mainmenu.JoinSessionModel;
+import sep.view.json.mainmenu.InitialClientConnectionModel;
 
 import javafx.application.Platform;
 import java.io.IOException;
@@ -50,11 +51,27 @@ public class GameInstance
         return;
     }
 
+    private static boolean defaultProtocolForEstablishingAServerConnection() throws IOException, JSONException
+    {
+        if (EClientInformation.INSTANCE.establishAServerConnection())
+        {
+            JSONObject j = GameInstance.waitForServerResponse();
+            if (j == null)
+            {
+                return false;
+            }
+
+           return InitialClientConnectionModel.checkServerProtocolVersion(j);
+        }
+
+        return false;
+    }
+
     public static boolean connectToNewSession(String playerName) throws IOException
     {
         System.out.printf("[CLIENT] Trying to connect client to new session.%n");
 
-        if (EClientInformation.INSTANCE.establishAServerConnection())
+        if (GameInstance.defaultProtocolForEstablishingAServerConnection())
         {
             System.out.printf("[CLIENT] Successfully connected to server.%n");
 
@@ -95,7 +112,7 @@ public class GameInstance
     {
         System.out.printf("[CLIENT] Trying to connect client to existing session.%n");
 
-        if (EClientInformation.INSTANCE.establishAServerConnection())
+        if (GameInstance.defaultProtocolForEstablishingAServerConnection())
         {
             System.out.printf("[CLIENT] Successfully connected to server.%n");
 

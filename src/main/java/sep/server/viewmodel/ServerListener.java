@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.net.Socket;
 
 /**
- * We create a special object for listening to the server socket on a separate
- * thread to avoid blocking the main thread of the application.
+ * We create a special object for listening to the server socket. This object is instantiated on the main thread.
+ * Therefore, it will always block it. If the {@link #listen()} method terminates, the application will terminate.
  */
 public final class ServerListener
 {
@@ -17,6 +17,7 @@ public final class ServerListener
         return;
     }
 
+    /** Accepts clients. */
     public void listen() throws IOException
     {
         //noinspection InfiniteLoopStatement

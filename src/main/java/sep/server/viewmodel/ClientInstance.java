@@ -1,6 +1,7 @@
 package sep.server.viewmodel;
 
 import sep.server.json.mainmenu.InitialClientConnectionModel;
+import sep.server.json.mainmenu.InitialClientConnectionModelv2;
 import sep.server.json.DefaultClientRequestParser;
 import sep.server.model.EServerInformation;
 
@@ -25,6 +26,7 @@ import java.net.SocketException;
  */
 public final class ClientInstance implements Runnable
 {
+    // TODO ??? In our current protocol (v0.1), this is not handled in any way. So how should we close connections???
     /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
     private static final int ESCAPE_CHARACTER = 36;
 
@@ -90,6 +92,11 @@ public final class ClientInstance implements Runnable
      */
     private boolean registerClient() throws IOException
     {
+        // Send the Protocol version
+        InitialClientConnectionModelv2 icc = new InitialClientConnectionModelv2(this);
+
+        icc.sendProtocolVersion();
+
         while (true)
         {
             int escapeCharacter;
@@ -110,11 +117,11 @@ public final class ClientInstance implements Runnable
                 return false;
             }
 
-            InitialClientConnectionModel icc;
+            InitialClientConnectionModel iccd;
             try
             {
                 // We need to do this because we already read the first character.
-                icc = new InitialClientConnectionModel(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
+                iccd = new InitialClientConnectionModel(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
             }
             catch (JSONException e)
             {
@@ -125,11 +132,11 @@ public final class ClientInstance implements Runnable
 
             try
             {
-                if (Objects.equals(icc.getConnectionMethod(), "createSession"))
+                if (Objects.equals(iccd.getConnectionMethod(), "createSession"))
                 {
                     System.out.printf("[SERVER] Client %s requested to create a new session.%n", this.socket.getInetAddress());
                     String sessionID = EServerInformation.INSTANCE.createNewSession();
-                    this.playerController = ServerInstance.createNewPlayerController(this, icc.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(sessionID));
+                    this.playerController = ServerInstance.createNewPlayerController(this, iccd.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(sessionID));
                     this.playerController.getSession().joinSession(this.playerController);
                     this.bIsRegistered = true;
 
@@ -139,28 +146,28 @@ public final class ClientInstance implements Runnable
                     return true;
                 }
 
-                if (Objects.equals(icc.getConnectionMethod(), "joinSession"))
+                if (Objects.equals(iccd.getConnectionMethod(), "joinSession"))
                 {
-                    System.out.printf("[SERVER] Client %s requested to join %s session.%n", this.socket.getInetAddress(), icc.getSessionID());
+                    System.out.printf("[SERVER] Client %s requested to join %s session.%n", this.socket.getInetAddress(), iccd.getSessionID());
                     // TODO More validation checks
-                    if (!EServerInformation.INSTANCE.isSessionIDValid(icc.getSessionID()))
+                    if (!EServerInformation.INSTANCE.isSessionIDValid(iccd.getSessionID()))
                     {
-                        System.out.printf("[SERVER] Client %s requested to join an invalid session %s.%n", this.socket.getInetAddress(), icc.getSessionID());
+                        System.out.printf("[SERVER] Client %s requested to join an invalid session %s.%n", this.socket.getInetAddress(), iccd.getSessionID());
                         InitialClientConnectionModel.sendNegative(this.bufferedWriter, "ID does not exist.");
                         return false;
                     }
-                    if (Objects.requireNonNull(EServerInformation.INSTANCE.getSessionByID(icc.getSessionID())).isPlayerNameInSession(icc.getPlayerName()))
+                    if (Objects.requireNonNull(EServerInformation.INSTANCE.getSessionByID(iccd.getSessionID())).isPlayerNameInSession(iccd.getPlayerName()))
                     {
                         System.out.printf("[SERVER] Client %s requested to join a session with an invalid name.%n", this.socket.getInetAddress());
                         InitialClientConnectionModel.sendNegative(this.bufferedWriter, "Player name already exists.");
                         return false;
                     }
-                    this.playerController = ServerInstance.createNewPlayerController(this, icc.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(icc.getSessionID()));
+                    this.playerController = ServerInstance.createNewPlayerController(this, iccd.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(iccd.getSessionID()));
                     this.playerController.getSession().joinSession(this.playerController);
                     this.bIsRegistered = true;
 
-                    InitialClientConnectionModel.sendPositive(this.bufferedWriter, icc.getSessionID());
-                    System.out.printf("[SERVER] Client %s is now registered in session %s.$n", this.socket.getInetAddress(), icc.getSessionID());
+                    InitialClientConnectionModel.sendPositive(this.bufferedWriter, iccd.getSessionID());
+                    System.out.printf("[SERVER] Client %s is now registered in session %s.$n", this.socket.getInetAddress(), iccd.getSessionID());
 
                     return true;
                 }
@@ -173,7 +180,7 @@ public final class ClientInstance implements Runnable
             }
 
             System.out.printf("[SERVER] Received unknown JSON from client.%n");
-            System.out.printf("%s%n", icc.getJSON().toString(1));
+            System.out.printf("%s%n", iccd.getJSON().toString(1));
 
             continue;
         }

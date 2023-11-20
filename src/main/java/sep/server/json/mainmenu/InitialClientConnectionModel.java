@@ -5,6 +5,10 @@ import java.io.BufferedWriter;
 import org.json.JSONException;
 import java.io.IOException;
 
+/**
+ * Handles the initial client server handshake.
+ * @deprecated
+ * */
 public class InitialClientConnectionModel
 {
     private final JSONObject json;

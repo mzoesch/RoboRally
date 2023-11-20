@@ -20,6 +20,7 @@ public enum EServerInformation
 
     // TODO Move to env var
     public static final int PORT = 8080;
+    public static final String PROTOCOL_VERSION = "0.1";
 
     private static final int MAX_CLIENTS = 32;
 

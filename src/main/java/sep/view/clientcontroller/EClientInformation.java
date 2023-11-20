@@ -23,6 +23,7 @@ public enum EClientInformation
     // TODO To env var
     private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 8080;
+    public static final String PROTOCOL_VERSION = "0.1";
 
     private Socket socket;
     private InputStreamReader inputStreamReader;
