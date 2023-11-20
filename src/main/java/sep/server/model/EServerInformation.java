@@ -1,6 +1,7 @@
 package sep.server.model;
 
 import sep.server.viewmodel.Session;
+import sep.server.viewmodel.ClientInstance;
 
 import java.util.concurrent.Executors;
 import java.io.IOException;
@@ -23,8 +24,10 @@ public enum EServerInformation
     public static final String PROTOCOL_VERSION = "0.1";
 
     private static final int MAX_CLIENTS = 32;
+    public static final int KEEP_ALIVE_INTERVAL = 5_000;
 
     private final ServerSocket serverSocket;
+    /** @deprecated */
     private final ExecutorService executorService;
 
     private final ArrayList<Session> sessions;
@@ -66,14 +69,36 @@ public enum EServerInformation
         return;
     }
 
+    public void sendKeepAlive()
+    {
+        ArrayList<ClientInstance> dead = new ArrayList<ClientInstance>();
+
+        for (Session s : this.sessions)
+        {
+            s.sendKeepAlive(dead);
+            continue;
+        }
+
+        System.out.printf("[SERVER] Sent keep-alive to all clients.%n");
+
+        if (!dead.isEmpty())
+        {
+            System.out.printf("[SERVER] Removing %d dead client%s.%n", dead.size(), dead.size() == 1 ? "" : "s");
+            for (ClientInstance ci : dead)
+            {
+                ci.handleDisconnect();
+                continue;
+            }
+
+            return;
+        }
+
+        return;
+    }
+
     public ServerSocket getServerSocket()
     {
         return serverSocket;
-    }
-
-    public ExecutorService getExecutorService()
-    {
-        return executorService;
     }
 
     public Session[] getSessions()

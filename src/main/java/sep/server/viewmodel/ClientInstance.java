@@ -4,6 +4,7 @@ import sep.server.json.mainmenu.InitialClientConnectionModel;
 import sep.server.json.mainmenu.InitialClientConnectionModelv2;
 import sep.server.json.DefaultClientRequestParser;
 import sep.server.model.EServerInformation;
+import sep.server.json.KeepAliveModel;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,6 +31,7 @@ public final class ClientInstance implements Runnable
     /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
     private static final int ESCAPE_CHARACTER = 36;
 
+    public Thread thread;
     private final Socket socket;
     private final InputStreamReader inputStreamReader;
     private final BufferedReader bufferedReader;
@@ -40,6 +42,9 @@ public final class ClientInstance implements Runnable
     private PlayerController playerController;
     /** If the client is registered in a session. */
     private boolean bIsRegistered;
+    /** Used to keep track if a client responded to the keep-alive request form the server. */
+    private boolean bIsAlive;
+    private boolean bDisconnecting;
 
     public ClientInstance(Socket socket) throws IOException
     {
@@ -53,12 +58,21 @@ public final class ClientInstance implements Runnable
 
         this.playerController = null;
         this.bIsRegistered = false;
+        this.bIsAlive = true;
+        this.bDisconnecting = false;
 
         return;
     }
 
-    private void handleDisconnect()
+    public void handleDisconnect()
     {
+        // Because this method may be called multiple times if the connection did not close in an orderly way.
+        if (this.bDisconnecting)
+        {
+            return;
+        }
+        this.bDisconnecting = true;
+
         System.out.printf("[SERVER] Client %s disconnected.%n", this.socket.getInetAddress());
 
         if (this.bIsRegistered)
@@ -66,17 +80,15 @@ public final class ClientInstance implements Runnable
             this.playerController.getSession().leaveSession(this.playerController);
         }
 
+        this.thread.interrupt();
+
         try
         {
-            this.inputStreamReader.close();
-            this.bufferedReader.close();
-            this.outputStreamWriter.close();
-            this.bufferedWriter.close();
             this.socket.close();
         }
         catch (IOException e)
         {
-            System.err.printf("Could not close the client connection in an orderly way.%n");
+            System.err.printf("[SERVER] Could not close the client connection in an orderly way.%n");
             System.err.printf("%s%n", e.getMessage());
             return;
         }
@@ -235,8 +247,19 @@ public final class ClientInstance implements Runnable
     {
         while (true)
         {
-            // If the client closed the connection in an orderly way, the server will receive -1.
-            int escapeCharacter = this.bufferedReader.read();
+            int escapeCharacter;
+            try
+            {
+                // If the client closed the connection in an orderly way, the server will receive -1.
+                escapeCharacter = this.bufferedReader.read();
+            }
+            catch (SocketException e)
+            {
+                this.handleDisconnect();
+                System.out.printf("[SERVER] Client %s disconnected unexpectedly.%n", this.socket.getInetAddress());
+                return;
+            }
+
             if (escapeCharacter == -1)
             {
                 this.handleDisconnect();
@@ -325,6 +348,26 @@ public final class ClientInstance implements Runnable
     public BufferedWriter getBufferedWriter()
     {
         return bufferedWriter;
+    }
+
+    public void sendKeepAlive()
+    {
+        this.bIsAlive = false;
+        new KeepAliveModel(this).send();
+        return;
+    }
+
+    // TODO Do we have to synchronize this? Because of multithreading?
+    public boolean isAlive()
+    {
+        return this.bIsAlive;
+    }
+
+    // TODO Do we have to synchronize this? Because of multithreading?
+    public void setAlive(boolean bIsAlive)
+    {
+        this.bIsAlive = bIsAlive;
+        return;
     }
 
 }

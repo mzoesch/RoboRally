@@ -27,8 +27,10 @@ public final class ServerListener
             Socket client = EServerInformation.INSTANCE.getServerSocket().accept();
             System.out.printf("[SERVER] Accepted connection from %s.%n", client.getInetAddress().getHostAddress());
 
-            ClientInstance clientInstance = new ClientInstance(client);
-            EServerInformation.INSTANCE.getExecutorService().execute(clientInstance);
+            ClientInstance ci = new ClientInstance(client);
+            Thread t = new Thread(ci);
+            ci.thread = t;
+            t.start();
 
             continue;
         }

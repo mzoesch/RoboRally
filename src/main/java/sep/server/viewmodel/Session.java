@@ -118,6 +118,24 @@ public final class Session
         return;
     }
 
+    public void sendKeepAlive(ArrayList<ClientInstance> dead)
+    {
+
+        for (PlayerController PC : this.playerControllers)
+        {
+            if (!PC.getClientInstance().isAlive())
+            {
+                dead.add(PC.getClientInstance());
+                continue;
+            }
+
+            PC.getClientInstance().sendKeepAlive();
+            continue;
+        }
+
+        return;
+    }
+
     public void defaultBehaviourAfterPostLogin(PlayerController playerController)
     {
         this.broadcastChatMessage("SERVER", String.format("%s joined the session.", playerController.getPlayerName()));
