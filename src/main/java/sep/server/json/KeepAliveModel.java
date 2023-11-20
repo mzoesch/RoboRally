@@ -32,7 +32,7 @@ public class KeepAliveModel implements IJSONModel
     @Override
     public void send()
     {
-        System.out.printf(String.format("%s%n", this.toJSON().toString(4)));
+//        System.out.printf(String.format("%s%n", this.toJSON().toString(4)));
 
         try
         {

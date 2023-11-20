@@ -123,7 +123,7 @@ public class ServerListener implements Runnable
         }
         catch (JSONException e)
         {
-            System.out.println("not v2");
+//            System.out.println("not v2");
         }
 
         if (Objects.equals(dsrp.getType(), "chatMessage"))

@@ -26,7 +26,7 @@ public class InitialClientConnectionModel_v2
         j.put("messageType", "HelloClient");
         j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", EServerInformation.PROTOCOL_VERSION)));
 
-        System.out.printf(String.format("%s%n", j.toString(4)));
+//        System.out.printf(String.format("%s%n", j.toString(4)));
 
         try
         {
