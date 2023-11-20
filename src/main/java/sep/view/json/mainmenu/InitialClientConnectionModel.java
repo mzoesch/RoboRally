@@ -1,9 +1,11 @@
 package sep.view.json.mainmenu;
 
 import sep.view.clientcontroller.EClientInformation;
+import sep.view.clientcontroller.GameInstance;
 
 import org.json.JSONObject;
 import org.json.JSONException;
+import java.io.IOException;
 
 public class InitialClientConnectionModel
 {
@@ -14,8 +16,24 @@ public class InitialClientConnectionModel
             return false;
         }
 
-        System.out.printf("[CLIENT] Server protocol version: %s%n", jsonObject.getJSONObject("messageBody").getString("protocol"));
+        System.out.printf("[CLIENT] Server Protocol %s. Client Protocol %s.%n", jsonObject.getJSONObject("messageBody").getString("protocol"), String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
         return jsonObject.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
+    }
+
+    public static void sendProtocolVersionConfirmation() throws IOException
+    {
+        JSONObject messageBody = new JSONObject();
+        messageBody.put("group", "???");
+        messageBody.put("isAI", false);
+        messageBody.put("protocol", String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
+
+        JSONObject j = new JSONObject();
+        j.put("messageType", "HelloServer");
+        j.put("messageBody", messageBody);
+
+        GameInstance.sendServerRequest(j);
+
+        return;
     }
 
 }

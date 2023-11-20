@@ -27,6 +27,7 @@ public final class ServerListener
             Socket client = EServerInformation.INSTANCE.getServerSocket().accept();
             System.out.printf("[SERVER] Accepted connection from %s.%n", client.getInetAddress().getHostAddress());
 
+            // This is a little bit of a hack, the Client Instance should extend Thread not implement it.
             ClientInstance ci = new ClientInstance(client);
             Thread t = new Thread(ci);
             ci.thread = t;

@@ -53,18 +53,27 @@ public class GameInstance
 
     private static boolean defaultProtocolForEstablishingAServerConnection() throws IOException, JSONException
     {
-        if (EClientInformation.INSTANCE.establishAServerConnection())
+        if (!EClientInformation.INSTANCE.establishAServerConnection())
         {
-            JSONObject j = GameInstance.waitForServerResponse();
-            if (j == null)
-            {
-                return false;
-            }
-
-           return InitialClientConnectionModel.checkServerProtocolVersion(j);
+            return false;
         }
 
-        return false;
+        JSONObject j = GameInstance.waitForServerResponse();
+        if (j == null)
+        {
+            return false;
+        }
+
+        boolean bOk = InitialClientConnectionModel.checkServerProtocolVersion(j);
+        if (!bOk)
+        {
+            System.out.printf("[CLIENT] Server protocol version mismatch.%n");
+            return false;
+        }
+
+        InitialClientConnectionModel.sendProtocolVersionConfirmation();
+
+        return true;
     }
 
     public static boolean connectToNewSession(String playerName) throws IOException
@@ -75,6 +84,7 @@ public class GameInstance
         {
             System.out.printf("[CLIENT] Successfully connected to server.%n");
 
+            // DEPRECATED
             CreateSessionModel model = new CreateSessionModel(playerName);
             model.send();
 
@@ -116,6 +126,7 @@ public class GameInstance
         {
             System.out.printf("[CLIENT] Successfully connected to server.%n");
 
+            // DEPRECATED
             JoinSessionModel model = new JoinSessionModel(playerName, sessionID);
             model.send();
 

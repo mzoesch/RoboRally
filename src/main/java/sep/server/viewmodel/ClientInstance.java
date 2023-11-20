@@ -104,10 +104,15 @@ public final class ClientInstance implements Runnable
      */
     private boolean registerClient() throws IOException
     {
-        // Send the Protocol version
         InitialClientConnectionModel_v2 icc = new InitialClientConnectionModel_v2(this);
-
         icc.sendProtocolVersion();
+        icc.waitForProtocolVersionConfirmation();
+        boolean isValid = icc.isClientProtocolVersionValid();
+
+        if (!isValid)
+        {
+            return false;
+        }
 
         while (true)
         {
@@ -198,6 +203,7 @@ public final class ClientInstance implements Runnable
         }
     }
 
+    /** @deprecated */
     private boolean waitForPostLoginConfirmation()
     {
         // TODO Handle timeout
@@ -226,6 +232,37 @@ public final class ClientInstance implements Runnable
             System.err.printf("[SERVER] Received invalid JSON from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
             System.err.printf("%s%n", e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Only use this method for the initial client registration. For receiving information form the client
+     * after, use the {@link #defaultClientListener()} method.*/
+    public String waitForResponse()
+    {
+        try
+        {
+            // If the client closed the connection in an orderly way, the server will receive -1.
+            int escapeCharacter = this.bufferedReader.read();
+            if (escapeCharacter == -1)
+            {
+                this.handleDisconnect();
+                return null;
+            }
+
+            return String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+        }
+        catch (IOException e)
+        {
+            System.err.printf("[SERVER] Failed to read from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
+            System.err.printf("%s%n", e.getMessage());
+            return null;
+        }
+        catch (JSONException e)
+        {
+            System.err.printf("[SERVER] Received invalid JSON from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
+            System.err.printf("%s%n", e.getMessage());
+            return null;
         }
     }
 
