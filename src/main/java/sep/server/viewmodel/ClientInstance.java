@@ -1,7 +1,7 @@
 package sep.server.viewmodel;
 
 import sep.server.json.mainmenu.InitialClientConnectionModel;
-import sep.server.json.mainmenu.InitialClientConnectionModelv2;
+import sep.server.json.mainmenu.InitialClientConnectionModel_v2;
 import sep.server.json.DefaultClientRequestParser;
 import sep.server.model.EServerInformation;
 import sep.server.json.KeepAliveModel;
@@ -105,7 +105,7 @@ public final class ClientInstance implements Runnable
     private boolean registerClient() throws IOException
     {
         // Send the Protocol version
-        InitialClientConnectionModelv2 icc = new InitialClientConnectionModelv2(this);
+        InitialClientConnectionModel_v2 icc = new InitialClientConnectionModel_v2(this);
 
         icc.sendProtocolVersion();
 

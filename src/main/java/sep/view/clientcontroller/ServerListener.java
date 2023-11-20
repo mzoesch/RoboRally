@@ -44,6 +44,7 @@ public class ServerListener implements Runnable
             return;
         }
 
+        // ALL DEPRECATED
         try
         {
             bufferedWriter.write((char) ServerListener.ESCAPE_CHARACTER);
@@ -102,6 +103,29 @@ public class ServerListener implements Runnable
 
     private void parseJSONRequestFromServer(DefaultServerRequestParser dsrp) throws JSONException
     {
+        try
+        {
+            if (Objects.equals(dsrp.getType_v2(), "Alive"))
+            {
+                System.out.printf("[CLIENT] Received keep-alive from server. Responding.%n");
+                try
+                {
+                    GameInstance.respondToKeepAlive();
+                }
+                catch (IOException e)
+                {
+                    GameInstance.handleServerDisconnect();
+                    return;
+                }
+
+                return;
+            }
+        }
+        catch (JSONException e)
+        {
+            System.out.println("not v2");
+        }
+
         if (Objects.equals(dsrp.getType(), "chatMessage"))
         {
             // TODO To interface which controllers can receive chat messages.

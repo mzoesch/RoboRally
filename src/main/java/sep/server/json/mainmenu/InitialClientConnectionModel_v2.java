@@ -7,11 +7,11 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 /** Handles the initial client server handshake. */
-public class InitialClientConnectionModelv2
+public class InitialClientConnectionModel_v2
 {
     private final ClientInstance ci;
 
-    public InitialClientConnectionModelv2(ClientInstance ci)
+    public InitialClientConnectionModel_v2(ClientInstance ci)
     {
         super();
         this.ci = ci;

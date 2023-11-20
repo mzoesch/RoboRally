@@ -163,6 +163,12 @@ public class GameInstance
         return;
     }
 
+    public static void respondToKeepAlive() throws IOException
+    {
+        GameInstance.sendServerRequest(new JSONObject().put("messageType", "Alive"));
+        return;
+    }
+
     public static void sendServerRequest(JSONObject json) throws IOException
     {
         EClientInformation.INSTANCE.sendServerRequest(json);

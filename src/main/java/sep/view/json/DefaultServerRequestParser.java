@@ -44,4 +44,9 @@ public class DefaultServerRequestParser
         return this.request.getString("hostPlayerName");
     }
 
+    public String getType_v2() throws JSONException
+    {
+        return this.request.getString("messageType");
+    }
+
 }

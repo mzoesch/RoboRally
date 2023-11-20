@@ -24,7 +24,7 @@ public class KeepAliveModel implements IJSONModel
     public JSONObject toJSON()
     {
         JSONObject j = new JSONObject();
-        j.put("messageType", "KeepAlive");
+        j.put("messageType", "Alive");
 
         return j;
     }

@@ -23,6 +23,7 @@ public enum EServerInformation
     public static final int PORT = 8080;
     public static final String PROTOCOL_VERSION = "0.1";
 
+    /** @deprecated */
     private static final int MAX_CLIENTS = 32;
     public static final int KEEP_ALIVE_INTERVAL = 5_000;
 
