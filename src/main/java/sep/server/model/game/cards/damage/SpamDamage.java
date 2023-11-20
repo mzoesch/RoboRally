@@ -1,9 +1,10 @@
 package sep.server.model.game.cards.damage;
 
-public class SpamDamage extends DamageCard {
-    public SpamDamage(String cardType, boolean isProgrammable) {
-        super(cardType, isProgrammable);
+public class SpamDamage extends ADamageCard {
+    public SpamDamage(String cardType) {
+        super(cardType);
     }
+
     @Override
     public void playCard() {}
 }

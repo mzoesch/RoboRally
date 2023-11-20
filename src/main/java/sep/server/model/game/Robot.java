@@ -4,13 +4,11 @@ public class Robot {
   int positionX;
   int positionY;
   String direction;
-  int priority;
 
-  public Robot(int positionX, int positionY, String direction, int priority) {
+  public Robot(int positionX, int positionY, String direction) {
     this.positionX = positionX;
     this.positionY = positionY;
     this.direction = direction;
-    this.priority = priority;
   }
 
   public int getPositionX() {
@@ -35,14 +33,6 @@ public class Robot {
 
   public void setDirection(String direction) {
     this.direction = direction;
-  }
-
-  public int getPriority() {
-    return priority;
-  }
-
-  public void setPriority(int priority) {
-    this.priority = priority;
   }
 
   public void reboot() {}

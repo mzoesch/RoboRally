@@ -1,6 +1,6 @@
 package sep.server.model.game;
 
-public class Board {
+public class Course {
     int boardWidth;
     int boardLength;
 

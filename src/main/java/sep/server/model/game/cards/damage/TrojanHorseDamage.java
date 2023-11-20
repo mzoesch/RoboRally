@@ -1,8 +1,8 @@
 package sep.server.model.game.cards.damage;
 
-public class TrojanHorseDamage extends DamageCard{
-    public TrojanHorseDamage(String cardType, boolean isProgrammable, int damageValue) {
-        super(cardType, isProgrammable);
+public class TrojanHorseDamage extends ADamageCard {
+    public TrojanHorseDamage(String cardType) {
+        super(cardType);
     }
     @Override
     public void playCard() {}

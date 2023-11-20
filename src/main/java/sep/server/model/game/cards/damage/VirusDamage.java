@@ -1,8 +1,8 @@
 package sep.server.model.game.cards.damage;
 
-public class VirusDamage extends DamageCard{
-    public VirusDamage(String cardType, boolean isProgrammable, int damageValue) {
-        super(cardType, isProgrammable);
+public class VirusDamage extends ADamageCard {
+    public VirusDamage(String cardType) {
+        super(cardType);
     }
     @Override
     public void playCard() {}
