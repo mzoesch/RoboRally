@@ -30,4 +30,8 @@ public class DefaultClientRequestParser
         return this.request.getString("message");
     }
 
+    public Object getType_v2()
+    {
+        return this.request.get("messageType");
+    }
 }

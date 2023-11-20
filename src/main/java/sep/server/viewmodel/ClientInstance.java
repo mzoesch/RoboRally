@@ -179,7 +179,7 @@ public final class ClientInstance implements Runnable
                     this.bIsRegistered = true;
 
                     InitialClientConnectionModel.sendPositive(this.bufferedWriter, iccd.getSessionID());
-                    System.out.printf("[SERVER] Client %s is now registered in session %s.$n", this.socket.getInetAddress(), iccd.getSessionID());
+                    System.out.printf("[SERVER] Client %s is now registered in session %s.%n", this.socket.getInetAddress(), iccd.getSessionID());
 
                     return true;
                 }
@@ -231,6 +231,20 @@ public final class ClientInstance implements Runnable
 
     private boolean parseRequest(DefaultClientRequestParser dcrp) throws JSONException
     {
+        try
+        {
+            if (Objects.equals(dcrp.getType_v2(), "Alive"))
+            {
+                System.out.printf("[SERVER] Ok keep-alive from client %s.%n", this.socket.getInetAddress());
+                this.setAlive(true);
+                return true;
+            }
+        }
+        catch (JSONException e)
+        {
+            System.out.println("not v2");
+        }
+
         if (Objects.equals(dcrp.getType(), "chatMessage"))
         {
             System.out.printf("[SERVER] Client %s sent chat message %s.%n", this.socket.getInetAddress(), dcrp.getChatMessage());
@@ -266,6 +280,7 @@ public final class ClientInstance implements Runnable
                 return;
             }
 
+            // DEPRECATED
             if (escapeCharacter == ClientInstance.ESCAPE_CHARACTER)
             {
                 System.out.printf("[SERVER] Received escape character from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
