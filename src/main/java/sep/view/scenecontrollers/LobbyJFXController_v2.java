@@ -101,6 +101,7 @@ public final class LobbyJFXController_v2
         catch (IOException e)
         {
             ViewLauncher.getSceneController().killCurrentScreen();
+            return;
         }
 
         if (!bSuccess)
