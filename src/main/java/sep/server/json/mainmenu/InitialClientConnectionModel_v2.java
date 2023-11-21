@@ -57,6 +57,27 @@ public class InitialClientConnectionModel_v2
         return;
     }
 
+    public void sendWelcome(int playerID)
+    {
+        JSONObject j = new JSONObject();
+        j.put("messageType", "Welcome");
+        j.put("messageBody", new JSONObject().put("clientID", playerID));
+
+        try
+        {
+            ci.getBufferedWriter().write(j.toString());
+            ci.getBufferedWriter().newLine();
+            ci.getBufferedWriter().flush();
+        }
+        catch (IOException e)
+        {
+            System.err.printf("[SERVER] Failed to send response to client%n");
+            System.err.printf("[SERVER] %s%n", e.getMessage());
+            return;
+        }
+
+    }
+
     public boolean isClientProtocolVersionValid()
     {
         if (this.response == null)
@@ -90,4 +111,24 @@ public class InitialClientConnectionModel_v2
         }
 
     }
+
+    public String getSessionID()
+    {
+        if (this.response == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            return this.response.getJSONObject("messageBody").getString("group");
+        }
+        catch (JSONException e)
+        {
+            System.err.printf("[SERVER] Failed to parse response from client%n");
+            System.err.printf("[SERVER] %s%n", e.getMessage());
+            return null;
+        }
+    }
+
 }

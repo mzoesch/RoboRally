@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ScrollPane?>
+<AnchorPane
+    id="master-container" stylesheets="@globals.css"
+    fx:controller="sep.view.scenecontrollers.LobbyJFXController_v2"
+    xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+>
+    <children>
+        <Label
+            text="Create Your Player"
+            styleClass="text-2xl" alignment="CENTER"
+            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+        />
+        <AnchorPane
+            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0" AnchorPane.bottomAnchor="0.0"
+        >
+            <children>
+                <HBox
+                    id="form-container" stylesheets="@lobby_v2.css"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                >
+                    <children>
+                        <VBox
+                            fx:id="playerNameContainer"
+                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                        >
+                            <Label
+                                text="Player Name:"
+                                styleClass="text-base"
+                                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                            />
+                            <TextField
+                                promptText="Enter your player name"
+                                id="input-text-field" stylesheets="@lobby_v2.css"
+                                fx:id="playerNameField"
+                            />
+                            <Label
+                                fx:id="formErrorLabel"
+                                styleClass="text-base-error"
+                            />
+                        </VBox>
+                        <HBox
+                            id="player-robot-selector-container" stylesheets="@lobby_v2.css"
+                            fx:id="playerRobotsSelectorContainer"
+                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                        />
+                    </children>
+                </HBox>
+            </children>
+        </AnchorPane>
+        <VBox
+            id="lobby-msg-container" stylesheets="@lobby_v2.css"
+            AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+        >
+            <children>
+                <ScrollPane
+                    id="lobby-msg-scroll-pane" stylesheets="@lobby_v2.css"
+                    fx:id="lobbyMsgScrollPane"
+                />
+                <TextField
+                    promptText="Write to lobby"
+                    id="lobby-msg-input-text-field" stylesheets="@lobby_v2.css"
+                    fx:id="lobbyMsgInputTextField"
+                />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

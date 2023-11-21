@@ -3,7 +3,8 @@ package sep.view.json.mainmenu;
 import org.json.JSONObject;
 import sep.view.json.AResponseModel;
 
-public class CreateSessionModel extends AResponseModel
+/** @deprecated */
+public non-sealed class CreateSessionModel extends AResponseModel
 {
     private final String playerName;
 

@@ -12,56 +12,35 @@
         <AnchorPane BorderPane.alignment="CENTER">
             <children>
                 <Label
-                        text="Robo Rally"
-                        styleClass="text-2xl" alignment="CENTER"
-                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                    text="Robo Rally"
+                    styleClass="text-2xl" alignment="CENTER"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
                 />
-                <VBox
-                        id="vbox-top-right" stylesheets="@main-menu.css"
-                        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-                >
-                    <children>
-                        <TextField
-                                promptText="Enter your player name"
-                                id="input-text-field" stylesheets="@main-menu.css"
-                                fx:id="playerNameField"
-                        />
-                        <TextField
-                                promptText="Enter remote Session-ID"
-                                id="input-text-field" stylesheets="@main-menu.css"
-                                fx:id="sessionIDField"
-                        />
-                        <Label
-                                styleClass="text-base-error"
-                                fx:id="formErrorField"
-                        />
-                    </children>
-                </VBox>
             </children>
         </AnchorPane>
     </top>
     <center>
         <AnchorPane
-                id="btn-container" stylesheets="@main-menu.css"
-                BorderPane.alignment="CENTER"
+            id="btn-container" stylesheets="@main-menu.css"
+            BorderPane.alignment="CENTER"
         >
             <children>
                 <Button
-                        text="HOST"
-                        styleClass="primary-btn"
-                        onAction="#onHostBtn"
-                        AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="0.0"
+                    text="HOST"
+                    styleClass="primary-btn"
+                    onAction="#onHostBtn"
+                    AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="0.0"
                 />
                 <Button
-                        text="JOIN"
-                        styleClass="primary-btn"
-                        onAction="#onJoinBtn"
-                        AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0"
+                    text="JOIN"
+                    styleClass="primary-btn"
+                    onAction="#onJoinBtn"
+                    AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="0.0"
                 />
                 <Label
-                        styleClass="text-xl-error" alignment="CENTER"
-                        fx:id="sessionJoinErrorField"
-                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0"
+                    styleClass="text-xl-error" alignment="CENTER"
+                    fx:id="sessionJoinErrorField"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0"
                 />
             </children>
         </AnchorPane>
@@ -70,10 +49,10 @@
         <AnchorPane BorderPane.alignment="CENTER">
             <children>
                 <Button
-                        text="Exit"
-                        styleClass="danger-btn"
-                        onAction="#onExitBtn"
-                        AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                    text="Exit"
+                    styleClass="danger-btn"
+                    onAction="#onExitBtn"
+                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 />
             </children>
         </AnchorPane>

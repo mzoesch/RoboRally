@@ -1,6 +1,6 @@
 package sep.server.viewmodel;
 
-import sep.server.json.ChatMessageModel;
+import sep.server.json.ChatMsgModel;
 
 /**
  * The interface between the Pawn in the game and the human player controlling it. The Player Controller essentially
@@ -16,23 +16,27 @@ import sep.server.json.ChatMessageModel;
 public final class PlayerController
 {
     private final ClientInstance clientInstance;
-    private final String playerName;
+    private String playerName;
+    private final int playerID;
     private final Session session;
+    private int figure;
 
-    public PlayerController(ClientInstance clientInstance, String playerName, Session session)
+    public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
     {
         super();
 
         this.clientInstance = clientInstance;
         this.playerName = playerName;
+        this.playerID = playerID;
         this.session = session;
+        this.figure = -1;
 
         return;
     }
 
-    public void sendChatMessage(String caller, String message)
+    public void sendChatMessage(int caller, String message, boolean bIsPrivate)
     {
-        new ChatMessageModel(this.clientInstance, caller, message).send();
+        new ChatMsgModel(this.clientInstance, caller, message, bIsPrivate).send();
         return;
     }
 
@@ -44,6 +48,28 @@ public final class PlayerController
     public String getPlayerName()
     {
         return this.playerName;
+    }
+
+    public void setPlayerName(String playerName)
+    {
+        this.playerName = playerName;
+        return;
+    }
+
+    public int getPlayerID()
+    {
+        return this.playerID;
+    }
+
+    public int getFigure()
+    {
+        return this.figure;
+    }
+
+    public void setFigure(int figure)
+    {
+        this.figure = figure;
+        return;
     }
 
     public ClientInstance getClientInstance()

@@ -1,7 +1,6 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
-import sep.view.scenecontrollers.LobbyJFXController;
 import sep.view.viewcontroller.ViewLauncher;
 
 import java.io.IOException;
@@ -103,72 +102,38 @@ public class ServerListener implements Runnable
 
     private void parseJSONRequestFromServer(DefaultServerRequestParser dsrp) throws JSONException
     {
-        try
+        if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {
-            if (Objects.equals(dsrp.getType_v2(), "Alive"))
-            {
-                System.out.printf("[CLIENT] Received keep-alive from server. Responding.%n");
-                try
-                {
-                    GameInstance.respondToKeepAlive();
-                }
-                catch (IOException e)
-                {
-                    GameInstance.handleServerDisconnect();
-                    return;
-                }
-
-                return;
-            }
-        }
-        catch (JSONException e)
-        {
-//            System.out.println("not v2");
-        }
-
-        if (Objects.equals(dsrp.getType(), "chatMessage"))
-        {
-            // TODO To interface which controllers can receive chat messages.
-            LobbyJFXController ctrl;
+            System.out.printf("[CLIENT] Received keep-alive from server. Responding.%n");
             try
             {
-                ctrl = (LobbyJFXController) ViewLauncher.getSceneController().getCurrentController();
+                GameInstance.respondToKeepAlive();
             }
-            catch (ClassCastException e)
+            catch (IOException e)
             {
-                System.err.println("[CLIENT] Failed to cast controller to LobbyFXController.");
-                System.err.println(e.getMessage());
+                GameInstance.handleServerDisconnect();
                 return;
             }
-
-            ctrl.addMessage(dsrp.getCaller(), dsrp.getChatMessage());
 
             return;
         }
 
-        if (Objects.equals(dsrp.getType(), "sessionState"))
+        if (Objects.equals(dsrp.getType_v2(), "PlayerAdded"))
         {
-            // TODO To interface which controllers can receive session state updates.
-            LobbyJFXController ctrl;
-            try
-            {
-                ctrl = (LobbyJFXController) ViewLauncher.getSceneController().getCurrentController();
-            }
-            catch (ClassCastException e)
-            {
-                System.err.println("[CLIENT] Failed to cast controller to LobbyFXController.");
-                System.err.println(e.getMessage());
-                return;
-            }
+            System.out.printf("[CLIENT] Received player added from server.%n");
+            EGameState.addRemotePlayer(dsrp);
+            return;
+        }
 
-            EGameState.INSTANCE.update(dsrp);
-            ctrl.updatePlayerNames();
-
+        if (Objects.equals(dsrp.getType_v2(), "ReceivedChat"))
+        {
+            System.out.printf("[CLIENT] Received chat message from server.%n");
+            ViewLauncher.handleChatMessage(dsrp);
             return;
         }
 
         System.err.println("[CLIENT] Received unknown request from server.");
-        System.err.println(dsrp.getRequest().toString(1));
+        System.err.println(dsrp.getRequest().toString(2));
 
         return;
     }

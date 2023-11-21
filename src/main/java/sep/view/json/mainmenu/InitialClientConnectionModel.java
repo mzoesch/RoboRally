@@ -7,8 +7,14 @@ import org.json.JSONObject;
 import org.json.JSONException;
 import java.io.IOException;
 
-public class InitialClientConnectionModel
+public final class InitialClientConnectionModel
 {
+    private InitialClientConnectionModel() throws IllegalStateException
+    {
+        super();
+        throw new IllegalStateException("Utility class");
+    }
+
     public static boolean checkServerProtocolVersion(JSONObject jsonObject) throws JSONException
     {
         if (!jsonObject.getString("messageType").equals("HelloClient"))
@@ -34,6 +40,18 @@ public class InitialClientConnectionModel
         GameInstance.sendServerRequest(j);
 
         return;
+    }
+
+    public static boolean checkPlayerID(JSONObject welcome) throws JSONException
+    {
+        if (!welcome.getString("messageType").equals("Welcome"))
+        {
+            return false;
+        }
+
+        EClientInformation.INSTANCE.setPlayerID(welcome.getJSONObject("messageBody").getInt("clientID"));
+
+        return true;
     }
 
 }

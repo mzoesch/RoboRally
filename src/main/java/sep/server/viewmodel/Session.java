@@ -1,8 +1,9 @@
 package sep.server.viewmodel;
 
-import sep.server.json.SessionStateModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
+import sep.server.json.lobby.PlayerValuesModel;
+import sep.server.json.ChatMsgModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -15,10 +16,9 @@ import java.util.UUID;
  */
 public final class Session
 {
+    /** @deprecated */
     private static final int SESSION_ID_LENGTH = 5;
 
-    /** May have more rights. (Initial game-start and change the config of it.) */
-    private PlayerController hostPlayerController;
     private final ArrayList<PlayerController> playerControllers;
     private final String sessionID;
 
@@ -26,11 +26,16 @@ public final class Session
 
     public Session()
     {
+        this(Session.generateSessionID());
+        return;
+    }
+
+    public Session(String sessionID)
+    {
         super();
 
-        this.hostPlayerController = null;
         this.playerControllers = new ArrayList<PlayerController>();
-        this.sessionID = Session.generateSessionID();
+        this.sessionID = sessionID;
         this.gameState = new GameState();
 
         return;
@@ -57,29 +62,14 @@ public final class Session
         return sessionID;
     }
 
-    public PlayerController getHostPlayerController()
-    {
-        return hostPlayerController;
-    }
-
-    public void setHostPlayerController(PlayerController hostPlayerController)
-    {
-        this.hostPlayerController = hostPlayerController;
-        return;
-    }
-
     public void joinSession(PlayerController playerController)
     {
         this.playerControllers.add(playerController);
-
-        if (this.hostPlayerController == null)
-        {
-            this.hostPlayerController = playerController;
-        }
-
         return;
     }
 
+    // TODO We handle the leaving player logic here. But we can not inform other clients about it. Because
+    //      we do not have the protocol for it yet.
     public void leaveSession(PlayerController playerController)
     {
         this.playerControllers.remove(playerController);
@@ -90,18 +80,12 @@ public final class Session
             return;
         }
 
-        if (this.hostPlayerController == playerController)
-        {
-            this.hostPlayerController = this.playerControllers.get(0);
-        }
-
-        this.broadcastChatMessage("SERVER", String.format("%s left the session.", playerController.getPlayerName()));
-        this.replicateSessionStateToClients();
+//        this.broadcastChatMessage("SERVER", String.format("%s left the session.", playerController.getPlayerName()));
 
         return;
     }
 
-    public void broadcastChatMessage(String caller, String message)
+    public void broadcastChatMessage(int caller, String message)
     {
         // TODO Validate message.
         if (message.isEmpty())
@@ -111,7 +95,7 @@ public final class Session
 
         for (PlayerController PC : this.playerControllers)
         {
-            PC.sendChatMessage(caller, message);
+            PC.sendChatMessage(caller, message, false);
             continue;
         }
 
@@ -136,28 +120,29 @@ public final class Session
         return;
     }
 
-    public void defaultBehaviourAfterPostLogin(PlayerController playerController)
+    public void defaultBehaviourAfterPostLogin(PlayerController newPC)
     {
-        this.broadcastChatMessage("SERVER", String.format("%s joined the session.", playerController.getPlayerName()));
-        this.replicateSessionStateToClients();
-
-        return;
-    }
-
-    private void replicateSessionStateToClients()
-    {
-        String[] playerNames = new String[this.playerControllers.size()];
-        for (int i = 0; i < this.playerControllers.size(); i++)
-        {
-            playerNames[i] = this.playerControllers.get(i).getPlayerName();
-            continue;
-        }
-
+        // Sending all current player values to the new client.
         for (PlayerController PC : this.playerControllers)
         {
-            new SessionStateModel(PC.getClientInstance(), playerNames, this.hostPlayerController.getPlayerName()).send();
+            new PlayerValuesModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
             continue;
         }
+
+        // Sending information about the new client to all other clients.
+        for (PlayerController PC : this.playerControllers)
+        {
+            if (PC.getPlayerID() == newPC.getPlayerID())
+            {
+                continue;
+            }
+
+            new PlayerValuesModel(PC, newPC.getPlayerID(), newPC.getPlayerName(), newPC.getFigure()).send();
+
+            continue;
+        }
+
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s joined the session.", newPC.getPlayerName()));
 
         return;
     }
@@ -176,5 +161,38 @@ public final class Session
 
         return false;
     }
-}
 
+    public void sendPlayerValuesToAllClients(PlayerController changedPC)
+    {
+        for (PlayerController PC : this.playerControllers)
+        {
+            new PlayerValuesModel(PC, changedPC.getPlayerID(), changedPC.getPlayerName(), changedPC.getFigure()).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void handleChatMessage(PlayerController playerController, String chatMessageV2, int receiverID)
+    {
+        if (receiverID == ChatMsgModel.CHAT_MSG_BROADCAST)
+        {
+            this.broadcastChatMessage(playerController.getPlayerID(), chatMessageV2);
+            return;
+        }
+
+        for (PlayerController PC : this.playerControllers)
+        {
+            if (PC.getPlayerID() == receiverID)
+            {
+                PC.sendChatMessage(playerController.getPlayerID(), chatMessageV2, true);
+                return;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
+}

@@ -56,6 +56,25 @@ public enum EServerInformation
         return;
     }
 
+    public Session getNewOrExistingSessionID(String sessionID)
+    {
+        if (this.isSessionIDValid(sessionID))
+        {
+            return this.getSessionByID(sessionID);
+        }
+
+        return this.createNewSession(sessionID);
+    }
+
+    /** This method will not check if the session ID is valid. */
+    public Session createNewSession(String sessionID)
+    {
+        Session s = new Session(sessionID);
+        this.sessions.add(s);
+        return s;
+    }
+
+    /** @deprecated */
     public String createNewSession()
     {
         Session s = new Session();

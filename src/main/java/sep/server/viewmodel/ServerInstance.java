@@ -3,6 +3,7 @@ package sep.server.viewmodel;
 import sep.server.model.EServerInformation;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /** Implements methods relevant to the server itself. */
 public final class ServerInstance
@@ -66,9 +67,19 @@ public final class ServerInstance
         return ServerInstance.INSTANCE.SERVER_LISTENER;
     }
 
-    public static PlayerController createNewPlayerController(ClientInstance clientInstance, String playerName, Session session)
+    public static PlayerController createNewPlayerController(ClientInstance clientInstance, Session session)
     {
-        return new PlayerController(clientInstance, playerName, session);
+        return new PlayerController(clientInstance, ServerInstance.createAnonymousPlayerName(), ServerInstance.createPlayerID(), session);
+    }
+
+    private static int createPlayerID()
+    {
+        return Math.abs(UUID.randomUUID().hashCode());
+    }
+
+    private static String createAnonymousPlayerName()
+    {
+        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0,4));
     }
 
 }

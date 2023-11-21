@@ -13,26 +13,16 @@ import java.io.IOException;
 /** JavaFX controller for the main menu screen. Handles session creation and joining. */
 public class MainMenuJFXController
 {
-    @FXML private TextField playerNameField;
-    @FXML private TextField sessionIDField;
-    @FXML private Label formErrorField;
     @FXML private Label sessionJoinErrorField;
 
     @FXML
     protected void onHostBtn(ActionEvent actionEvent) throws IOException
     {
-        this.formErrorField.setText("");
         this.sessionJoinErrorField.setText("");
 
-        if (this.isPlayerNameInvalid(this.getPlayerName()))
+        if (GameInstance.connectToServer())
         {
-            this.formErrorField.setText(String.format("Invalid player name (max %d characters).", GameInstance.MAX_PLAYER_NAME_LENGTH));
-            return;
-        }
-
-        if (GameInstance.connectToNewSession(this.getPlayerName()))
-        {
-            ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY, true);
+            ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
             return;
         }
 
@@ -45,24 +35,11 @@ public class MainMenuJFXController
     @FXML
     protected void onJoinBtn(ActionEvent actionEvent) throws IOException
     {
-        this.formErrorField.setText("");
         this.sessionJoinErrorField.setText("");
 
-        if (this.isPlayerNameInvalid(this.getPlayerName()))
+        if (GameInstance.connectToServer())
         {
-            this.formErrorField.setText(String.format("Invalid player name (max %d characters).", GameInstance.MAX_PLAYER_NAME_LENGTH));
-            return;
-        }
-
-        if (!this.isLobbyIDValid(this.getLobbyID()))
-        {
-            this.formErrorField.setText("Invalid lobby ID.");
-            return;
-        }
-
-        if (GameInstance.connectToExistingSession(this.getPlayerName(), this.getLobbyID()))
-        {
-            ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY, true);
+            ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
             return;
         }
 
@@ -77,33 +54,6 @@ public class MainMenuJFXController
     {
         GameInstance.kill();
         return;
-    }
-
-    @FXML
-    private void initialize()
-    {
-        // TODO Load the username from the last game session if available.
-        return;
-    }
-
-    private boolean isPlayerNameInvalid(String name)
-    {
-        return name.isEmpty() || name.length() > GameInstance.MAX_PLAYER_NAME_LENGTH;
-    }
-
-    private boolean isLobbyIDValid(String id)
-    {
-        return id.length() == GameInstance.SESSION_ID_LENGTH;
-    }
-
-    private String getPlayerName()
-    {
-        return this.playerNameField.getText();
-    }
-
-    private String getLobbyID()
-    {
-        return this.sessionIDField.getText();
     }
 
 }

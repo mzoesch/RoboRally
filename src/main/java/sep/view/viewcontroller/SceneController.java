@@ -23,6 +23,7 @@ public class SceneController
 
     public static final String PATH_TO_MAIN_MENU = "main-menu.fxml";
     public static final String PATH_TO_LOBBY = "lobby.fxml";
+    public static final String PATH_TO_LOBBY_V2 = "lobby_v2.fxml";
 
     /** The scene where we apply different screens (panes). */
     private final Scene masterScene;
@@ -82,7 +83,7 @@ public class SceneController
         catch (IOException e)
         {
             System.err.printf("[CLIENT] Failed to load FXML file at %s.%n", path);
-            System.err.printf("%s%n", e.getMessage());
+            System.err.printf("[CLIENT] %s%n", e.getMessage());
             GameInstance.kill();
             return;
         }

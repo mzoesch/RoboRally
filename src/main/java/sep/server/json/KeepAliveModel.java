@@ -46,6 +46,8 @@ public class KeepAliveModel implements IJSONModel
             System.err.printf("[SERVER] %s%n", e.getMessage());
             return;
         }
+
+        return;
     }
 
 }

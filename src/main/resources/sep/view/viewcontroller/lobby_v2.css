@@ -1,0 +1,64 @@
+#form-container {
+    -fx-spacing: 8px;
+}
+
+#input-text-field {
+    -fx-min-width: 100px;
+    -fx-max-width: 200px;
+
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+
+    -fx-pref-width: 200px;
+}
+
+#player-robot-selector-container {
+    -fx-alignment: top-center;
+    -fx-spacing: 16px;
+}
+
+#player-robot-selector-wrapper {
+    -fx-spacing: 5px;
+}
+
+#player-robot-player-name-wrapper {
+    -fx-alignment: center;
+}
+
+#lobby-msg-container {
+    -fx-min-width: 400px;
+    -fx-min-height: 400px;
+    -fx-max-width: 400px;
+    -fx-max-height: 400px;
+}
+
+#lobby-msg-scroll-pane {}
+
+#lobby-msg-input-text-field {}
+
+.lobby-msg-wrapper {
+    -fx-spacing: 8px;
+}
+.lobby-msg-whisper,
+.lobby-msg-server,
+.lobby-msg-client,
+.lobby-msg {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: #000000ff;
+    -fx-wrap-text: true;
+}
+.lobby-msg-whisper {
+    -fx-text-fill: #000000b2;
+}
+.lobby-msg-server {
+    -fx-text-fill: #a17800;
+}
+.lobby-msg-client {
+    -fx-text-fill: #0078a1;
+}

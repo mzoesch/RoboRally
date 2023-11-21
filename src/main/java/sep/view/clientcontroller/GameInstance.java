@@ -1,12 +1,11 @@
 package sep.view.clientcontroller;
 
-import sep.view.json.mainmenu.CreateSessionModel;
-import sep.view.json.mainmenu.PostLoginConfirmationModel;
-import sep.view.json.mainmenu.JoinSessionModel;
 import sep.view.json.mainmenu.InitialClientConnectionModel;
 
 import javafx.application.Platform;
 import java.io.IOException;
+import java.util.Objects;
+
 import org.json.JSONObject;
 import org.json.JSONException;
 import sep.view.viewcontroller.ViewLauncher;
@@ -51,20 +50,33 @@ public class GameInstance
         return;
     }
 
-    private static boolean defaultProtocolForEstablishingAServerConnection() throws IOException, JSONException
+    public static boolean connectToServer() throws IOException
     {
-        if (!EClientInformation.INSTANCE.establishAServerConnection())
+        if (EClientInformation.INSTANCE.hasServerConnection())
+        {
+            System.out.printf("[CLIENT] Client is already connected to a server.%n");
+            return false;
+        }
+
+        return EClientInformation.INSTANCE.establishAServerConnection();
+    }
+
+    /** Called after the client loaded the lobby screen. */
+    public static boolean connectToSessionPostLogin() throws IOException, JSONException
+    {
+        if (!EClientInformation.INSTANCE.hasServerConnection())
+        {
+            System.out.printf("[CLIENT] Client is not connected to a server.%n");
+            return false;
+        }
+
+        JSONObject serverProtocolVersion = GameInstance.waitForServerResponse();
+        if (serverProtocolVersion == null)
         {
             return false;
         }
 
-        JSONObject j = GameInstance.waitForServerResponse();
-        if (j == null)
-        {
-            return false;
-        }
-
-        boolean bOk = InitialClientConnectionModel.checkServerProtocolVersion(j);
+        boolean bOk = InitialClientConnectionModel.checkServerProtocolVersion(serverProtocolVersion);
         if (!bOk)
         {
             System.out.printf("[CLIENT] Server protocol version mismatch.%n");
@@ -72,99 +84,24 @@ public class GameInstance
         }
 
         InitialClientConnectionModel.sendProtocolVersionConfirmation();
+        System.out.printf("[CLIENT] Server protocol version confirmed.%n");
+
+        JSONObject welcome = GameInstance.waitForServerResponse();
+        if (welcome == null)
+        {
+            return false;
+        }
+        bOk = InitialClientConnectionModel.checkPlayerID(welcome);
+        if (!bOk)
+        {
+            System.out.printf("[CLIENT] Failed to retrieve player ID.%n");
+            return false;
+        }
+        System.out.printf("[CLIENT] Player ID received (%d).%n", EClientInformation.INSTANCE.getPlayerID());
+
+        EClientInformation.INSTANCE.listen();
 
         return true;
-    }
-
-    public static boolean connectToNewSession(String playerName) throws IOException
-    {
-        System.out.printf("[CLIENT] Trying to connect client to new session.%n");
-
-        if (GameInstance.defaultProtocolForEstablishingAServerConnection())
-        {
-            System.out.printf("[CLIENT] Successfully connected to server.%n");
-
-            // DEPRECATED
-            CreateSessionModel model = new CreateSessionModel(playerName);
-            model.send();
-
-            model.waitForResponse();
-            if (model.getResponse() == null)
-            {
-                return false;
-            }
-
-            if (model.isConnectionStateInvalid())
-            {
-                GameInstance.handleServerDisconnect();
-                EClientInformation.INSTANCE.getStdServerErrPipeline().setLength(0);
-                EClientInformation.INSTANCE.getStdServerErrPipeline().append(model.getErrorMessage());
-
-                return false;
-            }
-
-            EClientInformation.INSTANCE.setConnectedSessionID(model.getSessionID());
-            EClientInformation.INSTANCE.setPlayerName(playerName);
-
-            EClientInformation.INSTANCE.listen();
-
-            System.out.printf("[CLIENT] Successfully connected to new session (%s).%n", model.getSessionID());
-
-            return true;
-        }
-
-        System.out.printf("[CLIENT] Failed to connect to server.%n");
-
-        return false;
-    }
-
-    public static boolean connectToExistingSession(String playerName, String sessionID) throws IOException
-    {
-        System.out.printf("[CLIENT] Trying to connect client to existing session.%n");
-
-        if (GameInstance.defaultProtocolForEstablishingAServerConnection())
-        {
-            System.out.printf("[CLIENT] Successfully connected to server.%n");
-
-            // DEPRECATED
-            JoinSessionModel model = new JoinSessionModel(playerName, sessionID);
-            model.send();
-
-            model.waitForResponse();
-            if (model.getResponse() == null)
-            {
-                return false;
-            }
-
-            if (model.isConnectionStateInvalid())
-            {
-                GameInstance.handleServerDisconnect();
-                EClientInformation.INSTANCE.getStdServerErrPipeline().setLength(0);
-                EClientInformation.INSTANCE.getStdServerErrPipeline().append(model.getErrorMessage());
-
-                return false;
-            }
-
-            EClientInformation.INSTANCE.setConnectedSessionID(model.getSessionID());
-            EClientInformation.INSTANCE.setPlayerName(playerName);
-
-            EClientInformation.INSTANCE.listen();
-
-            System.out.printf("[CLIENT] Successfully connected to existing session (%s).%n", sessionID);
-
-            return true;
-        }
-
-        System.out.printf("[CLIENT] Failed to connect to server.%n");
-
-        return false;
-    }
-
-    /** Called after the client loaded into the lobby. */
-    public static void connectToSessionPostLogin() throws IOException
-    {
-        PostLoginConfirmationModel.sendPositive(EClientInformation.INSTANCE.getBufferedWriter());
-        return;
     }
 
     public static void handleServerDisconnect()

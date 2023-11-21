@@ -5,7 +5,8 @@ import sep.view.clientcontroller.GameInstance;
 import org.json.JSONObject;
 import java.io.IOException;
 
-public abstract class AResponseModel
+/** @deprecated */
+public abstract sealed class AResponseModel permits sep.view.json.mainmenu.CreateSessionModel, sep.view.json.mainmenu.JoinSessionModel
 {
     protected JSONObject response;
 

@@ -19,34 +19,39 @@ public class DefaultServerRequestParser
         return this.request;
     }
 
-    public String getType() throws JSONException
-    {
-        return this.request.getString("type");
-    }
-
-    public String getCaller() throws JSONException
-    {
-        return this.request.getString("caller");
-    }
-
-    public String getChatMessage() throws JSONException
-    {
-        return this.request.getString("message");
-    }
-
-    public String[] getPlayerNames() throws JSONException
-    {
-        return this.request.getJSONArray("playerNames").toList().toArray(new String[0]);
-    }
-
-    public String getHostPlayerName() throws JSONException
-    {
-        return this.request.getString("hostPlayerName");
-    }
-
     public String getType_v2() throws JSONException
     {
         return this.request.getString("messageType");
+    }
+
+    public int getPlayerID() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("clientID");
+    }
+
+    public String getPlayerName() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("name");
+    }
+
+    public int getFigureID() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("figure");
+    }
+
+    public boolean isChatMsgPrivate() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getBoolean("isPrivate");
+    }
+
+    public String getChatMsg() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("message");
+    }
+
+    public int getChatMsgSourceID() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("from");
     }
 
 }

@@ -2,7 +2,8 @@ package sep.view.json;
 
 import org.json.JSONObject;
 
-public class ChatMessageModel extends AServerRequestModel
+/** @deprecated */
+public final class ChatMessageModel extends AServerRequestModel
 {
     public static final int MAX_MESSAGE_LENGTH = 64;
 

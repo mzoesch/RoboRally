@@ -20,18 +20,35 @@ public class DefaultClientRequestParser
         return this.request;
     }
 
-    public String getType() throws JSONException
+    public Object getType_v2() throws JSONException
     {
-        return this.request.getString("type");
+        return this.request.get("messageType");
     }
 
+    /** @deprecated */
     public String getChatMessage() throws JSONException
     {
         return this.request.getString("message");
     }
 
-    public Object getType_v2()
+    public String getChatMessage_v2() throws JSONException
     {
-        return this.request.get("messageType");
+        return this.request.getJSONObject("messageBody").getString("message");
     }
+
+    public int getReceiverID() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("to");
+    }
+
+    public String getPlayerName() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("name");
+    }
+
+    public int getFigureID()
+    {
+        return this.request.getJSONObject("messageBody").getInt("figure");
+    }
+
 }

@@ -38,6 +38,7 @@ public enum EClientInformation
 
     private String connectedLobbyID;
     private String playerName;
+    private int playerID;
 
     private EClientInformation()
     {
@@ -97,13 +98,15 @@ public enum EClientInformation
     {
         if (this.serverListener != null)
         {
-            System.err.println("[CLIENT] ServerListener already initialized.");
+            System.err.printf("[CLIENT] ServerListener already initialized.%n");
             return;
         }
 
         this.executorService = Executors.newFixedThreadPool(1);
         this.serverListener = new ServerListener(this.socket, this.inputStreamReader, this.bufferedReader);
         this.executorService.execute(this.serverListener);
+
+        System.out.printf("[CLIENT] Now listening for standard server responses.%n");
 
         return;
     }
@@ -180,6 +183,17 @@ public enum EClientInformation
         return this.playerName;
     }
 
+    public void setPlayerID(int playerID)
+    {
+        this.playerID = playerID;
+        return;
+    }
+
+    public int getPlayerID()
+    {
+        return this.playerID;
+    }
+
     public void resetServerConnectionAfterDisconnect()
     {
         this.socket = null;
@@ -193,6 +207,11 @@ public enum EClientInformation
         this.playerName = null;
 
         return;
+    }
+
+    public boolean hasServerConnection()
+    {
+        return this.socket != null && this.bufferedReader != null && this.bufferedWriter != null;
     }
 
 }

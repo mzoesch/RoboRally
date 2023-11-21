@@ -4,6 +4,7 @@ import org.json.JSONObject;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+/** @deprecated */
 public class PostLoginConfirmationModel
 {
     public static void sendPositive(BufferedWriter bufferedWriter) throws IOException

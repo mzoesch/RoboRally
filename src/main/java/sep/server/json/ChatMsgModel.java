@@ -5,21 +5,25 @@ import sep.server.viewmodel.ClientInstance;
 import org.json.JSONObject;
 import java.io.IOException;
 
-public class ChatMessageModel implements IJSONModel
+public class ChatMsgModel implements IJSONModel
 {
     public static final int MAX_MESSAGE_LENGTH = 64;
+    public static final int CHAT_MSG_BROADCAST = -1;
+    public static final int SERVER_ID = 0;
 
     private final ClientInstance clientInstance;
-    private final String caller;
+    private final int caller;
     private final String message;
+    private final boolean bIsPrivate;
 
-    public ChatMessageModel(ClientInstance clientInstance, String caller, String message)
+    public ChatMsgModel(ClientInstance clientInstance, int caller, String message, boolean bIsPrivate)
     {
         super();
 
         this.clientInstance = clientInstance;
         this.caller = caller;
         this.message = message;
+        this.bIsPrivate = bIsPrivate;
 
         return;
     }
@@ -27,12 +31,16 @@ public class ChatMessageModel implements IJSONModel
     @Override
     public JSONObject toJSON()
     {
-        JSONObject json = new JSONObject();
-        json.put("type", "chatMessage");
-        json.put("caller", this.caller);
-        json.put("message", this.message);
+        JSONObject body = new JSONObject();
+        body.put("message", this.message);
+        body.put("from", this.caller);
+        body.put("isPrivate", this.bIsPrivate);
 
-        return json;
+        JSONObject j = new JSONObject();
+        j.put("messageType", "ReceivedChat");
+        j.put("messageBody", body);
+
+        return j;
     }
 
     @Override

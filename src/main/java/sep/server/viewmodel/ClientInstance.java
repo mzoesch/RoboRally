@@ -1,5 +1,6 @@
 package sep.server.viewmodel;
 
+import sep.server.json.ChatMsgModel;
 import sep.server.json.mainmenu.InitialClientConnectionModel;
 import sep.server.json.mainmenu.InitialClientConnectionModel_v2;
 import sep.server.json.DefaultClientRequestParser;
@@ -106,133 +107,24 @@ public final class ClientInstance implements Runnable
     {
         InitialClientConnectionModel_v2 icc = new InitialClientConnectionModel_v2(this);
         icc.sendProtocolVersion();
+
         icc.waitForProtocolVersionConfirmation();
         boolean isValid = icc.isClientProtocolVersionValid();
-
         if (!isValid)
         {
             return false;
         }
 
-        while (true)
-        {
-            int escapeCharacter;
-            try
-            {
-                escapeCharacter = this.bufferedReader.read();
-            }
-            catch (SocketException e)
-            {
-                this.handleDisconnect();
-                System.out.printf("[SERVER] Client %s disconnected unexpectedly.%n", this.socket.getInetAddress());
-                return false;
-            }
-            // If the client closed the connection in an orderly way, the server will receive -1.
-            if (escapeCharacter == -1)
-            {
-                this.handleDisconnect();
-                return false;
-            }
+        // TODO Check if session id is valid.
+        Session s = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
+        this.playerController = ServerInstance.createNewPlayerController(this, s);
+        icc.sendWelcome(this.playerController.getPlayerID());
+        this.playerController.getSession().joinSession(this.playerController);
+        this.bIsRegistered = true;
 
-            InitialClientConnectionModel iccd;
-            try
-            {
-                // We need to do this because we already read the first character.
-                iccd = new InitialClientConnectionModel(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
-            }
-            catch (JSONException e)
-            {
-                System.err.printf("[SERVER] Failed to parse JSON request from client %s. Ignoring.%n", this.socket.getInetAddress());
-                System.err.printf("%s%n", e.getMessage());
-                continue;
-            }
+        System.out.println("[SERVER] Client registered successfully.");
 
-            try
-            {
-                if (Objects.equals(iccd.getConnectionMethod(), "createSession"))
-                {
-                    System.out.printf("[SERVER] Client %s requested to create a new session.%n", this.socket.getInetAddress());
-                    String sessionID = EServerInformation.INSTANCE.createNewSession();
-                    this.playerController = ServerInstance.createNewPlayerController(this, iccd.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(sessionID));
-                    this.playerController.getSession().joinSession(this.playerController);
-                    this.bIsRegistered = true;
-
-                    InitialClientConnectionModel.sendPositive(this.bufferedWriter, sessionID);
-                    System.out.printf("[SERVER] Client %s is now registered in session %s.%n", this.socket.getInetAddress(), sessionID);
-
-                    return true;
-                }
-
-                if (Objects.equals(iccd.getConnectionMethod(), "joinSession"))
-                {
-                    System.out.printf("[SERVER] Client %s requested to join %s session.%n", this.socket.getInetAddress(), iccd.getSessionID());
-                    // TODO More validation checks
-                    if (!EServerInformation.INSTANCE.isSessionIDValid(iccd.getSessionID()))
-                    {
-                        System.out.printf("[SERVER] Client %s requested to join an invalid session %s.%n", this.socket.getInetAddress(), iccd.getSessionID());
-                        InitialClientConnectionModel.sendNegative(this.bufferedWriter, "ID does not exist.");
-                        return false;
-                    }
-                    if (Objects.requireNonNull(EServerInformation.INSTANCE.getSessionByID(iccd.getSessionID())).isPlayerNameInSession(iccd.getPlayerName()))
-                    {
-                        System.out.printf("[SERVER] Client %s requested to join a session with an invalid name.%n", this.socket.getInetAddress());
-                        InitialClientConnectionModel.sendNegative(this.bufferedWriter, "Player name already exists.");
-                        return false;
-                    }
-                    this.playerController = ServerInstance.createNewPlayerController(this, iccd.getPlayerName(), EServerInformation.INSTANCE.getSessionByID(iccd.getSessionID()));
-                    this.playerController.getSession().joinSession(this.playerController);
-                    this.bIsRegistered = true;
-
-                    InitialClientConnectionModel.sendPositive(this.bufferedWriter, iccd.getSessionID());
-                    System.out.printf("[SERVER] Client %s is now registered in session %s.%n", this.socket.getInetAddress(), iccd.getSessionID());
-
-                    return true;
-                }
-            }
-            catch (JSONException e)
-            {
-                System.err.printf("[SERVER] Failed to parse JSON request from client %s. Ignoring.%n", this.socket.getInetAddress());
-                System.err.printf("%s%n", e.getMessage());
-                continue;
-            }
-
-            System.out.printf("[SERVER] Received unknown JSON from client.%n");
-            System.out.printf("%s%n", iccd.getJSON().toString(1));
-
-            continue;
-        }
-    }
-
-    /** @deprecated */
-    private boolean waitForPostLoginConfirmation()
-    {
-        // TODO Handle timeout
-        try
-        {
-            // If the client closed the connection in an orderly way, the server will receive -1.
-            int escapeCharacter = this.bufferedReader.read();
-            if (escapeCharacter == -1)
-            {
-                this.handleDisconnect();
-                return false;
-            }
-
-            // We need to do this because we already read the first character.
-            InitialClientConnectionModel icc = new InitialClientConnectionModel(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
-            return Objects.equals(icc.getConnectionMethod(), "postLoginConfirmation");
-        }
-        catch (IOException e)
-        {
-            System.err.printf("[SERVER] Failed to read from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
-            System.err.printf("%s%n", e.getMessage());
-            return false;
-        }
-        catch (JSONException e)
-        {
-            System.err.printf("[SERVER] Received invalid JSON from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
-            System.err.printf("%s%n", e.getMessage());
-            return false;
-        }
+        return true;
     }
 
     /**
@@ -268,28 +160,38 @@ public final class ClientInstance implements Runnable
 
     private boolean parseRequest(DefaultClientRequestParser dcrp) throws JSONException
     {
-        try
+        if (Objects.equals(dcrp.getType_v2(), "Alive"))
         {
-            if (Objects.equals(dcrp.getType_v2(), "Alive"))
-            {
-                System.out.printf("[SERVER] Ok keep-alive from client %s.%n", this.socket.getInetAddress());
-                this.setAlive(true);
-                return true;
-            }
-        }
-        catch (JSONException e)
-        {
-            System.out.println("not v2");
-        }
-
-        if (Objects.equals(dcrp.getType(), "chatMessage"))
-        {
-            System.out.printf("[SERVER] Client %s sent chat message %s.%n", this.socket.getInetAddress(), dcrp.getChatMessage());
-            this.playerController.getSession().broadcastChatMessage(this.playerController.getPlayerName(), dcrp.getChatMessage());
+            System.out.printf("[SERVER] Ok keep-alive from client %s.%n", this.socket.getInetAddress());
+            this.setAlive(true);
             return true;
         }
 
-        // etc.
+        if (Objects.equals(dcrp.getType_v2(), "PlayerValues"))
+        {
+            String oldName = this.playerController.getPlayerName();
+
+            // TODO We have to do some validation here.
+            this.playerController.setPlayerName(dcrp.getPlayerName());
+            this.playerController.setFigure(dcrp.getFigureID());
+            System.out.printf("[SERVER] Player %s selected figure %d.%n", this.playerController.getPlayerName(), this.playerController.getFigure());
+
+            this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
+            if (!Objects.equals(oldName, this.playerController.getPlayerName()))
+            {
+                this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oldName, this.playerController.getPlayerName()));
+            }
+
+            return true;
+        }
+
+        if (Objects.equals(dcrp.getType_v2(), "SendChat"))
+        {
+            // TODO Validate chat message.
+            this.playerController.getSession().handleChatMessage(this.playerController, dcrp.getChatMessage_v2(), dcrp.getReceiverID());
+
+            return true;
+        }
 
         return false;
     }
@@ -317,31 +219,10 @@ public final class ClientInstance implements Runnable
                 return;
             }
 
-            // DEPRECATED
-            if (escapeCharacter == ClientInstance.ESCAPE_CHARACTER)
-            {
-                System.out.printf("[SERVER] Received escape character from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
-                this.handleDisconnect();
-                break;
-            }
-
-            DefaultClientRequestParser dcrp;
-            try
-            {
-                // We need to do this because we already read the first character.
-                dcrp = new DefaultClientRequestParser(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine())));
-            }
-            catch (JSONException e)
-            {
-                System.err.printf("[SERVER] Received invalid JSON from client %s. Ignoring.%n", this.socket.getInetAddress());
-                System.err.println(e.getMessage());
-                continue;
-            }
-
             boolean bAccepted;
             try
             {
-                bAccepted = this.parseRequest(dcrp);
+                bAccepted = this.parseRequest(new DefaultClientRequestParser(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine()))));
             }
             catch (JSONException e)
             {
@@ -350,15 +231,14 @@ public final class ClientInstance implements Runnable
                 continue;
             }
 
-            if (!bAccepted)
+            if (bAccepted)
             {
-                System.err.printf("%s%n", dcrp.getRequest().toString(1));
+                continue;
             }
 
+            System.err.println("[SERVER] Received unknown request from client. Ignoring.");
             continue;
         }
-
-        return;
     }
 
     /** Life-cycle of a client connection. */
@@ -370,13 +250,6 @@ public final class ClientInstance implements Runnable
             boolean bSuccess = this.registerClient();
 
             if (!bSuccess)
-            {
-                this.handleDisconnect();
-                return;
-            }
-
-            boolean bPostLoginConfirmation = this.waitForPostLoginConfirmation();
-            if (!bPostLoginConfirmation)
             {
                 this.handleDisconnect();
                 return;
@@ -420,6 +293,11 @@ public final class ClientInstance implements Runnable
     {
         this.bIsAlive = bIsAlive;
         return;
+    }
+
+    public PlayerController getPlayerController()
+    {
+        return this.playerController;
     }
 
 }
