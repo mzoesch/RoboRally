@@ -26,6 +26,7 @@ import javafx.scene.input.KeyCode;
 
 public class LobbyJFXController_v2
 {
+    @FXML private Label sessionIDLabel;
     @FXML private TextField lobbyMsgInputTextField;
     @FXML private ScrollPane lobbyMsgScrollPane;
     private VBox lobbyMsgContainer;
@@ -159,6 +160,8 @@ public class LobbyJFXController_v2
         {
             ViewLauncher.getSceneController().killCurrentScreen();
         }
+
+        this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
 
         return;
     }

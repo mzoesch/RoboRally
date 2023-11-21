@@ -36,7 +36,8 @@ public enum EClientInformation
 
     public GameInstance JFX_INSTANCE;
 
-    private String connectedLobbyID;
+    private String connectedSessionID;
+    private String preferredSessionID;
     private String playerName;
     private int playerID;
 
@@ -53,8 +54,9 @@ public enum EClientInformation
         this.serverListener = null;
         this.executorService = null;
 
-        this.connectedLobbyID = null;
+        this.connectedSessionID = null;
         this.playerName = null;
+        this.preferredSessionID = "";
 
         return;
     }
@@ -133,13 +135,13 @@ public enum EClientInformation
 
     public void setConnectedSessionID(String connectedLobbyID)
     {
-        this.connectedLobbyID = connectedLobbyID;
+        this.connectedSessionID = connectedLobbyID;
         return;
     }
 
-    public String getConnectedLobbyID()
+    public String getConnectedSessionID()
     {
-        return this.connectedLobbyID;
+        return this.connectedSessionID;
     }
 
     public void setServerListener(ServerListener serverListener)
@@ -203,7 +205,7 @@ public enum EClientInformation
         this.bufferedWriter = null;
         this.stdServerErrPipeline.setLength(0);
 
-        this.connectedLobbyID = null;
+        this.connectedSessionID = null;
         this.playerName = null;
 
         return;
@@ -212,6 +214,17 @@ public enum EClientInformation
     public boolean hasServerConnection()
     {
         return this.socket != null && this.bufferedReader != null && this.bufferedWriter != null;
+    }
+
+    public void setPreferredSessionID(String text)
+    {
+        this.preferredSessionID = text;
+        return;
+    }
+
+    public String getPreferredSessionID()
+    {
+        return this.preferredSessionID;
     }
 
 }

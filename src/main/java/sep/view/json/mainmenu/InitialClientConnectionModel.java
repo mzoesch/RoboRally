@@ -6,6 +6,7 @@ import sep.view.clientcontroller.GameInstance;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.io.IOException;
+import java.util.UUID;
 
 public final class InitialClientConnectionModel
 {
@@ -28,8 +29,14 @@ public final class InitialClientConnectionModel
 
     public static void sendProtocolVersionConfirmation() throws IOException
     {
+        // TODO Validate group
+        if (EClientInformation.INSTANCE.getPreferredSessionID().isEmpty() || EClientInformation.INSTANCE.getPreferredSessionID().isBlank())
+        {
+            EClientInformation.INSTANCE.setPreferredSessionID(UUID.randomUUID().toString().substring(0, 5));
+        }
+
         JSONObject messageBody = new JSONObject();
-        messageBody.put("group", "???");
+        messageBody.put("group", EClientInformation.INSTANCE.getPreferredSessionID());
         messageBody.put("isAI", false);
         messageBody.put("protocol", String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
 

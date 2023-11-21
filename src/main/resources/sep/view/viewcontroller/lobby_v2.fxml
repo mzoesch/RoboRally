@@ -16,6 +16,11 @@
             styleClass="text-2xl" alignment="CENTER"
             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
         />
+        <Label
+            styleClass="text-base" alignment="TOP_RIGHT"
+            fx:id="sessionIDLabel"
+            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+        />
         <AnchorPane
             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0" AnchorPane.bottomAnchor="0.0"
         >

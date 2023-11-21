@@ -1,8 +1,10 @@
 package sep.view.scenecontrollers;
 
+import javafx.scene.control.Button;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.viewcontroller.ViewLauncher;
 import sep.view.viewcontroller.SceneController;
+import sep.view.clientcontroller.EClientInformation;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,6 +15,8 @@ import java.io.IOException;
 /** JavaFX controller for the main menu screen. Handles session creation and joining. */
 public class MainMenuJFXController
 {
+    @FXML private TextField sessionIDField;
+    @FXML private Button hostBtn;
     @FXML private Label sessionJoinErrorField;
 
     @FXML
@@ -39,6 +43,7 @@ public class MainMenuJFXController
 
         if (GameInstance.connectToServer())
         {
+            EClientInformation.INSTANCE.setPreferredSessionID(this.sessionIDField.getText());
             ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
             return;
         }
@@ -53,6 +58,13 @@ public class MainMenuJFXController
     protected void onExitBtn(ActionEvent actionEvent)
     {
         GameInstance.kill();
+        return;
+    }
+
+    @FXML
+    private void initialize()
+    {
+        // TODO Un focus session ID field
         return;
     }
 

@@ -3,6 +3,16 @@
     -fx-spacing: 16px;
 }
 
+#temp-text-field {
+    -fx-font-size: 0px;
+    -fx-font-weight: 100;
+    -fx-text-fill: -std-background-color;
+    -fx-background-color: -std-background-color;
+    -fx-border-color: -std-background-color;
+    -fx-max-width: 0px;
+    -fx-max-height: 0px;
+}
+
 #input-text-field {
     -fx-font-size: 16px;
     -fx-font-weight: 400;
@@ -11,11 +21,20 @@
     -fx-background-color: -std-background-color;
 
     -fx-border-color: #ffffff;
-
-    -fx-pref-width: 200px;
+    -fx-alignment: center-right;
+    -fx-max-width: 200px;
 }
 
 #btn-container {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+
     -fx-max-width: 400px;
-    -fx-padding: 100px 0px 0px 0px;
+    -fx-max-height: 400px;
+
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-color: rgba(0, 0, 0, 1);
+
+    -fx-background-color: rgba(255, 255, 255, 0.05);
 }
