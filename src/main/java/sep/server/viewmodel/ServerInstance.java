@@ -62,6 +62,8 @@ public final class ServerInstance
         return;
     }
 
+    // region Getters and Setters
+
     public static ServerListener getInstance()
     {
         return ServerInstance.INSTANCE.SERVER_LISTENER;
@@ -79,7 +81,10 @@ public final class ServerInstance
 
     private static String createAnonymousPlayerName()
     {
-        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0,4));
+        int SUFFIX_LENGTH = 4;
+        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0, SUFFIX_LENGTH));
     }
+
+    // endregion Getters and Setters
 
 }

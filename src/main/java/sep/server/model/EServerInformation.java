@@ -3,9 +3,7 @@ package sep.server.model;
 import sep.server.viewmodel.Session;
 import sep.server.viewmodel.ClientInstance;
 
-import java.util.concurrent.Executors;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
@@ -22,14 +20,9 @@ public enum EServerInformation
     // TODO Move to env var
     public static final int PORT = 8080;
     public static final String PROTOCOL_VERSION = "0.1";
-
-    /** @deprecated */
-    private static final int MAX_CLIENTS = 32;
     public static final int KEEP_ALIVE_INTERVAL = 5_000;
 
     private final ServerSocket serverSocket;
-    /** @deprecated */
-    private final ExecutorService executorService;
 
     private final ArrayList<Session> sessions;
 
@@ -49,43 +42,8 @@ public enum EServerInformation
         }
         this.serverSocket = tServerSocket;
 
-        this.executorService = Executors.newFixedThreadPool(EServerInformation.MAX_CLIENTS);
-
         this.sessions = new ArrayList<Session>();
 
-        return;
-    }
-
-    public Session getNewOrExistingSessionID(String sessionID)
-    {
-        if (this.isSessionIDValid(sessionID))
-        {
-            return this.getSessionByID(sessionID);
-        }
-
-        return this.createNewSession(sessionID);
-    }
-
-    /** This method will not check if the session ID is valid. */
-    public Session createNewSession(String sessionID)
-    {
-        Session s = new Session(sessionID);
-        this.sessions.add(s);
-        return s;
-    }
-
-    /** @deprecated */
-    public String createNewSession()
-    {
-        Session s = new Session();
-        this.sessions.add(s);
-        return s.getSessionID();
-    }
-
-    public void removeSession(Session session)
-    {
-        this.sessions.remove(session);
-        System.out.printf("[SERVER] Session %s closed.%n", session.getSessionID());
         return;
     }
 
@@ -115,6 +73,8 @@ public enum EServerInformation
 
         return;
     }
+
+    // region Getters and Setters
 
     public ServerSocket getServerSocket()
     {
@@ -155,5 +115,32 @@ public enum EServerInformation
 
         return false;
     }
+
+    public Session getNewOrExistingSessionID(String sessionID)
+    {
+        if (this.isSessionIDValid(sessionID))
+        {
+            return this.getSessionByID(sessionID);
+        }
+
+        return this.createNewSession(sessionID);
+    }
+
+    /** This method will not check if the session ID is valid. */
+    public Session createNewSession(String sessionID)
+    {
+        Session s = new Session(sessionID);
+        this.sessions.add(s);
+        return s;
+    }
+
+    public void removeSession(Session session)
+    {
+        this.sessions.remove(session);
+        System.out.printf("[SERVER] Session %s closed.%n", session.getSessionID());
+        return;
+    }
+
+    // region Getters and Setters
 
 }

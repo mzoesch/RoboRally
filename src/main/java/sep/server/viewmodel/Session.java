@@ -9,14 +9,12 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 /**
- * Handles how clients can join and leave a session, which of the clients is the current host and also how to
- * communicate with each other. For example, chat messages. If a client disconnects mid-game, this class will handle
- * that as well. (Wait for reconnection or replace that player by an AI. We will probably have to handle this later
- * on in an upcoming milestone.)
+ * Handles how clients can join and leave a session and also how to communicate with each other. For example,
+ * chat messages. If a client disconnects mid-game, this class must handle that as well. (Wait for reconnection
+ * or replace that player by an AI. We will probably have to handle this later on in an upcoming milestone.)
  */
 public final class Session
 {
-    /** @deprecated */
     private static final int SESSION_ID_LENGTH = 5;
 
     private final ArrayList<PlayerController> playerControllers;
@@ -39,27 +37,6 @@ public final class Session
         this.gameState = new GameState();
 
         return;
-    }
-
-    private static String generateSessionID()
-    {
-        String t = UUID.randomUUID().toString().substring(0, Session.SESSION_ID_LENGTH);
-        for (Session s : EServerInformation.INSTANCE.getSessions())
-        {
-            if (s.getSessionID().equals(t))
-            {
-                return Session.generateSessionID();
-            }
-
-            continue;
-        }
-
-        return t;
-    }
-
-    public String getSessionID()
-    {
-        return sessionID;
     }
 
     public void joinSession(PlayerController playerController)
@@ -122,14 +99,14 @@ public final class Session
 
     public void defaultBehaviourAfterPostLogin(PlayerController newPC)
     {
-        // Sending all current player values to the new client.
+        /* Information for the new client to understand the current state of the game. */
         for (PlayerController PC : this.playerControllers)
         {
             new PlayerValuesModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
             continue;
         }
 
-        // Sending information about the new client to all other clients.
+        /* Sending information about the new client to all other clients. */
         for (PlayerController PC : this.playerControllers)
         {
             if (PC.getPlayerID() == newPC.getPlayerID())
@@ -145,21 +122,6 @@ public final class Session
         this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s joined the session.", newPC.getPlayerName()));
 
         return;
-    }
-
-    public boolean isPlayerNameInSession(String playerName)
-    {
-        for (PlayerController PC : this.playerControllers)
-        {
-            if (PC.getPlayerName().equals(playerName))
-            {
-                return true;
-            }
-
-            continue;
-        }
-
-        return false;
     }
 
     public void sendPlayerValuesToAllClients(PlayerController changedPC)
@@ -194,5 +156,51 @@ public final class Session
 
         return;
     }
+
+    // region Getters and Setters
+
+    public String getSessionID()
+    {
+        return sessionID;
+    }
+
+    /** @deprecated Because multiple clients can have the same name. */
+    public boolean isPlayerNameInSession(String playerName)
+    {
+        for (PlayerController PC : this.playerControllers)
+        {
+            if (PC.getPlayerName().equals(playerName))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
+    }
+
+    private static String generateSessionID()
+    {
+        String t = UUID.randomUUID().toString().substring(0, Session.SESSION_ID_LENGTH);
+        for (Session s : EServerInformation.INSTANCE.getSessions())
+        {
+            if (s.getSessionID().equals(t))
+            {
+                return Session.generateSessionID();
+            }
+
+            continue;
+        }
+
+        return t;
+    }
+
+    public GameState getGameState()
+    {
+        return gameState;
+    }
+
+    // endregion Getters and Setters
 
 }

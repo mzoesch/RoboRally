@@ -1,7 +1,6 @@
 package sep.server.viewmodel;
 
 import sep.server.json.ChatMsgModel;
-import sep.server.json.mainmenu.InitialClientConnectionModel;
 import sep.server.json.mainmenu.InitialClientConnectionModel_v2;
 import sep.server.json.DefaultClientRequestParser;
 import sep.server.model.EServerInformation;
@@ -45,6 +44,10 @@ public final class ClientInstance implements Runnable
     private boolean bIsRegistered;
     /** Used to keep track if a client responded to the keep-alive request form the server. */
     private boolean bIsAlive;
+    /**
+     * If a client disconnects unexpectedly, we may try to disconnect them multiple times.
+     * This variable is used to keep track of that.
+     */
     private boolean bDisconnecting;
 
     public ClientInstance(Socket socket) throws IOException
@@ -67,14 +70,14 @@ public final class ClientInstance implements Runnable
 
     public void handleDisconnect()
     {
-        // Because this method may be called multiple times if the connection did not close in an orderly way.
+        /* Because this method may be called multiple times if the connection did not close in an orderly way. */
         if (this.bDisconnecting)
         {
             return;
         }
         this.bDisconnecting = true;
 
-        System.out.printf("[SERVER] Client %s disconnected.%n", this.socket.getInetAddress());
+        System.out.printf("[SERVER] Client %s is disconnecting.%n", this.socket.getInetAddress());
 
         if (this.bIsRegistered)
         {
@@ -241,6 +244,13 @@ public final class ClientInstance implements Runnable
         }
     }
 
+    public void sendKeepAlive()
+    {
+        this.bIsAlive = false;
+        new KeepAliveModel(this).send();
+        return;
+    }
+
     /** Life-cycle of a client connection. */
     @Override
     public void run()
@@ -270,16 +280,11 @@ public final class ClientInstance implements Runnable
         }
     }
 
+    // region Getters and Setters
+
     public BufferedWriter getBufferedWriter()
     {
         return bufferedWriter;
-    }
-
-    public void sendKeepAlive()
-    {
-        this.bIsAlive = false;
-        new KeepAliveModel(this).send();
-        return;
     }
 
     // TODO Do we have to synchronize this? Because of multithreading?
@@ -299,5 +304,7 @@ public final class ClientInstance implements Runnable
     {
         return this.playerController;
     }
+
+    // endregion Getters and Setters
 
 }

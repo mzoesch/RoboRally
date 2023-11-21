@@ -40,6 +40,8 @@ public final class PlayerController
         return;
     }
 
+    // region Getters and Setters
+
     public Session getSession()
     {
         return this.session;
@@ -76,5 +78,7 @@ public final class PlayerController
     {
         return this.clientInstance;
     }
+
+    // endregion Getters and Setters
 
 }
