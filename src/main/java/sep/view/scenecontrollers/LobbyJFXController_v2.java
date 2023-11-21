@@ -143,7 +143,7 @@ public class LobbyJFXController_v2
         this.addPlayerRobotSelector();
 
         this.lobbyMsgContainer = new VBox();
-        this.lobbyMsgContainer.setStyle("-fx-max-width: 380px");
+        this.lobbyMsgContainer.setId("lobby-msg-scroll-pane-inner");
         this.lobbyMsgScrollPane.setContent(this.lobbyMsgContainer);
 
         boolean bSuccess = false;
@@ -222,7 +222,20 @@ public class LobbyJFXController_v2
                     return;
                 }
 
-                String msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
+                String msgToWhisper;
+                try
+                {
+                    msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
+                }
+                catch (IndexOutOfBoundsException e)
+                {
+                    this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid message.", false);
+                    return;
+                }
+                if (msgToWhisper.isEmpty() || msgToWhisper.isBlank())
+                {
+                    return;
+                }
 
                 RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
                 if (target == null)
@@ -307,7 +320,7 @@ public class LobbyJFXController_v2
             return;
         }
 
-        Label l = new Label(String.format("<%s%s> %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers" : "", msg));
+        Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
         if (bIsPrivate)
         {
             l.getStyleClass().add("lobby-msg-whisper");

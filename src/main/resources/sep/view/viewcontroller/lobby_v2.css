@@ -35,11 +35,29 @@
     -fx-min-height: 400px;
     -fx-max-width: 400px;
     -fx-max-height: 400px;
+    -fx-spacing: 8px;
+    -fx-background-color: transparent;
 }
 
-#lobby-msg-scroll-pane {}
+#lobby-msg-scroll-pane {
+    -fx-border-radius: 0px;
+    -fx-border-width: 3px;
+}
 
-#lobby-msg-input-text-field {}
+#lobby-msg-scroll-pane-inner {
+    -fx-min-width: 380px;
+    -fx-max-width: 380px;
+    -fx-background-color: transparent;
+}
+
+#lobby-msg-input-text-field {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+}
 
 .lobby-msg-wrapper {
     -fx-spacing: 8px;

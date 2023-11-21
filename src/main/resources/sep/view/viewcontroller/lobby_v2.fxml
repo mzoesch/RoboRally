@@ -65,6 +65,7 @@
             <children>
                 <ScrollPane
                     id="lobby-msg-scroll-pane" stylesheets="@lobby_v2.css"
+                    style="-fx-background: #E5E5E5FF; -fx-border-color: #ffffff;"
                     fx:id="lobbyMsgScrollPane"
                 />
                 <TextField
