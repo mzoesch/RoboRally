@@ -34,7 +34,6 @@
             <Button
                 text="HOST SESSION"
                 styleClass="secondary-btn" style="-fx-min-width: 300px;"
-                fx:id="hostBtn"
                 onAction="#onHostBtn"
             />
             <Button

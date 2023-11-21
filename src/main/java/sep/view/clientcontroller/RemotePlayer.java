@@ -1,6 +1,11 @@
 package sep.view.clientcontroller;
 
-public class RemotePlayer
+/**
+ * Represents a player in the lobby. Not just remote players but also the client player.
+ * We may store information on the remote player state here that is unique to a player and not to the game. This
+ * class should not contain any kind of logic it is just the long-term storage solution from the {@link ServerListener}.
+ */
+public final class RemotePlayer
 {
     private final int playerID;
     private String playerName;

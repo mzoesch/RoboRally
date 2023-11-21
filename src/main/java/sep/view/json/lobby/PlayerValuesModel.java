@@ -1,13 +1,10 @@
 package sep.view.json.lobby;
 
-import sep.view.clientcontroller.GameInstance;
+import sep.view.json.AServerRequestModel;
 
 import org.json.JSONObject;
-import sep.view.json.IJSONModel;
 
-import java.io.IOException;
-
-public class PlayerValuesModel implements IJSONModel
+public final class PlayerValuesModel extends AServerRequestModel
 {
     private final String PLAYER_NAME;
     private final int FIGURE_ID;
@@ -32,22 +29,6 @@ public class PlayerValuesModel implements IJSONModel
         j.put("messageBody", body);
 
         return j;
-    }
-
-    @Override
-    public void send()
-    {
-        try
-        {
-            GameInstance.sendServerRequest(this.toJSON());
-        }
-        catch (IOException e)
-        {
-            System.err.println("[CLIENT] Could not send player values to server.");
-            System.err.printf("[CLIENT] %s%n", e.getMessage());
-        }
-
-        return;
     }
 
 }

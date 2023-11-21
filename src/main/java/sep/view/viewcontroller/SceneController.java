@@ -12,7 +12,7 @@ import java.io.IOException;
  * Object that handles the overall flow in the Graphical User Interface. It manages the loading of FXML files and
  * the corresponding controllers, the activation of them and destruction.
  */
-public class SceneController
+public final class SceneController
 {
     public static final String WIN_TITLE = "CLIENT";
     public static final int PREF_WIDTH = 1_280;
@@ -22,13 +22,15 @@ public class SceneController
     public static final String LOBBY_ID = "lobby";
 
     public static final String PATH_TO_MAIN_MENU = "main-menu.fxml";
+    /** @deprecated */
     public static final String PATH_TO_LOBBY = "lobby.fxml";
     public static final String PATH_TO_LOBBY_V2 = "lobby_v2.fxml";
 
-    /** The scene where we apply different screens (panes). */
+    /** The scene where we apply different screens (panes in our case) (They are actually called "nodes".) to. */
     private final Scene masterScene;
     private String currentScreen;
-    private final ArrayList<GameScene<?>> screens;
+    /** Rendered screens. */
+    private final ArrayList<RGameScene<?>> screens;
 
     public SceneController(Scene masterScene)
     {
@@ -36,24 +38,24 @@ public class SceneController
 
         this.masterScene = masterScene;
         this.currentScreen = "";
-        this.screens = new ArrayList<GameScene<?>>();
+        this.screens = new ArrayList<RGameScene<?>>();
 
         return;
     }
 
-    private <T> void addScreen(GameScene<T> gameScene)
+    private <T> void addScreen(RGameScene<T> RGameScene)
     {
-        this.screens.add(gameScene);
+        this.screens.add(RGameScene);
         return;
     }
 
     private void activateScreen(String ID)
     {
-        for (GameScene<?> s : this.screens)
+        for (RGameScene<?> s : this.screens)
         {
             if (s.ID().equals(ID))
             {
-                GameScene<?> oldScreen = this.screens.size() > 1 ? this.getCurrentScreen() : null;
+                RGameScene<?> oldScreen = this.screens.size() > 1 ? this.getCurrentScreen() : null;
 
                 this.currentScreen = ID;
                 this.masterScene.setRoot(s.screen());
@@ -89,9 +91,9 @@ public class SceneController
         }
         T ctrl = fxmlLoader.getController();
 
-        GameScene<T> gameScene = new GameScene<T>(ID, p, ctrl, bAutoKillAfterUse ? this.currentScreen : "");
+        RGameScene<T> RGameScene = new RGameScene<T>(ID, p, ctrl, bAutoKillAfterUse ? this.currentScreen : "");
 
-        this.addScreen(gameScene);
+        this.addScreen(RGameScene);
         this.activateScreen(ID);
 
         return;
@@ -99,7 +101,7 @@ public class SceneController
 
     public void killCurrentScreen()
     {
-        GameScene<?> currentScreen = this.getCurrentScreen();
+        RGameScene<?> currentScreen = this.getCurrentScreen();
         if (!currentScreen.hasFallback())
         {
             System.err.println("[CLIENT] Fatal error. No fallback screen found.");
@@ -118,7 +120,7 @@ public class SceneController
         return this.masterScene;
     }
 
-    public GameScene<?> getScreenByID(String ID)
+    public RGameScene<?> getScreenByID(String ID)
     {
         if (this.screens.isEmpty())
         {
@@ -127,7 +129,7 @@ public class SceneController
             return null;
         }
 
-        for (GameScene<?> s : this.screens)
+        for (RGameScene<?> s : this.screens)
         {
             if (s.ID().equals(ID))
             {
@@ -140,7 +142,7 @@ public class SceneController
         return null;
     }
 
-    public GameScene<?> getCurrentScreen()
+    public RGameScene<?> getCurrentScreen()
     {
         return this.getScreenByID(this.currentScreen);
     }

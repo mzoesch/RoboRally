@@ -4,7 +4,6 @@ import sep.view.json.mainmenu.InitialClientConnectionModel;
 
 import javafx.application.Platform;
 import java.io.IOException;
-import java.util.Objects;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -18,15 +17,15 @@ import sep.view.viewcontroller.ViewLauncher;
 public class GameInstance
 {
     public static final int MAX_PLAYER_NAME_LENGTH = 16;
-    public static final int SESSION_ID_LENGTH = 5;
 
     private GameInstance()
     {
         super();
 
-        if (EClientInformation.INSTANCE.JFX_INSTANCE == null)
+        if (EClientInformation.INSTANCE.getJFXInstance() == null)
         {
             System.out.printf("[CLIENT] Game Instance initialized on main thread (JFX) constructing window.%n");
+            EClientInformation.INSTANCE.setJFXInstance(this);
             ViewLauncher.run();
             return;
         }
@@ -123,6 +122,12 @@ public class GameInstance
         return;
     }
 
+    /**
+     * Will block the calling thread until a response from the server is received. Only use this method for the
+     * initial connection to the server.
+     *
+     * @see EClientInformation#waitForServerResponse()
+     */
     public static JSONObject waitForServerResponse() throws IOException
     {
         String response = EClientInformation.INSTANCE.waitForServerResponse();

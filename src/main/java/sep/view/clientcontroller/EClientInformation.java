@@ -1,7 +1,6 @@
 package sep.view.clientcontroller;
 
 import org.json.JSONObject;
-
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.io.BufferedReader;
@@ -26,7 +25,7 @@ public enum EClientInformation
     public static final String PROTOCOL_VERSION = "0.1";
 
     private Socket socket;
-    private InputStreamReader inputStreamReader;
+    private InputStreamReader inputStreamReader; // TODO We may remove the stream readers and writers.
     private OutputStreamWriter outputStreamWriter;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
@@ -34,11 +33,11 @@ public enum EClientInformation
     private ServerListener serverListener;
     private ExecutorService executorService;
 
-    public GameInstance JFX_INSTANCE;
+    /** The main thread. */
+    private GameInstance JFX_INSTANCE;
 
-    private String connectedSessionID;
     private String preferredSessionID;
-    private String playerName;
+    /** Cannot be changed for the duration of a session connection. */
     private int playerID;
 
     private EClientInformation()
@@ -54,13 +53,13 @@ public enum EClientInformation
         this.serverListener = null;
         this.executorService = null;
 
-        this.connectedSessionID = null;
-        this.playerName = null;
+        this.playerID = -1;
         this.preferredSessionID = "";
 
         return;
     }
 
+    /** Establishing a server connection via the TCP. */
     public boolean establishAServerConnection() throws IOException
     {
         if (this.socket != null || this.bufferedReader != null || this.bufferedWriter != null)
@@ -78,8 +77,9 @@ public enum EClientInformation
         return true;
     }
 
-    /** Will block the main thread until a response from the server is received. Only use this method for the initial
-     * connection to the server. After that, use the {@link #listen()} method.
+    /**
+     * Will block the calling thread until a response from the server is received. Only use this method for the
+     * initial connection to the server. After that, use the {@link #listen()} method.
      */
     public String waitForServerResponse() throws IOException
     {
@@ -94,6 +94,7 @@ public enum EClientInformation
 
     /**
      * Will create a new thread that will listen for server responses to not block the main thread.
+     *
      * @see sep.view.clientcontroller.ServerListener
      * */
     public void listen()
@@ -110,43 +111,6 @@ public enum EClientInformation
 
         System.out.printf("[CLIENT] Now listening for standard server responses.%n");
 
-        return;
-    }
-
-    public Socket getSocket()
-    {
-        return this.socket;
-    }
-
-    public BufferedReader getBufferedReader()
-    {
-        return bufferedReader;
-    }
-
-    public BufferedWriter getBufferedWriter()
-    {
-        return bufferedWriter;
-    }
-
-    public StringBuilder getStdServerErrPipeline()
-    {
-        return stdServerErrPipeline;
-    }
-
-    public void setConnectedSessionID(String connectedLobbyID)
-    {
-        this.connectedSessionID = connectedLobbyID;
-        return;
-    }
-
-    public String getConnectedSessionID()
-    {
-        return this.connectedSessionID;
-    }
-
-    public void setServerListener(ServerListener serverListener)
-    {
-        this.serverListener = serverListener;
         return;
     }
 
@@ -174,15 +138,22 @@ public enum EClientInformation
         return;
     }
 
-    public void setPlayerName(String playerName)
+    // region Getters and Setters
+
+    public BufferedWriter getBufferedWriter()
     {
-        this.playerName = playerName;
-        return;
+        return bufferedWriter;
     }
 
-    public String getPlayerName()
+    public StringBuilder getStdServerErrPipeline()
     {
-        return this.playerName;
+        return stdServerErrPipeline;
+    }
+
+    public void setServerListener(ServerListener serverListener)
+    {
+        this.serverListener = serverListener;
+        return;
     }
 
     public void setPlayerID(int playerID)
@@ -205,8 +176,8 @@ public enum EClientInformation
         this.bufferedWriter = null;
         this.stdServerErrPipeline.setLength(0);
 
-        this.connectedSessionID = null;
-        this.playerName = null;
+        this.playerID = -1;
+        this.preferredSessionID = "";
 
         return;
     }
@@ -226,5 +197,18 @@ public enum EClientInformation
     {
         return this.preferredSessionID;
     }
+
+    public void setJFXInstance(GameInstance JFX_INSTANCE)
+    {
+        this.JFX_INSTANCE = JFX_INSTANCE;
+        return;
+    }
+
+    public GameInstance getJFXInstance()
+    {
+        return this.JFX_INSTANCE;
+    }
+
+    // endregion Getters and Setters
 
 }

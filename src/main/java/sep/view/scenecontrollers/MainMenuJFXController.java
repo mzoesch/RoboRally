@@ -1,6 +1,5 @@
 package sep.view.scenecontrollers;
 
-import javafx.scene.control.Button;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.viewcontroller.ViewLauncher;
 import sep.view.viewcontroller.SceneController;
@@ -16,7 +15,6 @@ import java.io.IOException;
 public class MainMenuJFXController
 {
     @FXML private TextField sessionIDField;
-    @FXML private Button hostBtn;
     @FXML private Label sessionJoinErrorField;
 
     @FXML
@@ -70,7 +68,7 @@ public class MainMenuJFXController
     @FXML
     private void initialize()
     {
-        // TODO Un focus session ID field
+        // TODO Un focus session ID field. It's annoying. See this fxml file for more information.
         return;
     }
 

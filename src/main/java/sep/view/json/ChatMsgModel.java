@@ -2,7 +2,7 @@ package sep.view.json;
 
 import org.json.JSONObject;
 
-public class ChatMsgModel extends AServerRequestModel
+public final class ChatMsgModel extends AServerRequestModel
 {
     public static final String COMMAND_PREFIX = "/";
     public static final int CHAT_MSG_BROADCAST = -1;

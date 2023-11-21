@@ -43,7 +43,8 @@ public class ServerListener implements Runnable
             return;
         }
 
-        // ALL DEPRECATED
+        // TODO ALL DEPRECATED PLEASE REMOVE IF WE KNOW HOW TO DISCONNECT FROM SERVER!
+        //      This is not to the norm of Protocol v0.1!
         try
         {
             bufferedWriter.write((char) ServerListener.ESCAPE_CHARACTER);
@@ -59,6 +60,7 @@ public class ServerListener implements Runnable
 
         System.out.printf("[CLIENT] Send closing connection request to server.%n");
         EClientInformation.INSTANCE.setServerListener(null);
+
         return;
     }
 
@@ -132,7 +134,7 @@ public class ServerListener implements Runnable
             return;
         }
 
-        System.err.println("[CLIENT] Received unknown request from server.");
+        System.err.println("[CLIENT] Received unknown request from server. Ignoring.");
         System.err.println(dsrp.getRequest().toString(2));
 
         return;

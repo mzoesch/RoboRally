@@ -1,8 +1,5 @@
 package sep.view.scenecontrollers;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ScrollPane;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.json.lobby.PlayerValuesModel;
 import sep.view.viewcontroller.ViewLauncher;
@@ -12,6 +9,9 @@ import sep.view.json.ChatMsgModel;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.clientcontroller.EClientInformation;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.ScrollPane;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Objects;
 import javafx.scene.input.KeyCode;
 
-public class LobbyJFXController_v2
+public final class LobbyJFXController_v2
 {
     @FXML private Label sessionIDLabel;
     @FXML private TextField lobbyMsgInputTextField;
@@ -35,60 +35,7 @@ public class LobbyJFXController_v2
     @FXML private Label formErrorLabel;
     @FXML private HBox playerRobotsSelectorContainer;
 
-    private void addPlayerRobotSelector()
-    {
-        this.playerRobotsSelectorContainer.getChildren().clear();
-
-        for (int i = 0; i < EGameState.FIGURE_NAMES.length; i++)
-        {
-            Button btn = new Button(String.format(EGameState.FIGURE_NAMES[i]));
-            if (EGameState.INSTANCE.hasClientSelectedARobot())
-            {
-                btn.getStyleClass().add("secondary-btn-mini");
-            }
-            else
-            {
-                btn.getStyleClass().add("primary-btn-mini");
-            }
-            btn.setDisable(!EGameState.INSTANCE.isPlayerRobotAvailable(i));
-
-            int finalI = i;
-            btn.setOnAction(actionEvent -> {
-                this.formErrorLabel.setText("");
-
-                if (this.isPlayerNameValid())
-                {
-                    System.out.printf("[CLIENT] Robot %d selected.%n", finalI);
-                    new PlayerValuesModel(this.getPlayerName(), finalI).send();
-                    return;
-                }
-
-                this.formErrorLabel.setText("Invalid player name.");
-                System.out.printf("[CLIENT] Robot %d selected, but player name is invalid.%n", finalI);
-
-                return;
-            });
-
-            Label possessedBy = new Label();
-            if (!EGameState.INSTANCE.isPlayerRobotAvailable(i))
-            {
-                possessedBy.setText(Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByFigureID(i)).getPlayerName());
-            }
-            possessedBy.getStyleClass().add("text-base");
-            HBox hbox = new HBox(possessedBy);
-            hbox.setId("player-robot-player-name-wrapper");
-            HBox.setHgrow(possessedBy, Priority.ALWAYS);
-
-            VBox v = new VBox(btn, hbox);
-            v.setId("player-robot-selector-wrapper");
-
-            this.playerRobotsSelectorContainer.getChildren().add(v);
-        }
-
-        return;
-    }
-
-    // Just for debugging purposes. Can be removed at any given time.
+    /** Just for debugging purposes. Can be removed at any given time. */
     private void testChat()
     {
         VBox v = new VBox();
@@ -164,26 +111,6 @@ public class LobbyJFXController_v2
         this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
 
         return;
-    }
-
-    private String getCommand(String token)
-    {
-        if (!token.contains(" "))
-        {
-            return token.substring(1);
-        }
-
-        return token.substring(1, token.indexOf(" "));
-    }
-
-    private boolean isChatMsgACommand(String token)
-    {
-        return token.startsWith(ChatMsgModel.COMMAND_PREFIX);
-    }
-
-    private boolean isChatMsgValid(String token)
-    {
-        return !token.isEmpty() && token.length() <= EGameState.MAX_CHAT_MESSAGE_LENGTH;
     }
 
     private void onSubmitLobbyMsg()
@@ -283,21 +210,6 @@ public class LobbyJFXController_v2
         });
     }
 
-    private boolean isPlayerNameValid()
-    {
-        return !this.getPlayerName().isEmpty() && this.getPlayerName().length() <= GameInstance.MAX_PLAYER_NAME_LENGTH;
-    }
-
-    private String getPlayerName()
-    {
-        return this.playerNameField.getText();
-    }
-
-    private String getChatMsg()
-    {
-        return this.lobbyMsgInputTextField.getText();
-    }
-
     private void addToChatMsgToScrollPane(int caller, String msg, boolean bIsPrivate)
     {
         if (caller == ChatMsgModel.SERVER_ID)
@@ -345,5 +257,100 @@ public class LobbyJFXController_v2
 
         return;
     }
+
+    /** Will create the btn to select the different robots. */
+    private void addPlayerRobotSelector()
+    {
+        this.playerRobotsSelectorContainer.getChildren().clear();
+
+        for (int i = 0; i < EGameState.FIGURE_NAMES.length; i++)
+        {
+            Button btn = new Button(String.format(EGameState.FIGURE_NAMES[i]));
+            if (EGameState.INSTANCE.hasClientSelectedARobot())
+            {
+                btn.getStyleClass().add("secondary-btn-mini");
+            }
+            else
+            {
+                btn.getStyleClass().add("primary-btn-mini");
+            }
+            btn.setDisable(EGameState.INSTANCE.isPlayerRobotUnavailable(i));
+
+            int finalI = i;
+            btn.setOnAction(actionEvent -> {
+                this.formErrorLabel.setText("");
+
+                if (this.isPlayerNameValid())
+                {
+                    System.out.printf("[CLIENT] Robot %d selected.%n", finalI);
+                    new PlayerValuesModel(this.getPlayerName(), finalI).send();
+                    return;
+                }
+
+                this.formErrorLabel.setText("Invalid player name.");
+                System.out.printf("[CLIENT] Robot %d selected, but player name is invalid.%n", finalI);
+
+                return;
+            });
+
+            Label possessedBy = new Label();
+            if (EGameState.INSTANCE.isPlayerRobotUnavailable(i))
+            {
+                possessedBy.setText(Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByFigureID(i)).getPlayerName());
+            }
+            possessedBy.getStyleClass().add("text-base");
+            HBox hbox = new HBox(possessedBy);
+            hbox.setId("player-robot-player-name-wrapper");
+            HBox.setHgrow(possessedBy, Priority.ALWAYS);
+
+            VBox v = new VBox(btn, hbox);
+            v.setId("player-robot-selector-wrapper");
+
+            this.playerRobotsSelectorContainer.getChildren().add(v);
+
+            continue;
+        }
+
+        return;
+    }
+
+    // region Getters and Setters
+
+    private String getCommand(String token)
+    {
+        if (!token.contains(" "))
+        {
+            return token.substring(1);
+        }
+
+        return token.substring(1, token.indexOf(" "));
+    }
+
+    private boolean isChatMsgACommand(String token)
+    {
+        return token.startsWith(ChatMsgModel.COMMAND_PREFIX);
+    }
+
+    private boolean isChatMsgValid(String token)
+    {
+        return !token.isEmpty() && token.length() <= EGameState.MAX_CHAT_MESSAGE_LENGTH;
+    }
+
+    private boolean isPlayerNameValid()
+    {
+        return !this.getPlayerName().isEmpty() && this.getPlayerName().length() <= GameInstance.MAX_PLAYER_NAME_LENGTH;
+    }
+
+    private String getPlayerName()
+    {
+        return this.playerNameField.getText();
+    }
+
+    private String getChatMsg()
+    {
+        return this.lobbyMsgInputTextField.getText();
+    }
+
+    // endregion Getters and Setters
 
 }

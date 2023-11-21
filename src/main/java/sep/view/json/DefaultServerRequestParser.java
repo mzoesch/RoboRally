@@ -3,7 +3,11 @@ package sep.view.json;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-public class DefaultServerRequestParser
+/**
+ * For easier access to the JSON object received from the server. Does not contain actual logic.
+ * We may want to split this into multiple classes later if it gets too messy.
+ */
+public final class DefaultServerRequestParser
 {
     private final JSONObject request;
 
