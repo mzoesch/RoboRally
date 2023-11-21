@@ -122,7 +122,7 @@ public final class LobbyJFXController_v2
         {
             if (this.getCommand(token).isEmpty() || this.getCommand(token).isBlank())
             {
-                this.addToChatMsgToScrollPane(0, "Type /h for help on commands.", false);
+                this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Type /h for help on commands.", false);
                 return;
             }
 
