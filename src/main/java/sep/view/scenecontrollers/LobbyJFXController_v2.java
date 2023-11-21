@@ -232,10 +232,13 @@ public class LobbyJFXController_v2
                 }
 
                 new ChatMsgModel(msgToWhisper, target.getPlayerID()).send();
-                this.addToChatMsgToScrollPane(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
+                if (EClientInformation.INSTANCE.getPlayerID() != target.getPlayerID())
+                {
+                    this.addToChatMsgToScrollPane(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
+                }
 
                 System.out.printf("[CLIENT] Whispering to %s.%n", targetPlayer);
-                System.out.printf("[CLIENT] Message: %s.%n", msgToWhisper);
+
                 return;
             }
 

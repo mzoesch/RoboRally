@@ -41,6 +41,12 @@ public class MainMenuJFXController
     {
         this.sessionJoinErrorField.setText("");
 
+        if (this.sessionIDField.getText().isEmpty() || this.sessionIDField.getText().isBlank())
+        {
+            this.sessionJoinErrorField.setText("Session ID is invalid.");
+            return;
+        }
+
         if (GameInstance.connectToServer())
         {
             EClientInformation.INSTANCE.setPreferredSessionID(this.sessionIDField.getText());
