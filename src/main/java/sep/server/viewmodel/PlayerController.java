@@ -1,6 +1,6 @@
 package sep.server.viewmodel;
 
-import sep.server.json.ChatMsgModel;
+import sep.server.json.common.ChatMsgModel;
 
 /**
  * The interface between the Pawn in the game and the human player controlling it. The Player Controller essentially

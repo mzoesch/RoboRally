@@ -1,19 +1,15 @@
 package sep.server.json;
 
-import org.json.JSONObject;
-
 import sep.server.viewmodel.ClientInstance;
 
 import org.json.JSONObject;
-import org.json.JSONException;
 import java.io.IOException;
 
-public class KeepAliveModel implements IJSONModel
+public abstract class AModel implements IJSONSerializable
 {
-    private final ClientInstance ci;
-    private JSONObject serverResponse;
+    ClientInstance ci;
 
-    public KeepAliveModel(ClientInstance ci)
+    public AModel(ClientInstance ci)
     {
         super();
         this.ci = ci;
@@ -21,24 +17,16 @@ public class KeepAliveModel implements IJSONModel
     }
 
     @Override
-    public JSONObject toJSON()
-    {
-        JSONObject j = new JSONObject();
-        j.put("messageType", "Alive");
+    public abstract JSONObject toJSON();
 
-        return j;
-    }
-
-    @Override
     public void send()
     {
-//        System.out.printf(String.format("%s%n", this.toJSON().toString(4)));
-
         try
         {
             ci.getBufferedWriter().write(this.toJSON().toString());
             ci.getBufferedWriter().newLine();
             ci.getBufferedWriter().flush();
+            return;
         }
         catch (IOException e)
         {
@@ -46,8 +34,6 @@ public class KeepAliveModel implements IJSONModel
             System.err.printf("[SERVER] %s%n", e.getMessage());
             return;
         }
-
-        return;
     }
 
 }

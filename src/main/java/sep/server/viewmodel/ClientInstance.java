@@ -1,10 +1,10 @@
 package sep.server.viewmodel;
 
-import sep.server.json.ChatMsgModel;
+import sep.server.json.common.ChatMsgModel;
 import sep.server.json.mainmenu.InitialClientConnectionModel_v2;
 import sep.server.json.DefaultClientRequestParser;
 import sep.server.model.EServerInformation;
-import sep.server.json.KeepAliveModel;
+import sep.server.json.common.KeepAliveModel;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

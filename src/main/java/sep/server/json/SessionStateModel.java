@@ -5,7 +5,8 @@ import sep.server.viewmodel.ClientInstance;
 import org.json.JSONObject;
 import java.io.IOException;
 
-public class SessionStateModel implements IJSONModel
+/** @deprecated */
+public class SessionStateModel extends AModel
 {
     private final ClientInstance clientInstance;
     private final String[] playerNames;
@@ -13,7 +14,7 @@ public class SessionStateModel implements IJSONModel
 
     public SessionStateModel(ClientInstance clientInstance, String[] playerNames, String hostPlayerName)
     {
-        super();
+        super(clientInstance);
 
         this.clientInstance = clientInstance;
         this.playerNames = playerNames;

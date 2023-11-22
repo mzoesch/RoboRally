@@ -3,7 +3,7 @@ package sep.server.viewmodel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerValuesModel;
-import sep.server.json.ChatMsgModel;
+import sep.server.json.common.ChatMsgModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
