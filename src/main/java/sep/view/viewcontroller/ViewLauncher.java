@@ -30,14 +30,24 @@ public final class ViewLauncher extends Application
     }
 
     @Override
-    public void start(Stage stage)
+    public void start(Stage s)
     {
         this.sceneController = new SceneController(new Scene(new Parent(){}, SceneController.PREF_WIDTH, SceneController.PREF_HEIGHT));
-        stage.setScene(this.sceneController.getMasterScene());
-        stage.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
-        this.sceneController.renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
+        s.setScene(this.sceneController.getMasterScene());
 
-        stage.show();
+        if (EClientInformation.INSTANCE.getWrap())
+        {
+            s.setTitle(String.format("%s v%s", sep.EArgs.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
+            this.sceneController.renderNewScreen(SceneController.WRAPPER_ID, SceneController.PATH_TO_WRAPPER, false);
+            EClientInformation.INSTANCE.setStage(s);
+        }
+        else
+        {
+            s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
+            this.sceneController.renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
+        }
+
+        s.show();
 
         return;
     }
@@ -45,6 +55,14 @@ public final class ViewLauncher extends Application
     public static void run()
     {
         Application.launch();
+        return;
+    }
+
+    /** Called when wrapping. */
+    public static void loadInnerClient()
+    {
+        EClientInformation.INSTANCE.getStage().setTitle(String.format("%s v%s", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
+        ViewLauncher.getSceneController().renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
         return;
     }
 

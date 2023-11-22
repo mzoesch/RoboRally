@@ -14,16 +14,37 @@ public class Launcher
      * This is the entry point of the client part of the application.
      * The Game Instance is created here.
      *
-     * @param args CMD arguments are ignored.
+     * @param args To determine wrapping. Else ignored.
      */
     public static void main(String[] args)
     {
         double t0 = System.currentTimeMillis();
 
+        boolean bWrap = false;
+        if (args.length > 0)
+        {
+            if (args[0].equals("wrap"))
+            {
+                bWrap = true;
+            }
+        }
+
+        if (bWrap)
+        {
+            System.out.printf("[CLIENT] Wrapping main methods.%n");
+            sep.view.clientcontroller.EClientInformation.INSTANCE.setWrap(true);
+        }
+
         GameInstance.run();
 
-        System.out.printf("The application took %.2f seconds to run.%n", (System.currentTimeMillis() - t0) / 1000);
-        System.exit(0);
+        System.out.printf("[CLIENT] The application took %.2f seconds to run.%n", (System.currentTimeMillis() - t0) / 1000);
+
+        if (bWrap)
+        {
+            return;
+        }
+
+        System.exit(sep.EArgs.OK);
 
         return;
     }

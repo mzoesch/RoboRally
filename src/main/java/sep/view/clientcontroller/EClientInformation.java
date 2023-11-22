@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import java.io.BufferedWriter;
 import java.util.concurrent.Executors;
 import java.io.OutputStreamWriter;
+import javafx.stage.Stage;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -18,6 +19,10 @@ import java.io.OutputStreamWriter;
 public enum EClientInformation
 {
     INSTANCE;
+
+    private boolean bWrap;
+    /** Only valid during wrapping. */
+    private Stage stage;
 
     // TODO To env var
     private static final String SERVER_IP = "localhost";
@@ -42,6 +47,8 @@ public enum EClientInformation
 
     private EClientInformation()
     {
+        this.bWrap = false;
+
         this.JFX_INSTANCE = null;
 
         this.socket = null;
@@ -207,6 +214,28 @@ public enum EClientInformation
     public GameInstance getJFXInstance()
     {
         return this.JFX_INSTANCE;
+    }
+
+    public void setWrap(boolean bWrap)
+    {
+        this.bWrap = bWrap;
+        return;
+    }
+
+    public boolean getWrap()
+    {
+        return this.bWrap;
+    }
+
+    public void setStage(Stage stage)
+    {
+        this.stage = stage;
+        return;
+    }
+
+    public Stage getStage()
+    {
+        return this.stage;
     }
 
     // endregion Getters and Setters

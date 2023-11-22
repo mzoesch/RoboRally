@@ -151,4 +151,11 @@ public class GameInstance
         return res;
     }
 
+    /** Called when wrapping. */
+    public static void loadInnerClient()
+    {
+        ViewLauncher.loadInnerClient();
+        return;
+    }
+
 }

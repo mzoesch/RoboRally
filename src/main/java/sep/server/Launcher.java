@@ -33,7 +33,7 @@ public final class Launcher
         }
         finally
         {
-            System.out.printf("The application took %.2f seconds to run.%n", (System.currentTimeMillis() - t0) / 1000);
+            System.out.printf("[SERVER] The application took %.2f seconds to run.%n", (System.currentTimeMillis() - t0) / 1000);
             System.exit(0);
         }
 
