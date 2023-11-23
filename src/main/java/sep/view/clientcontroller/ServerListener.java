@@ -65,6 +65,8 @@ public class ServerListener implements Runnable
         l.debug("Send closing connection request to server.");
         EClientInformation.INSTANCE.setServerListener(null);
 
+        l.info("Client disconnected from server.");
+
         return;
     }
 

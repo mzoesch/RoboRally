@@ -52,6 +52,7 @@ public class GameInstance
         {
             sep.EArgs.setMode(sep.EArgs.EXIT);
         }
+        l.info("Game Instance killed.");
         Platform.exit();
         return;
     }
@@ -104,6 +105,8 @@ public class GameInstance
             return false;
         }
         l.debug("Player ID received.");
+
+        l.info("Client successfully connected to server.");
 
         EClientInformation.INSTANCE.listen();
 
