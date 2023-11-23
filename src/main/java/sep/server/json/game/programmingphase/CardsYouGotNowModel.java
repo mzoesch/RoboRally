@@ -5,13 +5,11 @@ import org.json.JSONObject;
 import sep.server.json.AModel;
 import sep.server.viewmodel.ClientInstance;
 
-import java.lang.reflect.Array;
-
-public class YourCardsModel extends AModel {
+public class CardsYouGotNowModel extends AModel {
 
     private final String[] cards;
 
-    public YourCardsModel(ClientInstance ci, String[] cards) {
+    public CardsYouGotNowModel(ClientInstance ci, String[] cards) {
         super(ci);
         this.cards = cards;
     }
@@ -19,12 +17,11 @@ public class YourCardsModel extends AModel {
     @Override
     public JSONObject toJSON() {
         JSONObject body = new JSONObject();
-        body.put("cardsInHand", new JSONArray(cards));
+        body.put("cards", new JSONArray(cards));
 
         JSONObject j = new JSONObject();
-        j.put("messageType", "YourCards");
-        j.put("messageBody", body);
-
-        return j;
+        j.put("messageType", "CardsYouGotNow");
+        j.put("messageBody",body);
+        return null;
     }
 }

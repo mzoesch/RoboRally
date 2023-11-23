@@ -5,25 +5,23 @@ import org.json.JSONObject;
 import sep.server.json.AModel;
 import sep.server.viewmodel.ClientInstance;
 
-import java.lang.reflect.Array;
+public class TimerEndedModel extends AModel {
 
-public class YourCardsModel extends AModel {
+    private final int[] playerID;
 
-    private final String[] cards;
-
-    public YourCardsModel(ClientInstance ci, String[] cards) {
+    public TimerEndedModel(ClientInstance ci, int[] playerID) {
         super(ci);
-        this.cards = cards;
+        this.playerID = playerID;
     }
 
     @Override
     public JSONObject toJSON() {
         JSONObject body = new JSONObject();
-        body.put("cardsInHand", new JSONArray(cards));
+        body.put("clientIDs", new JSONArray(playerID));
 
         JSONObject j = new JSONObject();
-        j.put("messageType", "YourCards");
-        j.put("messageBody", body);
+        j.put("messageType", "TimerEnded");
+        j.put("messageBody",body);
 
         return j;
     }
