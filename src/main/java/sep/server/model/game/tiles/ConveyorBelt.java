@@ -1,13 +1,13 @@
 package sep.server.model.game.tiles;
 
-import java.util.ArrayList;
-
 public class ConveyorBelt implements FieldType {
+
     private static String incomingFlowDirection;
-    private static ArrayList<String> outcomingFlowDirection;
+    private static String [] outcomingFlowDirection;
     private static int speed;
 
-    public ConveyorBelt(String inDirection, ArrayList<String> outDirection, int beltSpeed){
+    public ConveyorBelt(int beltSpeed, String outDirection, String [] inDirection) {
+
         incomingFlowDirection = inDirection;
         outcomingFlowDirection = outDirection;
         speed = beltSpeed;
@@ -17,7 +17,7 @@ public class ConveyorBelt implements FieldType {
         return incomingFlowDirection;
     }
 
-    public static ArrayList<String> getOutcomingFlowDirection() {
+    public static String[] getOutcomingFlowDirection() {
         return outcomingFlowDirection;
     }
 
