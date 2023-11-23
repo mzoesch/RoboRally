@@ -19,7 +19,7 @@ public class PlayCardModel extends AServerRequestModel {
 
         JSONObject j = new JSONObject();
         j.put("messageType", "PlayCard");
-        j.put("messsageBody", body);
+        j.put("messageBody", body);
 
         return j;
     }
