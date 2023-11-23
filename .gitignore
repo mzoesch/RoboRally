@@ -53,3 +53,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Other ###
+dependency-reduced-pom.xml
