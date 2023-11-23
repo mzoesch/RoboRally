@@ -1,6 +1,8 @@
 package sep.server.model.game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 
@@ -79,5 +81,11 @@ public class Player {
 
   public void setUpgradeCards(ArrayList<AUpgradeCard> upgradeCards) {
     this.upgradeCards = upgradeCards;
+  }
+
+  public void shuffleAndRefillDeck() {
+    Collections.shuffle(discardPile);
+    playerDeck.addAll(playerDeck.size(), discardPile); // Refill playerDeck with the shuffled discardPile at the end of PlayerDeck
+    discardPile.clear();
   }
 }

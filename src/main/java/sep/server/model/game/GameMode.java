@@ -13,10 +13,12 @@ public class GameMode
     Player[] players;
     int energyBank;
     AUpgradeCard[] upgradeShop;
+    int currentRoundNumber; //Represents the round number during the activation phase (indicate which register is currently being revealed)
 
     public GameMode(String course, PlayerController[] playerControllers)
     {
     }
+
 
     public void setupGame() {}
     public void startGame() {}
