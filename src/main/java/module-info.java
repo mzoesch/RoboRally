@@ -3,6 +3,7 @@ module sep
     requires javafx.controls;
     requires javafx.fxml;
     requires org.json;
+    requires org.apache.logging.log4j;
 
     opens sep.view to javafx.fxml;
     exports sep.view;
