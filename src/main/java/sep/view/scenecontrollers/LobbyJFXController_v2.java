@@ -23,9 +23,13 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.util.Objects;
 import javafx.scene.input.KeyCode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class LobbyJFXController_v2
 {
+    private static final Logger l = LogManager.getLogger(LobbyJFXController_v2.class);
+
     @FXML private Label sessionIDLabel;
     @FXML private TextField lobbyMsgInputTextField;
     @FXML private ScrollPane lobbyMsgScrollPane;
@@ -178,7 +182,7 @@ public final class LobbyJFXController_v2
                     this.addToChatMsgToScrollPane(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
                 }
 
-                System.out.printf("[CLIENT] Whispering to %s.%n", targetPlayer);
+                l.debug("Whispering to {}.", targetPlayer);
 
                 return;
             }
@@ -283,13 +287,13 @@ public final class LobbyJFXController_v2
 
                 if (this.isPlayerNameValid())
                 {
-                    System.out.printf("[CLIENT] Robot %d selected.%n", finalI);
+                    l.debug("Robot {} selected.", finalI);
                     new PlayerValuesModel(this.getPlayerName(), finalI).send();
                     return;
                 }
 
                 this.formErrorLabel.setText("Invalid player name.");
-                System.out.printf("[CLIENT] Robot %d selected, but player name is invalid.%n", finalI);
+                l.debug("Robot {} selected, but player name is invalid.", finalI);
 
                 return;
             });

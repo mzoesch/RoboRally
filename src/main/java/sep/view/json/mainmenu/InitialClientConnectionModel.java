@@ -7,9 +7,13 @@ import org.json.JSONObject;
 import org.json.JSONException;
 import java.io.IOException;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class InitialClientConnectionModel
 {
+    private static final Logger l = LogManager.getLogger(InitialClientConnectionModel.class);
+
     private InitialClientConnectionModel() throws IllegalStateException
     {
         super();
@@ -23,7 +27,8 @@ public final class InitialClientConnectionModel
             return false;
         }
 
-        System.out.printf("[CLIENT] Server Protocol %s. Client Protocol %s.%n", jsonObject.getJSONObject("messageBody").getString("protocol"), String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
+        l.debug("Server Protocol Version: {}", jsonObject.getJSONObject("messageBody").getString("protocol"));
+        l.debug("Client Protocol Version: {}", String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
         return jsonObject.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
     }
 

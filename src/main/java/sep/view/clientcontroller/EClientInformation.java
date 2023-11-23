@@ -10,6 +10,8 @@ import java.io.BufferedWriter;
 import java.util.concurrent.Executors;
 import java.io.OutputStreamWriter;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -19,6 +21,8 @@ import javafx.stage.Stage;
 public enum EClientInformation
 {
     INSTANCE;
+
+    private static final Logger l = LogManager.getLogger(EClientInformation.class);
 
     private boolean bWrap;
     /** Only valid during wrapping. */
@@ -71,11 +75,21 @@ public enum EClientInformation
     {
         if (this.socket != null || this.bufferedReader != null || this.bufferedWriter != null)
         {
-            System.err.println("[CLIENT] Socket already initialized.");
+            l.error("Socket already initialized.");
             return false;
         }
 
-        this.socket = new Socket(EClientInformation.SERVER_IP, EClientInformation.SERVER_PORT);
+        try
+        {
+            this.socket = new Socket(EClientInformation.SERVER_IP, EClientInformation.SERVER_PORT);
+        }
+        catch (java.net.ConnectException e)
+        {
+            l.error("Failed to connect to server.");
+            l.error(e.getMessage());
+            return false;
+        }
+
         this.inputStreamReader = new InputStreamReader(this.socket.getInputStream());
         this.outputStreamWriter = new OutputStreamWriter(this.socket.getOutputStream());
         this.bufferedReader = new BufferedReader(this.inputStreamReader);
@@ -92,7 +106,7 @@ public enum EClientInformation
     {
         if (this.bufferedReader == null)
         {
-            System.err.println("[CLIENT] Socket not initialized.");
+            l.error("Socket not initialized.");
             return null;
         }
 
@@ -108,7 +122,7 @@ public enum EClientInformation
     {
         if (this.serverListener != null)
         {
-            System.err.printf("[CLIENT] ServerListener already initialized.%n");
+            l.error("ServerListener already initialized.");
             return;
         }
 
@@ -116,7 +130,7 @@ public enum EClientInformation
         this.serverListener = new ServerListener(this.socket, this.inputStreamReader, this.bufferedReader);
         this.executorService.execute(this.serverListener);
 
-        System.out.printf("[CLIENT] Now listening for standard server responses.%n");
+        l.debug("Now listening for standard server responses.");
 
         return;
     }
@@ -125,7 +139,7 @@ public enum EClientInformation
     {
         if (this.bufferedWriter == null)
         {
-            System.err.println("[CLIENT] Socket not initialized.");
+            l.error("Socket not initialized.");
             return;
         }
 
@@ -137,8 +151,8 @@ public enum EClientInformation
         }
         catch (IOException e)
         {
-            System.err.println("[CLIENT] Failed to send request to server.");
-            System.err.println(e.getMessage());
+            l.error("Failed to send request to server.");
+            l.error(e.getMessage());
             return;
         }
 

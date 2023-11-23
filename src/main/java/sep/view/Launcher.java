@@ -2,11 +2,17 @@ package sep.view;
 
 import sep.view.clientcontroller.GameInstance;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Launcher
 {
+    private static final Logger l = LogManager.getLogger(Launcher.class);
+
     private Launcher() throws RuntimeException
     {
         super();
+        l.error("This class cannot be instantiated.");
         throw new RuntimeException("This class cannot be instantiated.");
     }
 
@@ -31,13 +37,13 @@ public class Launcher
 
         if (bWrap)
         {
-            System.out.printf("[CLIENT] Wrapping main method.%n");
+            l.info("Wrapping main method.");
             sep.view.clientcontroller.EClientInformation.INSTANCE.setWrap(true);
         }
 
         GameInstance.run();
 
-        System.out.printf("[CLIENT] The application took %.2f seconds to run.%n", (System.currentTimeMillis() - t0) / 1000);
+        l.debug("The application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
 
         if (bWrap)
         {

@@ -1,11 +1,16 @@
 package sep.view.json;
 
+import sep.view.clientcontroller.GameInstance;
+
 import org.json.JSONObject;
 import java.io.IOException;
-import sep.view.clientcontroller.GameInstance;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class AServerRequestModel
 {
+    private static final Logger l = LogManager.getLogger(AServerRequestModel.class);
+
     public AServerRequestModel()
     {
         super();
@@ -22,8 +27,8 @@ public abstract class AServerRequestModel
         }
         catch (IOException e)
         {
-            System.err.printf("[CLIENT] Failed to send request to server%n");
-            System.err.printf("[CLIENT] %s%n", e.getMessage());
+            l.error("Failed to send request to server");
+            l.error(e.getMessage());
             return;
         }
 

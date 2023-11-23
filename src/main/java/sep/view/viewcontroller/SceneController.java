@@ -7,6 +7,8 @@ import javafx.fxml.FXMLLoader;
 import java.util.ArrayList;
 import javafx.scene.layout.Pane;
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Object that handles the overall flow in the Graphical User Interface. It manages the loading of FXML files and
@@ -14,6 +16,8 @@ import java.io.IOException;
  */
 public final class SceneController
 {
+    private static final Logger l = LogManager.getLogger(SceneController.class);
+
     public static final String WIN_TITLE = "CLIENT";
     public static final int PREF_WIDTH = 1_280;
     public static final int PREF_HEIGHT = 720;
@@ -71,7 +75,7 @@ public final class SceneController
             }
         }
 
-        System.err.printf("[CLIENT] Failed to activate screen with ID %s.%n", ID);
+        l.fatal("Failed to activate screen with ID {}.", ID);
         GameInstance.kill();
         return;
     }
@@ -86,8 +90,8 @@ public final class SceneController
         }
         catch (IOException e)
         {
-            System.err.printf("[CLIENT] Failed to load FXML file at %s.%n", path);
-            System.err.printf("[CLIENT] %s%n", e.getMessage());
+            l.fatal("Failed to load FXML file at {}.", path);
+            l.fatal(e.getMessage());
             GameInstance.kill();
             return;
         }
@@ -106,7 +110,7 @@ public final class SceneController
         RGameScene<?> currentScreen = this.getCurrentScreen();
         if (!currentScreen.hasFallback())
         {
-            System.err.println("[CLIENT] Fatal error. No fallback screen found.");
+            l.fatal("No fallback screen found.");
             GameInstance.kill();
             return;
         }
@@ -126,7 +130,7 @@ public final class SceneController
     {
         if (this.screens.isEmpty())
         {
-            System.err.printf("[CLIENT] Fatal error. No screens are loaded.%n");
+            l.fatal("No screens are loaded.");
             GameInstance.kill();
             return null;
         }
@@ -139,7 +143,7 @@ public final class SceneController
             }
         }
 
-        System.err.printf("[CLIENT] Fatal error. No screen with ID %s found.%n", ID);
+        l.fatal("No screen with ID {} found.", ID);
         GameInstance.kill();
         return null;
     }

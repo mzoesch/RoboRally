@@ -5,6 +5,8 @@ import sep.view.viewcontroller.ViewLauncher;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
@@ -14,6 +16,8 @@ import java.util.Objects;
 public enum EGameState
 {
     INSTANCE;
+
+    private static final Logger l = LogManager.getLogger(EGameState.class);
 
     public static final int INVALID_FIGURE_ID = -1;
     public static final String[] FIGURE_NAMES = new String[] {"Hulk x90", "Spin Bot", "Hammer Bot", "Twonky", "Trundle Bot", "Twitch", "Squash Bot"};
@@ -81,7 +85,8 @@ public enum EGameState
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setPlayerName(dsrp.getPlayerName());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setFigureID(dsrp.getFigureID());
             ViewLauncher.updatePlayerSelection();
-            System.out.printf("[CLIENT] Remote player %d already added. Updating his name and figures.%n", dsrp.getPlayerID());
+
+            l.debug("Remote player {} already added. Updating his name and figures.%n", dsrp.getPlayerID());
             return;
         }
 

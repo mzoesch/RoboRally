@@ -11,6 +11,8 @@ import java.io.BufferedWriter;
 import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -18,6 +20,8 @@ import org.json.JSONObject;
  */
 public class ServerListener implements Runnable
 {
+    private static final Logger l = LogManager.getLogger(ServerListener.class);
+
     /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
     private static final int ESCAPE_CHARACTER = 36;
 
@@ -53,12 +57,12 @@ public class ServerListener implements Runnable
         }
         catch (IOException e)
         {
-            System.err.println("[CLIENT] Failed to send escape character.");
+            l.error("Failed to send escape character.");
             EClientInformation.INSTANCE.setServerListener(null);
             return;
         }
 
-        System.out.printf("[CLIENT] Send closing connection request to server.%n");
+        l.debug("Send closing connection request to server.");
         EClientInformation.INSTANCE.setServerListener(null);
 
         return;
@@ -85,8 +89,8 @@ public class ServerListener implements Runnable
                 }
                 catch (JSONException e)
                 {
-                    System.err.println("[CLIENT] Failed to parse JSON request from server. Ignoring.");
-                    System.err.println(e.getMessage());
+                    l.warn("Failed to parse JSON request from server. Ignoring.");
+                    l.warn(e.getMessage());
                     continue;
                 }
 
@@ -95,8 +99,8 @@ public class ServerListener implements Runnable
         }
         catch (IOException e)
         {
-            System.err.printf("[CLIENT] Failed to read from server.%n");
-            System.err.println(e.getMessage());
+            l.fatal("Failed to read from server.");
+            l.fatal(e.getMessage());
             GameInstance.handleServerDisconnect();
             return;
         }
@@ -106,7 +110,7 @@ public class ServerListener implements Runnable
     {
         if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {
-            System.out.printf("[CLIENT] Received keep-alive from server. Responding.%n");
+            l.trace("Received keep-alive from server. Responding.");
             try
             {
                 GameInstance.respondToKeepAlive();
@@ -122,20 +126,20 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "PlayerAdded"))
         {
-            System.out.printf("[CLIENT] Received player added from server.%n");
+            l.debug("Received player added from server.");
             EGameState.addRemotePlayer(dsrp);
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ReceivedChat"))
         {
-            System.out.printf("[CLIENT] Received chat message from server.%n");
+            l.debug("Received chat message from server.");
             ViewLauncher.handleChatMessage(dsrp);
             return;
         }
 
-        System.err.println("[CLIENT] Received unknown request from server. Ignoring.");
-        System.err.println(dsrp.getRequest().toString(2));
+        l.warn("Received unknown request from server. Ignoring.");
+        l.warn(dsrp.getType_v2());
 
         return;
     }

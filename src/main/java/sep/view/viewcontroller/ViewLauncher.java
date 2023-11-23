@@ -10,6 +10,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.WindowEvent;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * This class is responsible for launching the JavaFX application.
@@ -19,6 +21,8 @@ import javafx.stage.Stage;
  */
 public final class ViewLauncher extends Application
 {
+    private static final Logger l = LogManager.getLogger(ViewLauncher.class);
+
     /** This instance is only valid on the JFX thread. */
     private static ViewLauncher INSTANCE;
     private SceneController sceneController;
@@ -26,7 +30,8 @@ public final class ViewLauncher extends Application
     public ViewLauncher()
     {
         super();
-        System.out.printf("[CLIENT] Creating View Launcher instance.%n");
+
+        l.debug("Creating View Launcher instance.");
         ViewLauncher.INSTANCE = this;
         return;
     }
@@ -84,7 +89,7 @@ public final class ViewLauncher extends Application
             return;
         }
 
-        System.err.printf("[CLIENT] Received chat message but could not find the correct controller to handle it.%n");
+        l.error("Received chat message but could not find the correct controller to handle it.");
         return;
     }
 
@@ -99,8 +104,8 @@ public final class ViewLauncher extends Application
         }
         catch (ClassCastException e)
         {
-            System.err.printf("[CLIENT] Could not cast current controller to LobbyJFXController. Ignoring.%n");
-            System.err.printf("[CLIENT] %s%n", e.getMessage());
+            l.error("Could not cast current controller to LobbyJFXController. Ignoring.");
+            l.error(e.getMessage());
             return;
         }
     }

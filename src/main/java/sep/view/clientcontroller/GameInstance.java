@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.json.JSONObject;
 import org.json.JSONException;
 import sep.view.viewcontroller.ViewLauncher;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * High-level manager object for an instance of the running game. Spawned at game creation and not destroyed until
@@ -16,6 +18,7 @@ import sep.view.viewcontroller.ViewLauncher;
  */
 public class GameInstance
 {
+    private static final Logger l = LogManager.getLogger(GameInstance.class);
     public static final int MAX_PLAYER_NAME_LENGTH = 16;
 
     private GameInstance()
@@ -24,13 +27,13 @@ public class GameInstance
 
         if (EClientInformation.INSTANCE.getJFXInstance() == null)
         {
-            System.out.printf("[CLIENT] Game Instance initialized on main thread (JFX) constructing window.%n");
+            l.info("Creating Game Instance for main thread (JFX), constructing window.");
             EClientInformation.INSTANCE.setJFXInstance(this);
             ViewLauncher.run();
             return;
         }
 
-        System.out.printf("[CLIENT] Creating Game Instance for thread.%n");
+        l.info("Creating Game Instance for thread.");
 
         return;
     }
@@ -57,7 +60,7 @@ public class GameInstance
     {
         if (EClientInformation.INSTANCE.hasServerConnection())
         {
-            System.out.printf("[CLIENT] Client is already connected to a server.%n");
+            l.error("Client is already connected to a server.");
             return false;
         }
 
@@ -69,7 +72,7 @@ public class GameInstance
     {
         if (!EClientInformation.INSTANCE.hasServerConnection())
         {
-            System.out.printf("[CLIENT] Client is not connected to a server.%n");
+            l.error("Client is not connected to a server.");
             return false;
         }
 
@@ -82,12 +85,12 @@ public class GameInstance
         boolean bOk = InitialClientConnectionModel.checkServerProtocolVersion(serverProtocolVersion);
         if (!bOk)
         {
-            System.out.printf("[CLIENT] Server protocol version mismatch.%n");
+            l.fatal("Server protocol version mismatch.");
             return false;
         }
 
         InitialClientConnectionModel.sendProtocolVersionConfirmation();
-        System.out.printf("[CLIENT] Server protocol version confirmed.%n");
+        l.debug("Server protocol version confirmed.");
 
         JSONObject welcome = GameInstance.waitForServerResponse();
         if (welcome == null)
@@ -97,10 +100,10 @@ public class GameInstance
         bOk = InitialClientConnectionModel.checkPlayerID(welcome);
         if (!bOk)
         {
-            System.out.printf("[CLIENT] Failed to retrieve player ID.%n");
+            l.fatal("Failed to retrieve player ID.");
             return false;
         }
-        System.out.printf("[CLIENT] Player ID received (%d).%n", EClientInformation.INSTANCE.getPlayerID());
+        l.debug("Player ID received.");
 
         EClientInformation.INSTANCE.listen();
 
@@ -147,8 +150,8 @@ public class GameInstance
         }
         catch (JSONException e)
         {
-            System.err.printf("[CLIENT] Failed to parse server response.%n");
-            System.err.printf("[CLIENT] %s%n", e.getMessage());
+            l.error("Failed to parse server response.");
+            l.error(e.getMessage());
             return null;
         }
 
@@ -158,7 +161,7 @@ public class GameInstance
     /** Called when wrapping. */
     public static void loadInnerClient()
     {
-        System.out.printf("[WRAPPER] Launching client.%n");
+        l.info("Launching client.");
         ViewLauncher.loadInnerClient();
         return;
     }
