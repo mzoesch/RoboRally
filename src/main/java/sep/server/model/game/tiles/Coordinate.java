@@ -5,10 +5,10 @@ public class Coordinate{
 
     private static int yCoordinate;
 
-    private Coordinate northNeighbor;
-    private Coordinate eastNeighbor;
-    private Coordinate southNeighbor;
-    private Coordinate westNeighbor;
+    private Coordinate topNeighbor;
+    private Coordinate rightNeighbor;
+    private Coordinate bottomNeighbor;
+    private Coordinate leftNeighbor;
 
     public Coordinate(int x, int y){
         xCoordinate = x;
@@ -23,35 +23,35 @@ public class Coordinate{
         return yCoordinate;
     }
 
-    public Coordinate getNorthNeighbor() {
-        return northNeighbor;
+    public Coordinate getTopNeighbor() {
+        return topNeighbor;
     }
 
-    public Coordinate getEastNeighbor() {
-        return eastNeighbor;
+    public void setTopNeighbor(Coordinate topNeighbor) {
+        this.topNeighbor = topNeighbor;
     }
 
-    public Coordinate getSouthNeighbor() {
-        return southNeighbor;
+    public Coordinate getRightNeighbor() {
+        return rightNeighbor;
     }
 
-    public Coordinate getWestNeighbor() {
-        return westNeighbor;
+    public void setRightNeighbor(Coordinate rightNeighbor) {
+        this.rightNeighbor = rightNeighbor;
     }
 
-    public void setNorthNeighbor(Coordinate northNeighbor) {
-        this.northNeighbor = northNeighbor;
+    public Coordinate getBottomNeighbor() {
+        return bottomNeighbor;
     }
 
-    public void setEastNeighbor(Coordinate eastNeighbor) {
-        this.eastNeighbor = eastNeighbor;
+    public void setBottomNeighbor(Coordinate bottomNeighbor) {
+        this.bottomNeighbor = bottomNeighbor;
     }
 
-    public void setSouthNeighbor(Coordinate southNeighbor) {
-        this.southNeighbor = southNeighbor;
+    public Coordinate getLeftNeighbor() {
+        return leftNeighbor;
     }
 
-    public void setWestNeighbor(Coordinate westNeighbor) {
-        this.westNeighbor = westNeighbor;
+    public void setLeftNeighbor(Coordinate leftNeighbor) {
+        this.leftNeighbor = leftNeighbor;
     }
 }

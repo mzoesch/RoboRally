@@ -9,6 +9,9 @@ public class Tile {
     private Robot occupiedBy = null;
     private static ArrayList<FieldType> fieldTypes;
 
+    //braucht es das onBoard-Attribut? (aus Protokoll v0.1)
+    private String onBoard;
+
     public Tile(Coordinate fieldCoordinate, ArrayList<FieldType> arrayFieldTypes){
         coordinate = fieldCoordinate;
         fieldTypes = arrayFieldTypes;
