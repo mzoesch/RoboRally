@@ -1,4 +1,4 @@
 package sep.server.model.game.tiles;
 
-public class Walls implements ITile{
+public class Walls implements FieldType {
 }

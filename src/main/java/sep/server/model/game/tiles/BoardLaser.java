@@ -1,4 +1,4 @@
 package sep.server.model.game.tiles;
 
-public class BoardLaser implements ITile{
+public class BoardLaser implements FieldType {
 }

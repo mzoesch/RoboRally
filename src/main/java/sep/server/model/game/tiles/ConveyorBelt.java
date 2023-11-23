@@ -1,4 +1,4 @@
 package sep.server.model.game.tiles;
 
-public class ConveyorBelt implements ITile{
+public class ConveyorBelt implements FieldType {
 }
