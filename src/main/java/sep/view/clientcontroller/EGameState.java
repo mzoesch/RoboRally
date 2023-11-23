@@ -86,7 +86,7 @@ public enum EGameState
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setFigureID(dsrp.getFigureID());
             ViewLauncher.updatePlayerSelection();
 
-            l.debug("Remote player {} already added. Updating his name and figures.%n", dsrp.getPlayerID());
+            l.debug("Remote player {} already added. Updating his name and figures.", dsrp.getPlayerID());
             return;
         }
 
