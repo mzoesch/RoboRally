@@ -14,12 +14,10 @@ public class PlayCardModel extends AServerRequestModel {
 
     @Override
     public JSONObject toJSON() {
-        JSONObject body = new JSONObject();
-        body.put("card", this.cardName);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "PlayCard");
-        j.put("messageBody", body);
+        j.put("messageBody", new JSONObject().put("card", this.cardName));
 
         return j;
     }
