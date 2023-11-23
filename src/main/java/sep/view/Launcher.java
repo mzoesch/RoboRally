@@ -31,7 +31,7 @@ public class Launcher
 
         if (bWrap)
         {
-            System.out.printf("[CLIENT] Wrapping main methods.%n");
+            System.out.printf("[CLIENT] Wrapping main method.%n");
             sep.view.clientcontroller.EClientInformation.INSTANCE.setWrap(true);
         }
 

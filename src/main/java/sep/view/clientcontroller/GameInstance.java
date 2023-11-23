@@ -45,6 +45,10 @@ public class GameInstance
     public static void kill()
     {
         GameInstance.handleServerDisconnect();
+        if (sep.EArgs.getMode() == sep.EArgs.DEFAULT && EClientInformation.INSTANCE.getWrap())
+        {
+            sep.EArgs.setMode(sep.EArgs.EXIT);
+        }
         Platform.exit();
         return;
     }
@@ -154,6 +158,7 @@ public class GameInstance
     /** Called when wrapping. */
     public static void loadInnerClient()
     {
+        System.out.printf("[WRAPPER] Launching client.%n");
         ViewLauncher.loadInnerClient();
         return;
     }

@@ -3,10 +3,12 @@ package sep.view.viewcontroller;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.scenecontrollers.LobbyJFXController_v2;
+import sep.view.clientcontroller.GameInstance;
 
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.WindowEvent;
 import javafx.stage.Stage;
 
 /**
@@ -46,6 +48,8 @@ public final class ViewLauncher extends Application
             s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
             this.sceneController.renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
         }
+
+        s.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> GameInstance.kill());
 
         s.show();
 

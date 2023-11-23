@@ -22,6 +22,7 @@ public class WrapperJFXController
 
     public void onExitBtn(ActionEvent actionEvent)
     {
+        sep.EArgs.setMode(sep.EArgs.EXIT);
         GameInstance.kill();
         return;
     }
