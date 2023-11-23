@@ -1,5 +1,6 @@
 package sep.server.model.game.cards.programming;
 
+import sep.server.model.game.Player;
 import sep.server.model.game.Robot;
 import sep.server.model.game.cards.IPlayableCard;
 
@@ -10,7 +11,7 @@ public class RightTurn extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Robot robot) {
+    public void playCard(Player player, Robot robot) {
 
         String currentDirection = robot.getDirection();
         String newDirection;

@@ -1,5 +1,6 @@
 package sep.server.model.game.cards.programming;
 
+import sep.server.model.game.Player;
 import sep.server.model.game.Robot;
 import sep.server.model.game.cards.IPlayableCard;
 
@@ -9,6 +10,10 @@ public class PowerUp extends AProgrammingCard implements IPlayableCard {
         super(cardType);
     }
 
+
     @Override
-    public void playCard(Robot robot) {}
+    public void playCard(Player player, Robot robot) {
+        int currentEnergy = player.getEnergyCollected();
+        player.setEnergyCollected(currentEnergy + 1);
+    }
 }

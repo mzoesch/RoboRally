@@ -1,5 +1,6 @@
 package sep.server.model.game.cards.programming;
 
+import sep.server.model.game.Player;
 import sep.server.model.game.Robot;
 import sep.server.model.game.cards.IPlayableCard;
 
@@ -9,7 +10,7 @@ public class BackUp extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Robot robot) {
+    public void playCard(Player player, Robot robot) {
 
         // Assuming the game board is numbered from top to bottom (decrement the Y-coordinate when moving north)
 
