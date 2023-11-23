@@ -26,21 +26,21 @@ public class CourseBuilder {
     public ArrayList<ArrayList<Field>> buildBoard(String boardName){
 
         switch(boardName){
-            case("Test"){
+            case("Test") -> {
                 buildTestA();
 
             }
-            case("StartA"){
+            case("StartA") -> {
                 return buildStartA();
             }
 
         }
-
+        return null;
     }
 
     public ArrayList<ArrayList<Field>> buildStartA()
     {
-
+        return null;
     }
 
     public ArrayList<ArrayList<Tile>> buildTestA(){

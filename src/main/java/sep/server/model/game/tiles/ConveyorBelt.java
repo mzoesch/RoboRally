@@ -6,7 +6,7 @@ public class ConveyorBelt implements FieldType {
     private static String [] outcomingFlowDirection;
     private static int speed;
 
-    public ConveyorBelt(int beltSpeed, String outDirection, String [] inDirection) {
+    public ConveyorBelt(int beltSpeed, String inDirection, String [] outDirection) {
 
         incomingFlowDirection = inDirection;
         outcomingFlowDirection = outDirection;
