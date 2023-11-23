@@ -1,25 +1,26 @@
 package sep.server.model.game;
 
+import sep.server.model.game.tiles.*;
+
+import java.util.ArrayList;
+
 public class Tile {
     private static Coordinate coordinate;
     private Robot occupiedBy = null;
     private static ArrayList<FieldType> fieldTypes;
 
-    public Tile(Coordinate fieldCoordinate, ArrayList<FieldTypes> arrayFieldTypes){
-        this.coordinate = fieldCoordinate;
-        this.fieldTypes = arrayFieldTypes;
+    public Tile(Coordinate fieldCoordinate, ArrayList<FieldType> arrayFieldTypes){
+        coordinate = fieldCoordinate;
+        fieldTypes = arrayFieldTypes;
     }
 
     public Robot getRobot(){
         return occupiedBy;
     }
 
-    public void setRobot(Robot newRobot) throws OccupiedException{
-        if(occupiedBy == null){
-            occupiedBy = newRobot;
-        }else{
-            throw OccupiedException("This field already has a robot");
-        }
+    //TODO setRobot verhindert aktuell nicht, dass besetzes Feld neu belegt wird!
+    public void setRobot(Robot newRobot) {
+        occupiedBy = newRobot;
     }
 
     public Coordinate getCoordinate(){
