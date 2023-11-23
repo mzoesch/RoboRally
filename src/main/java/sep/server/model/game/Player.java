@@ -4,24 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import sep.server.model.game.cards.Card;
+import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 
 public class Player {
   Robot playerRobot;
   ArrayList<Card> playerDeck;
   ArrayList<Card> discardPile;
-  Card[] registers;
+  IPlayableCard[] registers;
+  int priority;
   int checkpointsCollected;
   int energyCollected;
   ArrayList<AUpgradeCard> upgradeCards;
 
   public Player(Robot playerRobot,
-                ArrayList<Card> playerDeck, ArrayList<Card> discardPile, Card[] registers,
+                ArrayList<Card> playerDeck, ArrayList<Card> discardPile, IPlayableCard[] registers, int priority,
                 int checkpointsCollected, int energyCollected, ArrayList<AUpgradeCard> upgradeCards) {
     this.playerRobot = playerRobot;
     this.playerDeck = playerDeck;
     this.discardPile = discardPile;
     this.registers = registers;
+    this.priority = priority;
     this.checkpointsCollected = checkpointsCollected;
     this.energyCollected = energyCollected;
     this.upgradeCards = upgradeCards;
@@ -51,12 +54,28 @@ public class Player {
     this.discardPile = discardPile;
   }
 
-  public Card[] getRegisters() {
+  public IPlayableCard[] getRegisters() {
     return registers;
   }
 
-  public void setRegisters(Card[] registers) {
+  public void setRegisters(IPlayableCard[] registers) {
     this.registers = registers;
+  }
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+
+  public int getCheckpointsCollected() {
+    return checkpointsCollected;
+  }
+
+  public void setCheckpointsCollected(int checkpointsCollected) {
+    this.checkpointsCollected = checkpointsCollected;
   }
 
   public int getEnergyCollected() {
