@@ -6,6 +6,8 @@ import sep.server.viewmodel.ClientInstance;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The EServerInformation enum is a singleton class that represents the server itself. The EServerInstance is spawned
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 public enum EServerInformation
 {
     INSTANCE;
+
+    private static final Logger l = LogManager.getLogger(EServerInformation.class);
 
     // TODO Move to env var
     public static final int PORT = 8080;
@@ -36,9 +40,9 @@ public enum EServerInformation
         catch (IOException e)
         {
             tServerSocket = null;
-            System.err.printf("[SERVER] Server socket failed in process.%n");
-            System.err.printf("%s%n", e.getMessage());
-            System.exit(1);
+            LogManager.getLogger(EServerInformation.class).fatal("Server socket failed in process.");
+            LogManager.getLogger(EServerInformation.class).fatal(e.getMessage());
+            System.exit(sep.EArgs.ERROR);
         }
         this.serverSocket = tServerSocket;
 
@@ -57,11 +61,11 @@ public enum EServerInformation
             continue;
         }
 
-        System.out.printf("[SERVER] Sent keep-alive to all clients.%n");
+        l.trace("Sent keep-alive to all clients.");
 
         if (!dead.isEmpty())
         {
-            System.out.printf("[SERVER] Removing %d dead client%s.%n", dead.size(), dead.size() == 1 ? "" : "s");
+            l.warn("Removing {} dead client{}.", dead.size(), dead.size() == 1 ? "" : "s");
             for (ClientInstance ci : dead)
             {
                 ci.handleDisconnect();
@@ -137,7 +141,7 @@ public enum EServerInformation
     public void removeSession(Session session)
     {
         this.sessions.remove(session);
-        System.out.printf("[SERVER] Session %s closed.%n", session.getSessionID());
+        l.info("Session {} closed.", session.getSessionID());
         return;
     }
 

@@ -4,10 +4,14 @@ import sep.server.model.EServerInformation;
 
 import java.io.IOException;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /** Implements methods relevant to the server itself. */
 public final class ServerInstance
 {
+    private static final Logger l = LogManager.getLogger(ServerInstance.class);
+
     public static ServerInstance INSTANCE;
     private final ServerListener SERVER_LISTENER;
 
@@ -15,7 +19,7 @@ public final class ServerInstance
     {
         super();
 
-        System.out.printf("[SERVER] Starting server.%n");
+        l.info("Starting server.");
 
         ServerInstance.INSTANCE = this;
         ServerInstance.keepAlive();
@@ -42,8 +46,8 @@ public final class ServerInstance
                 }
                 catch (InterruptedException e)
                 {
-                    System.err.printf("[SERVER] Keep-alive thread interrupted.%n");
-                    System.err.printf("[SERVER] %s%n", e.getMessage());
+                    l.error("Keep-alive thread interrupted.");
+                    l.error(e.getMessage());
                     return;
                 }
 

@@ -3,12 +3,17 @@ package sep.server;
 import sep.server.viewmodel.ServerInstance;
 
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class Launcher
 {
+    private static final Logger l = LogManager.getLogger(Launcher.class);
+
     private Launcher() throws RuntimeException
     {
         super();
+        l.error("This class cannot be instantiated.");
         throw new RuntimeException("This class cannot be instantiated.");
     }
 
@@ -28,13 +33,13 @@ public final class Launcher
         }
         catch (IOException e)
         {
-            System.err.printf("[SERVER] Server failed.%n");
-            System.err.printf("[SERVER] %s%n", e.getMessage());
+            l.fatal("Server failed.");
+            l.fatal(e.getMessage());
         }
         finally
         {
-            System.out.printf("[SERVER] The application took %.2f seconds to run.%n", (System.currentTimeMillis() - t0) / 1000);
-            System.exit(0);
+            l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(sep.EArgs.OK);
         }
 
         return;

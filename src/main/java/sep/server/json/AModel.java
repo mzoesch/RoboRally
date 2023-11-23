@@ -4,9 +4,13 @@ import sep.server.viewmodel.ClientInstance;
 
 import org.json.JSONObject;
 import java.io.IOException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class AModel implements IJSONSerializable
 {
+    private static final Logger l = LogManager.getLogger(AModel.class);
+
     ClientInstance ci;
 
     public AModel(ClientInstance ci)
@@ -30,8 +34,8 @@ public abstract class AModel implements IJSONSerializable
         }
         catch (IOException e)
         {
-            System.err.printf("[SERVER] Failed to send response to client%n");
-            System.err.printf("[SERVER] %s%n", e.getMessage());
+            l.error("Failed to send response to client.");
+            l.error(e.getMessage());
             return;
         }
     }

@@ -16,6 +16,8 @@ import java.util.Objects;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.net.SocketException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * High-level manager object for a client connection to the server. A Client Instance is spawned at connection
@@ -27,6 +29,8 @@ import java.net.SocketException;
  */
 public final class ClientInstance implements Runnable
 {
+    private static final Logger l = LogManager.getLogger(ClientInstance.class);
+
     // TODO ??? In our current protocol (v0.1), this is not handled in any way. So how should we close connections???
     /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
     private static final int ESCAPE_CHARACTER = 36;
@@ -77,7 +81,7 @@ public final class ClientInstance implements Runnable
         }
         this.bDisconnecting = true;
 
-        System.out.printf("[SERVER] Client %s is disconnecting.%n", this.socket.getInetAddress());
+        l.info("Client {} is disconnecting.", this.socket.getInetAddress());
 
         if (this.bIsRegistered)
         {
@@ -92,8 +96,8 @@ public final class ClientInstance implements Runnable
         }
         catch (IOException e)
         {
-            System.err.printf("[SERVER] Could not close the client connection in an orderly way.%n");
-            System.err.printf("%s%n", e.getMessage());
+            l.warn("Could not close client {} socket connection in an orderly way.", this.socket.getInetAddress());
+            l.warn(e.getMessage());
             return;
         }
 
@@ -125,7 +129,7 @@ public final class ClientInstance implements Runnable
         this.playerController.getSession().joinSession(this.playerController);
         this.bIsRegistered = true;
 
-        System.out.println("[SERVER] Client registered successfully.");
+        l.info("Client {} registered successfully.", this.socket.getInetAddress());
 
         return true;
     }
@@ -149,14 +153,14 @@ public final class ClientInstance implements Runnable
         }
         catch (IOException e)
         {
-            System.err.printf("[SERVER] Failed to read from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
-            System.err.printf("%s%n", e.getMessage());
+            l.error("Failed to read from client {}. Disconnecting them.", this.socket.getInetAddress());
+            l.error(e.getMessage());
             return null;
         }
         catch (JSONException e)
         {
-            System.err.printf("[SERVER] Received invalid JSON from client %s. Disconnecting the client.%n", this.socket.getInetAddress());
-            System.err.printf("%s%n", e.getMessage());
+            l.error("Received invalid JSON from client {}. Disconnecting them.", this.socket.getInetAddress());
+            l.error(e.getMessage());
             return null;
         }
     }
@@ -165,7 +169,7 @@ public final class ClientInstance implements Runnable
     {
         if (Objects.equals(dcrp.getType_v2(), "Alive"))
         {
-            System.out.printf("[SERVER] Ok keep-alive from client %s.%n", this.socket.getInetAddress());
+            l.trace("Ok keep-alive from client {}.", this.socket.getInetAddress());
             this.setAlive(true);
             return true;
         }
@@ -177,7 +181,7 @@ public final class ClientInstance implements Runnable
             // TODO We have to do some validation here.
             this.playerController.setPlayerName(dcrp.getPlayerName());
             this.playerController.setFigure(dcrp.getFigureID());
-            System.out.printf("[SERVER] Player %s selected figure %d.%n", this.playerController.getPlayerName(), this.playerController.getFigure());
+            l.debug("Player {} selected figure {}.", this.playerController.getPlayerName(), this.playerController.getFigure());
 
             this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
             if (!Objects.equals(oldName, this.playerController.getPlayerName()))
@@ -212,7 +216,7 @@ public final class ClientInstance implements Runnable
             catch (SocketException e)
             {
                 this.handleDisconnect();
-                System.out.printf("[SERVER] Client %s disconnected unexpectedly.%n", this.socket.getInetAddress());
+                l.warn("Client {} disconnected unexpectedly.", this.socket.getInetAddress());
                 return;
             }
 
@@ -229,8 +233,8 @@ public final class ClientInstance implements Runnable
             }
             catch (JSONException e)
             {
-                System.err.printf("[SERVER] Received invalid JSON from client %s. Ignoring.%n", this.socket.getInetAddress());
-                System.err.println(e.getMessage());
+                l.warn("Received invalid JSON from client {}. Ignoring.", this.socket.getInetAddress());
+                l.warn(e.getMessage());
                 continue;
             }
 
@@ -239,7 +243,7 @@ public final class ClientInstance implements Runnable
                 continue;
             }
 
-            System.err.println("[SERVER] Received unknown request from client. Ignoring.");
+            l.warn("Received unknown request from client {}. Ignoring.", this.socket.getInetAddress());
             continue;
         }
     }
