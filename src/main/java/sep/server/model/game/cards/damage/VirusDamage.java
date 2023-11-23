@@ -4,6 +4,7 @@ public class VirusDamage extends ADamageCard {
     public VirusDamage(String cardType) {
         super(cardType);
     }
+
     @Override
     public void playCard() {}
 }

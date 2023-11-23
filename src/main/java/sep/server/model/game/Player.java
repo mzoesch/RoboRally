@@ -4,55 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import sep.server.model.game.cards.Card;
-import sep.server.model.game.cards.upgrade.UpgradeCard;
+import sep.server.model.game.cards.upgrade.AUpgradeCard;
 
 public class Player {
-  String playerName;
-  int playerID;
-  int playerScore;
   Robot playerRobot;
   ArrayList<Card> playerDeck;
   ArrayList<Card> discardPile;
   Card[] registers;
-  ArrayList<EnergyCube> energyCollected;
-  ArrayList<UpgradeCard> upgradeCards;
+  int checkpointsCollected;
+  int energyCollected;
+  ArrayList<AUpgradeCard> upgradeCards;
 
-  public Player(String playerName, int playerID, int playerScore, Robot playerRobot,
+  public Player(Robot playerRobot,
                 ArrayList<Card> playerDeck, ArrayList<Card> discardPile, Card[] registers,
-                ArrayList<EnergyCube> energyCollected, ArrayList<UpgradeCard> upgradeCards) {
-    this.playerName = playerName;
-    this.playerID = playerID;
-    this.playerScore = playerScore;
+                int checkpointsCollected, int energyCollected, ArrayList<AUpgradeCard> upgradeCards) {
     this.playerRobot = playerRobot;
     this.playerDeck = playerDeck;
     this.discardPile = discardPile;
     this.registers = registers;
+    this.checkpointsCollected = checkpointsCollected;
     this.energyCollected = energyCollected;
     this.upgradeCards = upgradeCards;
-  }
-
-  public String getPlayerName() {
-    return playerName;
-  }
-
-  public void setPlayerName(String playerName) {
-    this.playerName = playerName;
-  }
-
-  public int getPlayerID() {
-    return playerID;
-  }
-
-  public void setPlayerID(int playerID) {
-    this.playerID = playerID;
-  }
-
-  public int getPlayerScore() {
-    return playerScore;
-  }
-
-  public void setPlayerScore(int playerScore) {
-    this.playerScore = playerScore;
   }
 
   public Robot getPlayerRobot() {
@@ -87,19 +59,19 @@ public class Player {
     this.registers = registers;
   }
 
-  public ArrayList<EnergyCube> getEnergyCollected() {
+  public int getEnergyCollected() {
     return energyCollected;
   }
 
-  public void setEnergyCollected(ArrayList<EnergyCube> energyCollected) {
+  public void setEnergyCollected(int energyCollected) {
     this.energyCollected = energyCollected;
   }
 
-  public ArrayList<UpgradeCard> getUpgradeCards() {
+  public ArrayList<AUpgradeCard> getUpgradeCards() {
     return upgradeCards;
   }
 
-  public void setUpgradeCards(ArrayList<UpgradeCard> upgradeCards) {
+  public void setUpgradeCards(ArrayList<AUpgradeCard> upgradeCards) {
     this.upgradeCards = upgradeCards;
   }
 

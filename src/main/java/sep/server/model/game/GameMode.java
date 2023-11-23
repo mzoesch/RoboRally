@@ -1,5 +1,6 @@
 package sep.server.model.game;
 
+import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.viewmodel.PlayerController;
 
 /**
@@ -8,7 +9,22 @@ import sep.server.viewmodel.PlayerController;
  */
 public class GameMode
 {
+    int playerNum;
+    Player[] players;
+    int energyBank;
+    AUpgradeCard[] upgradeShop;
+
+
     public GameMode(String course, PlayerController[] playerControllers)
     {
     }
+
+    public void setupGame() {}
+    public void startGame() {}
+    public void runRound() {}
+    public void upgradePhase() {}
+    public void programmingPhase() {}
+    public void activationPhase() {}
+    public void endRound() {}
+
 }
