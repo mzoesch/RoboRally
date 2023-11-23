@@ -1,4 +1,4 @@
 package sep.server.model.game.tiles;
 
-public class Pit implements ITile{
+public class Pit implements FieldType {
 }

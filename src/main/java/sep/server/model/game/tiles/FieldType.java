@@ -1,4 +1,4 @@
 package sep.server.model.game.tiles;
 
-public interface ITile {
+public interface FieldType {
 }

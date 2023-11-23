@@ -4,21 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import sep.server.model.game.cards.Card;
-import sep.server.model.game.cards.upgrade.AUpgradeCard;
+import sep.server.model.game.cards.upgrade.UpgradeCard;
 
 public class Player {
+  String playerName;
+  int playerID;
+  int playerScore;
   Robot playerRobot;
   ArrayList<Card> playerDeck;
   ArrayList<Card> discardPile;
   Card[] registers;
-  int checkpointsCollected;
-  int energyCollected;
-  ArrayList<AUpgradeCard> upgradeCards;
+  ArrayList<EnergyCube> energyCollected;
+  ArrayList<UpgradeCard> upgradeCards;
 
-  public Player(int checkpointsCollected, Robot playerRobot,
+  public Player(String playerName, int playerID, int playerScore, Robot playerRobot,
                 ArrayList<Card> playerDeck, ArrayList<Card> discardPile, Card[] registers,
-                int energyCollected, ArrayList<AUpgradeCard> upgradeCards) {
-    this.checkpointsCollected = checkpointsCollected;
+                ArrayList<EnergyCube> energyCollected, ArrayList<UpgradeCard> upgradeCards) {
+    this.playerName = playerName;
+    this.playerID = playerID;
+    this.playerScore = playerScore;
     this.playerRobot = playerRobot;
     this.playerDeck = playerDeck;
     this.discardPile = discardPile;
@@ -27,12 +31,28 @@ public class Player {
     this.upgradeCards = upgradeCards;
   }
 
-  public int getCheckpointsCollected() {
-    return checkpointsCollected;
+  public String getPlayerName() {
+    return playerName;
   }
 
-  public void setCheckpointsCollected(int playerScore) {
-    this.checkpointsCollected = playerScore;
+  public void setPlayerName(String playerName) {
+    this.playerName = playerName;
+  }
+
+  public int getPlayerID() {
+    return playerID;
+  }
+
+  public void setPlayerID(int playerID) {
+    this.playerID = playerID;
+  }
+
+  public int getPlayerScore() {
+    return playerScore;
+  }
+
+  public void setPlayerScore(int playerScore) {
+    this.playerScore = playerScore;
   }
 
   public Robot getPlayerRobot() {
@@ -67,19 +87,19 @@ public class Player {
     this.registers = registers;
   }
 
-  public int getEnergyCollected() {
+  public ArrayList<EnergyCube> getEnergyCollected() {
     return energyCollected;
   }
 
-  public void setEnergyCollected(int energyCollected) {
+  public void setEnergyCollected(ArrayList<EnergyCube> energyCollected) {
     this.energyCollected = energyCollected;
   }
 
-  public ArrayList<AUpgradeCard> getUpgradeCards() {
+  public ArrayList<UpgradeCard> getUpgradeCards() {
     return upgradeCards;
   }
 
-  public void setUpgradeCards(ArrayList<AUpgradeCard> upgradeCards) {
+  public void setUpgradeCards(ArrayList<UpgradeCard> upgradeCards) {
     this.upgradeCards = upgradeCards;
   }
 
