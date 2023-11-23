@@ -25,12 +25,6 @@ public class DefaultClientRequestParser
         return this.request.get("messageType");
     }
 
-    /** @deprecated */
-    public String getChatMessage() throws JSONException
-    {
-        return this.request.getString("message");
-    }
-
     public String getChatMessage_v2() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getString("message");
