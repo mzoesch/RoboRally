@@ -41,9 +41,9 @@ public class CourseBuilder {
     }
 
     public ArrayList<ArrayList<Tile>> buildTestA(){
-        ArrayList<ArrayList<Tile>> board = new ArrayList<ArrayList<Tile>>();
-        ArrayList<Tile> arrayListY = new ArrayList<Tile>();
-        ArrayList<FieldType> fieldtypes = new ArrayList<FieldType>();
+        ArrayList<ArrayList<Tile>> board = new ArrayList<>();
+        ArrayList<Tile> arrayListY = new ArrayList<>();
+        ArrayList<FieldType> fieldtypes = new ArrayList<>();
 
         //(0,0)
         fieldtypes.add(new ConveyorBelt(2, "top", new String[]{"right", "bottom"}));
@@ -75,9 +75,9 @@ public class CourseBuilder {
 
     public ArrayList<ArrayList<Tile>> buildStartA()
     {
-        ArrayList<ArrayList<Tile>> board = new ArrayList<ArrayList<Tile>>();
+        ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
-        ArrayList<FieldType> fieldtypes = new ArrayList<FieldType>();
+        ArrayList<FieldType> fieldtypes = new ArrayList<>();
 
         // (0,0)
         fieldtypes.add(new Empty());
@@ -241,9 +241,9 @@ public class CourseBuilder {
 
     public ArrayList<ArrayList<Tile>> build5B(){
 
-        ArrayList<ArrayList<Tile>> board = new ArrayList<ArrayList<Tile>>();
+        ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
-        ArrayList<FieldType> fieldtypes = new ArrayList<FieldType>();
+        ArrayList<FieldType> fieldtypes = new ArrayList<>();
 
         // (0,0)
         fieldtypes.add(new Empty());
@@ -531,7 +531,7 @@ public class CourseBuilder {
 
         // (5,3)
         fieldtypes.add(new Wall(new String[]{"WEST"}));
-        fieldtypes.add(new Laser("EAST", 1));;
+        fieldtypes.add(new Laser("EAST", 1));
         arrayListY.add(new Tile("5B",new Coordinate(5,3), fieldtypes));
         fieldtypes.clear();
 
@@ -585,7 +585,7 @@ public class CourseBuilder {
 
         // (6,3)
         fieldtypes.add(new Wall(new String[]{"EAST"}));
-        fieldtypes.add(new Laser("EAST", 1));;
+        fieldtypes.add(new Laser("EAST", 1));
         arrayListY.add(new Tile("5B",new Coordinate(6,3), fieldtypes));
         fieldtypes.clear();
 
