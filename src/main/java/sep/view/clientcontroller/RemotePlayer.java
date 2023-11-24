@@ -10,12 +10,14 @@ public final class RemotePlayer
     private final int playerID;
     private String playerName;
     private int figureID;
+    private boolean bReady;
 
-    public RemotePlayer(int playerID, String playerName, int figureID)
+    public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
     {
         this.playerID = playerID;
         this.playerName = playerName;
         this.figureID = figureID;
+        this.bReady = bReady;
 
         return;
     }
@@ -44,6 +46,17 @@ public final class RemotePlayer
     public void setFigureID(int figureID)
     {
         this.figureID = figureID;
+        return;
+    }
+
+    public boolean isReady()
+    {
+        return this.bReady;
+    }
+
+    public void setReady(boolean bReady)
+    {
+        this.bReady = bReady;
         return;
     }
 

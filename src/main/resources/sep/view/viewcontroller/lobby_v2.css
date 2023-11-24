@@ -1,9 +1,48 @@
 #form-container {
-    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#interface-wrapper {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+}
+
+#form-scroll-pane {
+    -fx-background-color: -std-background-color;
+    -fx-background: -std-background-color;
+    -fx-border-color: #ffffffff;
+
+    -fx-max-width: 700px;
+    -fx-min-height: 300px;
+    -fx-max-height: 300px;
 }
 
 #form-area {
+    -fx-alignment: center;
     -fx-spacing: 16px;
+    -fx-background-color: rgba(0, 34, 255, 0.1);
+}
+
+#player-name-form-container {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#bot-container {
+    -fx-alignment: center;
+    -fx-max-width: 700px;
+    -fx-spacing: 16px;
+
+    -fx-background-color: rgba(0, 34, 255, 0.1);
+    -fx-border-color: #ffffffff;
+    -fx-padding: 16px 16px 16px 16px;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-background-radius: 3px;
+}
+
+#ready-label-container {
+    -fx-spacing: 8px;
 }
 
 #input-text-field {
@@ -23,6 +62,7 @@
 
 #player-robot-selector-area {
     -fx-spacing: 16px;
+    -fx-alignment: center;
 }
 
 .player-robot-selector-hbox {
@@ -55,11 +95,16 @@
     -fx-alignment: center;
 }
 
+#server-map-selector-area {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+}
+
 #lobby-msg-container {
-    -fx-min-width: 400px;
-    -fx-min-height: 400px;
-    -fx-max-width: 400px;
-    -fx-max-height: 400px;
+    -fx-min-width: 350px;
+    -fx-min-height: 220px;
+    -fx-max-width: 350px;
+    -fx-max-height: 220px;
     -fx-spacing: 8px;
     -fx-background-color: transparent;
 }
@@ -67,12 +112,15 @@
 #lobby-msg-scroll-pane {
     -fx-border-radius: 0px;
     -fx-border-width: 3px;
+    -fx-background: #e5e5e5ff;
+    -fx-background-color: #ffffff;
 }
 
 #lobby-msg-scroll-pane-inner {
-    -fx-min-width: 380px;
-    -fx-max-width: 380px;
+    -fx-min-width: 320px;
+    -fx-max-width: 320px;
     -fx-background-color: transparent;
+    -fx-background: transparent;
 }
 
 #lobby-msg-input-text-field {
@@ -104,4 +152,17 @@
 }
 .lobby-msg-client {
     -fx-text-fill: #0078a1;
+}
+
+#player-list-container {
+    -fx-spacing: 4px;
+}
+
+
+.player-in-session-label {
+    -fx-padding: 4px 4px 4px 4px;
+    -fx-background-color: rgba(0, 0, 0, 0.15);
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
 }

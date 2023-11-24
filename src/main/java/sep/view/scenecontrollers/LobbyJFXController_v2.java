@@ -1,5 +1,6 @@
 package sep.view.scenecontrollers;
 
+import javafx.event.ActionEvent;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.json.lobby.PlayerValuesModel;
 import sep.view.viewcontroller.ViewLauncher;
@@ -8,6 +9,7 @@ import sep.view.clientcontroller.EGameState;
 import sep.view.json.ChatMsgModel;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.clientcontroller.EClientInformation;
+import sep.view.json.lobby.ReadyPlayerModel;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -27,13 +29,28 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.scene.Node;
 import javafx.scene.layout.Region;
-import javafx.scene.control.Labeled;
-import javafx.geometry.Pos;
+import javafx.beans.binding.Bindings;
+import javafx.util.Duration;
+import javafx.animation.PauseTransition;
 
 public final class LobbyJFXController_v2
 {
     private static final Logger l = LogManager.getLogger(LobbyJFXController_v2.class);
 
+    private boolean bReadyBtnClicked;
+
+    public LobbyJFXController_v2()
+    {
+        super();
+        this.bReadyBtnClicked = false;
+        return;
+    }
+
+    @FXML private Button readyButton;
+    @FXML private VBox playerListContainer;
+    @FXML private VBox readyLabelContainerWrapper;
+    @FXML private ScrollPane formScrollPane;
+    @FXML private VBox formArea;
     @FXML private Label sessionIDLabel;
     @FXML private TextField lobbyMsgInputTextField;
     @FXML private ScrollPane lobbyMsgScrollPane;
@@ -43,6 +60,7 @@ public final class LobbyJFXController_v2
     @FXML private Label formErrorLabel;
     @FXML private HBox playerRobotsSelectorContainer;
     @FXML private VBox playerRobotSelectorArea;
+    @FXML private HBox readyLabelContainer;
 
     /** Just for debugging purposes. Can be removed at any given time. */
     private void testChat()
@@ -69,6 +87,11 @@ public final class LobbyJFXController_v2
     {
         HBox.setHgrow(this.playerNameContainer, Priority.ALWAYS);
         VBox.setVgrow(this.lobbyMsgScrollPane, Priority.ALWAYS);
+        HBox.setHgrow(this.readyLabelContainer, Priority.ALWAYS);
+        HBox.setHgrow(this.readyLabelContainerWrapper, Priority.ALWAYS);
+
+        this.readyLabelContainerWrapper.getChildren().add(1, this.createVSpacer());
+        this.readyLabelContainer.getChildren().add(1, this.createHSpacer());
 
         this.lobbyMsgInputTextField.lengthProperty().addListener(new ChangeListener<Number>()
         {
@@ -96,11 +119,15 @@ public final class LobbyJFXController_v2
         })
         );
 
-        this.addPlayerRobotSelector_v2();
+        this.updateView();
 
         this.lobbyMsgContainer = new VBox();
         this.lobbyMsgContainer.setId("lobby-msg-scroll-pane-inner");
         this.lobbyMsgScrollPane.setContent(this.lobbyMsgContainer);
+
+        this.formArea.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
+            this.formScrollPane.getViewportBounds().getWidth(), this.formScrollPane.viewportBoundsProperty()
+        ));
 
         boolean bSuccess = false;
         try
@@ -212,10 +239,11 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    /** Always call from another thread. */
     public void updatePlayerSelection()
     {
         Platform.runLater(() -> {
-            this.addPlayerRobotSelector_v2();
+            this.updateView();
             return;
         });
     }
@@ -272,6 +300,13 @@ public final class LobbyJFXController_v2
     {
         final Region s = new Region();
         HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
         return s;
     }
 
@@ -332,9 +367,56 @@ public final class LobbyJFXController_v2
         return v;
     }
 
+    private void updateView()
+    {
+        this.addPlayerRobotSelector_v2();
+        this.updatePlayersInSession();
+        this.updateReadyBtn();
+
+        return;
+    }
+
+    private void updatePlayersInSession()
+    {
+        this.playerListContainer.getChildren().clear();
+
+        for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        {
+            Label l = new Label(rp.getPlayerName());
+            l.getStyleClass().add("player-in-session-label");
+            this.playerListContainer.getChildren().add(l);
+            continue;
+        }
+
+        return;
+    }
+
+    private void updateReadyBtn()
+    {
+        this.readyButton.setDisable(!EGameState.INSTANCE.hasClientSelectedARobot());
+        if (EGameState.INSTANCE.getClientRemotePlayer() == null)
+        {
+            this.readyButton.setText("Not Ready");
+            this.readyButton.getStyleClass().clear();
+            this.readyButton.getStyleClass().add("secondary-btn-mini");
+            return;
+        }
+        else
+        {
+            this.readyButton.setText(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "Ready" : "Not Ready");
+            this.readyButton.getStyleClass().clear();
+            this.readyButton.getStyleClass().add(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "confirm-btn-mini" : "secondary-btn-mini");
+        }
+        this.bReadyBtnClicked = false;
+
+        return;
+    }
+
     /** Will create the btn to select the different robots. */
     private void addPlayerRobotSelector_v2()
     {
+        double scrollPos = this.formScrollPane.getVvalue();
+
         this.playerRobotSelectorArea.getChildren().clear();
 
         int half = EGameState.FIGURE_NAMES.length / 2;
@@ -367,6 +449,26 @@ public final class LobbyJFXController_v2
         this.playerRobotSelectorArea.getChildren().add(hTop);
         this.playerRobotSelectorArea.getChildren().add(hBot);
 
+        // TODO This is highly experimental. But Platform.runLater() does not work (and ofc setting it
+        //      directly does not work either). Duration has to be increased on slower hardware.
+        PauseTransition p = new PauseTransition(Duration.millis(15));
+        p.setOnFinished(f -> this.formScrollPane.setVvalue(scrollPos));
+        p.play();
+
+        return;
+    }
+
+    @FXML
+    public void onReadyBtn(ActionEvent actionEvent)
+    {
+        if (this.bReadyBtnClicked)
+        {
+            return;
+        }
+        this.bReadyBtnClicked = true;
+
+        // TODO Some input validation needed.
+        new ReadyPlayerModel(!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady()).send();
         return;
     }
 

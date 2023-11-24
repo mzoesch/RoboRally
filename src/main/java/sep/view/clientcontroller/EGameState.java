@@ -90,7 +90,7 @@ public enum EGameState
             return;
         }
 
-        RemotePlayer rp = new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigureID());
+        RemotePlayer rp = new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigureID(), false);
         EGameState.INSTANCE.remotePlayers.add(rp);
         ViewLauncher.updatePlayerSelection();
 
@@ -175,6 +175,24 @@ public enum EGameState
         }
 
         return EGameState.INVALID_FIGURE_ID;
+    }
+
+    public RemotePlayer[] getRemotePlayers()
+    {
+        return this.remotePlayers.toArray(new RemotePlayer[0]);
+    }
+
+    public RemotePlayer getClientRemotePlayer()
+    {
+        for (RemotePlayer rp : this.remotePlayers)
+        {
+            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                return rp;
+            }
+        }
+
+        return null;
     }
 
     // endregion Getters and Setters
