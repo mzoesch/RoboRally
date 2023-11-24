@@ -2,22 +2,22 @@ package sep.server.model.game.tiles;
 
 public class ConveyorBelt implements FieldType {
 
-    private static String incomingFlowDirection;
-    private static String [] outcomingFlowDirection;
+    private static String[] incomingFlowDirection;
+    private static String outcomingFlowDirection;
     private static int speed;
 
-    public ConveyorBelt(int beltSpeed, String inDirection, String [] outDirection) {
+    public ConveyorBelt(int beltSpeed, String outDirection, String [] inDirection) {
 
-        incomingFlowDirection = inDirection;
         outcomingFlowDirection = outDirection;
+        incomingFlowDirection = inDirection;
         speed = beltSpeed;
     }
 
-    public static String getIncomingFlowDirection() {
+    public static String[] getIncomingFlowDirection() {
         return incomingFlowDirection;
     }
 
-    public static String[] getOutcomingFlowDirection() {
+    public static String getOutcomingFlowDirection() {
         return outcomingFlowDirection;
     }
 
