@@ -5,11 +5,19 @@ import sep.server.model.game.tiles.*;
 
 import java.util.ArrayList;
 
+/**
+ * Klasse, die das jeweilige Spielfeld erstellt
+ */
 public class CourseBuilder {
 
     public CourseBuilder() {
     }
 
+    /**
+     * Baut das entsprechende Spielfeld aus den einzelnen Boards
+     * @param courseName Name des Spielfelds
+     * @return komplettes Spielfeld als ArrayList<ArrayList<Tile>>
+     */
     public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
         switch(courseName){
             case("DizzyHighway") -> {
@@ -26,6 +34,10 @@ public class CourseBuilder {
         return null;
     }
 
+    /**
+     * Bekommt ein Spielfeld übergeben und setzt die Nachbarkoordinaten der einzelnen Tiles
+     * @param course Spielfeld
+     */
     //TODO Refactoring nötig
     public  void settingCoordinates(ArrayList<ArrayList<Tile>> course){
         for(int i = 0; i <  course.size(); i++){
@@ -56,7 +68,7 @@ public class CourseBuilder {
 
                 //bottomNeighbor
                 try{
-                    Coordinate bottomNeighbor = courseYRow.get(yCoordinate+1).getCoordinate();;
+                    Coordinate bottomNeighbor = courseYRow.get(yCoordinate+1).getCoordinate();
                     tile.getCoordinate().setBottomNeighbor(bottomNeighbor);
                 }
                 catch (Exception indexOutOfBoundsException){
@@ -75,16 +87,27 @@ public class CourseBuilder {
         }
     }
 
+    /**
+     * Fügt ein Board von rechts an ein anderes Board an
+     * @param leftBoard linkes Board
+     * @param rightBoard rechtes Board (wird angefügt)
+     * @return ArrayList, die zusammengefügtes Board repräsentiert
+     */
     public  ArrayList<ArrayList<Tile>> appendRight(ArrayList<ArrayList<Tile>> leftBoard, ArrayList<ArrayList<Tile>> rightBoard){
 
         return null;
     }
 
+    /**
+     * Baut ein Board abhängig vom Boardname
+     * @param boardName Name des zu erstellenden Boards
+     * @return erstelltes Board
+     */
     public ArrayList<ArrayList<Tile>> buildBoard(String boardName){
 
         switch(boardName){
             case("Test") -> {
-                buildTestA();
+                return buildTestA();
             }
             case("StartA") -> {
                 return buildStartA();
@@ -98,6 +121,10 @@ public class CourseBuilder {
         return null;
     }
 
+    /**
+     * Baut das TestBoard aus Protokollv0.1
+     * @return ArrayList des TestBoards
+     */
     public ArrayList<ArrayList<Tile>> buildTestA(){
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
@@ -131,6 +158,10 @@ public class CourseBuilder {
 
     }
 
+    /**
+     * Baut das Board StartA (Teil von DizzyHighway)
+     * @return ArrayList des Boards StartA
+     */
     public ArrayList<ArrayList<Tile>> buildStartA()
     {
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
@@ -297,6 +328,10 @@ public class CourseBuilder {
         return board;
     }
 
+    /**
+     * Baut das Board 5B (Teil von DizzyHighway)
+     * @return ArrayList des Boards 5B
+     */
     public ArrayList<ArrayList<Tile>> build5B(){
 
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
