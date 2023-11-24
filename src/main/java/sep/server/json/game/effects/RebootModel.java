@@ -6,7 +6,7 @@ import sep.server.viewmodel.ClientInstance;
 
 public class RebootModel extends AModel {
 
-    private final int playerID,
+    private final int playerID;
 
     public RebootModel(ClientInstance ci, int playerID) {
         super(ci);
