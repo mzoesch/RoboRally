@@ -15,8 +15,8 @@ public class Again extends AProgrammingCard implements IPlayableCard {
     @Override
     public void playCard(Player player, Robot robot, int currentRoundNumber) {
 
-        Card[] registers = player.getRegisters();
-        Card previousRoundCard = registers[currentRoundNumber - 2]; //-2 because the currentRoundNumber is numbered from 1 to 5
+        IPlayableCard[] registers = player.getRegisters();
+        IPlayableCard previousRoundCard = registers[currentRoundNumber - 2]; //-2 because the currentRoundNumber is numbered from 1 to 5
 
         //Check if the currentRoundNumber is higher than 1
         if (currentRoundNumber <= 1) {
@@ -41,7 +41,7 @@ public class Again extends AProgrammingCard implements IPlayableCard {
 
         Card drawnCard = player.getPlayerDeck().remove(0);
 
-        player.getRegisters()[currentRoundNumber - 2] = drawnCard;
+        player.getRegisters()[currentRoundNumber - 2] = (IPlayableCard) drawnCard;
 
         playCard(player, robot, currentRoundNumber - 2);
     }
