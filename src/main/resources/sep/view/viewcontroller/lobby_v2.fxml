@@ -25,37 +25,51 @@
             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0" AnchorPane.bottomAnchor="0.0"
         >
             <children>
-                <HBox
-                    id="form-container" stylesheets="@lobby_v2.css"
-                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                <VBox
+                    id="form-area" stylesheets="@lobby_v2.css"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
                 >
-                    <children>
-                        <VBox
-                            fx:id="playerNameContainer"
-                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
-                        >
-                            <Label
-                                text="Player Name:"
-                                styleClass="text-base"
-                                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    <HBox
+                        id="form-container" stylesheets="@lobby_v2.css"
+                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                    >
+                        <children>
+                            <VBox
+                                fx:id="playerNameContainer"
+                                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                            >
+                                <Label
+                                    text="Player Name:"
+                                    styleClass="text-base"
+                                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                />
+                                <TextField
+                                    promptText="Enter your player name"
+                                    id="input-text-field" stylesheets="@lobby_v2.css"
+                                    fx:id="playerNameField"
+                                />
+                                <Label
+                                    fx:id="formErrorLabel"
+                                    styleClass="text-base-error"
+                                />
+                            </VBox>
+                            <HBox
+                                id="player-robot-selector-container" stylesheets="@lobby_v2.css"
+                                fx:id="playerRobotsSelectorContainer"
+                                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
                             />
-                            <TextField
-                                promptText="Enter your player name"
-                                id="input-text-field" stylesheets="@lobby_v2.css"
-                                fx:id="playerNameField"
-                            />
-                            <Label
-                                fx:id="formErrorLabel"
-                                styleClass="text-base-error"
-                            />
-                        </VBox>
-                        <HBox
-                            id="player-robot-selector-container" stylesheets="@lobby_v2.css"
-                            fx:id="playerRobotsSelectorContainer"
-                            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
-                        />
-                    </children>
-                </HBox>
+                        </children>
+                    </HBox>
+                    <Label
+                        text="Select Your Robot:"
+                        styleClass="text-xl" alignment="CENTER"
+                    />
+                    <VBox
+                        id="player-robot-selector-area" stylesheets="@lobby_v2.css"
+                        fx:id="playerRobotSelectorArea"
+                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                    />
+                </VBox>
             </children>
         </AnchorPane>
         <VBox
