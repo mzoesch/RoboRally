@@ -3,7 +3,6 @@ package sep.server.model.game.courseBuilder;
 import sep.server.model.game.Tile;
 import sep.server.model.game.tiles.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class CourseBuilder {
@@ -11,19 +10,19 @@ public class CourseBuilder {
     public CourseBuilder() {
     }
 
-    public  ArrayList<ArrayList<Field>> buildCourse(){
-        ArrayList<ArrayList<Field>> boardStartA = buildBoard("StartA");
-        ArrayList<ArrayList<Field>> board5B = buildBoard("5B");
+    public  ArrayList<ArrayList<Tile>> buildCourse(){
+        ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+        ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
 
         return appendRight(boardStartA, board5B);
     }
 
-    public  ArrayList<ArrayList<Field>> appendRight(ArrayList<ArrayList<Field>> leftBoard, ArrayList<ArrayList<Field>> rightBoard){
+    public  ArrayList<ArrayList<Tile>> appendRight(ArrayList<ArrayList<Tile>> leftBoard, ArrayList<ArrayList<Tile>> rightBoard){
 
         return null;
     }
 
-    public ArrayList<ArrayList<Field>> buildBoard(String boardName){
+    public ArrayList<ArrayList<Tile>> buildBoard(String boardName){
 
         switch(boardName){
             case("Test") -> {
@@ -38,7 +37,7 @@ public class CourseBuilder {
         return null;
     }
 
-    public ArrayList<ArrayList<Field>> buildStartA()
+    public ArrayList<ArrayList<Tile>> buildStartA()
     {
         ArrayList<ArrayList<Tile>> board = new ArrayList<ArrayList<Tile>>();
         ArrayList<Tile> arrayListY = new ArrayList<>();

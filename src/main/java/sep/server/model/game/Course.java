@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class Course {
 
-    private ArrayList<ArrayList<Field>> course;
+    private ArrayList<ArrayList<Tile>> course;
 
     public Course(String courseName) {
         CourseBuilder courseBuilder = new CourseBuilder();
