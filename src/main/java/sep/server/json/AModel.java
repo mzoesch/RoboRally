@@ -11,7 +11,7 @@ public abstract class AModel implements IJSONSerializable
 {
     private static final Logger l = LogManager.getLogger(AModel.class);
 
-    ClientInstance ci;
+    private final ClientInstance ci;
 
     public AModel(ClientInstance ci)
     {
@@ -27,9 +27,9 @@ public abstract class AModel implements IJSONSerializable
     {
         try
         {
-            ci.getBufferedWriter().write(this.toJSON().toString());
-            ci.getBufferedWriter().newLine();
-            ci.getBufferedWriter().flush();
+            this.ci.getBufferedWriter().write(this.toJSON().toString());
+            this.ci.getBufferedWriter().newLine();
+            this.ci.getBufferedWriter().flush();
             return;
         }
         catch (IOException e)
