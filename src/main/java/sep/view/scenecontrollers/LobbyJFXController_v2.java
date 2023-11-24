@@ -360,6 +360,12 @@ public final class LobbyJFXController_v2
                     return;
                 }
 
+                if (EGameState.INSTANCE.isPlayerRobotUnavailable(idx))
+                {
+                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but this robot is already taken. Ignoring.", idx, EGameState.FIGURE_NAMES[idx]);
+                    return;
+                }
+
                 LobbyJFXController_v2.l.debug("Player selected robot ({}) {}.", idx, EGameState.FIGURE_NAMES[idx]);
                 new PlayerValuesModel(this.getPlayerName(), idx).send();
                 return;
