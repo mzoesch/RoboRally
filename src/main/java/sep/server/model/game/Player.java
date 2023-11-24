@@ -11,6 +11,7 @@ public class Player {
   Robot playerRobot;
   ArrayList<Card> playerDeck;
   ArrayList<Card> discardPile;
+  ArrayList<Card> playerHand;
   IPlayableCard[] registers;
   int priority;
   int checkpointsCollected;
@@ -53,6 +54,14 @@ public class Player {
   public void setDiscardPile(ArrayList<Card> discardPile) {
     this.discardPile = discardPile;
   }
+  public ArrayList<Card> getPlayerHand() {
+    return playerHand;
+  }
+
+  public void setPlayerHand(ArrayList<Card> playerHand) {
+    this.playerHand = playerHand;
+  }
+
 
   public IPlayableCard[] getRegisters() {
     return registers;

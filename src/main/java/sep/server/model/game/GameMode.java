@@ -1,5 +1,6 @@
 package sep.server.model.game;
 
+import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
@@ -30,7 +31,9 @@ public class GameMode
     public void determinePriority() {}
     public void runRound() {}
     public void upgradePhase() {}
-    public void programmingPhase() {}
+    public void programmingPhase() {
+        distributeCards(players);
+    }
     public void activationPhase() {
         //sort players by priority
         players.sort(Comparator.comparingInt(Player::getPriority));
@@ -49,6 +52,18 @@ public class GameMode
 
         endRound();
     }
+    public void distributeCards(ArrayList<Player> players) {
+        for (Player player : players) {
+            for (int i = 0; i < 9; i++) {
+                if (player.getPlayerDeck().isEmpty()) {
+                    player.shuffleAndRefillDeck();
+                }
+                Card card = player.getPlayerDeck().remove(0);
+                player.getPlayerHand().add(card);
+            }
+        }
+    }
+
     public void activateBoardElements() {}
     public void shootRobotLasers() {}
     public void endRound() {
