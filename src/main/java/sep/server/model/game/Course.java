@@ -10,7 +10,7 @@ public class Course {
 
     public Course(String courseName) {
         CourseBuilder courseBuilder = new CourseBuilder();
-        course = courseBuilder.buildCourse();
+        course = courseBuilder.buildCourse(courseName);
     }
 
     public void activateBoard() {}

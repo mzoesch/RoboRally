@@ -15,11 +15,11 @@ public class Coordinate{
         yCoordinate = y;
 
     }
-    public static int getXCoordinate() {
+    public int getXCoordinate() {
         return xCoordinate;
     }
 
-    public static int getYCoordinate() {
+    public int getYCoordinate() {
         return yCoordinate;
     }
 

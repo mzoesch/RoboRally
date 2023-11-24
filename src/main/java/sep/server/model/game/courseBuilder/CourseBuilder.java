@@ -10,11 +10,69 @@ public class CourseBuilder {
     public CourseBuilder() {
     }
 
-    public  ArrayList<ArrayList<Tile>> buildCourse(){
-        ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
-        ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
+    public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
+        switch(courseName){
+            case("DizzyHighway") -> {
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
+                settingCoordinates(entireCourse);
+                return entireCourse;
+            }
+            case("Test") -> {
+                return buildBoard("Test");
+            }
+        }
+        return null;
+    }
 
-        return appendRight(boardStartA, board5B);
+    //TODO Refactoring nötig
+    public  void settingCoordinates(ArrayList<ArrayList<Tile>> course){
+        for(int i = 0; i <  course.size(); i++){
+
+            ArrayList<Tile> courseYRow = course.get(i);
+            for(int a = 0; a < courseYRow.size(); a++){
+                Tile tile = courseYRow.get(i);
+                int xCoordinate = tile.getCoordinate().getXCoordinate();
+                int yCoordinate = tile.getCoordinate().getYCoordinate();
+
+                //topNeighbor
+                try{
+                    Coordinate topNeighbor = courseYRow.get(yCoordinate-1).getCoordinate();
+                    tile.getCoordinate().setTopNeighbor(topNeighbor);
+                }
+                catch (Exception indexOutOfBoundsException){
+                    tile.getCoordinate().setTopNeighbor(null);
+                }
+
+                //rightNeighbor
+                try{
+                    Coordinate rightNeighbor = course.get(xCoordinate+1).get(yCoordinate).getCoordinate();
+                    tile.getCoordinate().setRightNeighbor(rightNeighbor);
+                }
+                catch (Exception indexOutOfBoundsException){
+                    tile.getCoordinate().setRightNeighbor(null);
+                }
+
+                //bottomNeighbor
+                try{
+                    Coordinate bottomNeighbor = courseYRow.get(yCoordinate+1).getCoordinate();;
+                    tile.getCoordinate().setBottomNeighbor(bottomNeighbor);
+                }
+                catch (Exception indexOutOfBoundsException){
+                    tile.getCoordinate().setBottomNeighbor(null);
+                }
+
+                //rightNeighbor
+                try{
+                    Coordinate leftNeighbor = course.get(xCoordinate-1).get(yCoordinate).getCoordinate();
+                    tile.getCoordinate().setLeftNeighbor(leftNeighbor);
+                }
+                catch (Exception indexOutOfBoundsException){
+                    tile.getCoordinate().setLeftNeighbor(null);
+                }
+            }
+        }
     }
 
     public  ArrayList<ArrayList<Tile>> appendRight(ArrayList<ArrayList<Tile>> leftBoard, ArrayList<ArrayList<Tile>> rightBoard){
