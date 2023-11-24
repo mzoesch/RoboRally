@@ -38,7 +38,6 @@ public class CourseBuilder {
      * Bekommt ein Spielfeld übergeben und setzt die Nachbarkoordinaten der einzelnen Tiles
      * @param course Spielfeld
      */
-    //TODO Refactoring nötig
     public  void settingCoordinates(ArrayList<ArrayList<Tile>> course){
         for(int i = 0; i <  course.size(); i++){
 
@@ -855,7 +854,6 @@ public class CourseBuilder {
         fieldtypes.clear();
 
         // (9,3)
-        //TODO ist das die richtige Checkpoint Nummer?
         fieldtypes.add(new CheckPoint(1));
         arrayListY.add(new Tile("5B",new Coordinate(9,3), fieldtypes));
         fieldtypes.clear();
