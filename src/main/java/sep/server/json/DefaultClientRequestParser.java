@@ -45,4 +45,9 @@ public class DefaultClientRequestParser
         return this.request.getJSONObject("messageBody").getInt("figure");
     }
 
+    public boolean getIsReadyInLobby()
+    {
+        return this.request.getJSONObject("messageBody").getBoolean("ready");
+    }
+
 }

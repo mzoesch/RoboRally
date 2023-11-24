@@ -20,6 +20,7 @@ public final class PlayerController
     private final int playerID;
     private final Session session;
     private int figure;
+    private boolean bIsReady;
 
     public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
     {
@@ -30,6 +31,7 @@ public final class PlayerController
         this.playerID = playerID;
         this.session = session;
         this.figure = -1;
+        this.bIsReady = false;
 
         return;
     }
@@ -77,6 +79,18 @@ public final class PlayerController
     public ClientInstance getClientInstance()
     {
         return this.clientInstance;
+    }
+
+    public boolean isReady()
+    {
+        return this.bIsReady;
+    }
+
+    public void setReady(boolean bIsReady)
+    {
+        this.bIsReady = bIsReady;
+        this.session.broadcastPlayerLobbyReadyStatus(this);
+        return;
     }
 
     // endregion Getters and Setters

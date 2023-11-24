@@ -196,7 +196,12 @@ public final class ClientInstance implements Runnable
         {
             // TODO Validate chat message.
             this.playerController.getSession().handleChatMessage(this.playerController, dcrp.getChatMessage_v2(), dcrp.getReceiverID());
+            return true;
+        }
 
+        if (Objects.equals(dcrp.getType_v2(), "SetStatus"))
+        {
+            this.playerController.setReady(dcrp.getIsReadyInLobby());
             return true;
         }
 

@@ -4,6 +4,7 @@ import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerValuesModel;
 import sep.server.json.common.ChatMsgModel;
+import sep.server.json.lobby.PlayerReadyModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -151,6 +152,18 @@ public final class Session
                 return;
             }
 
+            continue;
+        }
+
+        return;
+    }
+
+
+    public void broadcastPlayerLobbyReadyStatus(PlayerController playerController)
+    {
+        for (PlayerController PC : this.playerControllers)
+        {
+            new PlayerReadyModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
             continue;
         }
 
