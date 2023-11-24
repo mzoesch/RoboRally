@@ -296,6 +296,16 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    /** Will update the player status from another thread. */
+    public void handlePlayerStatusUpdate()
+    {
+        Platform.runLater(() -> {
+            this.updateReadyBtn();
+            return;
+        });
+        return;
+    }
+
     private Node createHSpacer()
     {
         final Region s = new Region();
@@ -399,7 +409,6 @@ public final class LobbyJFXController_v2
             this.readyButton.setText("Not Ready");
             this.readyButton.getStyleClass().clear();
             this.readyButton.getStyleClass().add("secondary-btn-mini");
-            return;
         }
         else
         {

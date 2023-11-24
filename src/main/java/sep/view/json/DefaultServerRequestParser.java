@@ -58,4 +58,9 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getInt("from");
     }
 
+    public boolean isLobbyPlayerStatusReady() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getBoolean("ready");
+    }
+
 }

@@ -140,6 +140,14 @@ public class ServerListener implements Runnable
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "PlayerStatus"))
+        {
+            l.debug("Received player status update.");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setReady(dsrp.isLobbyPlayerStatusReady());
+            ViewLauncher.updatePlayerStatus(dsrp);
+            return;
+        }
+
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(dsrp.getType_v2());
 

@@ -83,13 +83,27 @@ public final class ViewLauncher extends Application
 
         // TODO Here than cast to the game ctrl etc.
 
-        if (ctrl instanceof LobbyJFXController_v2 lobbyCtrl)
+        if (ctrl instanceof LobbyJFXController_v2 lCtrl)
         {
-            lobbyCtrl.handleChatMessage(dsrp);
+            lCtrl.handleChatMessage(dsrp);
             return;
         }
 
         l.error("Received chat message but could not find the correct controller to handle it.");
+        return;
+    }
+
+    public static <T> void updatePlayerStatus(DefaultServerRequestParser dsrp)
+    {
+        T ctrl = ViewLauncher.getSceneController().getCurrentController();
+
+        if (ctrl instanceof LobbyJFXController_v2 lCtrl)
+        {
+            lCtrl.handlePlayerStatusUpdate();
+            return;
+        }
+
+        l.error("Received player status update but could not find the correct controller to handle it.");
         return;
     }
 
