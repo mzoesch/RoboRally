@@ -88,14 +88,29 @@ public class CourseBuilder {
     }
 
     /**
-     * Fügt ein Board von rechts an ein anderes Board an
+     * Fügt ein Board von rechts an ein anderes Board an (funktioniert aktuell nur bei gleicher Länge)
      * @param leftBoard linkes Board
      * @param rightBoard rechtes Board (wird angefügt)
-     * @return ArrayList, die zusammengefügtes Board repräsentiert
+     * @return ArrayList, die das zusammengefügtes Board repräsentiert
      */
     public  ArrayList<ArrayList<Tile>> appendRight(ArrayList<ArrayList<Tile>> leftBoard, ArrayList<ArrayList<Tile>> rightBoard){
 
-        return null;
+        leftBoard.addAll(rightBoard);
+        return leftBoard;
+    }
+
+    /**
+     * Fügt ein Board unterhalb des anderen Boards hinzu (funktioniert aktuell nur bei gleicher Breite)
+     * @param topBoard oberes Board
+     * @param bottomBoard unteres Board
+     * @return ArrayList, die das zusammengefügte Board repräsentiert
+     */
+    public  ArrayList<ArrayList<Tile>> appendBottom(ArrayList<ArrayList<Tile>> topBoard, ArrayList<ArrayList<Tile>> bottomBoard){
+
+        for(int i = 0; i< topBoard.size(); i++){
+            topBoard.get(i).addAll(bottomBoard.get(i));
+        }
+        return topBoard;
     }
 
     /**
