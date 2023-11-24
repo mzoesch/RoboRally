@@ -20,7 +20,7 @@ public enum EGameState
     private static final Logger l = LogManager.getLogger(EGameState.class);
 
     public static final int INVALID_FIGURE_ID = -1;
-    public static final String[] FIGURE_NAMES = new String[] {"Hulk x90", "Spin Bot", "Hammer Bot", "Twonky", "Trundle Bot", "Twitch", "Squash Bot"};
+    public static final String[] FIGURE_NAMES = new String[] {"Hammer Bot", "Trundle Bot", "Squash Bot", "Hulk x90", "Spin Bot", "Twonky", "Twitch"};
     public static final int MAX_CHAT_MESSAGE_LENGTH = 64;
 
     /**
@@ -162,6 +162,19 @@ public enum EGameState
         }
 
         return null;
+    }
+
+    public int getClientSelectedRobotID()
+    {
+        for (RemotePlayer rp : this.remotePlayers)
+        {
+            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                return rp.getFigureID();
+            }
+        }
+
+        return EGameState.INVALID_FIGURE_ID;
     }
 
     // endregion Getters and Setters
