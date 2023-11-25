@@ -5,6 +5,8 @@ import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerValuesModel;
 import sep.server.json.common.ChatMsgModel;
 import sep.server.json.lobby.PlayerReadyModel;
+import sep.server.json.lobby.SelectCourseModel;
+import sep.server.json.lobby.CourseSelectedModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -19,6 +21,7 @@ public final class Session
     private static final int DEFAULT_SESSION_ID_LENGTH = 5;
 
     private final ArrayList<PlayerController> playerControllers;
+    private final ArrayList<PlayerController> readyPlayerControllerOrder;
     private final String sessionID;
 
     private final GameState gameState;
@@ -34,6 +37,7 @@ public final class Session
         super();
 
         this.playerControllers = new ArrayList<PlayerController>();
+        this.readyPlayerControllerOrder = new ArrayList<PlayerController>();
         this.sessionID = sessionID;
         this.gameState = new GameState();
 
@@ -104,8 +108,10 @@ public final class Session
         for (PlayerController PC : this.playerControllers)
         {
             new PlayerValuesModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
+            new PlayerReadyModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
             continue;
         }
+        new CourseSelectedModel(newPC, this.gameState.getCourseName()).send();
 
         /* Sending information about the new client to all other clients. */
         for (PlayerController PC : this.playerControllers)
@@ -158,7 +164,6 @@ public final class Session
         return;
     }
 
-
     public void broadcastPlayerLobbyReadyStatus(PlayerController playerController)
     {
         for (PlayerController PC : this.playerControllers)
@@ -166,6 +171,79 @@ public final class Session
             new PlayerReadyModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
             continue;
         }
+
+        return;
+    }
+
+    private void broadcastCourseSelected(PlayerController playerController)
+    {
+        for (PlayerController PC : this.playerControllers)
+        {
+            new CourseSelectedModel(PC, this.gameState.getCourseName()).send();
+            continue;
+        }
+
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s selected the course %s.", playerController.getPlayerName(), this.gameState.getCourseName()));
+
+        return;
+    }
+
+    private void updateCourseSelectorPower()
+    {
+        if (this.readyPlayerControllerOrder.isEmpty())
+        {
+            return;
+        }
+
+        new SelectCourseModel(this.readyPlayerControllerOrder.get(0)).send();
+
+        return;
+    }
+
+    public void handlePlayerReadyStatus(PlayerController PC, boolean bIsReady)
+    {
+        PC.setReady(bIsReady);
+
+        if (!bIsReady)
+        {
+            if (!this.readyPlayerControllerOrder.contains(PC))
+            {
+                return;
+            }
+
+            if (this.readyPlayerControllerOrder.indexOf(PC) != 0)
+            {
+                this.readyPlayerControllerOrder.remove(PC);
+                return;
+            }
+
+            this.readyPlayerControllerOrder.remove(PC);
+            this.updateCourseSelectorPower();
+
+            return;
+        }
+
+        if (this.readyPlayerControllerOrder.isEmpty())
+        {
+            this.readyPlayerControllerOrder.add(PC);
+            this.updateCourseSelectorPower();
+            return;
+        }
+
+        if (this.readyPlayerControllerOrder.contains(PC))
+        {
+            return;
+        }
+
+        this.readyPlayerControllerOrder.add(PC);
+
+        return;
+    }
+
+    public void handleSelectCourseName(PlayerController PC, String courseName)
+    {
+        this.gameState.setCourseName(courseName);
+        this.broadcastCourseSelected(PC);
 
         return;
     }
@@ -212,6 +290,27 @@ public final class Session
     public GameState getGameState()
     {
         return gameState;
+    }
+
+    private boolean isReadyToStartGame()
+    {
+        // TODO Don't check PC size but the human player size.
+        if (this.playerControllers.size() < GameState.MIN_PLAYER_START)
+        {
+            return false;
+        }
+
+        for (PlayerController PC : this.playerControllers)
+        {
+            if (!PC.isReady())
+            {
+                return false;
+            }
+
+            continue;
+        }
+
+        return true;
     }
 
     // endregion Getters and Setters
