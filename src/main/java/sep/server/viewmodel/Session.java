@@ -16,7 +16,7 @@ import java.util.UUID;
  */
 public final class Session
 {
-    private static final int SESSION_ID_LENGTH = 5;
+    private static final int DEFAULT_SESSION_ID_LENGTH = 5;
 
     private final ArrayList<PlayerController> playerControllers;
     private final String sessionID;
@@ -195,7 +195,7 @@ public final class Session
 
     private static String generateSessionID()
     {
-        String t = UUID.randomUUID().toString().substring(0, Session.SESSION_ID_LENGTH);
+        String t = UUID.randomUUID().toString().substring(0, Session.DEFAULT_SESSION_ID_LENGTH);
         for (Session s : EServerInformation.INSTANCE.getSessions())
         {
             if (s.getSessionID().equals(t))
