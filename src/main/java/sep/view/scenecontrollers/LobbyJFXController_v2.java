@@ -1,6 +1,5 @@
 package sep.view.scenecontrollers;
 
-import javafx.event.ActionEvent;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.json.lobby.PlayerValuesModel;
 import sep.view.viewcontroller.ViewLauncher;
@@ -10,6 +9,7 @@ import sep.view.json.ChatMsgModel;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.json.lobby.ReadyPlayerModel;
+import sep.view.json.lobby.CourseSelectedModel;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -32,20 +32,25 @@ import javafx.scene.layout.Region;
 import javafx.beans.binding.Bindings;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
+import javafx.event.ActionEvent;
 
 public final class LobbyJFXController_v2
 {
     private static final Logger l = LogManager.getLogger(LobbyJFXController_v2.class);
 
     private boolean bReadyBtnClicked;
+    private boolean bSelectBtnClicked;
 
     public LobbyJFXController_v2()
     {
         super();
         this.bReadyBtnClicked = false;
+        this.bSelectBtnClicked = false;
         return;
     }
 
+    @FXML private Label serverCourseLabel;
+    @FXML private VBox serverCourseSelectorArea;
     @FXML private Button readyButton;
     @FXML private VBox playerListContainer;
     @FXML private VBox readyLabelContainerWrapper;
@@ -129,6 +134,8 @@ public final class LobbyJFXController_v2
             this.formScrollPane.getViewportBounds().getWidth(), this.formScrollPane.viewportBoundsProperty()
         ));
 
+        this.updateAvailableCourses();
+
         boolean bSuccess = false;
         try
         {
@@ -146,6 +153,7 @@ public final class LobbyJFXController_v2
         }
 
         this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
+        this.updateSessionCourseLabel();
 
         return;
     }
@@ -300,7 +308,7 @@ public final class LobbyJFXController_v2
     public void handlePlayerStatusUpdate()
     {
         Platform.runLater(() -> {
-            this.updateReadyBtn();
+            this.updateView();
             return;
         });
         return;
@@ -388,6 +396,7 @@ public final class LobbyJFXController_v2
         this.addPlayerRobotSelector_v2();
         this.updatePlayersInSession();
         this.updateReadyBtn();
+        this.updateSessionCourseLabel();
 
         return;
     }
@@ -410,17 +419,21 @@ public final class LobbyJFXController_v2
     private void updateReadyBtn()
     {
         this.readyButton.setDisable(!EGameState.INSTANCE.hasClientSelectedARobot());
+        this.readyButton.getStyleClass().clear();
         if (EGameState.INSTANCE.getClientRemotePlayer() == null)
         {
             this.readyButton.setText("Not Ready");
-            this.readyButton.getStyleClass().clear();
             this.readyButton.getStyleClass().add("secondary-btn-mini");
         }
         else
         {
             this.readyButton.setText(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "Ready" : "Not Ready");
-            this.readyButton.getStyleClass().clear();
             this.readyButton.getStyleClass().add(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "confirm-btn-mini" : "secondary-btn-mini");
+            if (!EGameState.INSTANCE.getClientRemotePlayer().isReady())
+            {
+                EGameState.INSTANCE.setServerCourses(new String[0]);
+                this.updateAvailableCourses();
+            }
         }
         this.bReadyBtnClicked = false;
 
