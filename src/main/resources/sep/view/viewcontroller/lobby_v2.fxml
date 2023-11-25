@@ -17,11 +17,20 @@
             styleClass="text-2xl" alignment="CENTER"
             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
         />
-        <Label
-            styleClass="text-base" alignment="TOP_RIGHT"
-            fx:id="sessionIDLabel"
+        <VBox
             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-        />
+        >
+            <children>
+                <Label
+                    styleClass="text-base" alignment="TOP_RIGHT"
+                    fx:id="sessionIDLabel"
+                />
+                <Label
+                    styleClass="text-base" alignment="TOP_RIGHT"
+                    fx:id="serverCourseLabel"
+                />
+            </children>
+        </VBox>
         <AnchorPane
             id="form-container" stylesheets="@lobby_v2.css"
             AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0"
@@ -70,13 +79,16 @@
                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
                             />
                             <Label
-                                text="Select Server Map:"
+                                text="Select Server Course:"
                                 styleClass="text-xl" alignment="CENTER"
                             />
                             <VBox
-                                id="server-map-selector-area" stylesheets="@lobby_v2.css"
-                                fx:id="serverMapSelectorArea"
+                                id="server-course-selector-area" stylesheets="@lobby_v2.css"
+                                fx:id="serverCourseSelectorArea"
                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                            />
+                            <HBox
+                                styleClass="virtual-v-space" stylesheets="@lobby_v2.css"
                             />
                         </children>
                     </VBox>

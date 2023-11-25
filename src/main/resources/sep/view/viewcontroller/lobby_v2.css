@@ -95,7 +95,11 @@
     -fx-alignment: center;
 }
 
-#server-map-selector-area {
+#server-course-selector-area {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+}
+.server-course-selector-hbox {
     -fx-spacing: 16px;
     -fx-alignment: center;
 }
@@ -158,11 +162,24 @@
     -fx-spacing: 4px;
 }
 
-
-.player-in-session-label {
+.player-in-session-label-not-ready,
+.player-in-session-label-ready {
     -fx-padding: 4px 4px 4px 4px;
-    -fx-background-color: rgba(0, 0, 0, 0.15);
+    -fx-background-color: rgba(0, 255, 0, 0.15);
     -fx-font-size: 14px;
     -fx-font-weight: 400;
     -fx-text-fill: -primary-text-fill;
+}
+.player-in-session-label-not-ready {
+    -fx-background-color: rgba(255, 0, 0, 0.15);
+}
+.player-in-session-label-client {
+    -fx-border-color: #ffffffff;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-background-radius: 3px;
+}
+
+.virtual-v-space {
+    -fx-min-height: 80px;
 }
