@@ -371,6 +371,10 @@ public final class LobbyJFXController_v2
                 b.getStyleClass().add("primary-btn-mini");
             }
         }
+        if (EGameState.INSTANCE.getRemotePlayerByFigureID(idx) != null)
+        {
+            b.setDisable(EGameState.INSTANCE.getClientSelectedRobotID() != idx);
+        }
         b.setOnAction(actionEvent ->
         {
             this.formErrorLabel.setText("");
@@ -379,7 +383,14 @@ public final class LobbyJFXController_v2
             {
                 if (EGameState.INSTANCE.getClientSelectedRobotID() == idx)
                 {
-                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but he already selected this robot. Ignoring.", idx, EGameState.FIGURE_NAMES[idx]);
+                    if (!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerName().equals(this.getPlayerName()))
+                    {
+                        LobbyJFXController_v2.l.debug("Player selected robot ({}) {}.", idx, EGameState.FIGURE_NAMES[idx]);
+                        new PlayerValuesModel(this.getPlayerName(), idx).send();
+                        return;
+                    }
+
+                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but he already selected this robot and the name did not change. Ignoring.", idx, EGameState.FIGURE_NAMES[idx]);
                     return;
                 }
 
