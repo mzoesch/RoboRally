@@ -124,6 +124,39 @@ public final class ViewLauncher extends Application
         }
     }
 
+    /** While in lobby screen. */
+    public static void updateAvailableCourses(boolean bScrollToEnd)
+    {
+        try
+        {
+            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.updateAvailableCourses(bScrollToEnd);
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to LobbyJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void updateCourseSelected()
+    {
+        try
+        {
+            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.updateCourseSelected();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to LobbyJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // endregion Updating methods
 
     /** Only valid on the JFX thread. */

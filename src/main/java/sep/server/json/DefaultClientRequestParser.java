@@ -50,4 +50,8 @@ public class DefaultClientRequestParser
         return this.request.getJSONObject("messageBody").getBoolean("ready");
     }
 
+    public String getCourseName()
+    {
+        return this.request.getJSONObject("messageBody").getString("map");
+    }
 }

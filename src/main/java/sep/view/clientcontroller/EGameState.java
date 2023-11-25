@@ -30,6 +30,9 @@ public enum EGameState
      */
     private ArrayList<RemotePlayer> remotePlayers;
 
+    private String[] serverCourses;
+    private String currentServerCourse;
+
     // HERE
     // The current course with its midfielders...
     // The current programming cards of this client.
@@ -39,6 +42,8 @@ public enum EGameState
     private EGameState()
     {
         this.remotePlayers = new ArrayList<RemotePlayer>();
+        this.serverCourses = new String[0];
+        this.currentServerCourse = "";
         return;
     }
 
@@ -193,6 +198,28 @@ public enum EGameState
         }
 
         return null;
+    }
+
+    public String[] getServerCourses()
+    {
+        return this.serverCourses;
+    }
+
+    public void setServerCourses(String[] serverCourses)
+    {
+        this.serverCourses = serverCourses;
+        return;
+    }
+
+    public String getCurrentServerCourse()
+    {
+        return this.currentServerCourse;
+    }
+
+    public void setCurrentServerCourse(String currentServerCourse)
+    {
+        this.currentServerCourse = currentServerCourse;
+        return;
     }
 
     // endregion Getters and Setters

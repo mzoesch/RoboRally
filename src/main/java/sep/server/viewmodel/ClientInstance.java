@@ -201,7 +201,13 @@ public final class ClientInstance implements Runnable
 
         if (Objects.equals(dcrp.getType_v2(), "SetStatus"))
         {
-            this.playerController.setReady(dcrp.getIsReadyInLobby());
+            this.playerController.getSession().handlePlayerReadyStatus(this.playerController, dcrp.getIsReadyInLobby());
+            return true;
+        }
+
+        if (Objects.equals(dcrp.getType_v2(), "MapSelected"))
+        {
+            this.playerController.getSession().handleSelectCourseName(this.playerController, dcrp.getCourseName());
             return true;
         }
 

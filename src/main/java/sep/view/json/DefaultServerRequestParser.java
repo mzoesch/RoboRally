@@ -2,6 +2,7 @@ package sep.view.json;
 
 import org.json.JSONObject;
 import org.json.JSONException;
+import java.util.stream.IntStream;
 
 /**
  * For easier access to the JSON object received from the server. Does not contain actual logic.
@@ -61,6 +62,16 @@ public final class DefaultServerRequestParser
     public boolean isLobbyPlayerStatusReady() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getBoolean("ready");
+    }
+
+    public String[] getAvailableCourses() throws JSONException
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("availableMaps").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("availableMaps").getString(i)).toArray(String[]::new);
+    }
+
+    public String getCourseName() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("map");
     }
 
 }

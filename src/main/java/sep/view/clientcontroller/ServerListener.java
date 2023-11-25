@@ -148,6 +148,22 @@ public class ServerListener implements Runnable
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "SelectMap"))
+        {
+            l.debug("Received course selected from server.");
+            EGameState.INSTANCE.setServerCourses(dsrp.getAvailableCourses());
+            ViewLauncher.updateAvailableCourses(true);
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "MapSelected"))
+        {
+            l.debug("Received course selected from server.");
+            EGameState.INSTANCE.setCurrentServerCourse(dsrp.getCourseName());
+            ViewLauncher.updateCourseSelected();
+            return;
+        }
+
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(dsrp.getType_v2());
 

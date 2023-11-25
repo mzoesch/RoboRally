@@ -20,13 +20,17 @@ public class GameState
     }
 
     /** The host of a session will be able to call this method. */
-    public void startGame(PlayerController[] playerControllers, String course /* etc. config */)
+    public void startGame(PlayerController[] playerControllers /* etc. config */)
     {
         this.bGameStarted = true;
-        this.gameMode = new GameMode(course, playerControllers);
+        this.gameMode = new GameMode(this.courseName, playerControllers);
+
+        System.out.printf("Game started with %d players.\n", playerControllers.length);
 
         return;
     }
+
+    // region Getters and Setters
 
     public GameMode getAuthGameMode()
     {
@@ -46,5 +50,7 @@ public class GameState
     {
         return new JSONObject();
     }
+
+    // endregion Getters and Setters
 
 }

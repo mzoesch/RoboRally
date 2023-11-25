@@ -427,6 +427,122 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    public void updateAvailableCourses()
+    {
+        this.updateAvailableCourses(false);
+        return;
+    }
+
+    public void updateAvailableCourses(boolean bScrollToEnd)
+    {
+        this.bSelectBtnClicked = false;
+
+        Platform.runLater(() ->
+        {
+            double scrollPos = this.formScrollPane.getVvalue();
+            this.updateSessionCourseLabel();
+            this.serverCourseSelectorArea.getChildren().clear();
+
+            if (EGameState.INSTANCE.getServerCourses().length == 0)
+            {
+                Label l = new Label("Your are currently not allowed to select a course.");
+                l.getStyleClass().add("text-base");
+                this.serverCourseSelectorArea.getChildren().add(l);
+                return;
+            }
+
+            for (int i = 0; i < EGameState.INSTANCE.getServerCourses().length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    this.serverCourseSelectorArea.getChildren().add(new HBox() {{ getStyleClass().add("server-course-selector-hbox"); }});
+                }
+
+                Button b = new Button(EGameState.INSTANCE.getServerCourses()[i]);
+                if (EGameState.INSTANCE.getCurrentServerCourse().isEmpty())
+                {
+                    b.getStyleClass().add("primary-btn-mini");
+                    b.setStyle("-fx-min-width: 250px;");
+                }
+                else
+                {
+                    if (Objects.equals(EGameState.INSTANCE.getCurrentServerCourse(), EGameState.INSTANCE.getServerCourses()[i]))
+                    {
+                        b.getStyleClass().add("primary-btn-mini");
+                        b.setStyle("-fx-min-width: 250px;");
+                    }
+                    else
+                    {
+                        b.getStyleClass().add("secondary-btn-mini");
+                        b.setStyle("-fx-min-width: 250px;");
+                    }
+                }
+                int finalI = i;
+                b.setOnAction(actionEvent ->
+                {
+                    l.debug("Player clicked course selection button.");
+                    if (this.bSelectBtnClicked)
+                    {
+                        return;
+                    }
+                    this.bSelectBtnClicked = true;
+
+                    if (Objects.equals(EGameState.INSTANCE.getCurrentServerCourse(), EGameState.INSTANCE.getServerCourses()[finalI]))
+                    {
+                        LobbyJFXController_v2.l.debug("Player selected course {}, but this course is already the server course. Ignoring.", EGameState.INSTANCE.getServerCourses()[finalI]);
+                        this.bSelectBtnClicked = false;
+                        return;
+                    }
+                    l.debug("Player selected course {}.", EGameState.INSTANCE.getServerCourses()[finalI]);
+
+                    new CourseSelectedModel(EGameState.INSTANCE.getServerCourses()[finalI]).send();
+
+                    return;
+                });
+
+                ( (HBox) this.serverCourseSelectorArea.getChildren().get(this.serverCourseSelectorArea.getChildren().size() - 1)).getChildren().add(b);
+
+                continue;
+            }
+
+            if (bScrollToEnd)
+            {
+                // This is super ludicrous and should be changed :D. Works for now
+                // but could cause unpredictable behavior in the future.
+                /* Must be higher than addPlayerRobotSelector_v2 delay. */
+                PauseTransition p = new PauseTransition(Duration.millis(30));
+                p.setOnFinished(f -> this.formScrollPane.setVvalue(1.0));
+                p.play();
+                return;
+            }
+
+            PauseTransition p = new PauseTransition(Duration.millis(15));
+            p.setOnFinished(f -> this.formScrollPane.setVvalue(scrollPos));
+            p.play();
+
+            return;
+        });
+
+        return;
+    }
+
+    public void updateCourseSelected()
+    {
+        Platform.runLater(() ->
+        {
+            this.updateAvailableCourses();
+            return;
+        });
+
+        return;
+    }
+
+    private void updateSessionCourseLabel()
+    {
+        this.serverCourseLabel.setText(String.format("Course: %s", EGameState.INSTANCE.getCurrentServerCourse().isBlank() || EGameState.INSTANCE.getCurrentServerCourse().isEmpty() ? "None" : EGameState.INSTANCE.getCurrentServerCourse()));
+        return;
+    }
+
     /** Will create the btn to select the different robots. */
     private void addPlayerRobotSelector_v2()
     {
