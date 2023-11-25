@@ -592,6 +592,7 @@ public final class LobbyJFXController_v2
     @FXML
     public void onReadyBtn(ActionEvent actionEvent)
     {
+        l.debug("Player clicked ready button.");
         if (this.bReadyBtnClicked)
         {
             return;
@@ -599,6 +600,7 @@ public final class LobbyJFXController_v2
         this.bReadyBtnClicked = true;
 
         // TODO Some input validation needed.
+        l.debug("Player wants to be {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "not ready" : "ready");
         new ReadyPlayerModel(!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady()).send();
         return;
     }
