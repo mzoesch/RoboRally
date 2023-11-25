@@ -434,7 +434,20 @@ public final class LobbyJFXController_v2
         for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
             Label l = new Label(rp.getPlayerName());
-            l.getStyleClass().add("player-in-session-label");
+            l.getStyleClass().clear();
+            if (rp.isReady())
+            {
+                l.getStyleClass().add("player-in-session-label-ready");
+            }
+            else
+            {
+                l.getStyleClass().add("player-in-session-label-not-ready");
+            }
+            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                l.getStyleClass().add("player-in-session-label-client");
+            }
+            l.setPrefWidth(1_000);
             this.playerListContainer.getChildren().add(l);
             continue;
         }
