@@ -264,7 +264,12 @@ public final class LobbyJFXController_v2
             l.getStyleClass().add("lobby-msg-server");
             l.setWrapText(true);
             this.lobbyMsgContainer.getChildren().add(l);
-            this.lobbyMsgScrollPane.setVvalue(1.0);
+
+            /* Kinda sketchy. But is there a better way? */
+            PauseTransition p = new PauseTransition(Duration.millis(15));
+            p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
+            p.play();
+
             return;
         }
 
@@ -274,7 +279,12 @@ public final class LobbyJFXController_v2
             l.getStyleClass().add("lobby-msg-client");
             l.setWrapText(true);
             this.lobbyMsgContainer.getChildren().add(l);
-            this.lobbyMsgScrollPane.setVvalue(1.0);
+
+            /* Kinda sketchy. But is there a better way? */
+            PauseTransition p = new PauseTransition(Duration.millis(15));
+            p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
+            p.play();
+
             return;
         }
 
@@ -289,7 +299,12 @@ public final class LobbyJFXController_v2
         }
         l.setWrapText(true);
         this.lobbyMsgContainer.getChildren().add(l);
-        this.lobbyMsgScrollPane.setVvalue(1.0); // TODO Kurwa does not work. We have to call this with a delay.
+
+        /* Kinda sketchy. But is there a better way? */
+        PauseTransition p = new PauseTransition(Duration.millis(15));
+        p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
+        p.play();
+
         return;
     }
 
