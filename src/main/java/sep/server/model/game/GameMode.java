@@ -1,12 +1,10 @@
 package sep.server.model.game;
 
-import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 /**
@@ -35,17 +33,14 @@ public class GameMode
         distributeCards(players);
     }
     public void activationPhase() {
-        //sort players by priority
         players.sort(Comparator.comparingInt(Player::getPriority));
 
-        //for loop iterates over registers
         for(int i=0; i<5; i++) {
             for(Player player : players) {
-                IPlayableCard[] curPlayerRegister = player.getRegisters();
-                //card of the current register is played
-                curPlayerRegister[i].playCard();
+                player.getRegisters()[i].playCard();
+                player.getDiscardPile().add(player.getRegisters()[i]);
+                player.getRegisters()[i] = null;
             }
-            //after every player has played the card of the current register, board elements are activated
             activateBoardElements();
             shootRobotLasers();
         }
@@ -58,7 +53,7 @@ public class GameMode
                 if (player.getPlayerDeck().isEmpty()) {
                     player.shuffleAndRefillDeck();
                 }
-                Card card = player.getPlayerDeck().remove(0);
+                IPlayableCard card = player.getPlayerDeck().remove(0);
                 player.getPlayerHand().add(card);
             }
         }

@@ -3,15 +3,14 @@ package sep.server.model.game;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 
 public class Player {
   Robot playerRobot;
-  ArrayList<Card> playerDeck;
-  ArrayList<Card> discardPile;
-  ArrayList<Card> playerHand;
+  ArrayList<IPlayableCard> playerDeck;
+  ArrayList<IPlayableCard> discardPile;
+  ArrayList<IPlayableCard> playerHand;
   IPlayableCard[] registers;
   int priority;
   int checkpointsCollected;
@@ -19,7 +18,7 @@ public class Player {
   ArrayList<AUpgradeCard> upgradeCards;
 
   public Player(Robot playerRobot,
-                ArrayList<Card> playerDeck, ArrayList<Card> discardPile, IPlayableCard[] registers, int priority,
+                ArrayList<IPlayableCard> playerDeck, ArrayList<IPlayableCard> discardPile, IPlayableCard[] registers, int priority,
                 int checkpointsCollected, int energyCollected, ArrayList<AUpgradeCard> upgradeCards) {
     this.playerRobot = playerRobot;
     this.playerDeck = playerDeck;
@@ -39,26 +38,26 @@ public class Player {
     this.playerRobot = playerRobot;
   }
 
-  public ArrayList<Card> getPlayerDeck() {
+  public ArrayList<IPlayableCard> getPlayerDeck() {
     return playerDeck;
   }
 
-  public void setPlayerDeck(ArrayList<Card> playerDeck) {
+  public void setPlayerDeck(ArrayList<IPlayableCard> playerDeck) {
     this.playerDeck = playerDeck;
   }
 
-  public ArrayList<Card> getDiscardPile() {
+  public ArrayList<IPlayableCard> getDiscardPile() {
     return discardPile;
   }
 
-  public void setDiscardPile(ArrayList<Card> discardPile) {
+  public void setDiscardPile(ArrayList<IPlayableCard> discardPile) {
     this.discardPile = discardPile;
   }
-  public ArrayList<Card> getPlayerHand() {
+  public ArrayList<IPlayableCard> getPlayerHand() {
     return playerHand;
   }
 
-  public void setPlayerHand(ArrayList<Card> playerHand) {
+  public void setPlayerHand(ArrayList<IPlayableCard> playerHand) {
     this.playerHand = playerHand;
   }
 
