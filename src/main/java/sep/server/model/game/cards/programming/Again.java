@@ -39,7 +39,7 @@ public class Again extends AProgrammingCard implements IPlayableCard {
             player.shuffleAndRefillDeck();
         }
 
-        Card drawnCard = player.getPlayerDeck().remove(0);
+        IPlayableCard drawnCard = player.getPlayerDeck().remove(0);
 
         player.getRegisters()[currentRoundNumber - 2] = (IPlayableCard) drawnCard;
 

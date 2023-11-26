@@ -38,8 +38,6 @@ public class GameMode
         for(int i=0; i<5; i++) {
             for(Player player : players) {
                 player.getRegisters()[i].playCard();
-                player.getDiscardPile().add(player.getRegisters()[i]);
-                player.getRegisters()[i] = null;
             }
             activateBoardElements();
             shootRobotLasers();
@@ -62,6 +60,13 @@ public class GameMode
     public void activateBoardElements() {}
     public void shootRobotLasers() {}
     public void endRound() {
+        for(int i = 0; i<5; i++) {
+            for(Player player : players) {
+                player.getDiscardPile().add(player.getRegisters()[i]);
+                player.getRegisters()[i] = null;
+            }
+        }
+
         //TODO: check if game is finished
 
         for(Player player : players) {
