@@ -4,21 +4,26 @@ public enum EArgs
 {
     INSTANCE;
 
-    public final static String WIN_TITLE = "SEP WRAPPER";
-
     public final static int OK = 0;
-    public final static int ERROR = 1;
+    public final static int ERR = 1;
 
     public final static int DEFAULT = 0;
     public final static int CLIENT = 1;
     public final static int SERVER = 2;
     public final static int EXIT = 3;
 
+    public static final String PREF_SERVER_IP = "localhost";
+    public static final EPort PREF_SERVER_PORT = EPort.DEFAULT;
+    private String customServerIP;
+    private int customServerPort;
+
     private int mode;
 
     private EArgs()
     {
         this.mode = EArgs.DEFAULT;
+        this.customServerIP = "";
+        this.customServerPort = EPort.INVALID.i;
         return;
     }
 
@@ -35,6 +40,28 @@ public enum EArgs
         }
 
         EArgs.INSTANCE.mode = mode;
+        return;
+    }
+
+    public static String getCustomServerIP()
+    {
+        return EArgs.INSTANCE.customServerIP;
+    }
+
+    public static void setCustomServerIP(String customServerIP)
+    {
+        EArgs.INSTANCE.customServerIP = customServerIP;
+        return;
+    }
+
+    public static int getCustomServerPort()
+    {
+        return EArgs.INSTANCE.customServerPort;
+    }
+
+    public static void setCustomServerPort(int customServerPort)
+    {
+        EArgs.INSTANCE.customServerPort = customServerPort;
         return;
     }
 

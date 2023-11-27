@@ -27,7 +27,7 @@ public final class ServerListener
         //noinspection InfiniteLoopStatement
         while (true)
         {
-            l.debug("Listening on port {} for client connection . . .", EServerInformation.PORT);
+            l.debug("Listening on port {} for client connection . . .", EServerInformation.INSTANCE.getPort());
             Socket client = EServerInformation.INSTANCE.getServerSocket().accept();
             l.debug("Accepted connection from {}.", client.getInetAddress().getHostAddress());
 

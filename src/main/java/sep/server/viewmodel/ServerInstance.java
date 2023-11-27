@@ -22,6 +22,7 @@ public final class ServerInstance
         l.info("Starting server.");
 
         ServerInstance.INSTANCE = this;
+        EServerInformation.INSTANCE.startServer();
         ServerInstance.keepAlive();
         this.SERVER_LISTENER = new ServerListener();
         this.SERVER_LISTENER.listen(); /* Will block the main thread. */

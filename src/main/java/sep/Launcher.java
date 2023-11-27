@@ -25,14 +25,14 @@ public class Launcher
      *
      * @param args Valid program arguments in descending order of precedence. All arguments that are not consumed by
      *             the wrapper will be passed down to the follow-up process:
-     *            <ul>
-     *             <li>[--cmd]     - Start a new process terminal and run this application in it.
-     *             <li>[--sv]      - Will instantly start a server process.
-     *             <li>[--cl]      - Will instantly start a client process (IO is inherited to calling process).
-     *             <li>[--nocmd]   - Will not create a new process terminal for the follow-up server process.
-     *             <li>[--noclose] - If allowed a new process terminal will not be closed after the follow-up process
-     *                               has exited.
-     *            </ul>
+     *             <ul>
+     *              <li>[--cmd]     - Start a new process terminal and run this application in it.
+     *              <li>[--sv]      - Will instantly start a server process.
+     *              <li>[--cl]      - Will instantly start a client process (IO is inherited to calling process).
+     *              <li>[--nocmd]   - Will not create a new process terminal for the follow-up server process.
+     *              <li>[--noclose] - If allowed a new process terminal will not be closed after the follow-up process
+     *                                has exited.
+     *             </ul>
      */
     public static void main(final String[] args)
     {
@@ -77,7 +77,7 @@ public class Launcher
             {
                 l.fatal("Failed to start new process terminal. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-                System.exit(EArgs.ERROR);
+                System.exit(EArgs.ERR);
                 return;
             }
 
@@ -91,7 +91,7 @@ public class Launcher
             {
                 l.fatal("Process terminal was interrupted. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-                System.exit(EArgs.ERROR);
+                System.exit(EArgs.ERR);
                 return;
             }
 
@@ -120,7 +120,7 @@ public class Launcher
         {
             l.fatal("No mode specified. Shutting down.");
             l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-            System.exit(EArgs.ERROR);
+            System.exit(EArgs.ERR);
             return;
         }
         else if (EArgs.getMode() == EArgs.CLIENT)
@@ -150,7 +150,7 @@ public class Launcher
             {
                 l.fatal("Failed to start client. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-                System.exit(EArgs.ERROR);
+                System.exit(EArgs.ERR);
                 return;
             }
 
@@ -162,7 +162,7 @@ public class Launcher
             {
                 l.fatal("Client was interrupted. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-                System.exit(EArgs.ERROR);
+                System.exit(EArgs.ERR);
                 return;
             }
 
@@ -174,24 +174,29 @@ public class Launcher
 
             if (Arrays.asList(args).contains("--nocmd"))
             {
-                sep.server.Launcher.main(new String[] {});
+                sep.server.Launcher.main(Arrays.stream(args).filter(s -> !s.equals("--nocmd") && !s.equals("--sv")).toArray(String[]::new));
                 /* Currently this code is unreachable, because the sv will never terminate. */
                 l.info("Server shutdown. Wrapping complete. Shutting down.");
             }
             else
             {
+                if (EArgs.getCustomServerPort() != EPort.INVALID.i) /* Set through GUI. */
+                {
+                    l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
+                }
+
                 final ProcessBuilder pb =
                         System.getProperty("os.name").toLowerCase().contains("windows")
-                        ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s%s", f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                        ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s%s%s", f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
                         :
                         System.getProperty("os.name").toLowerCase().contains("mac")
-                        ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s%s\"", fp.substring(0, fp.lastIndexOf("/")), f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                        ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s%s%s\"", fp.substring(0, fp.lastIndexOf("/")), f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
                         : null
                         ;
                 if (pb == null)
                 {
                     Launcher.stdoutForNoOSSupport(t0);
-                    System.exit(EArgs.ERROR);
+                    System.exit(EArgs.ERR);
                     return;
                 }
 
@@ -204,7 +209,7 @@ public class Launcher
                 {
                     l.fatal("Failed to start new server process terminal. Shutting down.");
                     l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-                    System.exit(EArgs.ERROR);
+                    System.exit(EArgs.ERR);
                     return;
                 }
 
@@ -218,7 +223,7 @@ public class Launcher
                 {
                     l.fatal("Server process terminal was interrupted. Shutting down.");
                     l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-                    System.exit(EArgs.ERROR);
+                    System.exit(EArgs.ERR);
                     return;
                 }
 
@@ -239,7 +244,7 @@ public class Launcher
             l.fatal("Invalid mode. Shutting down.");
             l.fatal("Invalid mode: " + EArgs.getMode());
             l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-            System.exit(EArgs.ERROR);
+            System.exit(EArgs.ERR);
             return;
         }
 

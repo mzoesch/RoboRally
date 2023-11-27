@@ -2,6 +2,8 @@ package sep.server.model;
 
 import sep.server.viewmodel.Session;
 import sep.server.viewmodel.ClientInstance;
+import sep.EPort;
+import sep.EArgs;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -21,33 +23,31 @@ public enum EServerInformation
 
     private static final Logger l = LogManager.getLogger(EServerInformation.class);
 
-    // TODO Move to env var
-    public static final int PORT = 8080;
     public static final String PROTOCOL_VERSION = "0.1";
     public static final int KEEP_ALIVE_INTERVAL = 5_000;
 
-    private final ServerSocket serverSocket;
-
+    private int port;
+    private ServerSocket serverSocket;
     private final ArrayList<Session> sessions;
 
     private EServerInformation()
     {
-        ServerSocket tServerSocket;
-        try
-        {
-            tServerSocket = new ServerSocket(EServerInformation.PORT);
-        }
-        catch (IOException e)
-        {
-            tServerSocket = null;
-            LogManager.getLogger(EServerInformation.class).fatal("Server socket failed in process.");
-            LogManager.getLogger(EServerInformation.class).fatal(e.getMessage());
-            System.exit(sep.EArgs.ERROR);
-        }
-        this.serverSocket = tServerSocket;
-
+        this.port = EPort.INVALID.i;
+        this.serverSocket = null;
         this.sessions = new ArrayList<Session>();
+        return;
+    }
 
+    public void startServer() throws IOException
+    {
+        if (this.serverSocket != null)
+        {
+            l.error("Server already started.");
+            return;
+        }
+
+        this.serverSocket = new ServerSocket(this.port);
+        l.info("Server started on port {}.", this.port);
         return;
     }
 
@@ -142,6 +142,17 @@ public enum EServerInformation
     {
         this.sessions.remove(session);
         l.info("Session {} closed.", session.getSessionID());
+        return;
+    }
+
+    public int getPort()
+    {
+        return this.port;
+    }
+
+    public void setPort(int port)
+    {
+        this.port = port;
         return;
     }
 
