@@ -24,10 +24,6 @@ public enum EClientInformation
 
     private static final Logger l = LogManager.getLogger(EClientInformation.class);
 
-    private boolean bWrap;
-    /** Only valid during wrapping. */
-    private Stage stage;
-
     // TODO To env var
     private static final String SERVER_IP = "localhost";
     private static final int SERVER_PORT = 8080;
@@ -51,8 +47,6 @@ public enum EClientInformation
 
     private EClientInformation()
     {
-        this.bWrap = false;
-
         this.JFX_INSTANCE = null;
 
         this.socket = null;
@@ -228,28 +222,6 @@ public enum EClientInformation
     public GameInstance getJFXInstance()
     {
         return this.JFX_INSTANCE;
-    }
-
-    public void setWrap(boolean bWrap)
-    {
-        this.bWrap = bWrap;
-        return;
-    }
-
-    public boolean getWrap()
-    {
-        return this.bWrap;
-    }
-
-    public void setStage(Stage stage)
-    {
-        this.stage = stage;
-        return;
-    }
-
-    public Stage getStage()
-    {
-        return this.stage;
     }
 
     // endregion Getters and Setters

@@ -22,11 +22,9 @@ public final class SceneController
     public static final int PREF_WIDTH = 1_280;
     public static final int PREF_HEIGHT = 720;
 
-    public static final String WRAPPER_ID = "wrapper";
     public static final String MAIN_MENU_ID = "main-menu";
     public static final String LOBBY_ID = "lobby";
 
-    public static final String PATH_TO_WRAPPER = "wrapper.fxml";
     public static final String PATH_TO_MAIN_MENU = "main-menu.fxml";
     /** @deprecated */
     public static final String PATH_TO_LOBBY = "lobby.fxml";
