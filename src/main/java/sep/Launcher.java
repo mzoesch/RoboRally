@@ -1,11 +1,14 @@
 package sep;
 
+import sep.wrapper.Wrapper;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+// TODO Allow to config the sv in different scene. IMPORTANT!
+// TODO Save screen size and position of the wrapper Graphical User Interface and inherit it to the follow-up process.
 public class Launcher
 {
     private static final Logger l = LogManager.getLogger(Launcher.class);
@@ -17,156 +20,241 @@ public class Launcher
         throw new RuntimeException("This class cannot be instantiated.");
     }
 
-    private static void runWrapper(String[] args)
-    {
-        String[] targs = new String[args.length + 1];
-        targs[0] = "nocmd";
-        System.arraycopy(args, 0, targs, 1, args.length);
-        Launcher.main(targs);
-        return;
-    }
-
     /**
-     * When wrapping.
+     * When wrapping. Support for Win and Mac OS X.
      *
-     * @param args Call with "nocmd" to prevent creating a new process terminal.
-     *             All other args will always be passed down.
-     *             When developing, call with "nocmd" program argument because we already
-     *             have the stdout and stderr pipeline to the integrated terminal.
+     * @param args Valid program arguments in descending order of precedence. All arguments that are not consumed by
+     *             the wrapper will be passed down to the follow-up process:
+     *            <ul>
+     *             <li>[--cmd]     - Start a new process terminal and run this application in it.
+     *             <li>[--sv]      - Will instantly start a server process.
+     *             <li>[--cl]      - Will instantly start a client process (IO is inherited to calling process).
+     *             <li>[--nocmd]   - Will not create a new process terminal for the follow-up server process.
+     *             <li>[--noclose] - If allowed a new process terminal will not be closed after the follow-up process
+     *                               has exited.
+     *            </ul>
      */
-    public static void main(String[] args)
+    public static void main(final String[] args)
     {
-        // This is highly sketchy. We essentially start the wrapper again but with the stdout & stderr to the new
-        // created process. We need this because the server does not have a Graphical User Interface and thus no
-        // way to display the std pipeline to the user.
-        // We could also just start the server as a service and read the stdout & stderr from the logs.
-        if (args.length == 0 || !Arrays.asList(args).contains("nocmd"))
+        final double t0 = System.currentTimeMillis();
+
+        l.info("Starting application.");
+        l.info("Detected operating system: " + System.getProperty("os.name"));
+
+        /* This only works with jar files because else the getPath() will return a dir. */
+        final String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        final String f = fp.substring(fp.lastIndexOf("/") + 1);
+
+        if (args.length == 0)
         {
-            l.info("Trying to cast stdout to new terminal.");
+            l.info("No command line arguments detected. Starting wrapper with default configuration.");
+            Wrapper.run();
+        }
+        else if (Arrays.asList(args).contains("--cmd"))
+        {
+            l.info("Command line argument [--cmd] detected. Starting new process terminal.");
+            final ProcessBuilder pb =
+                    System.getProperty("os.name").toLowerCase().contains("windows")
+                    ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher %s --nocmd%s", f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                    :
+                    System.getProperty("os.name").toLowerCase().contains("mac")
+                    ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher %s --nocmd%s\"", fp.substring(0, fp.lastIndexOf("/")), f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                    : null
+                    ;
+            /* I do not have a linux machine, therefore, I cannot test this. */
+            if (pb == null)
+            {
+                Launcher.stdoutForNoOSSupport(t0);
+                return;
+            }
+
+            final Process p;
             try
             {
-                double t0 = System.currentTimeMillis();
-
-                String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-                /* This only works with a jar file. Because else we get a dir. */
-                String f = fp.substring(fp.lastIndexOf("/") + 1);
-
-                ProcessBuilder pb;
-                if (System.getProperty("os.name").toLowerCase().contains("windows"))
-                {
-                    l.debug("Starting wrapper with windows cmd.");
-                    pb = new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -jar %s nocmd %s & exit", f, String.join(" ", args)));
-                }
-                else if (System.getProperty("os.name").toLowerCase().contains("mac"))
-                {
-                    l.debug("Starting wrapper with mac osascript.");
-                    String p = fp.substring(0, fp.lastIndexOf("/"));
-                    String rcmd = String.format("cd %s && java -jar %s nocmd %s & exit", p, f, String.join(" ", args));
-
-                    ArrayList<String> cmd = new ArrayList<String>();
-                    cmd.add("osascript");
-                    cmd.add("-e");
-                    cmd.add(String.format("tell application \"Terminal\" to do script \"%s\"", rcmd));
-                    pb = new ProcessBuilder(cmd);
-                }
-                else
-                {
-                    // To test:
-                    // pb = new ProcessBuilder("xterm", "-e", String.format("java -jar sep-0.1.jar nocmd %s ; exit", String.join(" ", args)));
-                    l.warn("Unsupported OS. Starting wrapper normally.");
-                    Launcher.runWrapper(args);
-                    System.exit(EArgs.OK);
-                    return;
-                }
-                Process p = pb.start();
-
-                int rc = p.waitFor();
-                if (rc != EArgs.OK)
-                {
-                    l.error("Something went wrong. When trying to cast stdout to new terminal.");
-                    l.error("Starting wrapper normally.");
-                    p.destroy();
-                    Launcher.runWrapper(args);
-                    return;
-                }
-
-                /* Also super sketchy. But win will always return a rc of 0 somehow. */
-                /* Only uncomment this, when using an IDE, and this method is not called with "nocmd" argument. For the actual JAR-File, this won't work. */
-//                if (System.currentTimeMillis() - t0 < 100 && System.getProperty("os.name").toLowerCase().contains("windows"))
-//                {
-//                    l.error("Something went wrong. When trying to cast stdout to new terminal.");
-//                    l.error("Starting wrapper normally.");
-//                    p.destroy();
-//                    Launcher.runWrapper(args);
-//                    return;
-//                }
-
-                l.debug("Wrapper took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                p = pb.start();
             }
             catch (IOException e)
             {
-                l.fatal("Failed to start wrapper.", e);
+                l.fatal("Failed to start new process terminal. Shutting down.");
+                l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                 System.exit(EArgs.ERROR);
                 return;
+            }
+
+            int RC = EArgs.OK;
+            try
+            {
+                /* We do not inherit IO. This may still be necessary. To be tested. */
+                RC = p.waitFor();
             }
             catch (InterruptedException e)
             {
-                l.fatal("Wrapper was interrupted.", e);
+                l.fatal("Process terminal was interrupted. Shutting down.");
+                l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                 System.exit(EArgs.ERROR);
                 return;
             }
-            finally
-            {
-                l.info("Shutting down.");
-                System.exit(EArgs.OK);
-            }
 
+            l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(EArgs.OK);
             return;
         }
+        else if (Arrays.asList(args).contains("--sv"))
+        {
+            l.info("Command line argument [--sv] detected. Starting server.");
+            EArgs.setMode(EArgs.SERVER);
+        }
+        else if (Arrays.asList(args).contains("--cl"))
+        {
+            l.info("Command line argument [--cl] detected. Starting client.");
+            EArgs.setMode(EArgs.CLIENT);
+        }
+        else {
+            l.info("No relevant program command line arguments detected that are necessary to start the application. Starting wrapper with default configuration.");
+            Wrapper.run();
+        }
 
-        double t0 = System.currentTimeMillis();
-
-        l.info("Wrapping main methods.");
-
-        String[] targs = new String[args.length + 1];
-        targs[0] = "wrap";
-        System.arraycopy(args, 0, targs, 1, args.length);
-
-        sep.view.Launcher.main(targs);
-
-        l.debug("Wrapper took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+        l.info("Wrapping complete. Starting follow up process if necessary.");
 
         if (EArgs.getMode() == EArgs.DEFAULT)
         {
-            l.fatal("Wrapper did not receive a return code from the GUI. Shutting down.");
+            l.fatal("No mode specified. Shutting down.");
+            l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(EArgs.ERROR);
+            return;
+        }
+        else if (EArgs.getMode() == EArgs.CLIENT)
+        {
+            l.info("Launching client.");
+
+            // The client will be started immediately, therefore, the wrapper Graphical User Interface was not started.
+            // We can immediately call the client process in this process.
+            if (Arrays.asList(args).contains("--cl"))
+            {
+                sep.view.Launcher.main(Arrays.stream(args).filter(s -> !s.equals("--cl")).toArray(String[]::new));
+                l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                System.exit(EArgs.OK);
+                return;
+            }
+
+            /* We have to call a new process because we already initialized the wrapper Graphical User Interface. */
+            final ProcessBuilder pb = new ProcessBuilder("java", "-cp", f, "sep.view.Launcher", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cl")).toArray(String[]::new)));
+            pb.inheritIO();
+
+            Process p = null;
+            try
+            {
+                p = pb.start();
+            }
+            catch (IOException e)
+            {
+                l.fatal("Failed to start client. Shutting down.");
+                l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                System.exit(EArgs.ERROR);
+                return;
+            }
+
+            try
+            {
+               p.waitFor();
+            }
+            catch (InterruptedException e)
+            {
+                l.fatal("Client was interrupted. Shutting down.");
+                l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                System.exit(EArgs.ERROR);
+                return;
+            }
+
+            l.info("Client shutdown. Wrapping complete. Shutting down.");
+        }
+        else if (EArgs.getMode() == EArgs.SERVER)
+        {
+            l.info("Launching server.");
+
+            if (Arrays.asList(args).contains("--nocmd"))
+            {
+                sep.server.Launcher.main(new String[] {});
+                /* Currently this code is unreachable, because the sv will never terminate. */
+                l.info("Server shutdown. Wrapping complete. Shutting down.");
+            }
+            else
+            {
+                final ProcessBuilder pb =
+                        System.getProperty("os.name").toLowerCase().contains("windows")
+                        ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s%s", f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                        :
+                        System.getProperty("os.name").toLowerCase().contains("mac")
+                        ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s%s\"", fp.substring(0, fp.lastIndexOf("/")), f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                        : null
+                        ;
+                if (pb == null)
+                {
+                    Launcher.stdoutForNoOSSupport(t0);
+                    System.exit(EArgs.ERROR);
+                    return;
+                }
+
+                Process p = null;
+                try
+                {
+                    p = pb.start();
+                }
+                catch (IOException e)
+                {
+                    l.fatal("Failed to start new server process terminal. Shutting down.");
+                    l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(EArgs.ERROR);
+                    return;
+                }
+
+                int RC = EArgs.OK;
+                try
+                {
+                    /* We do not inherit IO. This may still be necessary. To be tested. */
+                    RC = p.waitFor();
+                }
+                catch (InterruptedException e)
+                {
+                    l.fatal("Server process terminal was interrupted. Shutting down.");
+                    l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(EArgs.ERROR);
+                    return;
+                }
+
+                l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                System.exit(EArgs.OK);
+                return;
+            }
+        }
+        else if (EArgs.getMode() == EArgs.EXIT)
+        {
+            l.info("Shutdown requested. Ok.");
+            l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(EArgs.OK);
+            return;
+        }
+        else
+        {
+            l.fatal("Invalid mode. Shutting down.");
+            l.fatal("Invalid mode: " + EArgs.getMode());
+            l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
             System.exit(EArgs.ERROR);
             return;
         }
 
-        if (EArgs.getMode() == EArgs.CLIENT)
-        {
-            l.info("Client closed. Shutting down.");
-            System.exit(EArgs.OK);
-            return;
-        }
+        l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+        System.exit(EArgs.OK);
 
-        if (EArgs.getMode() == EArgs.SERVER)
-        {
-            l.info("Launching server.");
-            sep.server.Launcher.main(args);
-            System.exit(EArgs.OK);
-            return;
-        }
+        return;
+    }
 
-        if (EArgs.getMode() == EArgs.EXIT)
-        {
-            l.info("Wrapper received exit command. Shutting down.");
-            System.exit(EArgs.OK);
-            return;
-        }
-
-        l.fatal("The wrapper received an invalid return code from the GUI: {}.", EArgs.getMode());
-        System.exit(EArgs.ERROR);
+    private static void stdoutForNoOSSupport(double t0)
+    {
+        l.fatal("Unsupported operating system. Shutting down.");
+        l.fatal(String.format("Detected operating system: %s", System.getProperty("os.name")));
+        l.info("You may run this application with [--nocmd].");
+        l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
 
         return;
     }
