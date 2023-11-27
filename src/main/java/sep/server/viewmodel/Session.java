@@ -10,6 +10,8 @@ import sep.server.json.lobby.CourseSelectedModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Handles how clients can join and leave a session and also how to communicate with each other. For example,
@@ -18,6 +20,8 @@ import java.util.UUID;
  */
 public final class Session
 {
+    private static final Logger l = LogManager.getLogger(Session.class);
+
     private static final int DEFAULT_SESSION_ID_LENGTH = 5;
 
     private final ArrayList<PlayerController> playerControllers;
@@ -25,6 +29,8 @@ public final class Session
     private final String sessionID;
 
     private final GameState gameState;
+
+    private Thread awaitGameStartThread;
 
     public Session()
     {
@@ -40,6 +46,8 @@ public final class Session
         this.readyPlayerControllerOrder = new ArrayList<PlayerController>();
         this.sessionID = sessionID;
         this.gameState = new GameState();
+
+        this.awaitGameStartThread = null;
 
         return;
     }
@@ -237,6 +245,12 @@ public final class Session
 
         this.readyPlayerControllerOrder.add(PC);
 
+        if (this.isReadyToStartGame())
+        {
+            this.prepareGameStart();
+            return;
+        }
+
         return;
     }
 
@@ -244,6 +258,40 @@ public final class Session
     {
         this.gameState.setCourseName(courseName);
         this.broadcastCourseSelected(PC);
+
+        if (this.isReadyToStartGame())
+        {
+            this.prepareGameStart();
+            return;
+        }
+
+        return;
+    }
+
+    public void prepareGameStart()
+    {
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, "All players are ready. The game will start in 5 seconds.");
+
+        this.awaitGameStartThread = new Thread(() ->
+        {
+            l.info("Awaiting game start. . .");
+
+            try
+            {
+                Thread.sleep(5000);
+            }
+            catch (InterruptedException e)
+            {
+                l.warn("Prepare Game Start thread was interrupted.");
+                l.warn(e.getMessage());
+                return;
+            }
+
+            this.gameState.startGame(this.playerControllers.toArray(new PlayerController[0]));
+            return;
+        });
+
+        this.awaitGameStartThread.start();
 
         return;
     }
@@ -308,6 +356,13 @@ public final class Session
             }
 
             continue;
+        }
+
+        if (this.gameState.getCourseName().isEmpty() || this.gameState.getCourseName().isBlank())
+        {
+            l.info("All players are ready. The server is awaiting a course selection.");
+            this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("All players are ready. The server is awaiting %s to select a course.", this.readyPlayerControllerOrder.get(0).getPlayerName()));
+            return false;
         }
 
         return true;

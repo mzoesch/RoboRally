@@ -6,6 +6,7 @@ import sep.server.model.game.Course;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.Robot;
+import sep.server.json.game.MockGameStartedModel;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -16,6 +17,8 @@ import java.util.Comparator;
  */
 public class GameMode
 {
+    private final Course course;
+
     int playerNum;
     ArrayList<Player> players;
     Player currentPlayer;
@@ -26,6 +29,16 @@ public class GameMode
 
     public GameMode(String course, PlayerController[] playerControllers)
     {
+        super();
+
+        this.course = new Course(course);
+
+        for (PlayerController pc : playerControllers) {
+            new MockGameStartedModel(pc.getClientInstance()).send();
+            continue;
+        }
+
+        return;
     }
 
     public void programmingPhase() {

@@ -2,12 +2,17 @@ package sep.server.model.game;
 
 import sep.server.viewmodel.PlayerController;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
  * Game Modes. It is persistent throughout the life-time of a session.
  */
 public class GameState
 {
+    private static final Logger l = LogManager.getLogger(GameState.class);
+
     private static final String[] AVAILABLE_COURSES = new String[] { "Dizzy Highway", "DEBUG COURSE ONE", "DEBUG COURSE TWO", "DEBUG COURSE THREE" };
 
     // TODO As described in Protocol v0.1, this var should be passed as a cmd program argument
@@ -26,13 +31,14 @@ public class GameState
         return;
     }
 
-    /** The host of a session will be able to call this method. */
     public void startGame(PlayerController[] playerControllers /* etc. config */)
     {
+        l.info("Creating Game Mode.");
+
         this.bGameStarted = true;
         this.gameMode = new GameMode(this.courseName, playerControllers);
 
-        System.out.printf("Game started with %d players.\n", playerControllers.length);
+        l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 
         return;
     }
