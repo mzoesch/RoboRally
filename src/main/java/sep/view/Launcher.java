@@ -28,7 +28,7 @@ public class Launcher
 
         GameInstance.run();
 
-        l.debug("The application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
 
         System.exit(sep.EArgs.OK);
 
