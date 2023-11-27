@@ -9,7 +9,7 @@
 <AnchorPane
     id="master-container" stylesheets="@globals.css"
     fx:controller="sep.view.scenecontrollers.LobbyJFXController_v2"
-    xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+    xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
 >
     <children>
         <Label
