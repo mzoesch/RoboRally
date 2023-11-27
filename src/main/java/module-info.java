@@ -5,6 +5,9 @@ module sep
     requires org.json;
     requires org.apache.logging.log4j;
 
+    exports sep;
+    opens sep to javafx.fxml;
+
     opens sep.view to javafx.fxml;
     exports sep.view;
 
