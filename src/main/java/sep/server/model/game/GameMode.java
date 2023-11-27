@@ -1,8 +1,11 @@
 package sep.server.model.game;
 
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
+import sep.server.model.game.tiles.Coordinate;
+import sep.server.model.game.Course;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
+import sep.server.model.game.Robot;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,7 +40,8 @@ public class GameMode
         currentPlayer.getRegisters()[currentRegister].playCard();
     }
 
-    public void distributeCards(ArrayList<Player> players) {
+    public void distributeCards(ArrayList<Player> players)
+    {
         for (Player player : players) {
             for (int i = 0; i < 9; i++) {
                 if (player.getPlayerDeck().isEmpty()) {
@@ -49,6 +53,44 @@ public class GameMode
         }
     }
 
+    public void moveRobotOneTile(Player player) {
+        Robot robot = player.getPlayerRobot();
+        Course course = robot.getCourse();
+        Tile currentTile = robot.getCurrentTile();
+        Coordinate currentCoordinate = currentTile.getCoordinate();
+        String currentDirection = robot.getDirection();
+        Coordinate newCoordinate = null;
+
+        switch (currentDirection) {
+            case "NORTH":
+                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
+                break;
+            case "SOUTH":
+                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
+                break;
+            case "EAST":
+                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
+                break;
+            case "WEST":
+                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
+                break;
+            default:
+                break;
+        }
+
+        if (isValidMove(newCoordinate)) {
+            Tile newTile = course.getTileByCoordinate(newCoordinate);
+            currentTile.setRobot(null);  // Roboter vom aktuellen Feld entfernen
+            newTile.setRobot(robot);    // Roboter auf das neue Feld setzen
+            robot.setCurrentTile(newTile);  // Roboter-Referenz auf das neue Feld aktualisieren
+        }
+
+    }
+
+    public boolean isValidMove(Coordinate coordinate) {
+    //Check ob Wand, Antenne, .. im Weg ist.
+        return true;
+    }
     public void endRound() {
         for(int i = 0; i<5; i++) {
             for(Player player : players) {
