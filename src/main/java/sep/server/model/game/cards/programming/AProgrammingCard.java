@@ -13,5 +13,5 @@ public abstract class AProgrammingCard extends Card implements IPlayableCard {
     @Override
     public void playCard() {}
 
-    public abstract void playCard(Player player);
+    public abstract void playCard(Player player, int currentRoundNumber);
 }

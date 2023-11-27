@@ -12,7 +12,7 @@ public class PowerUp extends AProgrammingCard implements IPlayableCard {
 
 
     @Override
-    public void playCard(Player player) {
+    public void playCard(Player player, int currentRoundNumber) {
         int currentEnergy = player.getEnergyCollected();
         player.setEnergyCollected(currentEnergy + 1);
     }

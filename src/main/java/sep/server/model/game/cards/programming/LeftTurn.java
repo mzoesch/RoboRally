@@ -10,7 +10,7 @@ public class LeftTurn extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Player player) {
+    public void playCard(Player player, int currentRoundNumber) {
         player.rotateRobotOneTileToTheRight();
         player.rotateRobotOneTileToTheRight();
         player.rotateRobotOneTileToTheRight();

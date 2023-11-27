@@ -13,8 +13,9 @@ public class Again extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Player player, Robot robot, int currentRoundNumber) {
+    public void playCard(Player player, int currentRoundNumber) {
 
+        Robot robot = player.getPlayerRobot();
         IPlayableCard[] registers = player.getRegisters();
         IPlayableCard previousRoundCard = registers[currentRoundNumber - 2]; //-2 because the currentRoundNumber is numbered from 1 to 5
 
@@ -25,15 +26,15 @@ public class Again extends AProgrammingCard implements IPlayableCard {
 
         // Check if the previous card is a Damage Card or a Upgrade Card
         if (previousRoundCard instanceof ADamageCard) {
-            handleDamageCard(player, robot, currentRoundNumber);
+            handleDamageCard(player, currentRoundNumber);
         } else if (previousRoundCard instanceof AUpgradeCard) {
-            handleUpgradeCard(player, robot, currentRoundNumber);
+            handleUpgradeCard(player,  currentRoundNumber);
         } else {
-            playCard(player, robot, currentRoundNumber - 2); //If not, play the Card in the last register.
+            playCard(player, currentRoundNumber - 2); //If not, play the Card in the last register.
         }
     }
 
-    private void handleDamageCard(Player player, Robot robot, int currentRoundNumber) {
+    private void handleDamageCard(Player player,  int currentRoundNumber) {
 
         if (player.getPlayerDeck().isEmpty()) {
             player.shuffleAndRefillDeck();
@@ -43,10 +44,10 @@ public class Again extends AProgrammingCard implements IPlayableCard {
 
         player.getRegisters()[currentRoundNumber - 2] = (IPlayableCard) drawnCard;
 
-        playCard(player, robot, currentRoundNumber - 2);
+        playCard(player, currentRoundNumber - 2);
     }
 
-    private void handleUpgradeCard(Player player, Robot robot, int currentRoundNumber) {
+    private void handleUpgradeCard(Player player,  int currentRoundNumber) {
         //... Incomplete, because the Upgrade Cards still missing.
     }
 

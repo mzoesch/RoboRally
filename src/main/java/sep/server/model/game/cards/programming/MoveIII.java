@@ -11,10 +11,8 @@ public class MoveIII extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Player player) {
-        player.moveRobotOneTile();
-        player.moveRobotOneTile();
-        player.moveRobotOneTile();
+    public void playCard(Player player, int currentRoundNumber) {
+        player.moveRobot(3);
     }
 
 }

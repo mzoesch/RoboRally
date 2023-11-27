@@ -109,38 +109,47 @@ public class Player {
     discardPile.clear();
   }
 
-  public void moveRobotOneTile() {
+  public void moveRobot(int steps) {
     Robot robot = getPlayerRobot();
     Course course = robot.getCourse();
+    String currentDirection = robot.getDirection();
     Tile currentTile = robot.getCurrentTile();
     Coordinate currentCoordinate = currentTile.getCoordinate();
-    String currentDirection = robot.getDirection();
     Coordinate newCoordinate = null;
 
-    switch (currentDirection) {
-      case "NORTH":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
-        break;
-      case "SOUTH":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
-        break;
-      case "EAST":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
-        break;
-      case "WEST":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
-        break;
-      default:
-        break;
-    }
+    for (int i = 0; i < steps; i++) {
+      switch (currentDirection) {
+        case "NORTH":
+          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
+          break;
+        case "SOUTH":
+          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
+          break;
+        case "EAST":
+          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
+          break;
+        case "WEST":
+          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
+          break;
+        default:
+          break;
+      }
 
-    if (isValidMove(newCoordinate)) {
-      Tile newTile = course.getTileByCoordinate(newCoordinate);
-      currentTile.setRobot(null);
-      newTile.setRobot(robot);
-      robot.setCurrentTile(newTile);
+      if (isValidMove(newCoordinate)) {
+        Tile newTile = course.getTileByCoordinate(newCoordinate);
+        currentTile.setRobot(null);
+        newTile.setRobot(robot);
+        robot.setCurrentTile(newTile);
+
+        currentCoordinate = newCoordinate;
+      } else {
+        break;
+      }
     }
   }
+
+
+
 
   public void rotateRobotOneTileToTheRight(){
     Robot robot = getPlayerRobot();
