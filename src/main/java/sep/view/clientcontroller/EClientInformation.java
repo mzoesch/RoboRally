@@ -1,5 +1,8 @@
 package sep.view.clientcontroller;
 
+import sep.EPort;
+import sep.EArgs;
+
 import org.json.JSONObject;
 import java.io.InputStreamReader;
 import java.net.Socket;
@@ -9,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.io.BufferedWriter;
 import java.util.concurrent.Executors;
 import java.io.OutputStreamWriter;
-import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,9 +26,9 @@ public enum EClientInformation
 
     private static final Logger l = LogManager.getLogger(EClientInformation.class);
 
-    // TODO To env var
-    private static final String SERVER_IP = "localhost";
-    private static final int SERVER_PORT = 8080;
+    private String SERVER_IP;
+    private int SERVER_PORT;
+
     public static final String PROTOCOL_VERSION = "0.1";
 
     private Socket socket;
@@ -48,6 +50,9 @@ public enum EClientInformation
     private EClientInformation()
     {
         this.JFX_INSTANCE = null;
+
+        this.SERVER_IP = EArgs.PREF_SERVER_IP;
+        this.SERVER_PORT = EPort.DEFAULT.i;
 
         this.socket = null;
         this.inputStreamReader = null;
@@ -75,7 +80,8 @@ public enum EClientInformation
 
         try
         {
-            this.socket = new Socket(EClientInformation.SERVER_IP, EClientInformation.SERVER_PORT);
+            l.info(String.format("Connecting to server %s %d.", EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT));
+            this.socket = new Socket(EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT);
         }
         catch (java.net.ConnectException e)
         {
@@ -222,6 +228,18 @@ public enum EClientInformation
     public GameInstance getJFXInstance()
     {
         return this.JFX_INSTANCE;
+    }
+
+    public void setServerIP(String SERVER_IP)
+    {
+        this.SERVER_IP = SERVER_IP;
+        return;
+    }
+
+    public void setServerPort(int PORT)
+    {
+        this.SERVER_PORT = PORT;
+        return;
     }
 
     // endregion Getters and Setters

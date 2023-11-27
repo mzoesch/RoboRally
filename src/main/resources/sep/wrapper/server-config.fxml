@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Text?>
+<BorderPane
+        id="master-container" stylesheets="@globals.css"
+        fx:controller="sep.wrapper.ServerConfigJFXController"
+        xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+>
+    <top>
+        <AnchorPane>
+            <Label
+                text="Configure Server"
+                styleClass="text-2xl" alignment="CENTER"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+            />
+            <!--This is just temporary, until unfocused fields are a thing. -->
+            <TextField
+                id="temp-text-field" stylesheets="@server-config.css"
+            />
+        </AnchorPane>
+    </top>
+    <center>
+        <VBox
+                style="-fx-spacing: 16px; -fx-alignment: center; -fx-max-width: 400px; -fx-max-height: 300px; -fx-border-radius: 5px; -fx-background-radius: 5px;-fx-border-color: #000000ff; -fx-background-color: #ffffff0c;"
+        >
+            <Label
+                text="Server Address"
+                styleClass="text-xl"
+            />
+            <HBox
+                styleClass="server-address-container" stylesheets="@server-config.css"
+            >
+                <TextField
+                    disable="true"
+                    fx:id="serverIPTextField"
+                    styleClass="text-field-host" stylesheets="@server-config.css"
+                />
+                <Label
+                    text=":"
+                    styleClass="text-xl"
+                />
+                <TextField
+                    fx:id="serverPortTextField"
+                    styleClass="text-field-port" stylesheets="@server-config.css"
+                />
+            </HBox>
+            <Button
+                    text="START SERVER"
+                    styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                    onAction="#onStartServerBtn"
+            />
+            <Button
+                    text="CANCEL"
+                    styleClass="danger-btn" style="-fx-min-width: 300px;"
+                        onAction="#onCancelBtn"
+            />
+        </VBox>
+    </center>
+    <bottom>
+        <AnchorPane>
+            <Label
+                fx:id="alertLabel"
+                styleClass="text-xl-error" alignment="CENTER"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+            />
+        </AnchorPane>
+    </bottom>
+</BorderPane>
