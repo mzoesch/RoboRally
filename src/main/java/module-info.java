@@ -17,5 +17,8 @@ module sep
     opens sep.view.viewcontroller to javafx.fxml;
     exports sep.view.viewcontroller;
 
+    opens sep.wrapper to javafx.fxml;
+    exports sep.wrapper;
+
     exports sep.view.json;
 }
