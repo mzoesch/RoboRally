@@ -45,5 +45,6 @@ public class Robot {
   public Course getCourse() {
     return course;
   }
+
   public void reboot() {}
 }

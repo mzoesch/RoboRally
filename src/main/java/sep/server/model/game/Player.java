@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
+import sep.server.model.game.tiles.Coordinate;
 
 public class Player {
   Robot playerRobot;
@@ -106,5 +107,42 @@ public class Player {
     Collections.shuffle(discardPile);
     playerDeck.addAll(playerDeck.size(), discardPile); // Refill playerDeck with the shuffled discardPile at the end of PlayerDeck
     discardPile.clear();
+  }
+
+  public void moveRobotOneTile() {
+    Robot robot = getPlayerRobot();
+    Course course = robot.getCourse();
+    Tile currentTile = robot.getCurrentTile();
+    Coordinate currentCoordinate = currentTile.getCoordinate();
+    String currentDirection = robot.getDirection();
+    Coordinate newCoordinate = null;
+
+    switch (currentDirection) {
+      case "NORTH":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
+        break;
+      case "SOUTH":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
+        break;
+      case "EAST":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
+        break;
+      case "WEST":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
+        break;
+      default:
+        break;
+    }
+
+    if (isValidMove(newCoordinate)) {
+      Tile newTile = course.getTileByCoordinate(newCoordinate);
+      currentTile.setRobot(null);
+      newTile.setRobot(robot);
+      robot.setCurrentTile(newTile);
+    }
+  }
+
+  public boolean isValidMove (Coordinate coordinate){
+    return true;
   }
 }
