@@ -135,21 +135,24 @@ public class Player {
           break;
       }
 
-      if (isValidMove(newCoordinate)) {
-        Tile newTile = course.getTileByCoordinate(newCoordinate);
-        currentTile.setRobot(null);
-        newTile.setRobot(robot);
-        robot.setCurrentTile(newTile);
-
-        currentCoordinate = newCoordinate;
-      } else {
+      if (!isWithinBounds(newCoordinate)) {
+        robot.reboot();
         break;
       }
+
+      if (!isValidMove(newCoordinate, course)) {
+        break;
+      }
+
+      Tile newTile = course.getTileByCoordinate(newCoordinate);
+      currentTile.setRobot(null);
+      newTile.setRobot(robot);
+      robot.setCurrentTile(newTile);
+
+      currentCoordinate = newCoordinate;
     }
-  }
 
-
-
+    }
 
   public void rotateRobotOneTileToTheRight(){
     Robot robot = getPlayerRobot();
@@ -177,7 +180,27 @@ public class Player {
     robot.setDirection(newDirection);
   }
 
-  public boolean isValidMove (Coordinate coordinate){
+  /**
+   * Checks whether the target field is occupied by an antenna, another immovable robot,
+   * or a wall. Returns true if the move is valid, otherwise it returns false
+   */
+  public boolean isValidMove (Coordinate coordinate, Course course){
+    Tile targetTile = course.getTileByCoordinate(coordinate);
+    // Check if the target tile has a wall
+
+    //Check if the target tile has a robot who cannot get passed
+
+    //Check if the target has the antanna
     return true;
+  }
+
+  /**
+   * Returns true if the coordinate is within the valid range, otherwise returns false.
+   */
+  private boolean isWithinBounds(Coordinate coordinate) {
+    int fieldSize = 8;
+    int x = coordinate.getXCoordinate();
+    int y = coordinate.getYCoordinate();
+    return x >= 0 && x < fieldSize && y >= 0 && y < fieldSize;
   }
 }
