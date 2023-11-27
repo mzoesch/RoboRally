@@ -7,7 +7,6 @@ import java.util.Arrays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-// TODO Allow to config the sv in different scene. IMPORTANT!
 // TODO Save screen size and position of the wrapper Graphical User Interface and inherit it to the follow-up process.
 public class Launcher
 {
@@ -187,10 +186,10 @@ public class Launcher
 
                 final ProcessBuilder pb =
                         System.getProperty("os.name").toLowerCase().contains("windows")
-                        ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s%s%s", f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                        ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s %s %s", f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
                         :
                         System.getProperty("os.name").toLowerCase().contains("mac")
-                        ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s%s%s\"", fp.substring(0, fp.lastIndexOf("/")), f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                        ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s\"", fp.substring(0, fp.lastIndexOf("/")), f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
                         : null
                         ;
                 if (pb == null)
