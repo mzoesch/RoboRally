@@ -15,6 +15,8 @@ public class GameMode
 {
     int playerNum;
     ArrayList<Player> players;
+    Player currentPlayer;
+    int currentRegister;
     int energyBank;
     AUpgradeCard[] upgradeShop;
 
@@ -23,28 +25,18 @@ public class GameMode
     {
     }
 
-    public void setupGame() {
-        determinePriority();
-    }
-    public void determinePriority() {}
-    public void runRound() {}
-    public void upgradePhase() {}
     public void programmingPhase() {
         distributeCards(players);
     }
-    public void activationPhase() {
+
+    public void sortPlayersByPriority() {
         players.sort(Comparator.comparingInt(Player::getPriority));
-
-        for(int i=0; i<5; i++) {
-            for(Player player : players) {
-                player.getRegisters()[i].playCard();
-            }
-            activateBoardElements();
-            shootRobotLasers();
-        }
-
-        endRound();
     }
+
+    public void activateRegister() {
+        currentPlayer.getRegisters()[currentRegister].playCard();
+    }
+
     public void distributeCards(ArrayList<Player> players) {
         for (Player player : players) {
             for (int i = 0; i < 9; i++) {
@@ -57,8 +49,6 @@ public class GameMode
         }
     }
 
-    public void activateBoardElements() {}
-    public void shootRobotLasers() {}
     public void endRound() {
         for(int i = 0; i<5; i++) {
             for(Player player : players) {
