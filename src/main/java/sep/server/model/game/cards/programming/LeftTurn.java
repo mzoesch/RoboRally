@@ -10,29 +10,10 @@ public class LeftTurn extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Player player, Robot robot, int currentRoundNumber) {
-
-        String currentDirection = robot.getDirection();
-        String newDirection;
-
-        switch (currentDirection) {
-            case "NORTH":
-                newDirection = "WEST";
-                break;
-            case "EAST":
-                newDirection = "NORTH";
-                break;
-            case "SOUTH":
-                newDirection = "EAST";
-                break;
-            case "WEST":
-                newDirection = "SOUTH";
-                break;
-            default:
-                newDirection = currentDirection;
-                break;
-        }
-
-        robot.setDirection(newDirection);
+    public void playCard(Player player) {
+        player.rotateRobotOneTileToTheRight();
+        player.rotateRobotOneTileToTheRight();
+        player.rotateRobotOneTileToTheRight();
     }
+
 }

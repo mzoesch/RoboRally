@@ -11,29 +11,9 @@ public class UTurn extends AProgrammingCard implements IPlayableCard {
     }
 
     @Override
-    public void playCard(Player player, Robot robot, int currentRoundNumber) {
-
-        String currentDirection = robot.getDirection();
-        String newDirection;
-
-        switch (currentDirection) {
-            case "NORTH":
-                newDirection = "SOUTH";
-                break;
-            case "SOUTH":
-                newDirection = "NORTH";
-                break;
-            case "EAST":
-                newDirection = "WEST";
-                break;
-            case "WEST":
-                newDirection = "EAST";
-                break;
-            default:
-                newDirection = currentDirection;
-                break;
-        }
-
-        robot.setDirection(newDirection);
+    public void playCard(Player player) {
+        player.rotateRobotOneTileToTheRight();
+        player.rotateRobotOneTileToTheRight();
+        player.rotateRobotOneTileToTheRight();
     }
 }

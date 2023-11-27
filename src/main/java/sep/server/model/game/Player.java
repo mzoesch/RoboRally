@@ -142,6 +142,32 @@ public class Player {
     }
   }
 
+  public void rotateRobotOneTileToTheRight(){
+    Robot robot = getPlayerRobot();
+    String currentDirection = robot.getDirection();
+    String newDirection;
+
+    switch (currentDirection) {
+      case "NORTH":
+        newDirection = "EAST";
+        break;
+      case "EAST":
+        newDirection = "SOUTH";
+        break;
+      case "SOUTH":
+        newDirection = "WEST";
+        break;
+      case "WEST":
+        newDirection = "NORTH";
+        break;
+      default:
+        newDirection = currentDirection;
+        break;
+    }
+
+    robot.setDirection(newDirection);
+  }
+
   public boolean isValidMove (Coordinate coordinate){
     return true;
   }
