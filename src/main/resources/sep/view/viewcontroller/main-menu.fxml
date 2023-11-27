@@ -19,12 +19,23 @@
             <TextField
                 id="temp-text-field" stylesheets="@main-menu.css"
             />
-            <TextField
-                promptText="Session ID"
-                id="input-text-field" stylesheets="@main-menu.css"
-                fx:id="sessionIDField"
-               AnchorPane.rightAnchor="0.0"
-            />
+            <VBox
+                style="-fx-spacing: 8px;"
+                AnchorPane.rightAnchor="0.0"
+            >
+                <children>
+                    <TextField
+                        promptText="localhost:8080"
+                        id="input-text-field" stylesheets="@main-menu.css"
+                        fx:id="serverAddressField"
+                    />
+                    <TextField
+                        promptText="Session ID"
+                        id="input-text-field" stylesheets="@main-menu.css"
+                        fx:id="sessionIDField"
+                    />
+                </children>
+            </VBox>
         </AnchorPane>
     </top>
     <center>

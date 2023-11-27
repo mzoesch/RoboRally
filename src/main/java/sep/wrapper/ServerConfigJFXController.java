@@ -1,7 +1,6 @@
 package sep.wrapper;
 
 import sep.EPort;
-import sep.view.clientcontroller.EClientInformation;
 import sep.EArgs;
 
 import javafx.event.ActionEvent;

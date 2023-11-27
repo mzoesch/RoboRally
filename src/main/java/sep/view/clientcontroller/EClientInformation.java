@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.io.OutputStreamWriter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.net.ConnectException;
+import java.net.UnknownHostException;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -80,13 +82,23 @@ public enum EClientInformation
 
         try
         {
-            l.info(String.format("Connecting to server %s %d.", EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT));
+            l.info(String.format("Connecting to server [%s:%d].", EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT));
             this.socket = new Socket(EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT);
         }
-        catch (java.net.ConnectException e)
+        catch (ConnectException e)
         {
             l.error("Failed to connect to server.");
             l.error(e.getMessage());
+            this.stdServerErrPipeline.setLength(0);
+            this.stdServerErrPipeline.append(String.format("Failed to connect to server. %s", e.getMessage()));
+            return false;
+        }
+        catch (UnknownHostException e)
+        {
+            l.error("Failed to connect to server.");
+            l.error(e.getMessage());
+            this.stdServerErrPipeline.setLength(0);
+            this.stdServerErrPipeline.append("Failed to connect to server. Unknown host.");
             return false;
         }
 
