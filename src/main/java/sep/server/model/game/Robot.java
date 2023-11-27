@@ -5,6 +5,10 @@ public class Robot {
   int positionY;
   String direction;
 
+  private Course course;
+
+  private Tile occupies;
+
   public Robot(int positionX, int positionY, String direction) {
     this.positionX = positionX;
     this.positionY = positionY;

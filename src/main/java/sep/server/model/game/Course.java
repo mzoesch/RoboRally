@@ -1,6 +1,7 @@
 package sep.server.model.game;
 
 import sep.server.model.game.courseBuilder.CourseBuilder;
+import sep.server.model.game.tiles.*;
 import java.util.ArrayList;
 
 /**
@@ -20,4 +21,28 @@ public class Course {
     }
 
     public void activateBoard() {}
+
+    public Tile getTileByCoordinate(Coordinate coordinate){
+        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+    }
+
+    public Tile getTopNeighbor(Tile tile){
+        Coordinate coordinate = tile.getCoordinate().getTopNeighbor();
+        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+    }
+
+    public Tile getRightNeighbor(Tile tile){
+        Coordinate coordinate = tile.getCoordinate().getRightNeighbor();
+        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+    }
+
+    public Tile getBottomNeighbor(Tile tile){
+        Coordinate coordinate = tile.getCoordinate().getBottomNeighbor();
+        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+    }
+
+    public Tile getLeftNeighbor(Tile tile){
+        Coordinate coordinate = tile.getCoordinate().getLeftNeighbor();
+        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+    }
 }
