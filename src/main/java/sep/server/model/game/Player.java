@@ -110,10 +110,12 @@ public class Player {
   }
 
   /**
-   * Moves the robot one tile forwards based on the robots current direction
-   * Updates the robot's position
+   * Moves the robot one tile based on the given direction.
+   * Updates the robot's position.
+   *
+   * @param forward True if the robot should move forwards, false if backwards.
    */
-  public void moveRobotOneTileForwards() {
+  public void moveRobotOneTile(boolean forward) {
     Robot robot = getPlayerRobot();
     Course course = robot.getCourse();
     String currentDirection = robot.getDirection();
@@ -121,80 +123,56 @@ public class Player {
     Coordinate currentCoordinate = currentTile.getCoordinate();
     Coordinate newCoordinate = null;
 
+    int directionModifier = forward ? 1 : -1;
+
     switch (currentDirection) {
       case "NORTH":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - directionModifier);
         break;
       case "SOUTH":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + directionModifier);
         break;
       case "EAST":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + directionModifier, currentCoordinate.getYCoordinate());
         break;
       case "WEST":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - directionModifier, currentCoordinate.getYCoordinate());
         break;
       default:
         break;
     }
 
-    //Check if robot is still on the board after the move
+    // Check if the robot is still on the board
     if (!isWithinBounds(newCoordinate)) {
       robot.reboot();
       return;
     }
 
-    //Check if the move is possible
+    // Check if the move is possible
     if (!robot.isMovable(course.getTileByCoordinate(newCoordinate))) {
       return;
     }
 
-    //Update Robot Position in the Class Robot and Course
+    // Update Robot Position in Course and in Robot
     course.updateRobotPosition(robot, newCoordinate);
   }
 
   /**
-   * Moves the robot one tile backwards based on the current direction.
-   * Updates the  robot's position
+   * Moves the robot one tile forwards based on the robot's current direction.
+   * Updates the robot's position.
+   */
+  public void moveRobotOneTileForwards() {
+    moveRobotOneTile(true);
+  }
+
+  /**
+   * Moves the robot one tile backwards based on the robot's current direction.
+   * Updates the robot's position.
    */
   public void moveRobotOneTileBackwards() {
-    Robot robot = getPlayerRobot();
-    Course course = robot.getCourse();
-    String currentDirection = robot.getDirection();
-    Tile currentTile = robot.getCurrentTile();
-    Coordinate currentCoordinate = currentTile.getCoordinate();
-    Coordinate newCoordinate = null;
-
-    switch (currentDirection) {
-      case "NORTH":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
-        break;
-      case "SOUTH":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
-        break;
-      case "EAST":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
-        break;
-      case "WEST":
-        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
-        break;
-      default:
-        break;
-    }
-
-    //Check if the Robot is still on the board
-    if (!isWithinBounds(newCoordinate)) {
-      robot.reboot();
-      return;
-    }
-
-    if (!robot.isMovable(course.getTileByCoordinate(newCoordinate))) {
-      return;
-    }
-
-    //Update Robot Position in Course and in Robot
-    course.updateRobotPosition(robot, newCoordinate);
+    moveRobotOneTile(false);
   }
+
 
   /**
    * Rotates the robot 90 degrees to the right
