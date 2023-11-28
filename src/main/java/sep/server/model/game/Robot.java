@@ -50,4 +50,17 @@ public class Robot {
 
 
   public void reboot() {}
+
+  public boolean isMovable(Tile targetTile) {
+    if (targetTile.hasAntenna()){
+      return false;
+    };
+    if (targetTile.hasWall()){
+      return false;
+    }
+    if (targetTile.hasUnmovableRobot()) {
+      return false;
+    }
+    return true;
+  }
 }

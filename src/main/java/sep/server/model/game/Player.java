@@ -138,15 +138,18 @@ public class Player {
         break;
     }
 
+    //Check if robot is still on the board after the move
     if (!isWithinBounds(newCoordinate)) {
       robot.reboot();
       return;
     }
 
-    if (!isValidMove(newCoordinate, course)) {
+    //Check if the move is possible
+    if (!robot.isMovable(course.getTileByCoordinate(newCoordinate))) {
       return;
     }
 
+    //Update Robot Position in the Class Robot and Course
     course.updateRobotPosition(robot, newCoordinate);
   }
 
@@ -179,15 +182,17 @@ public class Player {
         break;
     }
 
+    //Check if the Robot is still on the board
     if (!isWithinBounds(newCoordinate)) {
       robot.reboot();
       return;
     }
 
-    if (!isValidMove(newCoordinate, course)) {
+    if (!robot.isMovable(course.getTileByCoordinate(newCoordinate))) {
       return;
     }
 
+    //Update Robot Position in Course and in Robot
     course.updateRobotPosition(robot, newCoordinate);
   }
 
@@ -221,30 +226,7 @@ public class Player {
     robot.setDirection(newDirection);
   }
 
-  /**
-   * Checks whether the target field is occupied by an antenna, another immovable robot,
-   * or a wall. Returns true if the move is valid, otherwise it returns false
-   */
-  public boolean isValidMove (Coordinate coordinate, Course course){
-    Tile targetTile = course.getTileByCoordinate(coordinate);
 
-    // Check if the target tile has a antenna
-    if(targetTile.hasAntenna()){
-      return false;
-    }
-
-    // Check if the target tile has a wall
-    if(targetTile.hasWall()){
-      return false;
-    }
-
-    //Check if the target tile has a robot who cannot get passed
-
-
-
-    //Check if the target has the antanna
-    return true;
-  }
 
   /**
    * Returns true if the coordinate is within the valid range, otherwise returns false.

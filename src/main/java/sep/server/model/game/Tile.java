@@ -12,12 +12,13 @@ public class Tile {
     //braucht es das onBoard-Attribut? (aus Protokoll v0.1)
     private String isOnBoard;
 
-    public Tile(String onBoard, Coordinate fieldCoordinate, ArrayList<FieldType> arrayFieldTypes){
+    public Tile(String onBoard, Coordinate fieldCoordinate, ArrayList<FieldType> arrayFieldTypes) {
         isOnBoard = onBoard;
         coordinate = fieldCoordinate;
         fieldTypes = arrayFieldTypes;
     }
-    public Robot getRobot(){
+
+    public Robot getRobot() {
         return occupiedBy;
     }
 
@@ -26,7 +27,7 @@ public class Tile {
         occupiedBy = newRobot;
     }
 
-    public Coordinate getCoordinate(){
+    public Coordinate getCoordinate() {
         return coordinate;
     }
 
@@ -62,8 +63,13 @@ public class Tile {
 
     public boolean hasUnmovableRobot() {
 
+        //Noch zu implementieren
         return true;
     }
-
-
 }
+
+
+
+
+
+
