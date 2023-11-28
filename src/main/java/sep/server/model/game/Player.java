@@ -143,7 +143,7 @@ public class Player {
     }
 
     // Check if the robot is still on the board
-    if (!isWithinBounds(newCoordinate)) {
+    if (!course.isCoordinateWithinBounds(newCoordinate)) {
       robot.reboot();
       return;
     }
@@ -172,7 +172,6 @@ public class Player {
   public void moveRobotOneTileBackwards() {
     moveRobotOneTile(false);
   }
-
 
   /**
    * Rotates the robot 90 degrees to the right
@@ -206,14 +205,5 @@ public class Player {
 
 
 
-  /**
-   * Returns true if the coordinate is within the valid range, otherwise returns false.
-   */
-  private boolean isWithinBounds(Coordinate coordinate) {
-    int fieldSize = 8;
-    int x = coordinate.getXCoordinate();
-    int y = coordinate.getYCoordinate();
-    return x >= 0 && x < fieldSize && y >= 0 && y < fieldSize;
-  }
 
 }

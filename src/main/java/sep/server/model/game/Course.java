@@ -24,6 +24,12 @@ public class Course {
     public void activateBoard() {
     }
 
+    /**
+     * Updates the position of the robot on the game board.
+     *
+     * @param robot The robot who get updated
+     * @param newCoordinate The new coordinate where the robot is moved
+     */
     public void updateRobotPosition(Robot robot, Coordinate newCoordinate) {
 
         //Update Old Tile in Course
@@ -37,6 +43,18 @@ public class Course {
 
     }
 
+    /**
+     * Checks if the  coordinate is within the bounds of the game board.
+     *
+     * @param coordinate The coordinate to be checked
+     * @return True if the coordinate is within the game board bounds, otherwise false.
+     */
+    public boolean isCoordinateWithinBounds(Coordinate coordinate) {
+        int x = coordinate.getXCoordinate();
+        int y = coordinate.getYCoordinate();
+
+        return x >= 0 && x < course.size() && y >= 0 && y < course.get(0).size();
+    }
 
     public Tile getTileByCoordinate(Coordinate coordinate){
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
