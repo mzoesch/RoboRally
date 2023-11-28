@@ -144,10 +144,8 @@ public class Player {
         break;
       }
 
-      Tile newTile = course.getTileByCoordinate(newCoordinate);
-      currentTile.setRobot(null);
-      newTile.setRobot(robot);
-      robot.setCurrentTile(newTile);
+
+      course.updateRobotPosition(robot,newCoordinate);
 
       currentCoordinate = newCoordinate;
     }

@@ -13,6 +13,7 @@ public class Course {
 
     /**
      * Erstellt das Spielbrett abhängig vom übergebenen Kartennamen
+     *
      * @param courseName Name des entsprechenden Spielfelds
      */
     public Course(String courseName) {
@@ -20,7 +21,22 @@ public class Course {
         course = courseBuilder.buildCourse(courseName);
     }
 
-    public void activateBoard() {}
+    public void activateBoard() {
+    }
+
+    public void updateRobotPosition(Robot robot, Coordinate newCoordinate) {
+
+        //Update Old Tile in Course
+        getTileByCoordinate(robot.getCurrentTile().getCoordinate()).setRobot(null);
+
+        //Update New Tile in Course
+        getTileByCoordinate(newCoordinate).setRobot(robot);
+
+        //Update Robot
+        robot.setCurrentTile(getTileByCoordinate(newCoordinate));
+
+    }
+
 
     public Tile getTileByCoordinate(Coordinate coordinate){
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());

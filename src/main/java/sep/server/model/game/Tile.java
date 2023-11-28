@@ -17,7 +17,6 @@ public class Tile {
         coordinate = fieldCoordinate;
         fieldTypes = arrayFieldTypes;
     }
-
     public Robot getRobot(){
         return occupiedBy;
     }

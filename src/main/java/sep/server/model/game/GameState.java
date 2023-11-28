@@ -37,6 +37,8 @@ public class GameState
 
         this.bGameStarted = true;
         this.gameMode = new GameMode(this.courseName, playerControllers);
+        this.gameMode.activationPhase();
+        sessiom.sendProgrammingCarstoClients()
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 
