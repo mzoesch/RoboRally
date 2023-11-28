@@ -1,5 +1,7 @@
 package sep.server.model.game.tiles;
 
+import org.json.JSONObject;
+
 public class EnergySpace implements FieldType {
 
     private int availableEnergy;
@@ -7,5 +9,13 @@ public class EnergySpace implements FieldType {
     public EnergySpace(int availableEnergy) {
 
         this.availableEnergy = availableEnergy;
+    }
+
+    public JSONObject toJSON(String isOnBoard){
+        JSONObject fieldInfo = new JSONObject();
+        fieldInfo.put("type","EnergySpace");
+        fieldInfo.put("type", isOnBoard);
+        fieldInfo.put("count", availableEnergy);
+        return fieldInfo;
     }
 }
