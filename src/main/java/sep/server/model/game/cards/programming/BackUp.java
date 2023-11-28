@@ -11,6 +11,6 @@ public class BackUp extends AProgrammingCard implements IPlayableCard {
 
     @Override
     public void playCard(Player player, int currentRoundNumber) {
-        player.moveRobot(-1);
+        player.moveRobotOneTileBackwards();
     }
 }

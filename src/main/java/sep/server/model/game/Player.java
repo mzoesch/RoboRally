@@ -109,7 +109,11 @@ public class Player {
     discardPile.clear();
   }
 
-  public void moveRobot(int steps) {
+  /**
+   * Moves the robot one tile forwards based on the robots current direction
+   * Updates the robot's position
+   */
+  public void moveRobotOneTileForwards() {
     Robot robot = getPlayerRobot();
     Course course = robot.getCourse();
     String currentDirection = robot.getDirection();
@@ -117,41 +121,80 @@ public class Player {
     Coordinate currentCoordinate = currentTile.getCoordinate();
     Coordinate newCoordinate = null;
 
-    for (int i = 0; i < steps; i++) {
-      switch (currentDirection) {
-        case "NORTH":
-          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
-          break;
-        case "SOUTH":
-          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
-          break;
-        case "EAST":
-          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
-          break;
-        case "WEST":
-          newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
-          break;
-        default:
-          break;
-      }
-
-      if (!isWithinBounds(newCoordinate)) {
-        robot.reboot();
+    switch (currentDirection) {
+      case "NORTH":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
         break;
-      }
-
-      if (!isValidMove(newCoordinate, course)) {
+      case "SOUTH":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
         break;
-      }
-
-
-      course.updateRobotPosition(robot,newCoordinate);
-
-      currentCoordinate = newCoordinate;
+      case "EAST":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
+        break;
+      case "WEST":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
+        break;
+      default:
+        break;
     }
 
+    if (!isWithinBounds(newCoordinate)) {
+      robot.reboot();
+      return;
     }
 
+    if (!isValidMove(newCoordinate, course)) {
+      return;
+    }
+
+    course.updateRobotPosition(robot, newCoordinate);
+  }
+
+  /**
+   * Moves the robot one tile backwards based on the current direction.
+   * Updates the  robot's position
+   */
+  public void moveRobotOneTileBackwards() {
+    Robot robot = getPlayerRobot();
+    Course course = robot.getCourse();
+    String currentDirection = robot.getDirection();
+    Tile currentTile = robot.getCurrentTile();
+    Coordinate currentCoordinate = currentTile.getCoordinate();
+    Coordinate newCoordinate = null;
+
+    switch (currentDirection) {
+      case "NORTH":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + 1);
+        break;
+      case "SOUTH":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - 1);
+        break;
+      case "EAST":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - 1, currentCoordinate.getYCoordinate());
+        break;
+      case "WEST":
+        newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + 1, currentCoordinate.getYCoordinate());
+        break;
+      default:
+        break;
+    }
+
+    if (!isWithinBounds(newCoordinate)) {
+      robot.reboot();
+      return;
+    }
+
+    if (!isValidMove(newCoordinate, course)) {
+      return;
+    }
+
+    course.updateRobotPosition(robot, newCoordinate);
+  }
+
+  /**
+   * Rotates the robot 90 degrees to the right
+   * Updates the robot's direction
+   */
   public void rotateRobotOneTileToTheRight(){
     Robot robot = getPlayerRobot();
     String currentDirection = robot.getDirection();
@@ -184,9 +227,20 @@ public class Player {
    */
   public boolean isValidMove (Coordinate coordinate, Course course){
     Tile targetTile = course.getTileByCoordinate(coordinate);
+
+    // Check if the target tile has a antenna
+    if(targetTile.hasAntenna()){
+      return false;
+    }
+
     // Check if the target tile has a wall
+    if(targetTile.hasWall()){
+      return false;
+    }
 
     //Check if the target tile has a robot who cannot get passed
+
+
 
     //Check if the target has the antanna
     return true;
@@ -201,4 +255,5 @@ public class Player {
     int y = coordinate.getYCoordinate();
     return x >= 0 && x < fieldSize && y >= 0 && y < fieldSize;
   }
+
 }

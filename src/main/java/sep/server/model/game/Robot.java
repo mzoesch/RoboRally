@@ -1,5 +1,7 @@
 package sep.server.model.game;
 
+import sep.server.model.game.tiles.Coordinate;
+
 public class Robot {
   int positionX;
   int positionY;
@@ -45,6 +47,7 @@ public class Robot {
   public Course getCourse() {
     return course;
   }
+
 
   public void reboot() {}
 }
