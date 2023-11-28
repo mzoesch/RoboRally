@@ -165,84 +165,105 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CurrentPlayer")) {
+            l.debug("Received current player from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Error")) {
+            l.debug("Received an error message from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
+            l.debug("Received card played from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "GameStarted")) {
+            l.debug("Received game started from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken")) {
+            l.debug("Received starting point from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CardSelected")) {
+            l.debug("Received card selected from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGorNow")) {
+            l.debug("Received cards you got now from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "NotYourCards")) {
+            l.debug("Received not yours cards from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
+            l.debug("Received shuffle coding from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerEnded")) {
+            l.debug("Received timer ended from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
+            l.debug("Received timer started from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "YourCards")) {
+            l.debug("Received your cards from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Animation")) {
+            l.debug("Received animation from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CheckPoint")) {
+            l.debug("Received checkpoint from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Energy")) {
+            l.debug("Received energy from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "GameFinished")) {
+            l.debug("Received game finished from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Movement")) {
+            l.debug("Received movement from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
+            l.debug("Received player turning from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "RebootDirection")) {
+            l.debug("Received reboot diretion from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Reboot")) {
+            l.debug("Received reboot from server.");
             return;
         }
+
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(dsrp.getType_v2());
 
