@@ -164,10 +164,85 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "")) {
-
+        if (Objects.equals(dsrp.getType_v2(), "CurrentPlayer")) {
+            return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "Error")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "GameStarted")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "CardSelected")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "CardsYouGorNow")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "NotYourCards")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "TimerEnded")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "YourCards")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "Animation")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "CheckPoint")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "Energy")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "GameFinished")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "Movement")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "RebootDirection")) {
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "Reboot")) {
+            return;
+        }
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(dsrp.getType_v2());
 
