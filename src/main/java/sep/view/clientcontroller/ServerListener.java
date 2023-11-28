@@ -110,7 +110,7 @@ public class ServerListener implements Runnable
 
     private void parseJSONRequestFromServer(DefaultServerRequestParser dsrp) throws JSONException
     {
-        l.trace("Received request from server. Parsing:%n{}", dsrp.getRequest().toString(2));
+        l.trace("Received request from server. Parsing: {}", dsrp.getRequest().toString(2));
 
         if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {

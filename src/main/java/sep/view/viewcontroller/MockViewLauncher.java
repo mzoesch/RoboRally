@@ -50,6 +50,8 @@ public final class MockViewLauncher
                 EGameState.addRemotePlayer(dsrp);
             }
 
+            // region Course creation
+
             /* Course */
             DefaultServerRequestParser dsrp = new DefaultServerRequestParser(new JSONObject()
                 .put("messageType", "GameStarted")
@@ -951,7 +953,9 @@ public final class MockViewLauncher
                     )
                 )
             ));
-            l.trace("Mock view: " + dsrp.getGameCourse().toString(2));
+
+            // endregion Course creation
+
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
             ViewLauncher.updateCourseView();
         });

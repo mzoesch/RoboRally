@@ -5,6 +5,7 @@ import sep.view.json.DefaultServerRequestParser;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.scenecontrollers.LobbyJFXController_v2;
 import sep.view.clientcontroller.GameInstance;
+import sep.view.clientcontroller.EGameState;
 import sep.view.scenecontrollers.GameJFXController;
 
 import javafx.application.Application;
@@ -105,6 +106,7 @@ public final class ViewLauncher extends Application
 
     public static void startGame(JSONArray course)
     {
+        EGameState.INSTANCE.setCurrentServerCourseJSON(course);
         ViewLauncher.INSTANCE.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
         return;
     }

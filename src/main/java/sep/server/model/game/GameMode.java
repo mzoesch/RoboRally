@@ -35,8 +35,9 @@ public class GameMode
 
         //TODO hier Spieler erstellen; Roboter erstellen
 
+        /* Just temporary. This is for helping to develop the front-end. */
         for (PlayerController pc : playerControllers) {
-            new MockGameStartedModel(pc.getClientInstance(), this.course.getCourse()).send();
+            new MockGameStartedModel(pc.getClientInstance()).send();
             continue;
         }
 
