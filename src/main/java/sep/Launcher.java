@@ -3,11 +3,14 @@ package sep;
 import sep.wrapper.Wrapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 // TODO Save screen size and position of the wrapper Graphical User Interface and inherit it to the follow-up process.
+// TODO Osascript will always open a new window (Meaning two if Terminal is not running).
+// TODO Open Terminal in pref App not default.
 public class Launcher
 {
     private static final Logger l = LogManager.getLogger(Launcher.class);
@@ -57,9 +60,10 @@ public class Launcher
                     ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher %s --nocmd%s", f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
                     :
                     System.getProperty("os.name").toLowerCase().contains("mac")
-                    ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher %s --nocmd%s\"", fp.substring(0, fp.lastIndexOf("/")), f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
+                    ? new ProcessBuilder("osascript", "-e", String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher %s --nocmd%s\"", fp.substring(0, fp.lastIndexOf("/")), f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
                     : null
                     ;
+
             /* I do not have a linux machine, therefore, I cannot test this. */
             if (pb == null)
             {
@@ -189,7 +193,7 @@ public class Launcher
                         ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s %s %s", f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
                         :
                         System.getProperty("os.name").toLowerCase().contains("mac")
-                        ? new ProcessBuilder(String.format("osascript -e tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s\"", fp.substring(0, fp.lastIndexOf("/")), f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
+                        ? new ProcessBuilder("osascript", "-e", String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s\"", fp.substring(0, fp.lastIndexOf("/")), f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
                         : null
                         ;
                 if (pb == null)

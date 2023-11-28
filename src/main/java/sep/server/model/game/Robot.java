@@ -9,6 +9,7 @@ public class Robot {
   private Course course;
   private Tile currentTile;
 
+  //TODO Konstruktor Robot-Klasse anpassen
   public Robot(int positionX, int positionY, String direction) {
     this.positionX = positionX;
     this.positionY = positionY;

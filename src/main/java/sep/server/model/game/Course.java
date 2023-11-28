@@ -79,4 +79,8 @@ public class Course {
         Coordinate coordinate = tile.getCoordinate().getLeftNeighbor();
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
     }
+
+    public ArrayList<ArrayList<Tile>> getCourse() {
+        return course;
+    }
 }

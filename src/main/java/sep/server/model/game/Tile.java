@@ -1,5 +1,9 @@
 package sep.server.model.game;
 
+import sep.server.json.IJSONSerializable;
+import org.json.JSONObject;
+import org.json.JSONArray;
+
 import sep.server.model.game.tiles.*;
 
 import java.util.ArrayList;
@@ -65,6 +69,16 @@ public class Tile {
 
         //Noch zu implementieren
         return true;
+    }
+
+    public JSONArray toJSON() {
+        JSONArray tileInfo = new JSONArray();
+
+        for(FieldType fieldType : fieldTypes){
+            tileInfo.put(fieldType.toJSON(isOnBoard));
+        }
+
+        return tileInfo;
     }
 }
 

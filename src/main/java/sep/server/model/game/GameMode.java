@@ -33,8 +33,10 @@ public class GameMode
 
         this.course = new Course(course);
 
+        //TODO hier Spieler erstellen; Roboter erstellen
+
         for (PlayerController pc : playerControllers) {
-            new MockGameStartedModel(pc.getClientInstance()).send();
+            new MockGameStartedModel(pc.getClientInstance(), this.course.getCourse()).send();
             continue;
         }
 
