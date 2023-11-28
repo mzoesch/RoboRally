@@ -212,18 +212,22 @@ public final class ClientInstance implements Runnable
         }
 
         if (Objects.equals(dcrp.getType_v2(), "PlayCard")) {
+            l.debug("Received play Card from client.");
             return true;
         }
 
         if (Objects.equals(dcrp.getType_v2(), "SelectCard")) {
+            l.debug("Received selected Card from client.");
             return true;
         }
 
         if (Objects.equals(dcrp.getType_v2(), "SelecetionFinished")) {
+            l.debug("Received selection finished from client.");
             return true;
         }
 
         if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint")) {
+            l.debug("Received starting point from client.");
 
         }
 
