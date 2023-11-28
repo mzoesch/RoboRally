@@ -164,6 +164,10 @@ public class ServerListener implements Runnable
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "")) {
+
+        }
+
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(dsrp.getType_v2());
 

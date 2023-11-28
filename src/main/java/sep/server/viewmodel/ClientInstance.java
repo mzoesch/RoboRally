@@ -42,7 +42,7 @@ public final class ClientInstance implements Runnable
     private final OutputStreamWriter outputStreamWriter;
     private final BufferedWriter bufferedWriter;
 
-    /** Must be crated to join a given session. */
+    /** Must be created to join a given session. */
     private PlayerController playerController;
     /** If the client is registered in a session. */
     private boolean bIsRegistered;
@@ -209,6 +209,22 @@ public final class ClientInstance implements Runnable
         {
             this.playerController.getSession().handleSelectCourseName(this.playerController, dcrp.getCourseName());
             return true;
+        }
+
+        if (Objects.equals(dcrp.getType_v2(), "PlayCard")) {
+            return true;
+        }
+
+        if (Objects.equals(dcrp.getType_v2(), "SelectCard")) {
+            return true;
+        }
+
+        if (Objects.equals(dcrp.getType_v2(), "SelecetionFinished")) {
+            return true;
+        }
+
+        if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint")) {
+
         }
 
         return false;
