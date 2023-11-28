@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Button?>
+
+<AnchorPane
+    id="master-container" stylesheets="@globals.css"
+    fx:controller="sep.view.scenecontrollers.GameJFXController"
+    xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+>
+    <children>
+            <AnchorPane
+                id="course-container" stylesheets="@game.css"
+                fx:id="courseContainer"
+                AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+            />
+        <HBox
+            id="player-container" stylesheets="@game.css"
+            fx:id="playerContainer"
+            AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        />
+    </children>
+</AnchorPane>

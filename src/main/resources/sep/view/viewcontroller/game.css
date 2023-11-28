@@ -1,0 +1,40 @@
+#player-container {
+    -fx-spacing: 6px;
+}
+
+.player-box {
+    -fx-min-width: 80px;
+    -fx-max-width: 80px;
+    -fx-min-height: 100px;
+    -fx-max-height: 100px;
+
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-border-color: rgba(255, 255, 255, 0.5);
+
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 5px;
+
+    -fx-alignment: top-center;
+}
+
+.player-box:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+}
+
+.player-box-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+
+#course-container {
+}
+
+.tile {
+    -fx-min-width: 64px;
+    -fx-max-width: 64px;
+    -fx-min-height: 64px;
+    -fx-max-height: 64px;
+}
