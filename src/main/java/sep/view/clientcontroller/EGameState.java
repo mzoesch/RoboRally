@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+import org.json.JSONArray;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
@@ -32,6 +34,7 @@ public enum EGameState
 
     private String[] serverCourses;
     private String currentServerCourse;
+    private JSONArray currentServerCourseJSON;
 
     // HERE
     // The current course with its midfielders...
@@ -44,12 +47,18 @@ public enum EGameState
         this.remotePlayers = new ArrayList<RemotePlayer>();
         this.serverCourses = new String[0];
         this.currentServerCourse = "";
+        this.currentServerCourseJSON = null;
+
         return;
     }
 
     public static void reset()
     {
         EGameState.INSTANCE.remotePlayers = new ArrayList<RemotePlayer>();
+        EGameState.INSTANCE.serverCourses = new String[0];
+        EGameState.INSTANCE.currentServerCourse = "";
+        EGameState.INSTANCE.currentServerCourseJSON = null;
+
         return;
     }
 
@@ -83,7 +92,7 @@ public enum EGameState
 
     public static void addRemotePlayer(DefaultServerRequestParser dsrp)
     {
-        // TODO This is not save at all. More type checking needed.
+        // TODO This is not safe at all. More type checking needed.
 
         if (EGameState.INSTANCE.isRemotePlayerAlreadyAdded(dsrp.getPlayerID()))
         {
@@ -219,6 +228,17 @@ public enum EGameState
     public void setCurrentServerCourse(String currentServerCourse)
     {
         this.currentServerCourse = currentServerCourse;
+        return;
+    }
+
+    public JSONArray getCurrentServerCourseJSON()
+    {
+        return this.currentServerCourseJSON;
+    }
+
+    public void setCurrentServerCourseJSON(JSONArray currentServerCourseJSON)
+    {
+        this.currentServerCourseJSON = currentServerCourseJSON;
         return;
     }
 

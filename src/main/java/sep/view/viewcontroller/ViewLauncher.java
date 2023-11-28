@@ -1,9 +1,11 @@
 package sep.view.viewcontroller;
 
+import org.json.JSONArray;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.scenecontrollers.LobbyJFXController_v2;
 import sep.view.clientcontroller.GameInstance;
+import sep.view.scenecontrollers.GameJFXController;
 
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -27,6 +29,8 @@ public final class ViewLauncher extends Application
     private static ViewLauncher INSTANCE;
     private SceneController sceneController;
 
+    public static final int TILE_DIMENSIONS = 64;
+
     public ViewLauncher()
     {
         super();
@@ -41,6 +45,16 @@ public final class ViewLauncher extends Application
     {
         this.sceneController = new SceneController(new Scene(new Parent(){}, SceneController.PREF_WIDTH, SceneController.PREF_HEIGHT));
         s.setScene(this.sceneController.getMasterScene());
+
+        if (EClientInformation.INSTANCE.isMockView())
+        {
+            s.setTitle(String.format("%s v%s (Mock View)", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
+            this.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
+            s.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> GameInstance.kill());
+            s.show();
+            return;
+        }
+
         s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
         this.sceneController.renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
 
@@ -89,13 +103,31 @@ public final class ViewLauncher extends Application
         return;
     }
 
+    public static void startGame(JSONArray course)
+    {
+        ViewLauncher.INSTANCE.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
+        return;
+    }
+    
     /** While in lobby selection robot screen. */
     public static void updatePlayerSelection()
     {
         try
         {
-            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewLauncher.getSceneController().getCurrentController();
-            ctrl.updatePlayerSelection();
+            if (ViewLauncher.INSTANCE.sceneController.getCurrentController() instanceof LobbyJFXController_v2 ctrl)
+            {
+                ctrl.updatePlayerSelection();
+                return;
+            }
+
+            if (ViewLauncher.INSTANCE.sceneController.getCurrentController() instanceof GameJFXController ctrl)
+            {
+                ctrl.onPlayerAdded();
+                return;
+            }
+
+            l.warn("Could not find a controller to update player selection.");
+
             return;
         }
         catch (ClassCastException e)
@@ -123,6 +155,7 @@ public final class ViewLauncher extends Application
         }
     }
 
+    /** While in lobby screen. */
     public static void updateCourseSelected()
     {
         try
@@ -138,6 +171,26 @@ public final class ViewLauncher extends Application
             return;
         }
     }
+
+    // region Game Events
+
+    public static void updateCourseView()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.onCourseUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    // endregion Game Events
 
     // endregion Updating methods
 

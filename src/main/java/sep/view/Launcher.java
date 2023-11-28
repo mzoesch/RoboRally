@@ -4,6 +4,7 @@ import sep.view.clientcontroller.GameInstance;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.Arrays;
 
 public class Launcher
 {
@@ -20,11 +21,20 @@ public class Launcher
      * This is the entry point of the client part of the application.
      * The Game Instance is created here.
      *
-     * @param args CMD arguments are ignored.
+     * @param args [--dev] - Starts mock game view.
      */
     public static void main(String[] args)
     {
         double t0 = System.currentTimeMillis();
+
+        if (args.length > 0 && Arrays.asList(args).contains("--dev"))
+        {
+            l.info("Starting mock game view.");
+            sep.view.viewcontroller.MockViewLauncher.run();
+            l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(sep.EArgs.OK);
+            return;
+        }
 
         GameInstance.run();
 

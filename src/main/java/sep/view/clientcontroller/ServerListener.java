@@ -110,6 +110,8 @@ public class ServerListener implements Runnable
 
     private void parseJSONRequestFromServer(DefaultServerRequestParser dsrp) throws JSONException
     {
+        l.trace("Received request from server. Parsing:%n{}", dsrp.getRequest().toString(2));
+
         if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {
             l.trace("Received keep-alive from server. Responding.");
@@ -161,6 +163,14 @@ public class ServerListener implements Runnable
             l.debug("Received course selected from server.");
             EGameState.INSTANCE.setCurrentServerCourse(dsrp.getCourseName());
             ViewLauncher.updateCourseSelected();
+            return;
+        }
+
+        /* Currently only supports the mock game start. */
+        if (Objects.equals(dsrp.getType_v2(), "GameStarted"))
+        {
+            l.debug("Received start game from server.");
+            ViewLauncher.startGame(dsrp.getGameCourse());
             return;
         }
 

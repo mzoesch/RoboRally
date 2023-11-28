@@ -3,6 +3,7 @@ package sep.view.json;
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.util.stream.IntStream;
+import org.json.JSONArray;
 
 /**
  * For easier access to the JSON object received from the server. Does not contain actual logic.
@@ -72,6 +73,11 @@ public final class DefaultServerRequestParser
     public String getCourseName() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getString("map");
+    }
+
+    public JSONArray getGameCourse()
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("gameMap");
     }
 
 }

@@ -33,6 +33,8 @@ public enum EClientInformation
 
     public static final String PROTOCOL_VERSION = "0.1";
 
+    boolean bMockView;
+
     private Socket socket;
     private InputStreamReader inputStreamReader; // TODO We may remove the stream readers and writers.
     private OutputStreamWriter outputStreamWriter;
@@ -55,6 +57,8 @@ public enum EClientInformation
 
         this.SERVER_IP = EArgs.PREF_SERVER_IP;
         this.SERVER_PORT = EPort.DEFAULT.i;
+
+        this.bMockView = false;
 
         this.socket = null;
         this.inputStreamReader = null;
@@ -252,6 +256,17 @@ public enum EClientInformation
     {
         this.SERVER_PORT = PORT;
         return;
+    }
+
+    public void setMockView(boolean bMockView)
+    {
+        this.bMockView = bMockView;
+        return;
+    }
+
+    public boolean isMockView()
+    {
+        return this.bMockView;
     }
 
     // endregion Getters and Setters

@@ -24,11 +24,13 @@ public final class SceneController
 
     public static final String MAIN_MENU_ID = "main-menu";
     public static final String LOBBY_ID = "lobby";
+    public static final String GAME_ID = "game";
 
     public static final String PATH_TO_MAIN_MENU = "main-menu.fxml";
     /** @deprecated */
     public static final String PATH_TO_LOBBY = "lobby.fxml";
     public static final String PATH_TO_LOBBY_V2 = "lobby_v2.fxml";
+    public static final String PATH_TO_GAME = "game.fxml";
 
     /** The scene where we apply different screens (panes in our case) (They are actually called "nodes".) to. */
     private final Scene masterScene;
