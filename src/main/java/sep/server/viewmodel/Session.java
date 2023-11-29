@@ -371,7 +371,7 @@ public final class Session
         return true;
     }
 
-  
+
     public void sendHandCardsToPlayer(PlayerController targetPlayerController, String[] hand) {
         for (PlayerController playerController : this.playerControllers) {
             if (playerController == targetPlayerController) {
@@ -381,6 +381,13 @@ public final class Session
                 NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), playerController.getPlayerID(), hand.length);
                 notYourCardsModel.send();
             }
+        }
+    }
+
+    public void sendShuffleCodingNotification(int playerID) {
+        for (PlayerController playerController : this.playerControllers) {
+            ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(playerController.getClientInstance(), playerID);
+            shuffleCodingModel.send();
         }
     }
 
