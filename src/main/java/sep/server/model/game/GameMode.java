@@ -5,6 +5,7 @@ import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.json.game.MockGameStartedModel;
 import sep.server.model.game.cards.Card;
+import sep.server.model.game.tiles.Coordinate;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -53,7 +54,7 @@ public class GameMode
      * currentRegister is set to next possible register, currentPlayer is set to -1.
      */
     public void prepareRegister() {
-        determinePriority();
+        determinePriorities();
         sortPlayersByPriority();
         if(currentRegisterIndex < 5) {
             this.currentRegisterIndex += 1;
@@ -85,7 +86,42 @@ public class GameMode
         currentPlayer.registers[currentRegisterIndex].playCard();
     }
 
-    public void determinePriority() {}
+    /**
+     * The following method calculates the priorities for all players: First the distance from each robot to the
+     * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
+     */
+    public void determinePriorities() {
+        Coordinate antennaCoordinate = new Coordinate(0,4); //StartA board
+        int maxPriority = players.size();
+        int currentPriority = maxPriority;
+        int[] distances = new int[players.size()];
+
+        for(int i = 0; i < players.size(); i++) {
+            Robot playerRobot = players.get(i).getPlayerRobot();
+            Coordinate robotCoordinate = playerRobot.getCurrentTile().getCoordinate();
+            distances[i] = Math.abs(antennaCoordinate.getXCoordinate() - robotCoordinate.getXCoordinate())
+                    + Math.abs(antennaCoordinate.getYCoordinate() - robotCoordinate.getYCoordinate());
+        }
+
+        for(int j = 0; j < maxPriority; j++) {
+            int minDistance = Integer.MAX_VALUE;
+            int minIndex = -1;
+
+            for(int i = 0; i < distances.length; i++) {
+                if(distances[i] < minDistance) {
+                    minDistance = distances[i];
+                    minIndex = i;
+                }
+            }
+
+            if(minIndex != -1) {
+                players.get(minIndex).setPriority(currentPriority);
+                currentPriority--;
+                distances[minIndex] = Integer.MAX_VALUE;
+            }
+        }
+
+    }
 
     /**
      * The following method sorts all players from highest to lowest priority.
