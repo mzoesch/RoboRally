@@ -20,7 +20,7 @@ public class PushPanel implements FieldType {
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("type","PushPanel");
-        fieldInfo.put("type", isOnBoard);
+        fieldInfo.put("isOnBoard", isOnBoard);
         fieldInfo.put("orientations", new JSONArray().put(orientation));
         JSONArray registers = new JSONArray();
         for(int i : activateAtRegister){

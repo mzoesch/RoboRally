@@ -12,7 +12,7 @@ public class Wall implements FieldType {
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("type","Wall");
-        fieldInfo.put("type", isOnBoard);
+        fieldInfo.put("isOnBoard", isOnBoard);
 
         JSONArray wallOrientations = new JSONArray();
         for(String orientation : orientations){

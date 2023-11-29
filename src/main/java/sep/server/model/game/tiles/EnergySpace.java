@@ -14,7 +14,7 @@ public class EnergySpace implements FieldType {
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("type","EnergySpace");
-        fieldInfo.put("type", isOnBoard);
+        fieldInfo.put("isOnBoard", isOnBoard);
         fieldInfo.put("count", availableEnergy);
         return fieldInfo;
     }

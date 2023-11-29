@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import sep.server.model.game.tiles.*;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class Tile {
     private final Coordinate coordinate;
@@ -73,15 +74,14 @@ public class Tile {
 
     public JSONArray toJSON() {
         JSONArray tileInfo = new JSONArray();
-        //tileInfo.put(coordinate.getXCoordinate());
-        //tileInfo.put(coordinate.getYCoordinate());
 
-
-        for(int i = 0; i < fieldTypes.size(); i++){
-            //tileInfo.put(fieldTypes.get(i).toJSON(isOnBoard));
-            System.out.println(fieldTypes.get(i).toJSON(isOnBoard));
-            System.out.println(i);
-            System.out.println("Test");
+        if (fieldTypes.get(0).toJSON(isOnBoard) == null) {
+            tileInfo.put(Optional.ofNullable(null));
+        }
+        else{
+            for (int i = 0; i < fieldTypes.size(); i++) {
+                tileInfo.put(fieldTypes.get(i).toJSON(isOnBoard));
+            }
         }
         return tileInfo;
     }

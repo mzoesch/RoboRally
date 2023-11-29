@@ -166,6 +166,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         //(1,1)
+        fieldtypes.add(new Empty());
         arrayListY.add(new Tile("4A", new Coordinate(1,1),fieldtypes));
         fieldtypes = new ArrayList<>();
 

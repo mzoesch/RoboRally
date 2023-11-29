@@ -10,7 +10,7 @@ public class RestartPoint implements FieldType{
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("type","RestartPoint");
-        fieldInfo.put("type", isOnBoard);
+        fieldInfo.put("isOnBoard", isOnBoard);
         return fieldInfo;
     }
 }

@@ -14,7 +14,7 @@ public class Antenna implements FieldType {
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("type","Antenna");
-        fieldInfo.put("type", isOnBoard);
+        fieldInfo.put("isOnBoard", isOnBoard);
         fieldInfo.put("orientations", new JSONArray().put(direction));
         return fieldInfo;
     }
