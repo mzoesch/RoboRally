@@ -17,10 +17,10 @@ public class Laser implements FieldType {
 
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","Laser");
-        fieldInfo.put("isOnBoard", isOnBoard);
-        fieldInfo.put("count", laserCount);
         fieldInfo.put("orientations", new JSONArray().put(orientation));
+        fieldInfo.put("count", laserCount);
+        fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","Laser");
         return fieldInfo;
     }
 }

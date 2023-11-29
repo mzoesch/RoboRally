@@ -11,14 +11,13 @@ public class Wall implements FieldType {
     }
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","Wall");
-        fieldInfo.put("isOnBoard", isOnBoard);
-
         JSONArray wallOrientations = new JSONArray();
-        for(String orientation : orientations){
-            wallOrientations.put(orientation);
+        for(int i = 0; i < orientations.length; i++ ){
+            wallOrientations.put(orientations[i]);
         }
-
+        fieldInfo.put("orientations", wallOrientations);
+        fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","Wall");
         return fieldInfo;
     }
 }

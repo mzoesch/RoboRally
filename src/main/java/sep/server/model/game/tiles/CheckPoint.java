@@ -11,9 +11,9 @@ public class CheckPoint implements FieldType {
     }
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","CheckPoint");
-        fieldInfo.put("isOnBoard", isOnBoard);
         fieldInfo.put("count", checkpointNumber);
+        fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","CheckPoint");
         return fieldInfo;
     }
 }

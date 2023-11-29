@@ -9,8 +9,8 @@ public class StartPoint implements FieldType {
 
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","StartPoint");
         fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","StartPoint");
         return fieldInfo;
     }
 }

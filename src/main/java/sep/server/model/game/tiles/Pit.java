@@ -10,8 +10,8 @@ public class Pit implements FieldType {
     }
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","Pit");
         fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","Pit");
         return fieldInfo;
     }
 }

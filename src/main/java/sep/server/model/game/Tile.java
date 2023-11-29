@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import sep.server.model.game.tiles.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 public class Tile {
@@ -75,8 +76,9 @@ public class Tile {
     public JSONArray toJSON() {
         JSONArray tileInfo = new JSONArray();
 
+        //TODO entspricht noch nicht Protokoll v0.1!!!
         if (fieldTypes.get(0).toJSON(isOnBoard) == null) {
-            tileInfo.put(Optional.ofNullable(null));
+            tileInfo.put("null");
         }
         else{
             for (int i = 0; i < fieldTypes.size(); i++) {

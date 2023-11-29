@@ -30,16 +30,15 @@ public class ConveyorBelt implements FieldType {
 
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","ConveyorBelt");
-        fieldInfo.put("isOnBoard", isOnBoard);
-        fieldInfo.put("speed", speed);
-
         JSONArray orientations = new JSONArray();
         orientations.put(outcomingFlowDirection);
         for(String incomingDirection : incomingFlowDirection){
             orientations.put(incomingDirection);
         }
         fieldInfo.put("orientations", orientations);
+        fieldInfo.put("speed", speed);
+        fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","ConveyorBelt");
         return fieldInfo;
     }
 }

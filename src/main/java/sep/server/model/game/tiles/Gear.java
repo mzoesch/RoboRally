@@ -12,9 +12,9 @@ public class Gear implements FieldType {
 
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
-        fieldInfo.put("type","Gear");
-        fieldInfo.put("isOnBoard", isOnBoard);
         fieldInfo.put("orientations", rotationalDirection);
+        fieldInfo.put("isOnBoard", isOnBoard);
+        fieldInfo.put("type","Gear");
         return fieldInfo;
     }
 }
