@@ -1,15 +1,19 @@
 package sep.server.model.game;
 
+import sep.server.json.game.effects.MovementModel;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
+import sep.server.model.game.tiles.ConveyorBelt;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.json.game.MockGameStartedModel;
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.Coordinate;
+import sep.server.model.game.tiles.FieldType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import org.json.JSONObject;
 
 /**
  * The rules of the game are implemented here. It is a high-level manager object for one game and controls the
@@ -37,6 +41,13 @@ public class GameMode
             new MockGameStartedModel(pc.getClientInstance()).send();
             continue;
         }
+        /* Announcing Phase Zero. */
+        for (PlayerController pc : playerControllers) {
+            pc.getClientInstance().sendMockJSON(new JSONObject("{\"messageType\":\"ActivePhase\",\"messageBody\":{\"phase\":0}}"));
+            continue;
+        }
+
+
 
         return;
     }
@@ -62,8 +73,8 @@ public class GameMode
             for(int j = 0; j < players.size(); i++) {
                 players.get(j).registers[i].playCard();
             }
-            activateBlueConveyorBelts();
-            activateGreenConveyorBelts();
+            activateConveyorBelt(2);
+            activateConveyorBelt(1);
             activatePushPanels();
             activateGears();
             shootBoardLasers();
@@ -133,8 +144,58 @@ public class GameMode
         return currentCards;
     }
 
-    public void activateBlueConveyorBelts() {}
-    public void activateGreenConveyorBelts() {}
+    /**
+     * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
+     * The robot is moved in the outcoming flow direction of the conveyor belt.
+     * @param speed determines the amount of fields the robot is moved
+     */
+    private void activateConveyorBelt(int speed) {
+        for (Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if (fieldType instanceof ConveyorBelt) {
+                    ConveyorBelt conveyorBelt = (ConveyorBelt) fieldType;
+                    int beltSpeed = conveyorBelt.getSpeed();
+
+                    if (beltSpeed == speed) {
+                        Coordinate oldCoordinate = currentTile.getCoordinate();
+                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                        Coordinate newCoordinate = oldCoordinate;
+
+                        switch (outDirection) {
+                            case "NORTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                                    oldCoordinate.getYCoordinate() - speed);
+                            case "EAST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + speed,
+                                    oldCoordinate.getYCoordinate());
+                            case "SOUTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                                    oldCoordinate.getYCoordinate() + speed);
+                            case "WEST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - speed,
+                                    oldCoordinate.getYCoordinate());
+                        }
+
+                        if (!course.isCoordinateWithinBounds(newCoordinate)) {
+                            player.getPlayerRobot().reboot();
+                            return;
+                        }
+
+                        if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
+                            return;
+                        }
+
+                        course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+
+                        for(Player player1 : players) {
+                            new MovementModel(player1.getPlayerController().getClientInstance(),
+                                    player1.getPlayerController().getPlayerID(),
+                                    newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void activatePushPanels() {}
     public void activateGears() {}
     public void shootBoardLasers() {}
