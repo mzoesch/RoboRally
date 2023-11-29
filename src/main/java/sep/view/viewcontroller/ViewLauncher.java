@@ -30,7 +30,9 @@ public final class ViewLauncher extends Application
     private static ViewLauncher INSTANCE;
     private SceneController sceneController;
 
-    public static final int TILE_DIMENSIONS = 64;
+    public static final int TILE_DIMENSIONS = 128;
+    public static final int VIRTUAL_SPACE_VERTICAL = 128;
+    public static final int VIRTUAL_SPACE_HORIZONTAL = 128;
 
     public ViewLauncher()
     {
