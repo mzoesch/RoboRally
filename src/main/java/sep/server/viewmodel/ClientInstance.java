@@ -286,6 +286,24 @@ public final class ClientInstance implements Runnable
         return;
     }
 
+    public void sendMockJSON(JSONObject mockJSON)
+    {
+        try
+        {
+            this.bufferedWriter.write(mockJSON.toString());
+            this.bufferedWriter.newLine();
+            this.bufferedWriter.flush();
+        }
+        catch (IOException e)
+        {
+            l.error("Failed to send mock JSON to client {}.", this.socket.getInetAddress());
+            l.error(e.getMessage());
+            return;
+        }
+
+        return;
+    }
+
     /** Life-cycle of a client connection. */
     @Override
     public void run()

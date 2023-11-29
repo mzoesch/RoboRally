@@ -10,6 +10,7 @@ import sep.server.model.game.tiles.Coordinate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import org.json.JSONObject;
 
 /**
  * The rules of the game are implemented here. It is a high-level manager object for one game and controls the
@@ -37,6 +38,13 @@ public class GameMode
             new MockGameStartedModel(pc.getClientInstance()).send();
             continue;
         }
+        /* Announcing Phase Zero. */
+        for (PlayerController pc : playerControllers) {
+            pc.getClientInstance().sendMockJSON(new JSONObject("{\"messageType\":\"ActivePhase\",\"messageBody\":{\"phase\":0}}"));
+            continue;
+        }
+
+
 
         return;
     }
