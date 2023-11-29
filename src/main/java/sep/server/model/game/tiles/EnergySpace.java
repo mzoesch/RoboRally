@@ -7,8 +7,11 @@ public class EnergySpace implements FieldType {
     private int availableEnergy;
 
     public EnergySpace(int availableEnergy) {
-
         this.availableEnergy = availableEnergy;
+    }
+
+    public int getAvailableEnergy() {
+        return availableEnergy;
     }
 
     public JSONObject toJSON(String isOnBoard){

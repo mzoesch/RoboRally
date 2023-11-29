@@ -1,5 +1,6 @@
 package sep.server.model.game;
 
+import sep.server.json.game.effects.EnergyModel;
 import sep.server.json.game.effects.MovementModel;
 import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
@@ -71,20 +72,20 @@ public class GameMode
      * card has been played the board elements activate and the robot lasers are shot.
      */
     public void activationPhase() {
-        for(int i = 0; i < 5; i++) {
+        for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
             determinePriorities();
-            sortPlayersByPriority(i);
-            determineCurrentCards(i);
-            for(int j = 0; j < players.size(); i++) {
-                players.get(j).registers[i].playCard();
+            sortPlayersByPriority(currentRegister);
+            determineCurrentCards(currentRegister);
+            for(int j = 0; j < players.size(); currentRegister++) {
+                players.get(j).registers[currentRegister].playCard();
             }
             activateConveyorBelt(2);
             activateConveyorBelt(1);
-            activatePushPanels(i);
+            activatePushPanels(currentRegister);
             activateGears();
             shootBoardLasers();
             shootRobotLasers();
-            checkEnergySpaces();
+            checkEnergySpaces(currentRegister);
             checkCheckpoints();
         }
     }
@@ -279,7 +280,40 @@ public class GameMode
     }
     public void shootBoardLasers() {}
     public void shootRobotLasers() {}
-    public void checkEnergySpaces() {}
+
+    /**
+     * The following method checks if any robot ended their register on an energy space, if
+     * they receive an energy cube, and sends the corresponding JSON messages.
+     * @param currentRegister the register that is currently active
+     */
+    public void checkEnergySpaces(int currentRegister) {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof EnergySpace) {
+                    EnergySpace energySpace = (EnergySpace) fieldType;
+                    int availableEnergy = energySpace.getAvailableEnergy();
+                    int currentEnergy = player.getEnergyCollected();
+                    if(currentRegister == 5) {
+                        if(energyBank > 0) {
+                            player.setEnergyCollected(currentEnergy + 1);
+                            energyBank -= 1;
+                        }
+                    } else if(availableEnergy > 0) {
+                        player.setEnergyCollected(currentEnergy + 1);
+                    }
+
+                    for(Player player1 : players) {
+                        new EnergyModel(player1.getPlayerController().getClientInstance(),
+                                player1.getPlayerController().getPlayerID(),
+                                player.getEnergyCollected(),
+                                "EnergySpace").send();
+                    }
+                }
+            }
+        }
+    }
     public void checkCheckpoints() {}
 
     /**
