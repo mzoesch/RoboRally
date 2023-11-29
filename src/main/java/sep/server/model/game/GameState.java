@@ -7,8 +7,6 @@ import sep.server.viewmodel.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-
 /**
  * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
  * Game Modes. It is persistent throughout the life-time of a session.
@@ -24,7 +22,7 @@ public class GameState
 
     private String courseName;
 
-    private GameMode gameMode;
+    public static GameMode gameMode;
     private Session session;
 
     private boolean bGameStarted;
@@ -43,7 +41,7 @@ public class GameState
         l.info("Creating Game Mode.");
 
         this.bGameStarted = true;
-        this.gameMode = new GameMode(this.courseName, 0, playerControllers);
+        this.gameMode = new GameMode(this.courseName, playerControllers);
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 

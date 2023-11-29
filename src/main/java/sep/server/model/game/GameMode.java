@@ -1,15 +1,13 @@
 package sep.server.model.game;
 
 import sep.server.json.game.effects.MovementModel;
+import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
-import sep.server.model.game.tiles.ConveyorBelt;
-import sep.server.model.game.tiles.PushPanel;
+import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.json.game.MockGameStartedModel;
 import sep.server.model.game.cards.Card;
-import sep.server.model.game.tiles.Coordinate;
-import sep.server.model.game.tiles.FieldType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -238,7 +236,47 @@ public class GameMode
             }
         }
     }
-    public void activateGears() {}
+
+    /**
+     * The following method handles the activation of gears and sends the corresponding JSON messages.
+     * The robot is rotated 90 degrees into the gear's rotational direction.
+     */
+    public void activateGears() {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof Gear) {
+                    Gear gear = (Gear) fieldType;
+                    String rotationalDirection = gear.getRotationalDirection();
+                    String robotDirection = player.getPlayerRobot().getDirection();
+                    String newDirection = robotDirection;
+                    if(rotationalDirection == "counterclockwise") {
+                        switch (robotDirection) {
+                            case "NORTH" -> newDirection = "WEST";
+                            case "EAST" -> newDirection = "NORTH";
+                            case "SOUTH" -> newDirection = "EAST";
+                            case "WEST" -> newDirection = "SOUTH";
+                        }
+                    } else if(rotationalDirection == "clockwise") {
+                        switch (robotDirection) {
+                            case "NORTH" -> newDirection = "EAST";
+                            case "EAST" -> newDirection = "SOUTH";
+                            case "SOUTH" -> newDirection = "WEST";
+                            case "WEST" -> newDirection = "NORTH";
+                        }
+                    }
+
+                    player.getPlayerRobot().setDirection(newDirection);
+
+                    for(Player player1 : players) {
+                        new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                                player1.getPlayerController().getPlayerID(), rotationalDirection).send();
+                    }
+                }
+            }
+        }
+    }
     public void shootBoardLasers() {}
     public void shootRobotLasers() {}
     public void checkEnergySpaces() {}

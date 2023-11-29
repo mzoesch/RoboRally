@@ -10,6 +10,10 @@ public class Gear implements FieldType {
         rotationalDirection = gearRotationalDirection;
     }
 
+    public static String getRotationalDirection() {
+        return rotationalDirection;
+    }
+
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("type","Gear");
