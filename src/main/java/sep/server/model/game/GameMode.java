@@ -87,9 +87,14 @@ public class GameMode
 
     public void determinePriority() {}
 
+    /**
+     * The following method sorts all players from highest to lowest priority.
+     */
     public void sortPlayersByPriority() {
-        players.sort(Comparator.comparingInt(Player::getPriority));
+        players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
+
+
 
     public void distributeCards(ArrayList<Player> players)
     {
