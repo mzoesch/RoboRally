@@ -46,13 +46,18 @@ public class GameMode
             new MockGameStartedModel(pc.getClientInstance()).send();
             continue;
         }
+
         /* Announcing Phase Zero. */
         for (PlayerController pc : playerControllers) {
             pc.getClientInstance().sendMockJSON(new JSONObject("{\"messageType\":\"ActivePhase\",\"messageBody\":{\"phase\":0}}"));
             continue;
         }
 
-
+        /* Selecting starting player. */
+        for (PlayerController pc : playerControllers) {
+            pc.getClientInstance().sendMockJSON(new JSONObject(String.format("{\"messageType\":\"CurrentPlayer\",\"messageBody\":{\"clientID\":%d}}", playerControllers[0].getPlayerID())));
+            continue;
+        }
 
         return;
     }

@@ -6,6 +6,8 @@ import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.TileModifier;
 import sep.view.viewcontroller.ViewLauncher;
+import sep.view.clientcontroller.EClientInformation;
+import sep.view.json.game.SetStartingPointModel;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
@@ -21,6 +23,8 @@ public class GameJFXController
 {
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
+    @FXML private Label UIHeaderPhaseLabel;
+    @FXML private Label UIHeaderGameStateDescriptionLabel;
     @FXML private AnchorPane masterContainer;
     @FXML private HBox playerContainer;
     @FXML private AnchorPane courseContainer;
@@ -30,10 +34,13 @@ public class GameJFXController
     private int tileDimensions;
     private static final int resizeAmount = 10;
 
+    private boolean bClickedOnTile = false;
+
     public GameJFXController()
     {
         super();
         this.tileDimensions = ViewLauncher.TILE_DIMENSIONS;
+        this.bClickedOnTile = false;
         return;
     }
 
@@ -78,6 +85,7 @@ public class GameJFXController
         return;
     }
 
+    /** Update the view player area. */
     private void updatePlayers()
     {
         this.playerContainer.getChildren().clear();
@@ -85,10 +93,15 @@ public class GameJFXController
         {
             Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
             figureName.getStyleClass().add("player-box-text");
+
             Label playerName = new Label(rp.getPlayerName());
             playerName.getStyleClass().add("player-box-text");
+
             VBox v = new VBox(figureName, playerName);
             v.getStyleClass().add("player-box");
+            v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
+
+
             this.playerContainer.getChildren().add(v);
             continue;
         }
@@ -96,6 +109,9 @@ public class GameJFXController
         return;
     }
 
+    // TODO Updates the whole course view. Not efficient. We need to split this method up.
+    //      Many requests only want to do small updates, so we do not need to update the whole
+    //      course view.
     private void updateCourse()
     {
         this.courseScrollPaneContent.getChildren().clear();
@@ -164,6 +180,47 @@ public class GameJFXController
                     continue;
                 }
 
+                if (t.isClickable())
+                {
+                    a.setOnMouseClicked(e ->
+                    {
+                        l.info("User clicked on tile. Checking if valid move.");
+
+                        if (EGameState.INSTANCE.getCurrentPhase() == 0)
+                        {
+                            if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() != EClientInformation.INSTANCE.getPlayerID())
+                            {
+                                return;
+                            }
+
+                            if (this.bClickedOnTile)
+                            {
+                                return;
+                            }
+
+                            l.info("User wants to set starting position.");
+                            // TODO Some kind of validation.
+                            new SetStartingPointModel(t.getTranslateX(), t.getTranslateY()).send();
+                            this.bClickedOnTile = true;
+
+                            return;
+                        }
+
+                        return;
+                    });
+
+                    // Since there is AFAIK no "::before" or "::after" css
+                    // support for JavaFX. We add a pseudo elem here.
+                    AnchorPane after = new AnchorPane();
+
+                    after.getStyleClass().add("tile-after");
+
+                    after.setPrefWidth(this.tileDimensions);
+                    after.setPrefHeight(this.tileDimensions);
+
+                    a.getChildren().add(after);
+                }
+
                 this.courseScrollPaneContent.getChildren().add(a);
 
                 continue;
@@ -175,14 +232,84 @@ public class GameJFXController
         return;
     }
 
+    /** Updates the UI Phase Title in the Header. */
+    private void updatePhaseTitle()
+    {
+        this.UIHeaderPhaseLabel.setText(EGameState.PHASE_NAMES[EGameState.INSTANCE.getCurrentPhase()]);
+        return;
+    }
+
+    private void updateGameStateDescription()
+    {
+        if (EGameState.INSTANCE.getCurrentPlayer() == null)
+        {
+            this.UIHeaderGameStateDescriptionLabel.setText("Waiting for server.");
+            return;
+        }
+
+        switch (EGameState.INSTANCE.getCurrentPhase())
+        {
+            case 0:
+                this.UIHeaderGameStateDescriptionLabel.setText(String.format("Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+                return;
+
+            case 1:
+                this.UIHeaderGameStateDescriptionLabel.setText("PHASE 1");
+                return;
+
+            case 2:
+                this.UIHeaderGameStateDescriptionLabel.setText("PHASE 2");
+                return;
+
+            case 3:
+                this.UIHeaderGameStateDescriptionLabel.setText("PHASE 3");
+                return;
+        }
+
+        this.UIHeaderGameStateDescriptionLabel.setText("Unknown game state.");
+        return;
+    }
+
+    /** Updates every dependency of the header. */
+    private void updateUIHeader()
+    {
+        this.updatePhaseTitle();
+        this.updateGameStateDescription();
+        return;
+    }
+
     private void updateView()
     {
         this.updatePlayers();
         this.updateCourse();
+        this.updatePhaseTitle();
         return;
     }
 
     // region Update View Methods
+
+    public void onPhaseUpdate()
+    {
+        Platform.runLater(() ->
+        {
+            this.updateUIHeader();
+            return;
+        });
+
+        return;
+    }
+
+    public void onPlayerUpdate()
+    {
+        Platform.runLater(() ->
+        {
+            this.updatePlayers();
+            this.updateUIHeader();
+            return;
+        });
+
+        return;
+    }
 
     public void onPlayerAdded()
     {
@@ -206,6 +333,8 @@ public class GameJFXController
         return;
     }
 
+    // endregion Update View Methods
+
     private void setStyleOfCourseViewContent()
     {
         // With current scale
@@ -225,7 +354,5 @@ public class GameJFXController
     {
         return EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
     }
-
-    // endregion Update View Methods
 
 }

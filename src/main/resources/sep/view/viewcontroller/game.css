@@ -3,6 +3,23 @@
     -fx-background-color: #2b2a33ff;
 }
 
+#ui-header {
+    -fx-min-height: 50px;
+    -fx-background-color: rgb(66, 31, 31);
+}
+
+#ui-header-phase {
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+}
+
+#ui-header-game-state {
+    -fx-font-size: 20px;
+    -fx-text-fill: white;
+    -fx-alignment: center;
+}
+
 #player-container {
     -fx-spacing: 6px;
 }
@@ -13,9 +30,6 @@
     -fx-min-height: 100px;
     -fx-max-height: 100px;
 
-    -fx-background-color: rgba(0, 0, 0, 0.6);
-    -fx-border-color: rgba(255, 255, 255, 0.5);
-
     -fx-border-width: 1px;
     -fx-border-style: solid;
     -fx-border-radius: 5px;
@@ -23,6 +37,15 @@
     -fx-padding: 5px;
 
     -fx-alignment: top-center;
+}
+.player-box-inactive {
+    -fx-border-color: #2b2a33ff;
+    -fx-background-color: #2b2a33ff;
+}
+
+.player-box-active {
+    -fx-border-color: #ff0000ff;
+    -fx-background-color: #ff0000ff;
 }
 
 .player-box:hover {
@@ -49,4 +72,8 @@
     -fx-max-width: 64px;
     -fx-min-height: 64px;
     -fx-max-height: 64px;
+}
+
+.tile-after:hover {
+    -fx-background-color: rgba(176, 2, 2, 0.4);
 }

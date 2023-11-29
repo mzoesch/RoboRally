@@ -32,6 +32,23 @@
         </AnchorPane>
         <!--Game UI-->
         <HBox
+            id="ui-header" stylesheets="@game.css"
+            fx:id="uiHeader"
+            AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        >
+            <children>
+                <Label
+                    text="Current Phase ???"
+                    id="ui-header-phase" stylesheets="@game.css"
+                    fx:id="UIHeaderPhaseLabel"
+                />
+                <Label
+                    id="ui-header-game-state" stylesheets="@game.css"
+                    fx:id="UIHeaderGameStateDescriptionLabel"
+                />
+            </children>
+        </HBox>
+        <HBox
             id="player-container" stylesheets="@game.css"
             fx:id="playerContainer"
             AnchorPane.topAnchor="20.0" AnchorPane.rightAnchor="20.0"

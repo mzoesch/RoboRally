@@ -90,4 +90,17 @@ public class Tile
         return;
     }
 
+    public boolean isClickable()
+    {
+        for (int i = 0; i < this.tile.length(); i++)
+        {
+            if (Objects.equals(this.getModifier(i).getType(), "StartPoint"))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

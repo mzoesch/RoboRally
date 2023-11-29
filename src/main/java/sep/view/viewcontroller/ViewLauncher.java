@@ -176,6 +176,38 @@ public final class ViewLauncher extends Application
         }
     }
 
+    public static void updatePlayerView()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.onPlayerUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void updatePhase()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.onPhaseUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // region Game Events
 
     public static void updateCourseView()
