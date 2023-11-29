@@ -3,8 +3,6 @@ package sep.server.model.game.tiles;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 public class PushPanel implements FieldType {
 
     private static int[] activateAtRegister;
@@ -15,6 +13,14 @@ public class PushPanel implements FieldType {
         orientation = pushOrientation;
 
         activateAtRegister = activationRegisters;
+    }
+
+    public static int[] getActivateAtRegister() {
+        return activateAtRegister;
+    }
+
+    public static String getOrientation() {
+        return orientation;
     }
 
     public JSONObject toJSON(String isOnBoard){

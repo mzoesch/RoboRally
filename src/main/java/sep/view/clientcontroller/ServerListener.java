@@ -174,8 +174,16 @@ public class ServerListener implements Runnable
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "ActivePhase"))
+        {
+            l.debug("Received active phase update.");
+            EGameState.INSTANCE.setCurrentPhase(dsrp.getPhase());
+            return;
+        }
+
         if (Objects.equals(dsrp.getType_v2(), "CurrentPlayer")) {
             l.debug("Received current player from server.");
+            EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
             return;
         }
 

@@ -135,6 +135,20 @@ public class Player {
   }
 
   /**
+   * Converts the player's hand of playable cards into a String array.
+   *
+   * This method is necessary for creating an object of the CardsYouGotNowModel class
+   */
+  public String[] getPlayerHandAsStringArray() {
+    ArrayList<IPlayableCard> hand = this.getPlayerHand();
+    String[] handArray = new String[hand.size()];
+    for (int i = 0; i < hand.size(); i++) {
+      handArray[i] = hand.get(i).toString();
+    }
+    return handArray;
+  }
+
+  /**
    * Moves the robot one tile based on the given direction.
    * Updates the robot's position.
    *

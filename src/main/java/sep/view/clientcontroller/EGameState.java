@@ -25,12 +25,16 @@ public enum EGameState
     public static final String[] FIGURE_NAMES = new String[] {"Hammer Bot", "Trundle Bot", "Squash Bot", "Hulk x90", "Spin Bot", "Twonky", "Twitch"};
     public static final int MAX_CHAT_MESSAGE_LENGTH = 64;
 
+    public static final String[] PHASE_NAMES = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
+    private int currentPhase;
+
     /**
      * Stores information that is shared for all players. The player cards for one client are unique to them and must
      * be stored here in the Game State. Information that is not unique for one player like their selected robot or
      * their name is stored in the {@link RemotePlayer} object.
      */
     private ArrayList<RemotePlayer> remotePlayers;
+    private RemotePlayer currentPlayer;
 
     private String[] serverCourses;
     private String currentServerCourse;
@@ -48,6 +52,7 @@ public enum EGameState
         this.serverCourses = new String[0];
         this.currentServerCourse = "";
         this.currentServerCourseJSON = null;
+        this.currentPhase = 0;
 
         return;
     }
@@ -240,6 +245,30 @@ public enum EGameState
     {
         this.currentServerCourseJSON = currentServerCourseJSON;
         return;
+    }
+
+    public int getCurrentPhase()
+    {
+        return this.currentPhase;
+    }
+
+    public void setCurrentPhase(int currentPhase)
+    {
+        this.currentPhase = currentPhase;
+        ViewLauncher.updatePhase();
+        return;
+    }
+
+    public void setCurrentPlayer(int playerID)
+    {
+        this.currentPlayer = this.getRemotePlayer(playerID);
+        ViewLauncher.updatePlayerView();
+        return;
+    }
+
+    public RemotePlayer getCurrentPlayer()
+    {
+        return this.currentPlayer;
     }
 
     // endregion Getters and Setters

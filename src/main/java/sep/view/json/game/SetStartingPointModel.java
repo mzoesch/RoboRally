@@ -1,16 +1,20 @@
 package sep.view.json.game;
 
-import org.json.JSONObject;
 import sep.view.json.AServerRequestModel;
 
-public class StartingPointModel extends AServerRequestModel {
+import org.json.JSONObject;
 
+public class SetStartingPointModel extends AServerRequestModel
+{
     private final int x;
     private final int y;
 
-    public StartingPointModel(int x, int y) {
+    public SetStartingPointModel(int x, int y)
+    {
         this.x = x;
         this.y = y;
+
+        return;
     }
 
     @Override
@@ -20,9 +24,10 @@ public class StartingPointModel extends AServerRequestModel {
         body.put("y", this.y);
 
         JSONObject j = new JSONObject();
-        j.put("messageType", " SetStartingPoint");
+        j.put("messageType", "SetStartingPoint");
         j.put("messageBody", body);
 
         return j;
     }
+
 }

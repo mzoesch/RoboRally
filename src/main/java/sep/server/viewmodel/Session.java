@@ -7,6 +7,9 @@ import sep.server.json.common.ChatMsgModel;
 import sep.server.json.lobby.PlayerReadyModel;
 import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
+import sep.server.json.game.programmingphase.*;
+
+import sep.server.model.game.cards.*;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -367,6 +370,37 @@ public final class Session
 
         return true;
     }
+
+
+    /**
+     * Sends a set of hand cards to a specified player controller and notifies other players
+     */
+    public void sendHandCardsToPlayer(PlayerController targetPlayerController, String[] hand) {
+        for (PlayerController playerController : this.playerControllers) {
+            if (playerController == targetPlayerController) {
+                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(playerController.getClientInstance(),hand);
+                cardsYouGotNowModel.send();
+            } else {
+                NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), playerController.getPlayerID(), hand.length);
+                notYourCardsModel.send();
+            }
+        }
+    }
+
+    /**
+     * Sends a shuffle  notification to all clients
+     *
+     * @param playerID The ID of the player who shuffled.
+     */
+    public void sendShuffleCodingNotification(int playerID) {
+        for (PlayerController playerController : this.playerControllers) {
+            ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(playerController.getClientInstance(), playerID);
+            shuffleCodingModel.send();
+        }
+    }
+
+
+
 
     // endregion Getters and Setters
 

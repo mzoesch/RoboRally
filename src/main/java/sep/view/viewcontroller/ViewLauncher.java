@@ -30,7 +30,9 @@ public final class ViewLauncher extends Application
     private static ViewLauncher INSTANCE;
     private SceneController sceneController;
 
-    public static final int TILE_DIMENSIONS = 64;
+    public static final int TILE_DIMENSIONS = 128;
+    public static final int VIRTUAL_SPACE_VERTICAL = 128;
+    public static final int VIRTUAL_SPACE_HORIZONTAL = 128;
 
     public ViewLauncher()
     {
@@ -169,6 +171,38 @@ public final class ViewLauncher extends Application
         catch (ClassCastException e)
         {
             l.error("Could not cast current controller to LobbyJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void updatePlayerView()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.onPlayerUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void updatePhase()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            ctrl.onPhaseUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
             l.error(e.getMessage());
             return;
         }

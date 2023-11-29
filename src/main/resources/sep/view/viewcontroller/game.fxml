@@ -7,20 +7,51 @@
 <?import javafx.scene.control.Button?>
 
 <AnchorPane
-    id="master-container" stylesheets="@globals.css"
+    id="master-container" stylesheets="@game.css"
+    fx:id="masterContainer"
     fx:controller="sep.view.scenecontrollers.GameJFXController"
     xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
 >
     <children>
-            <AnchorPane
-                id="course-container" stylesheets="@game.css"
-                fx:id="courseContainer"
-                AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-            />
+        <!--Game Course-->
+        <AnchorPane
+            id="course-container" stylesheets="@game.css"
+            fx:id="courseContainer"
+            AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        >
+            <ScrollPane
+                id="course-scroll-pane" stylesheets="@game.css"
+                fx:id="courseScrollPane"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+            >
+                <AnchorPane
+                    id="course-scroll-pane-content" stylesheets="@game.css"
+                    fx:id="courseScrollPaneContent"
+                />
+            </ScrollPane>
+        </AnchorPane>
+        <!--Game UI-->
+        <HBox
+            id="ui-header" stylesheets="@game.css"
+            fx:id="uiHeader"
+            AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        >
+            <children>
+                <Label
+                    text="Current Phase ???"
+                    id="ui-header-phase" stylesheets="@game.css"
+                    fx:id="UIHeaderPhaseLabel"
+                />
+                <Label
+                    id="ui-header-game-state" stylesheets="@game.css"
+                    fx:id="UIHeaderGameStateDescriptionLabel"
+                />
+            </children>
+        </HBox>
         <HBox
             id="player-container" stylesheets="@game.css"
             fx:id="playerContainer"
-            AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0"
+            AnchorPane.topAnchor="20.0" AnchorPane.rightAnchor="20.0"
         />
     </children>
 </AnchorPane>

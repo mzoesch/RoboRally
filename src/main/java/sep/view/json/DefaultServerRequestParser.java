@@ -80,4 +80,9 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getJSONArray("gameMap");
     }
 
+    public int getPhase()
+    {
+        return this.request.getJSONObject("messageBody").getInt("phase");
+    }
+
 }

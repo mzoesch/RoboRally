@@ -958,7 +958,12 @@ public final class MockViewLauncher
 
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
             ViewLauncher.updateCourseView();
+            EGameState.INSTANCE.setCurrentPhase(0);
+            EGameState.INSTANCE.setCurrentPlayer(0);
+
+            return;
         });
+
         t.start();
 
         ViewLauncher.run();

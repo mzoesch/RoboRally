@@ -228,7 +228,8 @@ public final class ClientInstance implements Runnable
 
         if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint")) {
             l.debug("Received starting point from client.");
-
+            // TODO Here call Game to for logic and affirm the starting point.
+            return true;
         }
 
         return false;
@@ -283,6 +284,24 @@ public final class ClientInstance implements Runnable
     {
         this.bIsAlive = false;
         new KeepAliveModel(this).send();
+        return;
+    }
+
+    public void sendMockJSON(JSONObject mockJSON)
+    {
+        try
+        {
+            this.bufferedWriter.write(mockJSON.toString());
+            this.bufferedWriter.newLine();
+            this.bufferedWriter.flush();
+        }
+        catch (IOException e)
+        {
+            l.error("Failed to send mock JSON to client {}.", this.socket.getInetAddress());
+            l.error(e.getMessage());
+            return;
+        }
+
         return;
     }
 
