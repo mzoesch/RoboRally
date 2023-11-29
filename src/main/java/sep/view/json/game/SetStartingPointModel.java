@@ -24,7 +24,7 @@ public class SetStartingPointModel extends AServerRequestModel
         body.put("y", this.y);
 
         JSONObject j = new JSONObject();
-        j.put("messageType", " SetStartingPoint");
+        j.put("messageType", "SetStartingPoint");
         j.put("messageBody", body);
 
         return j;
