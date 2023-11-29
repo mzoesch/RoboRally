@@ -20,18 +20,15 @@ public class GameMode
     private final Course course;
     int playerNum;
     ArrayList<Player> players;
-    int currentPlayerIndex;
-    int currentRegisterIndex;
     int energyBank;
     AUpgradeCard[] upgradeShop;
 
 
-    public GameMode(String course, int registerIndex, PlayerController[] playerControllers)
+    public GameMode(String course, PlayerController[] playerControllers)
     {
         super();
 
         this.course = new Course(course);
-        this.currentRegisterIndex = -1;
 
         //TODO hier Spieler erstellen; Roboter erstellen
 
@@ -53,42 +50,21 @@ public class GameMode
     }
 
     /**
-     * The following method is called whenever a new register is to be activated: priorities of the players are determined,
-     * currentRegister is set to next possible register, currentPlayer is set to -1.
+     * The following method handles the activation phase: it iterates over the different registers and
+     * plays the current card for each player (players are sorted by priority). Once each player's
+     * card has been played the board elements activate and the robot lasers are shot.
      */
-    public void prepareRegister() {
-        determinePriorities();
-        sortPlayersByPriority();
-        if(currentRegisterIndex < 5) {
-            this.currentRegisterIndex += 1;
-            this.currentPlayerIndex = -1;
+    public void activationPhase() {
+        for(int i = 0; i < 5; i++) {
+            determinePriorities();
+            sortPlayersByPriority(i);
+            determineCurrentCards(i);
+            for(int j = 0; j < players.size(); i++) {
+                players.get(j).registers[i].playCard();
+            }
+            activateBoardElements();
+            shootRobotLasers();
         }
-        determineCurrentCards();
-    }
-
-    /**
-     * The following method determines the current card that each player holds in the currently active register.
-     * @return client ID and card type as String
-     */
-    public HashMap<Integer, String> determineCurrentCards() {
-        //TODO adjust to JSON wrapper class once created
-        HashMap<Integer, String> currentCards = new HashMap<>();
-
-        for(Player player : players) {
-            String cardInRegister = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
-            currentCards.put(player.getPlayerController().getPlayerID(), cardInRegister);
-        }
-
-        return currentCards;
-    }
-
-    /**
-     * The following method is called whenever a register is activated for a player: the currentPlayer is set to the player
-     * with the next lower priority and the card of the currently active register is played.
-     */
-    public void activateRegister() {
-        Player currentPlayer = players.get(currentPlayerIndex + 1);
-        currentPlayer.registers[currentRegisterIndex].playCard();
     }
 
     /**
@@ -131,9 +107,28 @@ public class GameMode
     /**
      * The following method sorts all players from highest to lowest priority.
      */
-    public void sortPlayersByPriority() {
+    public void sortPlayersByPriority(int currentRegisterIndex) {
         players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
+
+    /**
+     * The following method determines the current card that each player holds in the currently active register.
+     * @return client ID and card type as String
+     */
+    public HashMap<Integer, String> determineCurrentCards(int currentRegisterIndex) {
+        //TODO adjust to JSON wrapper class once created
+        HashMap<Integer, String> currentCards = new HashMap<>();
+
+        for(Player player : players) {
+            String cardInRegister = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
+            currentCards.put(player.getPlayerController().getPlayerID(), cardInRegister);
+        }
+
+        return currentCards;
+    }
+
+    public void activateBoardElements() {}
+    public void shootRobotLasers() {}
 
     /**
      * The following method is used whenever the current player's card in the currently active register needs to be
@@ -141,17 +136,16 @@ public class GameMode
      * @return array that holds current register, new card that is now placed in the current register and ID of player
      *  that is replacing cards
      */
-    public Object[] replaceCardInRegister() {
+    public Object[] replaceCardInRegister(int currentRegisterIndex, int currentPlayerIndex) {
         //TODO adjust to JSON wrapper class once created
-        int register = currentRegisterIndex;
         Player player = players.get(currentPlayerIndex);
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
         int clientID = player.getPlayerController().getPlayerID();
 
-        player.setCardInRegister(register, topCardFromDiscardPile);
+        player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile);
 
-        return new Object[] {register, newCard, clientID};
+        return new Object[] {currentRegisterIndex, newCard, clientID};
     }
 
     public void distributeCards(ArrayList<Player> players)
