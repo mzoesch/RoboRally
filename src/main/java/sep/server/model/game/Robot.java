@@ -1,38 +1,14 @@
 package sep.server.model.game;
 
-import sep.server.model.game.tiles.Coordinate;
-
 public class Robot {
-  int positionX;
-  int positionY;
   String direction;
-  private Course course;
+  private final Course course;
   private Tile currentTile;
 
-  //TODO Konstruktor Robot-Klasse anpassen
-  public Robot(int positionX, int positionY, String direction) {
-    this.positionX = positionX;
-    this.positionY = positionY;
+  public Robot(String direction, Course course, Tile currentTile) {
     this.direction = direction;
-  }
-
-  public int getPositionX() {
-    return positionX;
-  }
-
-  public void setPositionX(int positionX) {
-    this.positionX = positionX;
-  }
-
-  public int getPositionY() {
-    return positionY;
-  }
-
-  public void setPositionY(int positionY) {
-    this.positionY = positionY;
-  }
-  public Tile getCurrentTile() {
-    return currentTile;
+    this.course = course;
+    this.currentTile = currentTile;
   }
 
   public String getDirection() {
@@ -42,6 +18,11 @@ public class Robot {
   public void setDirection(String direction) {
     this.direction = direction;
   }
+
+  public Tile getCurrentTile() {
+    return currentTile;
+  }
+
   public void setCurrentTile(Tile currentTile) {
     this.currentTile = currentTile;
   }
@@ -49,13 +30,12 @@ public class Robot {
     return course;
   }
 
-
   public void reboot() {}
 
   public boolean isMovable(Tile targetTile) {
     if (targetTile.hasAntenna()){
       return false;
-    };
+    }
     if (targetTile.hasWall()){
       return false;
     }
