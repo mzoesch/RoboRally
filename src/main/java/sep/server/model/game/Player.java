@@ -85,6 +85,17 @@ public class Player {
       return registers[registerIndex];
   }
 
+  public void setCardInRegister(int registerIndex, IPlayableCard newCard) {
+    IPlayableCard previousCard = registers[registerIndex];
+
+    if(previousCard != null) {
+      discardPile.add(previousCard);
+    }
+
+    registers[registerIndex] = null;
+    registers[registerIndex] = newCard;
+  }
+
   public int getPriority() {
     return priority;
   }

@@ -94,7 +94,23 @@ public class GameMode
         players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
+    /**
+     * The following method is used whenever the current player's card in the currently active register needs to be
+     * replaced by the top card of the player deck.
+     * @return array that holds current register, new card that is now placed in the current register and ID of player
+     *  that is replacing cards
+     */
+    public Object[] replaceCardInRegister() {
+        int register = currentRegisterIndex;
+        Player player = players.get(currentPlayerIndex);
+        IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
+        String newCard = ((Card) topCardFromDiscardPile).getCardType();
+        int clientID = player.getPlayerController().getPlayerID();
 
+        player.setCardInRegister(register, topCardFromDiscardPile);
+
+        return new Object[] {register, newCard, clientID};
+    }
 
     public void distributeCards(ArrayList<Player> players)
     {
