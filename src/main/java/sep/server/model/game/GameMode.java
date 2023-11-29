@@ -3,16 +3,13 @@ package sep.server.model.game;
 import sep.server.json.game.effects.MovementModel;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.ConveyorBelt;
+import sep.server.model.game.tiles.PushPanel;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.json.game.MockGameStartedModel;
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.Coordinate;
 import sep.server.model.game.tiles.FieldType;
-
-import sep.server.model.game.GameState;
-
-import sep.server.viewmodel.Session;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -85,7 +82,7 @@ public class GameMode
             }
             activateConveyorBelt(2);
             activateConveyorBelt(1);
-            activatePushPanels();
+            activatePushPanels(i);
             activateGears();
             shootBoardLasers();
             shootRobotLasers();
@@ -173,16 +170,7 @@ public class GameMode
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
                         Coordinate newCoordinate = oldCoordinate;
 
-                        switch (outDirection) {
-                            case "NORTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
-                                    oldCoordinate.getYCoordinate() - speed);
-                            case "EAST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + speed,
-                                    oldCoordinate.getYCoordinate());
-                            case "SOUTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
-                                    oldCoordinate.getYCoordinate() + speed);
-                            case "WEST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - speed,
-                                    oldCoordinate.getYCoordinate());
-                        }
+                        newCoordinate = calculateNewCoordinate(speed, outDirection, oldCoordinate);
 
                         if (!course.isCoordinateWithinBounds(newCoordinate)) {
                             player.getPlayerRobot().reboot();
@@ -206,12 +194,77 @@ public class GameMode
         }
     }
 
-    public void activatePushPanels() {}
+    /**
+     * The following method handles the activation of push panels and sends the corresponding JSON messages.
+     * The robot is moved to the next field in the direction of the panel's pushOrientation.
+     * @param currentRegister the register that is currently active
+     */
+    public void activatePushPanels(int currentRegister) {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof PushPanel) {
+                    PushPanel pushPanel = (PushPanel) fieldType;
+                    int[] activateAtRegister = pushPanel.getActivateAtRegister();
+
+                    for(int register : activateAtRegister) {
+                        if(register == currentRegister) {
+                            String pushOrientation = pushPanel.getOrientation();
+                            Coordinate oldCoordinate = currentTile.getCoordinate();
+                            Coordinate newCoordinate = oldCoordinate;
+
+                            newCoordinate = calculateNewCoordinate(1, pushOrientation, oldCoordinate);
+
+                            if (!course.isCoordinateWithinBounds(newCoordinate)) {
+                                player.getPlayerRobot().reboot();
+                                return;
+                            }
+
+                            if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
+                                return;
+                            }
+
+                            course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+
+                            for(Player player1 : players) {
+                                new MovementModel(player1.getPlayerController().getClientInstance(),
+                                        player1.getPlayerController().getPlayerID(),
+                                        newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     public void activateGears() {}
     public void shootBoardLasers() {}
     public void shootRobotLasers() {}
     public void checkEnergySpaces() {}
     public void checkCheckpoints() {}
+
+    /**
+     * The following method calculates the new coordinates for activating conveyor belts and push panels.
+     * @param distance amount of fields the robot is moved
+     * @param orientation direction the robot is moved to
+     * @param oldCoordinate coordinates of the current push panel pushing a robot
+     * @return
+     */
+    public Coordinate calculateNewCoordinate(int distance, String orientation, Coordinate oldCoordinate) {
+        Coordinate newCoordinate = null;
+        switch (orientation) {
+            case "NORTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() - distance);
+            case "EAST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + distance,
+                    oldCoordinate.getYCoordinate());
+            case "SOUTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() + distance);
+            case "WEST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - distance,
+                    oldCoordinate.getYCoordinate());
+        }
+        return newCoordinate;
+    }
 
     /**
      * The following method is used whenever the current player's card in the currently active register needs to be
