@@ -1,11 +1,8 @@
 package sep.server.model.game;
 
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
-import sep.server.model.game.tiles.Coordinate;
-import sep.server.model.game.Course;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.model.game.Robot;
 import sep.server.json.game.MockGameStartedModel;
 
 import java.util.ArrayList;
@@ -21,17 +18,18 @@ public class GameMode
 
     int playerNum;
     ArrayList<Player> players;
-    Player currentPlayer;
-    int currentRegister;
+    int currentPlayerIndex;
+    int currentRegisterIndex;
     int energyBank;
     AUpgradeCard[] upgradeShop;
 
 
-    public GameMode(String course, PlayerController[] playerControllers)
+    public GameMode(String course, int registerIndex, PlayerController[] playerControllers)
     {
         super();
 
         this.course = new Course(course);
+        this.currentRegisterIndex = -1;
 
         //TODO hier Spieler erstellen; Roboter erstellen
 
@@ -48,12 +46,32 @@ public class GameMode
         distributeCards(players);
     }
 
-    public void sortPlayersByPriority() {
-        players.sort(Comparator.comparingInt(Player::getPriority));
+    /**
+     * The following method is called whenever a new register is to be activated: priorities of the players are determined,
+     * currentRegister is set to next possible register, currentPlayer is set to -1.
+     */
+    public void prepareRegister() {
+        determinePriority();
+        sortPlayersByPriority();
+        if(currentRegisterIndex < 5) {
+            this.currentRegisterIndex += 1;
+            this.currentPlayerIndex = -1;
+        }
     }
 
+    /**
+     * The following method is called whenever a register is activated for a player: the currentPlayer is set to the player
+     * with the next lower priority and the card of the currently active register is played.
+     */
     public void activateRegister() {
-        currentPlayer.getRegisters()[currentRegister].playCard();
+        Player currentPlayer = players.get(currentPlayerIndex + 1);
+        currentPlayer.registers[currentRegisterIndex].playCard();
+    }
+
+    public void determinePriority() {}
+
+    public void sortPlayersByPriority() {
+        players.sort(Comparator.comparingInt(Player::getPriority));
     }
 
     public void distributeCards(ArrayList<Player> players)

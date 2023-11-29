@@ -36,9 +36,9 @@ public class GameState
         l.info("Creating Game Mode.");
 
         this.bGameStarted = true;
-        this.gameMode = new GameMode(this.courseName, playerControllers);
-        this.gameMode.activationPhase();
-        session.sendProgrammingCardstoClients();
+        this.gameMode = new GameMode(this.courseName, 0, playerControllers);
+        //this.gameMode.activationPhase();
+        //session.sendProgrammingCardstoClients();
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 
