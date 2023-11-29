@@ -8,6 +8,7 @@ public class RightTurn extends AProgrammingCard implements IPlayableCard {
 
     public RightTurn(String cardType) {
         super(cardType);
+        this.cardType = "RightTurn";
     }
 
     @Override

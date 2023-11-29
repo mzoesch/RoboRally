@@ -4,9 +4,11 @@ import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.json.game.MockGameStartedModel;
+import sep.server.model.game.cards.Card;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 
 /**
  * The rules of the game are implemented here. It is a high-level manager object for one game and controls the
@@ -57,6 +59,21 @@ public class GameMode
             this.currentRegisterIndex += 1;
             this.currentPlayerIndex = -1;
         }
+    }
+
+    /**
+     * The following method determines the current card that each player holds in the currently active register.
+     * @return client ID and card type as String
+     */
+    public HashMap<Integer, String> determineCurrentCards() {
+        HashMap<Integer, String> currentCards = new HashMap<>();
+
+        for(Player player : players) {
+            String cardInRegister = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
+            currentCards.put(player.getPlayerController().getPlayerID(), cardInRegister);
+        }
+
+        return currentCards;
     }
 
     /**

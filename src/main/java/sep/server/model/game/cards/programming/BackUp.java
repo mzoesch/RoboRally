@@ -7,6 +7,7 @@ import sep.server.model.game.cards.IPlayableCard;
 public class BackUp extends AProgrammingCard implements IPlayableCard {
     public BackUp(String cardType) {
         super(cardType);
+        this.cardType = "BackUp";
     }
 
     @Override

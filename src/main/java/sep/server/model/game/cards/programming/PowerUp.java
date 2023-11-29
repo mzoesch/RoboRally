@@ -8,6 +8,7 @@ public class PowerUp extends AProgrammingCard implements IPlayableCard {
 
     public PowerUp(String cardType) {
         super(cardType);
+        this.cardType = "PowerUp";
     }
 
 

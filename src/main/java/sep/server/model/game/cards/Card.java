@@ -1,7 +1,7 @@
 package sep.server.model.game.cards;
 
 public abstract class Card {
-  String cardType;
+  public String cardType;
 
   public Card(String cardType) {
     this.cardType = cardType;

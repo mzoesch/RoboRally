@@ -7,6 +7,7 @@ import sep.server.model.game.cards.IPlayableCard;
 public class MoveII extends AProgrammingCard implements IPlayableCard {
     public MoveII(String cardType) {
         super(cardType);
+        this.cardType = "MoveII";
     }
 
     @Override

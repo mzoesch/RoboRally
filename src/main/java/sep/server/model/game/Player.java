@@ -6,8 +6,10 @@ import java.util.Collections;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.Coordinate;
+import sep.server.viewmodel.PlayerController;
 
 public class Player {
+  PlayerController playerController;
   Robot playerRobot;
   ArrayList<IPlayableCard> playerDeck;
   ArrayList<IPlayableCard> discardPile;
@@ -29,6 +31,14 @@ public class Player {
     this.checkpointsCollected = checkpointsCollected;
     this.energyCollected = energyCollected;
     this.upgradeCards = upgradeCards;
+  }
+
+  public PlayerController getPlayerController() {
+    return playerController;
+  }
+
+  public void setPlayerController(PlayerController playerController) {
+    this.playerController = playerController;
   }
 
   public Robot getPlayerRobot() {
@@ -69,6 +79,10 @@ public class Player {
 
   public void setRegisters(IPlayableCard[] registers) {
     this.registers = registers;
+  }
+
+  public IPlayableCard getCardInRegister(int registerIndex) {
+      return registers[registerIndex];
   }
 
   public int getPriority() {

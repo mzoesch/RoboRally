@@ -8,6 +8,7 @@ public class UTurn extends AProgrammingCard implements IPlayableCard {
 
     public UTurn(String cardType) {
         super(cardType);
+        this.cardType = "UTurn";
     }
 
     @Override

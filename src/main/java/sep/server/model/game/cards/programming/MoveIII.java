@@ -8,6 +8,7 @@ public class MoveIII extends AProgrammingCard implements IPlayableCard {
 
     public MoveIII(String cardType) {
         super(cardType);
+        this.cardType = "MoveIII";
     }
 
     @Override

@@ -6,6 +6,7 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
 
     public WeaselRoutine(String cardType, boolean isProgrammable) {
         super(cardType);
+        this.cardType = "WeaselRoutine";
     }
 
     @Override

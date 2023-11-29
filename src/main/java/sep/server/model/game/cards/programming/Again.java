@@ -10,6 +10,7 @@ import sep.server.model.game.cards.upgrade.AUpgradeCard;
 public class Again extends AProgrammingCard implements IPlayableCard {
     public Again(String cardType) {
         super(cardType);
+        this.cardType = "Again";
     }
 
     @Override
