@@ -19,7 +19,7 @@ public class LeftTurn extends AProgrammingCard implements IPlayableCard {
         for(Player player1 : GameState.gameMode.getPlayers()) {
             new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                     player.getPlayerController().getPlayerID(),
-                    "clockwise").send();
+                    "counterclockwise").send();
         }
     }
 

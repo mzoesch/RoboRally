@@ -21,6 +21,9 @@ public class UTurn extends AProgrammingCard implements IPlayableCard {
             new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                     player.getPlayerController().getPlayerID(),
                     "clockwise").send();
+            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                    player.getPlayerController().getPlayerID(),
+                    "clockwise").send();
         }
     }
 }
