@@ -1,3 +1,8 @@
+/* We have to do this because the Game Course should not be padded. */
+#master-container {
+    -fx-background-color: #2b2a33ff;
+}
+
 #player-container {
     -fx-spacing: 6px;
 }
@@ -30,6 +35,13 @@
 }
 
 #course-container {
+}
+
+#course-scroll-pane {
+    -fx-background: rgba(255, 0, 255, 0.01);
+}
+
+#course-scroll-pane-content {
 }
 
 .tile {
