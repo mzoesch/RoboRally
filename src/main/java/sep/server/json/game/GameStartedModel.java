@@ -1,6 +1,7 @@
 package sep.server.json.game;
 
 import sep.server.json.AModel;
+import sep.server.model.game.Course;
 import sep.server.model.game.Tile;
 import sep.server.viewmodel.ClientInstance;
 
@@ -32,16 +33,30 @@ public class GameStartedModel extends AModel
 
             for(int k = 0; k < course.get(i).size(); k++){
                 JSONArray tileInfo = course.get(i).get(k).toJSON();
-                arrayListY.put(tileInfo);
-            }
-            courseJSON.put(arrayListX);
-        }
+                System.out.println(tileInfo);
+                //arrayListY.put(tileInfo);
+                //arrayListY.put(i);
+                //arrayListY.put(k);
 
+            }
+            arrayListX.put(arrayListY);
+            //System.out.println(arrayListY);
+            arrayListY.clear();
+        }
+        //System.out.println(arrayListX);
+        courseJSON.put(arrayListX);
         body.put("gameMap", courseJSON);
         JSONObject j = new JSONObject();
         j.put("messageType", "GameStarted");
         j.put("messageBody", body);
 
         return j;
+    }
+
+    public static void main(final String[] args){
+        Course testCourse = new Course("Test");
+        GameStartedModel testModel = new GameStartedModel(null, testCourse.getCourse());
+        JSONObject testJSON = testModel.toJSON();
+        //System.out.println(testJSON);
     }
 }

@@ -4,9 +4,9 @@ package sep.server.model.game.tiles;
  * Klasse, die die X und Y Koordinate eines Tiles im Course sowie die benachbarten Koordinaten speichert
  */
 public class Coordinate{
-    private static int xCoordinate;
+    private final int xCoordinate;
 
-    private static int yCoordinate;
+    private final int yCoordinate;
 
     private Coordinate topNeighbor;
     private Coordinate rightNeighbor;

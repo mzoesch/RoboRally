@@ -9,9 +9,9 @@ import sep.server.model.game.tiles.*;
 import java.util.ArrayList;
 
 public class Tile {
-    private static Coordinate coordinate;
+    private final Coordinate coordinate;
     private Robot occupiedBy = null;
-    private static ArrayList<FieldType> fieldTypes;
+    private ArrayList<FieldType> fieldTypes;
 
     //braucht es das onBoard-Attribut? (aus Protokoll v0.1)
     private String isOnBoard;
@@ -73,12 +73,21 @@ public class Tile {
 
     public JSONArray toJSON() {
         JSONArray tileInfo = new JSONArray();
+        //tileInfo.put(coordinate.getXCoordinate());
+        //tileInfo.put(coordinate.getYCoordinate());
 
-        for(FieldType fieldType : fieldTypes){
-            tileInfo.put(fieldType.toJSON(isOnBoard));
+
+        for(int i = 0; i < fieldTypes.size(); i++){
+            //tileInfo.put(fieldTypes.get(i).toJSON(isOnBoard));
+            System.out.println(fieldTypes.get(i).toJSON(isOnBoard));
+            System.out.println(i);
+            System.out.println("Test");
         }
-
         return tileInfo;
+    }
+
+    public String getIsOnBoard() {
+        return isOnBoard;
     }
 }
 
