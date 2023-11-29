@@ -78,12 +78,8 @@ public class GameState
         return;
     }
 
-    public void notifyHandCardsDistribution(ArrayList<Player> players) {
-        for (Player player : players) {
-            if (player.getPlayerController() != null) {
-                session.sendHandCardsToPlayer(player.getPlayerController(), player.getPlayerHandAsStringArray());
-            }
-        }
+    public void notifyHandCardsDistribution(Player player) {
+        session.sendHandCardsToPlayer(player.getPlayerController(), player.getPlayerHandAsStringArray());
     }
 
     public void sendShuffle(Player player){

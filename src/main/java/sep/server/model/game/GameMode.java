@@ -237,8 +237,10 @@ public class GameMode
                 IPlayableCard card = player.getPlayerDeck().remove(0);
                 player.getPlayerHand().add(card);
             }
+
+            gameState.notifyHandCardsDistribution(player);
         }
-        gameState.notifyHandCardsDistribution(players);
+
     }
 
 
