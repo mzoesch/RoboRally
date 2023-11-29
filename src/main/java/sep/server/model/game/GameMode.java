@@ -62,8 +62,14 @@ public class GameMode
             for(int j = 0; j < players.size(); i++) {
                 players.get(j).registers[i].playCard();
             }
-            activateBoardElements();
+            activateBlueConveyorBelts();
+            activateGreenConveyorBelts();
+            activatePushPanels();
+            activateGears();
+            shootBoardLasers();
             shootRobotLasers();
+            checkEnergySpaces();
+            checkCheckpoints();
         }
     }
 
@@ -127,8 +133,14 @@ public class GameMode
         return currentCards;
     }
 
-    public void activateBoardElements() {}
+    public void activateBlueConveyorBelts() {}
+    public void activateGreenConveyorBelts() {}
+    public void activatePushPanels() {}
+    public void activateGears() {}
+    public void shootBoardLasers() {}
     public void shootRobotLasers() {}
+    public void checkEnergySpaces() {}
+    public void checkCheckpoints() {}
 
     /**
      * The following method is used whenever the current player's card in the currently active register needs to be
