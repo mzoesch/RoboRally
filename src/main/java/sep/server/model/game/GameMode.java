@@ -10,6 +10,10 @@ import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.Coordinate;
 import sep.server.model.game.tiles.FieldType;
 
+import sep.server.model.game.GameState;
+
+import sep.server.viewmodel.Session;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,6 +30,7 @@ public class GameMode
     ArrayList<Player> players;
     int energyBank;
     AUpgradeCard[] upgradeShop;
+    GameState gameState;
 
 
     public GameMode(String course, PlayerController[] playerControllers)
@@ -227,12 +232,18 @@ public class GameMode
             for (int i = 0; i < 9; i++) {
                 if (player.getPlayerDeck().isEmpty()) {
                     player.shuffleAndRefillDeck();
+                    gameState.sendShuffle(player);
                 }
                 IPlayableCard card = player.getPlayerDeck().remove(0);
                 player.getPlayerHand().add(card);
             }
         }
+        gameState.notifyHandCardsDistribution(players);
     }
+
+
+
+
 
     public void endRound() {
         for(int i = 0; i<5; i++) {

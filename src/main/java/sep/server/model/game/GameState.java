@@ -2,8 +2,12 @@ package sep.server.model.game;
 
 import sep.server.viewmodel.PlayerController;
 
+import sep.server.viewmodel.Session;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
 
 /**
  * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
@@ -20,8 +24,11 @@ public class GameState
 
     private String courseName;
 
-    public static GameMode gameMode;
+    private GameMode gameMode;
+    private Session session;
+
     private boolean bGameStarted;
+
 
     public GameState()
     {
@@ -36,9 +43,7 @@ public class GameState
         l.info("Creating Game Mode.");
 
         this.bGameStarted = true;
-        this.gameMode = new GameMode(this.courseName, playerControllers);
-        //this.gameMode.activationPhase();
-        //session.sendProgrammingCardstoClients();
+        this.gameMode = new GameMode(this.courseName, 0, playerControllers);
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 
@@ -73,6 +78,18 @@ public class GameState
         return;
     }
 
+    public void notifyHandCardsDistribution(ArrayList<Player> players) {
+        for (Player player : players) {
+            if (player.getPlayerController() != null) {
+                session.sendHandCardsToPlayer(player.getPlayerController(), player.getPlayerHandAsStringArray());
+            }
+        }
+    }
+
+    public void sendShuffle(Player player){
+        session.sendShuffleCodingNotification(player.getPlayerController().getPlayerID());
+    }
     // endregion Getters and Setters
+
 
 }
