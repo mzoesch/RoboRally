@@ -25,7 +25,7 @@ public class GameStartedModel extends AModel
     {
         //TODO JSON-Object-Erstellung
         JSONObject body = new JSONObject();
-        JSONArray courseJSON = new JSONArray();
+        JSONObject courseJson = new JSONObject();
         JSONArray arrayListX = new JSONArray();
         JSONArray arrayListY = new JSONArray();
 
@@ -33,24 +33,20 @@ public class GameStartedModel extends AModel
 
             for(int k = 0; k < course.get(i).size(); k++){
                 JSONArray tileInfo = course.get(i).get(k).toJSON();
-                System.out.println(tileInfo);
-                //arrayListY.put(tileInfo);
+                arrayListY.put(tileInfo);
                 //arrayListY.put(i);
                 //arrayListY.put(k);
 
             }
             arrayListX.put(arrayListY);
-            //System.out.println(arrayListY);
-            arrayListY.clear();
+;
+            arrayListY = new JSONArray();
         }
-        //System.out.println(arrayListX);
-        courseJSON.put(arrayListX);
-        body.put("gameMap", courseJSON);
-        JSONObject j = new JSONObject();
-        j.put("messageType", "GameStarted");
-        j.put("messageBody", body);
+        body.put("gameMap", arrayListX);
+        courseJson.put("messageType", "GameStarted");
+        courseJson.put("messageBody", body);
 
-        return j;
+        return courseJson;
     }
 
     public static void main(final String[] args){
