@@ -207,7 +207,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (0,4)
-        fieldtypes.add(new Antenna("EAST"));
+        fieldtypes.add(new Antenna("right"));
         arrayListY.add(new Tile("StartA",new Coordinate(0,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -249,7 +249,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (1,2)
-        fieldtypes.add(new Wall(new String[]{"NORTH"}));
+        fieldtypes.add(new Wall(new String[]{"top"}));
         arrayListY.add(new Tile("StartA",new Coordinate(1,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -274,7 +274,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (1,7)
-        fieldtypes.add(new Wall(new String[]{"SOUTH"}));
+        fieldtypes.add(new Wall(new String[]{"bottom"}));
         arrayListY.add(new Tile("StartA",new Coordinate(1,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -292,7 +292,7 @@ public class CourseBuilder {
         arrayListY = new ArrayList<>();
 
         // (2,0)
-        fieldtypes.add(new ConveyorBelt(1, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[]{"left"}));
         arrayListY.add(new Tile("StartA",new Coordinate(2,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -312,12 +312,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,4)
-        fieldtypes.add(new Wall(new String[]{"EAST"}));
+        fieldtypes.add(new Wall(new String[]{"right"}));
         arrayListY.add(new Tile("StartA",new Coordinate(2,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (2,5)
-        fieldtypes.add(new Wall(new String[]{"EAST"}));
+        fieldtypes.add(new Wall(new String[]{"right"}));
         arrayListY.add(new Tile("StartA",new Coordinate(2,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -337,7 +337,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,9)
-        fieldtypes.add(new ConveyorBelt(1, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[]{"left"}));
         arrayListY.add(new Tile("StartA",new Coordinate(2,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -391,12 +391,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (0,7)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[] {"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[] {"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(0,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (0,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[] {"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[] {"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(0,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -409,47 +409,47 @@ public class CourseBuilder {
         arrayListY = new ArrayList<>();
 
         // (1,0)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,1)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH", "EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top", "right"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,2)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,3)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,4)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,5)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,6)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,7)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH", "WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top", "left"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (1,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[] {"NORTH", "WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[] {"top", "left"}));
         arrayListY.add(new Tile("5B",new Coordinate(1,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -462,12 +462,12 @@ public class CourseBuilder {
         arrayListY = new ArrayList<>();
 
         // (2,0)
-        fieldtypes.add(new ConveyorBelt(2, "SOUTH", new String[] {"NORTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("5B",new Coordinate(2,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (2,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"NORTH", "EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"top", "right"}));
         arrayListY.add(new Tile("5B",new Coordinate(2,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -502,7 +502,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(2,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -520,7 +520,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"NORTH", "EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"top", "right"}));
         arrayListY.add(new Tile("5B",new Coordinate(3,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -530,14 +530,14 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,3)
-        fieldtypes.add(new Wall(new String[]{"NORTH"}));
-        fieldtypes.add(new Laser("North", 1));
+        fieldtypes.add(new Wall(new String[]{"top"}));
+        fieldtypes.add(new Laser("top", 1));
         arrayListY.add(new Tile("5B",new Coordinate(3,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (3,4)
-        fieldtypes.add(new Wall(new String[]{"SOUTH"}));
-        fieldtypes.add(new Laser("North", 1));
+        fieldtypes.add(new Wall(new String[]{"bottom"}));
+        fieldtypes.add(new Laser("top", 1));
         arrayListY.add(new Tile("5B",new Coordinate(3,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -547,8 +547,8 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,6)
-        fieldtypes.add(new Wall(new String[]{"WEST"}));
-        fieldtypes.add(new Laser("WEST", 1));
+        fieldtypes.add(new Wall(new String[]{"left"}));
+        fieldtypes.add(new Laser("left", 1));
         arrayListY.add(new Tile("5B",new Coordinate(3,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -558,7 +558,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(3,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -576,7 +576,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(4,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -601,8 +601,8 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,6)
-        fieldtypes.add(new Wall(new String[]{"EAST"}));
-        fieldtypes.add(new Laser("WEST", 1));
+        fieldtypes.add(new Wall(new String[]{"right"}));
+        fieldtypes.add(new Laser("left", 1));
         arrayListY.add(new Tile("5B",new Coordinate(4,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -612,7 +612,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(4,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -630,7 +630,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(5,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -640,8 +640,8 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,3)
-        fieldtypes.add(new Wall(new String[]{"WEST"}));
-        fieldtypes.add(new Laser("EAST", 1));
+        fieldtypes.add(new Wall(new String[]{"left"}));
+        fieldtypes.add(new Laser("right", 1));
         arrayListY.add(new Tile("5B",new Coordinate(5,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -666,7 +666,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(5,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -684,7 +684,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (6,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(6,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -694,8 +694,8 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (6,3)
-        fieldtypes.add(new Wall(new String[]{"EAST"}));
-        fieldtypes.add(new Laser("EAST", 1));
+        fieldtypes.add(new Wall(new String[]{"right"}));
+        fieldtypes.add(new Laser("right", 1));
         arrayListY.add(new Tile("5B",new Coordinate(6,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -705,14 +705,14 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (6,5)
-        fieldtypes.add(new Wall(new String[]{"NORTH"}));
-        fieldtypes.add(new Laser("SOUTH", 1));
+        fieldtypes.add(new Wall(new String[]{"top"}));
+        fieldtypes.add(new Laser("bottom", 1));
         arrayListY.add(new Tile("5B",new Coordinate(6,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (6,6)
-        fieldtypes.add(new Wall(new String[]{"SOUTH"}));
-        fieldtypes.add(new Laser("SOUTH", 1));
+        fieldtypes.add(new Wall(new String[]{"bottom"}));
+        fieldtypes.add(new Laser("bottom", 1));
         arrayListY.add(new Tile("5B",new Coordinate(6,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -722,7 +722,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (6,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"left"}));
         arrayListY.add(new Tile("5B",new Coordinate(6,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -740,7 +740,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (7,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(7,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -775,12 +775,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (7,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"SOUTH","WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"bottom","left"}));
         arrayListY.add(new Tile("5B",new Coordinate(7,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (7,9)
-        fieldtypes.add(new ConveyorBelt(2,"NORTH", new String[]{"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2,"top", new String[]{"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(7,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -793,47 +793,47 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (8,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST", "SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right", "bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,2)
-        fieldtypes.add(new ConveyorBelt(2, "NORTH", new String[] {"EAST", "SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"right", "bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,3)
-        fieldtypes.add(new ConveyorBelt(2, "NORTH", new String[] {"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,4)
-        fieldtypes.add(new ConveyorBelt(2, "NORTH", new String[] {"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,5)
-        fieldtypes.add(new ConveyorBelt(2, "NORTH", new String[] {"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,6)
-        fieldtypes.add(new ConveyorBelt(2, "NORTH", new String[] {"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,7)
-        fieldtypes.add(new ConveyorBelt(2, "NORTH", new String[] {"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,8)
-        fieldtypes.add(new ConveyorBelt(2, "EAST", new String[]{"SOUTH","WEST"}));
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"bottom","left"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (8,9)
-        fieldtypes.add(new ConveyorBelt(2,"NORTH", new String[]{"SOUTH"}));
+        fieldtypes.add(new ConveyorBelt(2,"top", new String[]{"bottom"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -847,12 +847,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (9,1)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(9,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (9,2)
-        fieldtypes.add(new ConveyorBelt(2, "WEST", new String[] {"EAST"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(9,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
