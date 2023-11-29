@@ -372,6 +372,9 @@ public final class Session
     }
 
 
+    /**
+     * Sends a set of hand cards to a specified player controller and notifies other players
+     */
     public void sendHandCardsToPlayer(PlayerController targetPlayerController, String[] hand) {
         for (PlayerController playerController : this.playerControllers) {
             if (playerController == targetPlayerController) {
@@ -384,6 +387,11 @@ public final class Session
         }
     }
 
+    /**
+     * Sends a shuffle  notification to all clients
+     *
+     * @param playerID The ID of the player who shuffled.
+     */
     public void sendShuffleCodingNotification(int playerID) {
         for (PlayerController playerController : this.playerControllers) {
             ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(playerController.getClientInstance(), playerID);
