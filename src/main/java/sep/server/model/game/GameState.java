@@ -20,7 +20,7 @@ public class GameState
 
     private String courseName;
 
-    private GameMode gameMode;
+    public static GameMode gameMode;
     private boolean bGameStarted;
 
     public GameState()

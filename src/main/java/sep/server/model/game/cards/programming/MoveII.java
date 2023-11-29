@@ -1,6 +1,7 @@
 package sep.server.model.game.cards.programming;
 
 import sep.server.json.game.effects.MovementModel;
+import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 
@@ -14,9 +15,11 @@ public class MoveII extends AProgrammingCard implements IPlayableCard {
     public void playCard(Player player, int currentRoundNumber) {
         player.moveRobotOneTileForwards();
         player.moveRobotOneTileForwards();
-        new MovementModel(player.getPlayerController().getClientInstance(),
-                player.getPlayerController().getPlayerID(),
-                player.getPlayerRobot().getCurrentTile().getCoordinate().getXCoordinate(),
-                player.getPlayerRobot().getCurrentTile().getCoordinate().getYCoordinate()).send();
+        for(Player player1 : GameState.gameMode.getPlayers()) {
+            new MovementModel(player1.getPlayerController().getClientInstance(),
+                    player.getPlayerController().getPlayerID(),
+                    player.getPlayerRobot().getCurrentTile().getCoordinate().getXCoordinate(),
+                    player.getPlayerRobot().getCurrentTile().getCoordinate().getYCoordinate()).send();
+        }
     }
 }

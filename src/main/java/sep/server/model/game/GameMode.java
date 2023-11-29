@@ -44,6 +44,10 @@ public class GameMode
         return;
     }
 
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
     public void programmingPhase() {
         distributeCards(players);
     }
