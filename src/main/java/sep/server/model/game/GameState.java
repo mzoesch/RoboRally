@@ -78,7 +78,7 @@ public class GameState
         return;
     }
 
-    public void notifyHandCardsDistribution(Player player) {
+    public void sendHandCards(Player player) {
         session.sendHandCardsToPlayer(player.getPlayerController(), player.getPlayerHandAsStringArray());
     }
 

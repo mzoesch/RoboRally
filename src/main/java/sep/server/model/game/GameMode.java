@@ -238,7 +238,7 @@ public class GameMode
                 player.getPlayerHand().add(card);
             }
 
-            gameState.notifyHandCardsDistribution(player);
+            gameState.sendHandCards(player);
         }
 
     }
