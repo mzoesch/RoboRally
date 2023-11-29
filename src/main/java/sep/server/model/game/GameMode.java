@@ -18,7 +18,6 @@ import java.util.HashMap;
 public class GameMode
 {
     private final Course course;
-
     int playerNum;
     ArrayList<Player> players;
     int currentPlayerIndex;
@@ -60,6 +59,7 @@ public class GameMode
             this.currentRegisterIndex += 1;
             this.currentPlayerIndex = -1;
         }
+        determineCurrentCards();
     }
 
     /**
@@ -67,6 +67,7 @@ public class GameMode
      * @return client ID and card type as String
      */
     public HashMap<Integer, String> determineCurrentCards() {
+        //TODO adjust to JSON wrapper class once created
         HashMap<Integer, String> currentCards = new HashMap<>();
 
         for(Player player : players) {
@@ -137,6 +138,7 @@ public class GameMode
      *  that is replacing cards
      */
     public Object[] replaceCardInRegister() {
+        //TODO adjust to JSON wrapper class once created
         int register = currentRegisterIndex;
         Player player = players.get(currentPlayerIndex);
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
