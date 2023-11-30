@@ -1,11 +1,9 @@
-package sep.server.model.game.courseBuilder;
+package sep.server.model.game.builder;
 
-import org.json.JSONArray;
 import sep.server.model.game.Tile;
 import sep.server.model.game.tiles.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Klasse, die das jeweilige Spielfeld erstellt
