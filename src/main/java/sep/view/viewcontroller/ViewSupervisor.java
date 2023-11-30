@@ -29,8 +29,10 @@ public final class ViewSupervisor extends Application
     private SceneController sceneController;
 
     public static final int TILE_DIMENSIONS = 96;
-    public static final int VIRTUAL_SPACE_VERTICAL = 128;
+    public static final int VIRTUAL_SPACE_VERTICAL = 512;
     public static final int VIRTUAL_SPACE_HORIZONTAL = 128;
+    public static final int REGISTER_SLOT_WIDTH = 102;
+    public static final int REGISTER_SLOT_HEIGHT = 180;
 
     public ViewSupervisor()
     {

@@ -18,6 +18,9 @@ public final class RemotePlayer
     Coordinate startPos;
     RobotView possessing;
 
+    private static final int REGISTER_SLOTS = 5;
+    private String[] registerSlots;
+
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
     {
         this.playerID = playerID;
@@ -27,6 +30,8 @@ public final class RemotePlayer
 
         this.startPos = null;
         this.possessing = new RobotView(this);
+
+        this.registerSlots = new String[REGISTER_SLOTS];
 
         return;
     }
@@ -88,6 +93,11 @@ public final class RemotePlayer
     public RobotView getRobotView()
     {
         return this.possessing;
+    }
+
+    public String getRegisterSlot(int i)
+    {
+        return this.registerSlots[i];
     }
 
 }

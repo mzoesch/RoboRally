@@ -51,7 +51,7 @@ public final class Session
         this.playerControllers = new ArrayList<PlayerController>();
         this.readyPlayerControllerOrder = new ArrayList<PlayerController>();
         this.sessionID = sessionID;
-        this.gameState = new GameState();
+        this.gameState = new GameState(this);
 
         this.awaitGameStartThread = null;
 

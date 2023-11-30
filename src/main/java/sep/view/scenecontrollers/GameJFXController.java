@@ -6,6 +6,7 @@ import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.Coordinate;
 import sep.view.json.game.SetStartingPointModel;
+import sep.view.viewcontroller.TileModifier;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
@@ -32,6 +33,11 @@ public class GameJFXController
     @FXML private AnchorPane courseContainer;
     @FXML private ScrollPane courseScrollPane;
     @FXML private AnchorPane courseScrollPaneContent;
+    @FXML private AnchorPane registerSlot1;
+    @FXML private AnchorPane registerSlot2;
+    @FXML private AnchorPane registerSlot3;
+    @FXML private AnchorPane registerSlot4;
+    @FXML private AnchorPane registerSlot5;
 
     private int tileDimensions;
     private static final int resizeAmount = 10;
@@ -164,6 +170,68 @@ public class GameJFXController
 
     // endregion HUD Header
 
+    // region HUD Footer
+
+    private ImageView getEmptyRegisterSlot()
+    {
+        ImageView iv = new ImageView();
+        iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
+        iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
+        iv.getStyleClass().add("register-slot");
+        iv.setImage(TileModifier.getImage("EmptyRegisterSlot"));
+        return iv;
+    }
+
+    /**
+     * @param idx       Index of the register slot.
+     * @param cardName  Name of the card to render. Pass null to render an empty slot.
+     */
+    private void renderRegisterSlot(int idx, String cardName)
+    {
+        if (cardName == null)
+        {
+            cardName = "EmptyRegisterSlot";
+        }
+
+        ImageView iv = new ImageView();
+        iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
+        iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
+        iv.getStyleClass().add("register-slot");
+        iv.setImage(TileModifier.getImage(cardName));
+
+        switch (idx)
+        {
+            case 0:
+                this.registerSlot1.getChildren().clear();
+                this.registerSlot1.getChildren().add(iv);
+                break;
+
+            case 1:
+                this.registerSlot2.getChildren().clear();
+                this.registerSlot2.getChildren().add(iv);
+                break;
+
+            case 2:
+                this.registerSlot3.getChildren().clear();
+                this.registerSlot3.getChildren().add(iv);
+                break;
+
+            case 3:
+                this.registerSlot4.getChildren().clear();
+                this.registerSlot4.getChildren().add(iv);
+                break;
+
+            case 4:
+                this.registerSlot5.getChildren().clear();
+                this.registerSlot5.getChildren().add(iv);
+                break;
+        }
+
+        return;
+    }
+
+    // endregion HUD Footer
+
     /**
      * Updates every dependency of the header.
      * No re-renders must be done after this method.
@@ -172,6 +240,26 @@ public class GameJFXController
     {
         this.renderPhaseTitle();
         this.renderGameStateDescription();
+
+        return;
+    }
+
+    /**
+     * Updates every dependency of the footer.
+     * No re-renders must be done after this method.
+     * */
+    private void renderHUDFooter()
+    {
+//        this.renderRegisterSlot(0, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(0));
+//        this.renderRegisterSlot(1, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(1));
+//        this.renderRegisterSlot(2, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(2));
+//        this.renderRegisterSlot(3, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(3));
+//        this.renderRegisterSlot(4, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(4));
+        this.renderRegisterSlot(0, null);
+        this.renderRegisterSlot(1, null);
+        this.renderRegisterSlot(2, null);
+        this.renderRegisterSlot(3, null);
+        this.renderRegisterSlot(4, null);
 
         return;
     }
@@ -210,6 +298,7 @@ public class GameJFXController
     public void renderHUD()
     {
         this.renderHUDHeader();
+        this.renderHUDFooter();
         this.renderPlayerInformationArea();
 
         return;
@@ -227,17 +316,16 @@ public class GameJFXController
      * */
     private void updateGlobalVariables()
     {
-
-        /* This is not safe at all. This only works with rectangle courses. */
-        this.files = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
-        this.ranks = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
+        /* We can do this because even if there is no tile, it must always be annotated with a null json object. */
+        this.files = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
+        this.ranks = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
 
         this.tiles = new Tile[this.files][this.ranks];
         for (int i = 0; i < this.files; i++)
         {
             for (int j = 0; j < this.ranks; j++)
             {
-                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(j).getJSONArray(i));
+                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(i).getJSONArray(j));
                 t.setTranslateX(i);
                 t.setTranslateY(j);
                 tiles[i][j] = t;

@@ -2,7 +2,6 @@ package sep.server.model.game;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sep.server.json.common.CurrentPlayerModel;
 import sep.server.json.common.ErrorMsgModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.GameStartedModel;
@@ -12,13 +11,12 @@ import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.game.cards.damage.*;
+import sep.server.viewmodel.Session;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
-
-import sep.server.viewmodel.Session;
 
 /**
  * The rules of the game are implemented here. It is a high-level manager object for one game and controls the
@@ -27,32 +25,37 @@ import sep.server.viewmodel.Session;
 public class GameMode
 {
     private static final Logger l = LogManager.getLogger(Session.class);
+
     private final Course course;
+    int gamePhase = 0; //0 => Aufbauphase, 1 => Upgradephase, 2 => Programmierphase, 3 => Aktivierungsphase
+    private final Session session;
+
     ArrayList<Player> players;
+    Player currentPlayer; //aktuell nur in setup-phase benutzt
+
     int energyBank;
     static GameState gameState;
     int availableCheckPoints;
-    int gamePhase = 0; //0 => Aufbauphase, 1 => Upgradephase, 2 => Programmierphase, 3 => Aktivierungsphase
     ArrayList<SpamDamage> spamCardDeck;
     ArrayList<TrojanHorseDamage> trojanCardDeck;
     ArrayList<VirusDamage> virusCardDeck;
     ArrayList<WormDamage> wormDamageDeck;
-    Player currentPlayer; //aktuell nur in setup-phase benutzt
 
-    public GameMode(String courseName, PlayerController[] playerControllers)
+    public GameMode(String courseName, PlayerController[] playerControllers, Session session)
     {
         super();
 
         this.course = new Course(courseName);
         this.gamePhase = 0;
+        this.session = session;
 
         DeckBuilder deckBuilder = new DeckBuilder();
-        spamCardDeck = deckBuilder.buildSpamDeck();
-        trojanCardDeck = deckBuilder.buildTrojanDeck();
-        virusCardDeck = deckBuilder.buildVirusDeck();
-        wormDamageDeck = deckBuilder.buildWormDeck();
+        this.spamCardDeck = deckBuilder.buildSpamDeck();
+        this.trojanCardDeck = deckBuilder.buildTrojanDeck();
+        this.virusCardDeck = deckBuilder.buildVirusDeck();
+        this.wormDamageDeck = deckBuilder.buildWormDeck();
 
-        setAvailableCheckPoints(courseName);
+        this.setAvailableCheckPoints(courseName);
 
         this.players = new ArrayList<>();
         for(PlayerController pc : playerControllers)
@@ -70,32 +73,8 @@ public class GameMode
             continue;
         }
 
-        // Announcing Phase Zero.
-        playerControllers[0].getSession().handleActivePhase(0);
-
-        //Selecting starting player. (first one in PlayerControllers ArrayList
-        new CurrentPlayerModel(currentPlayer.getPlayerController().getClientInstance(),
-                currentPlayer.getPlayerController().getPlayerID()).send();
-
-
-        /* Just temporary. This is for helping to develop the front-end.
-        for (PlayerController pc : playerControllers) {
-            new MockGameStartedModel(pc.getClientInstance()).send();
-            continue;
-        }
-
-        // Announcing Phase Zero.
-        for (PlayerController pc : playerControllers) {
-            pc.getClientInstance().sendMockJSON(new JSONObject("{\"messageType\":\"ActivePhase\",\"messageBody\":{\"phase\":0}}"));
-            continue;
-        }
-
-        // Selecting starting player.
-        for (PlayerController pc : playerControllers) {
-            pc.getClientInstance().sendMockJSON(new JSONObject(String.format("{\"messageType\":\"CurrentPlayer\",\"messageBody\":{\"clientID\":%d}}", playerControllers[0].getPlayerID())));
-            continue;
-        }
-        */
+        this.session.handleActivePhase(0);
+        this.session.handleCurrentPlayer(this.currentPlayer.getPlayerController().getPlayerID());
 
         return;
     }

@@ -23,15 +23,15 @@ public class GameState
     private String courseName;
 
     public static GameMode gameMode;
-    private Session session;
+    private final Session session;
 
     private boolean bGameStarted;
 
-
-    public GameState()
+    public GameState(Session session)
     {
         super();
         this.courseName = "";
+        this.session = session;
         this.bGameStarted = false;
         return;
     }
@@ -42,8 +42,7 @@ public class GameState
 
         //Erstellen des Spiels
         this.bGameStarted = true;
-        gameMode = new GameMode(this.courseName, playerControllers);
-
+        gameMode = new GameMode(this.courseName, playerControllers, this.session);
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 
