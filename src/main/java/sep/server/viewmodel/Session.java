@@ -401,6 +401,36 @@ public final class Session
     }
 
 
+    /**
+     * @param playerID The player ID of the player who made the selection
+     * @param register The register of the selection
+     * @param filled true for placed, false for removed
+     */
+    public void sendCardSelected(int playerID, int register, boolean filled) {
+        for (PlayerController playerController : this.playerControllers) {
+            CardSelectedModel cardSelectedModel = new CardSelectedModel(playerController.getClientInstance(), playerID, register, filled);
+            cardSelectedModel.send();
+        }
+    }
+
+    public void sendTimerStarted() {
+        for (PlayerController playerController : this.playerControllers) {
+            TimerStartedModel timerStartedModel = new TimerStartedModel(playerController.getClientInstance());
+            timerStartedModel.send();
+        }
+    }
+
+    /**
+     * @param playerIDS An array of player IDs who  have responded too slowly
+     */
+    public void sendTimerEnded(int[] playerIDS) {
+        for (PlayerController playerController : this.playerControllers) {
+            TimerEndedModel timerEndedModel = new TimerEndedModel(playerController.getClientInstance(), playerIDS);
+            timerEndedModel.send();
+        }
+    }
+
+
 
 
     // endregion Getters and Setters
