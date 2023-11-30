@@ -54,4 +54,15 @@ public class DefaultClientRequestParser
     {
         return this.request.getJSONObject("messageBody").getString("map");
     }
+
+    public Object getPosX()
+    {
+        return this.request.getJSONObject("messageBody").get("x");
+    }
+
+    public Object getPosY()
+    {
+        return this.request.getJSONObject("messageBody").get("y");
+    }
+
 }
