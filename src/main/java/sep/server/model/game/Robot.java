@@ -9,6 +9,10 @@ public class Robot {
     this.course = course;
   }
 
+  public int setStartingPoint(int x, int y){
+
+    return 1;
+  }
   public String getDirection() {
     return direction;
   }

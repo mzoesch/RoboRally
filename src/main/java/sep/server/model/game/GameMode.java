@@ -37,7 +37,7 @@ public class GameMode
 
         //TODO hier Spieler erstellen; Roboter erstellen
         for(PlayerController pc : playerControllers){
-            players.add(new Player());
+            players.add(new Player(this.course));
         }
         /* Just temporary. This is for helping to develop the front-end. */
         for (PlayerController pc : playerControllers) {

@@ -11,6 +11,8 @@ public class Course {
 
     private final ArrayList<ArrayList<Tile>> course;
 
+    private String startingDirection;
+
     /**
      * Erstellt das Spielbrett abhängig vom übergebenen Kartennamen
      *
@@ -19,6 +21,7 @@ public class Course {
     public Course(String courseName) {
         CourseBuilder courseBuilder = new CourseBuilder();
         course = courseBuilder.buildCourse(courseName);
+        startingDirection = courseBuilder.getStartingPosition(courseName);
     }
 
     public void activateBoard() {

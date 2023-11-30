@@ -86,6 +86,13 @@ public class CourseBuilder {
         }
     }
 
+    public String getStartingPosition(String courseName){
+        switch(courseName){
+            case("DizzyHighway") -> {
+                return "East";}
+        }
+        return "EAST";
+    }
     /**
      * Fügt ein Board von rechts an ein anderes Board an (funktioniert aktuell nur bei gleicher Länge)
      * @param leftBoard linkes Board
