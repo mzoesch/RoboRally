@@ -242,6 +242,29 @@ public class Player {
     robot.setDirection(newDirection);
   }
 
+  public void addCardToRegister(IPlayableCard card, int position) {
+    if (position >= 0 && position < 4) {
+      registers[position] = card;
+      //session.sendKartenAuswahlBestätigen();
+      checkRegisterStatus();
+    }
+  }
+
+  public void checkRegisterStatus() {
+    boolean isFull = true;
+    for (IPlayableCard card : registers) {
+      if (card == null) {
+        isFull = false;
+        break;
+      }
+    }
+    if (isFull) {
+      //session.sendAuswahlBeenden();
+    }
+  }
+
+
+
 
 
 
