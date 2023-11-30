@@ -1,6 +1,5 @@
-package sep.server.model.game.courseBuilder;
+package sep.server.model.game.builder;
 
-import sep.server.model.game.GameState;
 import sep.server.model.game.Tile;
 import sep.server.model.game.tiles.*;
 
@@ -26,7 +25,6 @@ public class CourseBuilder {
                 ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
                 settingCoordinates(entireCourse);
-                GameState.gameMode.setAvailableCheckPoints(1);
                 return entireCourse;
             }
             case("Test") -> {

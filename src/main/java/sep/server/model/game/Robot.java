@@ -5,10 +5,8 @@ public class Robot {
   private final Course course;
   private Tile currentTile;
 
-  public Robot(String direction, Course course, Tile currentTile) {
-    this.direction = direction;
+  public Robot(Course course) {
     this.course = course;
-    this.currentTile = currentTile;
   }
 
   public String getDirection() {

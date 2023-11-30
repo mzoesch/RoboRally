@@ -6,6 +6,7 @@ import java.util.Collections;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.Coordinate;
+import sep.server.model.game.builder.DeckBuilder;
 import sep.server.viewmodel.PlayerController;
 
 public class Player {
@@ -15,22 +16,18 @@ public class Player {
   ArrayList<IPlayableCard> discardPile;
   ArrayList<IPlayableCard> playerHand;
   IPlayableCard[] registers;
-  int priority;
+  int priority; //TODO aktuell überflüssig oder?; falls nicht, muss sie im Konstruktor gesetzt werden
   int checkpointsCollected;
   int energyCollected;
   ArrayList<AUpgradeCard> upgradeCards;
 
-  public Player(Robot playerRobot,
-                ArrayList<IPlayableCard> playerDeck, ArrayList<IPlayableCard> discardPile, IPlayableCard[] registers, int priority,
-                int checkpointsCollected, int energyCollected, ArrayList<AUpgradeCard> upgradeCards) {
-    this.playerRobot = playerRobot;
-    this.playerDeck = playerDeck;
-    this.discardPile = discardPile;
-    this.registers = registers;
-    this.priority = priority;
-    this.checkpointsCollected = checkpointsCollected;
-    this.energyCollected = energyCollected;
-    this.upgradeCards = upgradeCards;
+  public Player(Course currentCourse) {
+    this.playerRobot = new Robot(currentCourse);
+    this.playerDeck = new DeckBuilder().buildProgrammingDeck();
+    this.discardPile = new ArrayList<>();
+    this.checkpointsCollected = 0;
+    this.energyCollected = 5;
+    this.upgradeCards = new ArrayList<>();
   }
 
   public PlayerController getPlayerController() {
@@ -241,6 +238,29 @@ public class Player {
 
     robot.setDirection(newDirection);
   }
+
+  public void addCardToRegister(IPlayableCard card, int position) {
+    if (position >= 0 && position < 4) {
+      registers[position] = card;
+      //session.sendKartenAuswahlBestätigen();
+      checkRegisterStatus();
+    }
+  }
+
+  public void checkRegisterStatus() {
+    boolean isFull = true;
+    for (IPlayableCard card : registers) {
+      if (card == null) {
+        isFull = false;
+        break;
+      }
+    }
+    if (isFull) {
+      //session.sendAuswahlBeenden();
+    }
+  }
+
+
 
 
 
