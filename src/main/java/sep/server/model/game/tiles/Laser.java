@@ -7,12 +7,20 @@ public class Laser implements FieldType {
 
     private static int laserCount;
 
-    private String orientation;
+    private final String orientation;
 
     public Laser(String laserOrientation, int thisLaserCount) {
 
         orientation = laserOrientation;
         laserCount = thisLaserCount;
+    }
+
+    public static int getLaserCount() {
+        return laserCount;
+    }
+
+    public String getOrientation() {
+        return orientation;
     }
 
     public JSONObject toJSON(String isOnBoard){

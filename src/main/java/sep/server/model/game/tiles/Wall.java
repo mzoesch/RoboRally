@@ -4,11 +4,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Wall implements FieldType {
-    private String[] orientations;
+    private final String[] orientations;
 
     public Wall(String[] wallOrientations){
             this.orientations = wallOrientations;
     }
+
+    public String[] getOrientations() {
+        return orientations;
+    }
+
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         JSONArray wallOrientations = new JSONArray();

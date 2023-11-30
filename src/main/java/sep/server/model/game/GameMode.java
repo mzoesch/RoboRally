@@ -10,16 +10,14 @@ import sep.server.json.game.effects.*;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.json.game.MockGameStartedModel;
-import sep.server.model.game.cards.Card;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.game.cards.damage.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
-import org.json.JSONObject;
+import java.util.Objects;
+
 import sep.server.viewmodel.Session;
 
 /**
@@ -29,25 +27,17 @@ import sep.server.viewmodel.Session;
 public class GameMode
 {
     private static final Logger l = LogManager.getLogger(Session.class);
-    private Course course;
+    private final Course course;
     ArrayList<Player> players;
     int energyBank;
     static GameState gameState;
     int availableCheckPoints;
-
     int gamePhase = 0; //0 => Aufbauphase, 1 => Upgradephase, 2 => Programmierphase, 3 => Aktivierungsphase
-
     ArrayList<SpamDamage> spamCardDeck;
     ArrayList<TrojanHorseDamage> trojanCardDeck;
     ArrayList<VirusDamage> virusCardDeck;
     ArrayList<WormDamage> wormDamageDeck;
-
     Player currentPlayer; //aktuell nur in setup-phase benutzt
-
-
-
-
-
 
     public GameMode(String course, PlayerController[] playerControllers)
     {
@@ -203,11 +193,17 @@ public class GameMode
 
 
     /**
-     * The following method handles the activation phase: it iterates over the different registers and
-     * plays the current card for each player (players are sorted by priority). Once each player's
-     * card has been played the board elements activate and the robot lasers are shot.
+     * The following method handles the activation phase: It sends the corresponding JSON message.
+     * It iterates over the different registers and plays the current card for each player
+     * (players are sorted by priority). Once each player's card has been played the board
+     * elements activate and the robot lasers are shot.
      */
     public void activationPhase() {
+        for(Player player : players) {
+            new ActivePhaseModel(player.getPlayerController().getClientInstance(),
+                    3).send();
+        }
+
         for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
             determinePriorities();
             sortPlayersByPriority(currentRegister);
@@ -219,7 +215,7 @@ public class GameMode
             activateConveyorBelts(1);
             activatePushPanels(currentRegister);
             activateGears();
-            shootBoardLasers();
+            findLasers();
             shootRobotLasers();
             checkEnergySpaces(currentRegister);
             checkCheckpoints();
@@ -293,13 +289,12 @@ public class GameMode
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if (fieldType instanceof ConveyorBelt) {
-                    ConveyorBelt conveyorBelt = (ConveyorBelt) fieldType;
-                    int beltSpeed = conveyorBelt.getSpeed();
+                if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                    int beltSpeed = ConveyorBelt.getSpeed();
 
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
-                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                        String outDirection = ConveyorBelt.getOutcomingFlowDirection();
                         Coordinate newCoordinate = null;
 
                         for(int i = 0; i<speed; i++) {
@@ -341,10 +336,9 @@ public class GameMode
     public void curvedArrowCheck(Player player, Coordinate coordinate) {
         Tile newTile = course.getTileByCoordinate(coordinate);
         for(FieldType newFieldType : newTile.getFieldTypes()) {
-            if(newFieldType instanceof ConveyorBelt) {
-                ConveyorBelt newConveyorBelt = (ConveyorBelt) newFieldType;
-                String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
-                String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
+            if(newFieldType instanceof ConveyorBelt newConveyorBelt) {
+                String newOutDirection = ConveyorBelt.getOutcomingFlowDirection();
+                String[] newInDirection = ConveyorBelt.getIncomingFlowDirection();
                 String robotOldDirection = player.getPlayerRobot().getDirection();
                 if(newInDirection != null && newOutDirection != null) {
                     for(String direction : newInDirection) {
@@ -355,10 +349,10 @@ public class GameMode
                             case("left") -> player.getPlayerRobot().setDirection("WEST");
                         }
                     }
-                    if((robotOldDirection == "NORTH" && player.getPlayerRobot().getDirection() == "EAST") ||
-                            (robotOldDirection == "EAST" && player.getPlayerRobot().getDirection() == "SOUTH") ||
-                            (robotOldDirection == "SOUTH" && player.getPlayerRobot().getDirection() == "WEST") ||
-                            (robotOldDirection == "WEST" && player.getPlayerRobot().getDirection() == "NORTH")) {
+                    if((Objects.equals(robotOldDirection, "NORTH") && Objects.equals(player.getPlayerRobot().getDirection(), "EAST")) ||
+                            (Objects.equals(robotOldDirection, "EAST") && Objects.equals(player.getPlayerRobot().getDirection(), "SOUTH")) ||
+                            (Objects.equals(robotOldDirection, "SOUTH") && Objects.equals(player.getPlayerRobot().getDirection(), "WEST")) ||
+                            (Objects.equals(robotOldDirection, "WEST") && Objects.equals(player.getPlayerRobot().getDirection(), "NORTH"))) {
                         for(Player player1 : players) {
                             new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                                     player.getPlayerController().getPlayerID(),
@@ -386,13 +380,12 @@ public class GameMode
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof PushPanel) {
-                    PushPanel pushPanel = (PushPanel) fieldType;
-                    int[] activateAtRegister = pushPanel.getActivateAtRegister();
+                if(fieldType instanceof PushPanel pushPanel) {
+                    int[] activateAtRegister = PushPanel.getActivateAtRegister();
 
                     for(int register : activateAtRegister) {
                         if(register == currentRegister) {
-                            String pushOrientation = pushPanel.getOrientation();
+                            String pushOrientation = PushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
 
                             Coordinate newCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
@@ -429,19 +422,18 @@ public class GameMode
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof Gear) {
-                    Gear gear = (Gear) fieldType;
-                    String rotationalDirection = gear.getRotationalDirection();
+                if(fieldType instanceof Gear gear) {
+                    String rotationalDirection = Gear.getRotationalDirection();
                     String robotDirection = player.getPlayerRobot().getDirection();
                     String newDirection = robotDirection;
-                    if(rotationalDirection == "counterclockwise") {
+                    if(Objects.equals(rotationalDirection, "counterclockwise")) {
                         switch (robotDirection) {
                             case "NORTH" -> newDirection = "WEST";
                             case "EAST" -> newDirection = "NORTH";
                             case "SOUTH" -> newDirection = "EAST";
                             case "WEST" -> newDirection = "SOUTH";
                         }
-                    } else if(rotationalDirection == "clockwise") {
+                    } else if(Objects.equals(rotationalDirection, "clockwise")) {
                         switch (robotDirection) {
                             case "NORTH" -> newDirection = "EAST";
                             case "EAST" -> newDirection = "SOUTH";
@@ -460,7 +452,104 @@ public class GameMode
             }
         }
     }
-    public void shootBoardLasers() {}
+
+    /**
+     * The following method checks the course for lasers and passes the respective tile including its field types to
+     * the handleLaserByDirection method.
+     */
+    public void findLasers() {
+        for (ArrayList<Tile> row : course.getCourse()) {
+            for (Tile tile : row) {
+                for (FieldType fieldType : tile.getFieldTypes()) {
+                    if (fieldType instanceof Laser) {
+                        handleLaserByDirection((Laser) fieldType, tile);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method determines the laser orientation. Depending on the orientation it passes different values to
+     * the handleLaserShooting method.
+     * @param laser laser object holding laser orientation and laser strength
+     * @param tile tile of current laser being handled
+     */
+    private void handleLaserByDirection(Laser laser, Tile tile) {
+        int laserXCoordinate = tile.getCoordinate().getXCoordinate();
+        int laserYCoordinate = tile.getCoordinate().getYCoordinate();
+        String laserOrientation = laser.getOrientation();
+        int laserCount = Laser.getLaserCount();
+
+
+        switch (laserOrientation) {
+            case "top" -> handleLaserShooting("top", laserCount, laserXCoordinate, laserYCoordinate, 0, -1);
+            case "right" -> handleLaserShooting("right", laserCount, laserXCoordinate, laserYCoordinate, 1, 0);
+            case "bottom" -> handleLaserShooting("bottom", laserCount, laserXCoordinate, laserYCoordinate, 0, 1);
+            case "left" -> handleLaserShooting("left", laserCount, laserXCoordinate, laserYCoordinate, -1, 0);
+        };
+    }
+
+    /**
+     * The following method shoots the laser and checks for obstacles in its way which stop the laser.
+     * If the obstacle is a robot, they draw 1-3 spam cards, depending on the laser's strength.
+     * @param laserOrientation direction the laser is shooting into
+     * @param laserCount intensity of the laser, can vary between 1-3
+     * @param x x-coordinate of laser tile
+     * @param y y-coordinate of laser tile
+     * @param xIncrement differs depending on laser orientation
+     * @param yIncrement differs depending on laser orientation
+     */
+    private void handleLaserShooting(String laserOrientation, int laserCount, int x, int y, int xIncrement, int yIncrement) {
+        boolean laserGoing = true;
+
+        while (course.areCoordinatesWithinBounds(x, y) && laserGoing) {
+            Tile tile = course.getTileByNumbers(x, y);
+
+            if (tile.isOccupied()) {
+                Robot occupyingRobot = tile.getRobot();
+
+                for (Player player : players) {
+                    if (player.getPlayerRobot() == occupyingRobot) {
+                        for(int i = 0; i<laserCount; i++) {
+                            if(!this.spamCardDeck.isEmpty()) {
+                                player.getDiscardPile().add(this.spamCardDeck.remove(0));
+                            }
+                        }
+                        laserGoing = false;
+                        break;
+                    }
+                }
+            }
+
+            for (FieldType fieldType : tile.getFieldTypes()) {
+                if (fieldType instanceof Wall wall) {
+                    String[] orientations = wall.getOrientations();
+
+                    for (String wallOrientation : orientations) {
+                        if(((laserOrientation.equals("top") || laserOrientation.equals("bottom")) &&
+                                (wallOrientation.equals("bottom") || wallOrientation.equals("top")) &&
+                                (y != tile.getCoordinate().getYCoordinate())) ||
+                                ((laserOrientation.equals("left") || laserOrientation.equals("right")) &&
+                                        (wallOrientation.equals("left") || wallOrientation.equals("right")) &&
+                                        (x != tile.getCoordinate().getXCoordinate()))) {
+                            laserGoing = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (fieldType instanceof Antenna) {
+                    laserGoing = false;
+                    break;
+                }
+            }
+
+            x += xIncrement;
+            y += yIncrement;
+        }
+    }
+
     public void shootRobotLasers() {}
 
     /**
@@ -473,8 +562,7 @@ public class GameMode
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof EnergySpace) {
-                    EnergySpace energySpace = (EnergySpace) fieldType;
+                if(fieldType instanceof EnergySpace energySpace) {
                     int availableEnergy = energySpace.getAvailableEnergy();
                     int currentEnergy = player.getEnergyCollected();
                     if(currentRegister == 5) {
@@ -507,8 +595,7 @@ public class GameMode
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof CheckPoint) {
-                    CheckPoint checkPoint = (CheckPoint) fieldType;
+                if(fieldType instanceof CheckPoint checkPoint) {
                     int checkpointNumber = checkPoint.getCheckpointNumber();
                     if(player.getCheckpointsCollected() == checkpointNumber-1) {
                         player.setCheckpointsCollected(player.getCheckpointsCollected()+1);
@@ -536,7 +623,7 @@ public class GameMode
      * The following method calculates the new coordinates for activating conveyor belts and push panels.
      * @param orientation direction the robot is moved to
      * @param oldCoordinate coordinates of the current push panel pushing a robot
-     * @return
+     * @return new coordinate
      */
     public Coordinate calculateNewCoordinate(String orientation, Coordinate oldCoordinate) {
         Coordinate newCoordinate = null;

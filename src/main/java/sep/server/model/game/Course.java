@@ -11,7 +11,7 @@ public class Course {
 
     private final ArrayList<ArrayList<Tile>> course;
 
-    private String startingDirection;
+    private final String startingDirection;
 
     /**
      * Erstellt das Spielbrett abhängig vom übergebenen Kartennamen
@@ -56,6 +56,16 @@ public class Course {
         int x = coordinate.getXCoordinate();
         int y = coordinate.getYCoordinate();
 
+        return x >= 0 && x < course.size() && y >= 0 && y < course.get(0).size();
+    }
+
+    /**
+     * Checks if coordinate compatible with passed x and y values is within the bounds of the game board.
+     * @param x X-Coordinate
+     * @param y Y-Coordinate
+     * @return True if corresponding coordinate is within the game board bounds, false if not
+     */
+    public boolean areCoordinatesWithinBounds(int x, int y) {
         return x >= 0 && x < course.size() && y >= 0 && y < course.get(0).size();
     }
 
