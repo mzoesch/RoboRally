@@ -213,7 +213,8 @@ public class GameMode
      * The following method is required during the conveyor belt activation period.
      * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
      * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
-     * with the outcoming flow direction. If yes, the direction of the robot is changed accordingly.
+     * with the outcoming flow direction. If yes, the direction of the robot is changed accordingly
+     * and the corresponding JSON message is sent.
      * @param player Owner of the current robot
      * @param coordinate Coordinate of the new tile the robot moved onto
      */
@@ -224,6 +225,7 @@ public class GameMode
                 ConveyorBelt newConveyorBelt = (ConveyorBelt) newFieldType;
                 String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
                 String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
+                String robotOldDirection = player.getPlayerRobot().getDirection();
                 if(newInDirection != null && newOutDirection != null) {
                     for(String direction : newInDirection) {
                         switch(newOutDirection) {
@@ -231,6 +233,22 @@ public class GameMode
                             case("right") -> player.getPlayerRobot().setDirection("EAST");
                             case("bottom") -> player.getPlayerRobot().setDirection("SOUTH");
                             case("left") -> player.getPlayerRobot().setDirection("WEST");
+                        }
+                    }
+                    if((robotOldDirection == "NORTH" && player.getPlayerRobot().getDirection() == "EAST") ||
+                            (robotOldDirection == "EAST" && player.getPlayerRobot().getDirection() == "SOUTH") ||
+                            (robotOldDirection == "SOUTH" && player.getPlayerRobot().getDirection() == "WEST") ||
+                            (robotOldDirection == "WEST" && player.getPlayerRobot().getDirection() == "NORTH")) {
+                        for(Player player1 : players) {
+                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID(),
+                                    "clockwise").send();
+                        }
+                    } else {
+                        for(Player player1 : players) {
+                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID(),
+                                    "counterclockwise").send();
                         }
                     }
                 }
