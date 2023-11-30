@@ -28,7 +28,7 @@ import sep.server.viewmodel.Session;
 public class GameMode
 {
     private static final Logger l = LogManager.getLogger(Session.class);
-    private final Course course;
+    private Course course;
     ArrayList<Player> players;
     int energyBank;
     GameState gameState;
@@ -68,7 +68,7 @@ public class GameMode
 
         this.currentPlayer = players.get(0);
 
-        /*Real methods. Currently commented out for developing front-end
+        //Real methods
         //send the built Course to all Clients
         for (PlayerController pc : playerControllers) {
             new GameStartedModel(pc.getClientInstance(), this.course.getCourse()).send();
@@ -76,30 +76,31 @@ public class GameMode
         }
 
         // Announcing Phase Zero.
-        playerControllers.get(0).getSession.handleActivePhase(0);
+        playerControllers[0].getSession().handleActivePhase(0);
 
         //Selecting starting player. (first one in PlayerControllers ArrayList
         new CurrentPlayerModel(currentPlayer.getPlayerController().getClientInstance(),
                 currentPlayer.getPlayerController().getPlayerID()).send();
-        */
 
-        /* Just temporary. This is for helping to develop the front-end. */
+
+        /* Just temporary. This is for helping to develop the front-end.
         for (PlayerController pc : playerControllers) {
             new MockGameStartedModel(pc.getClientInstance()).send();
             continue;
         }
 
-        /* Announcing Phase Zero. */
+        // Announcing Phase Zero.
         for (PlayerController pc : playerControllers) {
             pc.getClientInstance().sendMockJSON(new JSONObject("{\"messageType\":\"ActivePhase\",\"messageBody\":{\"phase\":0}}"));
             continue;
         }
 
-        /* Selecting starting player. */
+        // Selecting starting player.
         for (PlayerController pc : playerControllers) {
             pc.getClientInstance().sendMockJSON(new JSONObject(String.format("{\"messageType\":\"CurrentPlayer\",\"messageBody\":{\"clientID\":%d}}", playerControllers[0].getPlayerID())));
             continue;
         }
+        */
 
         return;
     }
@@ -129,6 +130,7 @@ public class GameMode
                 pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
 
                 if(startingPointSelectionFinished()){
+                    //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
                     gamePhase = 1;
                     pc.getSession().handleActivePhase(gamePhase);
                     l.info("StartPhase has concluded. ProgrammingPhase has started");
