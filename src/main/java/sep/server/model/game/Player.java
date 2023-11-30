@@ -25,7 +25,8 @@ public class Player {
   Session session;
 
 
-  public Player(Course currentCourse) {
+  public Player(PlayerController playerController, Course currentCourse) {
+    this.playerController = playerController;
     this.playerRobot = new Robot(currentCourse);
     this.playerDeck = new DeckBuilder().buildProgrammingDeck();
     this.discardPile = new ArrayList<>();
