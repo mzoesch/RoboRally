@@ -209,7 +209,9 @@ public class GameMode
             sortPlayersByPriority(currentRegister);
             /*determineCurrentCards(currentRegister);*/
             for(int j = 0; j < players.size(); currentRegister++) {
-                players.get(j).registers[currentRegister].playCard();
+                if(players.get(j).registers[currentRegister] != null) {
+                    players.get(j).registers[currentRegister].playCard();
+                }
             }
             activateConveyorBelts(2);
             activateConveyorBelts(1);
@@ -268,7 +270,6 @@ public class GameMode
     }
 
     /*public HashMap<Integer, String> determineCurrentCards(int currentRegisterIndex) {
-        //TODO adjust to JSON wrapper class once created
         HashMap<Integer, String> currentCards = new HashMap<>();
 
         for(Player player : players) {
@@ -641,7 +642,6 @@ public class GameMode
     }
 
     /*public Object[] replaceCardInRegister(int currentRegisterIndex, int currentPlayerIndex) {
-        //TODO adjust to JSON wrapper class once created
         Player player = players.get(currentPlayerIndex);
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
