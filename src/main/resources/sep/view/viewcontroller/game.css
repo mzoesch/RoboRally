@@ -20,6 +20,25 @@
     -fx-alignment: center;
 }
 
+#ui-footer {
+    -fx-min-height: 200px;
+    -fx-background-color: rgb(45, 45, 45);
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+    -fx-padding: 12px 12px 12px 12px;
+}
+
+.register-slot {
+    -fx-background-color: #27029d;
+    -fx-border-color: #000000ff;
+    -fx-border-width: 1px;
+
+    -fx-min-width: 102px;
+    -fx-max-width: 102px;
+    -fx-min-height: 180px;
+    -fx-max-height: 180px;
+}
+
 #player-container {
     -fx-spacing: 6px;
 }
