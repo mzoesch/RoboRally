@@ -221,11 +221,6 @@ public final class ClientInstance implements Runnable
             return true;
         }
 
-        if (Objects.equals(dcrp.getType_v2(), "SelecetionFinished")) {
-            l.debug("Received selection finished from client.");
-            return true;
-        }
-
         if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint")) {
             l.debug("Received starting point from client.");
             int x = dcrp.getXCoordinate();
