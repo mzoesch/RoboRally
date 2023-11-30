@@ -54,8 +54,11 @@ public class GameMode
         virusCardDeck = deckBuilder.buildVirusDeck();
         wormDamageDeck = deckBuilder.buildWormDeck();
 
-        for(PlayerController pc : playerControllers){
-            players.add(new Player(pc, this.course));
+        this.players = new ArrayList<>();
+        for(PlayerController pc : playerControllers)
+        {
+            this.players.add(new Player(pc, this.course));
+            continue;
         }
 
         this.currentPlayer = players.get(0);
