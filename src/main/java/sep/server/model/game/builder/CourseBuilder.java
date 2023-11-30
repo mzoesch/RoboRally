@@ -600,7 +600,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,3)
-        fieldtypes.add(new RestartPoint());
+        fieldtypes.add(new RestartPoint("bottom"));
         arrayListY.add(new Tile("5B",new Coordinate(4,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 

@@ -4,13 +4,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class RestartPoint implements FieldType{
-
-    public RestartPoint(){
+    private String orientation;
+    public RestartPoint(String orientation){
+        this.orientation = orientation;
     }
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("isOnBoard", isOnBoard);
         fieldInfo.put("type","RestartPoint");
+        JSONArray orientations = new JSONArray();
+        orientations.put(orientation);
+        fieldInfo.put("orientations", orientations);
         return fieldInfo;
     }
 }
