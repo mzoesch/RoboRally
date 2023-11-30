@@ -54,8 +54,11 @@ public class GameMode
         virusCardDeck = deckBuilder.buildVirusDeck();
         wormDamageDeck = deckBuilder.buildWormDeck();
 
-        for(PlayerController pc : playerControllers){
-            players.add(new Player(pc, this.course));
+        this.players = new ArrayList<>();
+        for(PlayerController pc : playerControllers)
+        {
+            this.players.add(new Player(pc, this.course));
+            continue;
         }
 
         this.currentPlayer = players.get(0);
@@ -509,5 +512,16 @@ public class GameMode
     }
 
     public void endGame() {}
+
+    public PlayerController[] getPlayerControllers()
+    {
+        PlayerController[] playerControllers = new PlayerController[this.players.size()];
+        for (int i = 0; i < this.players.size(); i++)
+        {
+            playerControllers[i] = this.players.get(i).getPlayerController();
+            continue;
+        }
+        return playerControllers;
+    }
 
 }

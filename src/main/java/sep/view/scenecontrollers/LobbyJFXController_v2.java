@@ -2,7 +2,7 @@ package sep.view.scenecontrollers;
 
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.json.lobby.PlayerValuesModel;
-import sep.view.viewcontroller.ViewLauncher;
+import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.clientcontroller.EGameState;
 import sep.view.json.ChatMsgModel;
@@ -143,13 +143,13 @@ public final class LobbyJFXController_v2
         }
         catch (IOException e)
         {
-            ViewLauncher.getSceneController().killCurrentScreen();
+            ViewSupervisor.getSceneController().killCurrentScreen();
             return;
         }
 
         if (!bSuccess)
         {
-            ViewLauncher.getSceneController().killCurrentScreen();
+            ViewSupervisor.getSceneController().killCurrentScreen();
         }
 
         this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));

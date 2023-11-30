@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import org.json.JSONObject;
 import org.json.JSONException;
-import sep.view.viewcontroller.ViewLauncher;
+import sep.view.viewcontroller.ViewSupervisor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +29,7 @@ public class GameInstance
         {
             l.info("Creating Game Instance for main thread (JFX), constructing window.");
             EClientInformation.INSTANCE.setJFXInstance(this);
-            ViewLauncher.run();
+            ViewSupervisor.run();
             return;
         }
 

@@ -1,5 +1,8 @@
 package sep.view.clientcontroller;
 
+import sep.view.viewcontroller.RobotView;
+import sep.view.lib.Coordinate;
+
 /**
  * Represents a player in the lobby. Not just remote players but also the client player.
  * We may store information on the remote player state here that is unique to a player and not to the game. This
@@ -12,12 +15,18 @@ public final class RemotePlayer
     private int figureID;
     private boolean bReady;
 
+    Coordinate startPos;
+    RobotView possessing;
+
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
     {
         this.playerID = playerID;
         this.playerName = playerName;
         this.figureID = figureID;
         this.bReady = bReady;
+
+        this.startPos = null;
+        this.possessing = new RobotView(this);
 
         return;
     }
@@ -58,6 +67,27 @@ public final class RemotePlayer
     {
         this.bReady = bReady;
         return;
+    }
+
+    public boolean hasStartingPosition()
+    {
+        return this.startPos != null;
+    }
+
+    public Coordinate getStartingPosition()
+    {
+        return this.startPos;
+    }
+
+    public void setStartingPosition(Coordinate startPos)
+    {
+        this.startPos = startPos;
+        return;
+    }
+
+    public RobotView getRobotView()
+    {
+        return this.possessing;
     }
 
 }

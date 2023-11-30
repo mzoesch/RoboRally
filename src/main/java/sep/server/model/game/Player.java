@@ -277,7 +277,7 @@ public class Player {
       }
     }
     if (isFull) {
-      //session.sendSelectionEndConfirmation()
+      session.sendSelectionFinished(playerController.getPlayerID());
     }
   }
 

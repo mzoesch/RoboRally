@@ -24,4 +24,5 @@ module sep
     exports sep.wrapper;
 
     exports sep.view.json;
+    exports sep.view.lib;
 }
