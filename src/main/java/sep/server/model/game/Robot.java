@@ -1,5 +1,7 @@
 package sep.server.model.game;
 
+import sep.server.json.game.effects.RebootModel;
+
 public class Robot {
   String direction;
   private final Course course;
@@ -17,11 +19,11 @@ public class Robot {
    * @return 1, wenn erfolgreich; 0, wenn nicht auf Course; -1, wenn besetzt; -2, wenn kein StartingPoint
    */
   public int validStartingPoint(int x, int y){
-    Tile choosenStart = course.getTileByNumbers(x,y);
-    if(choosenStart != null) {
-      if(choosenStart.isOccupied()){
+    Tile chosenStart = course.getTileByNumbers(x,y);
+    if(chosenStart != null) {
+      if(chosenStart.isOccupied()){
         return -1;
-      } else if(!choosenStart.isStartingPoint()){
+      } else if(!chosenStart.isStartingPoint()){
         return -2;
       }
       else
@@ -32,9 +34,9 @@ public class Robot {
     }
   }
    public void setStartingPoint(int x, int y){
-     Tile choosenStart = course.getTileByNumbers(x,y);
+     Tile chosenStart = course.getTileByNumbers(x,y);
      direction = course.getStartingDirection();
-     currentTile = choosenStart;
+     currentTile = chosenStart;
    }
 
   public String getDirection() {
@@ -56,7 +58,27 @@ public class Robot {
     return course;
   }
 
-  public void reboot() {}
+  public void reboot() {
+    for(Player player : GameState.gameMode.getPlayers()) {
+      if(this.equals(player.playerRobot) && GameState.gameMode.spamCardDeck.size() >= 2) {
+
+        for(Player player1 : GameState.gameMode.getPlayers()) {
+          new RebootModel(player1.getPlayerController().getClientInstance(),
+                  player.getPlayerController().getPlayerID()).send();
+        }
+
+        player.getDiscardPile().add(GameState.gameMode.spamCardDeck.get(0));
+        player.getDiscardPile().add(GameState.gameMode.spamCardDeck.get(0));
+
+        for (int i = 0; i < player.getRegisters().length; i++) {
+            player.getDiscardPile().add(player.getCardInRegister(i));
+            player.setCardInRegister(i,null);
+        }
+
+        //TODO finish
+      }
+    }
+  }
 
   public boolean isMovable(Tile targetTile) {
     if (targetTile.hasAntenna()){
