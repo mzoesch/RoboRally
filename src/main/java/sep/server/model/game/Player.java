@@ -33,6 +33,7 @@ public class Player {
     this.checkpointsCollected = 0;
     this.energyCollected = 5;
     this.upgradeCards = new ArrayList<>();
+    this.playerHand = new ArrayList<>();
   }
 
   public PlayerController getPlayerController() {
