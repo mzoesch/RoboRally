@@ -9,6 +9,8 @@ import sep.server.model.game.tiles.Coordinate;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.viewmodel.PlayerController;
 
+import sep.server.viewmodel.Session;
+
 public class Player {
   PlayerController playerController;
   Robot playerRobot;
@@ -20,6 +22,8 @@ public class Player {
   int checkpointsCollected;
   int energyCollected;
   ArrayList<AUpgradeCard> upgradeCards;
+  Session session;
+
 
   public Player(Course currentCourse) {
     this.playerRobot = new Robot(currentCourse);
@@ -145,6 +149,15 @@ public class Player {
     return handArray;
   }
 
+  public String[] getRegistersAsStringArray() {
+    String[] registersArray = new String[registers.length];
+    for (int i = 0; i < registers.length; i++) {
+      registersArray[i] = registers[i].toString();
+    }
+    return registersArray;
+  }
+
+
   /**
    * Moves the robot one tile based on the given direction.
    * Updates the robot's position.
@@ -241,9 +254,16 @@ public class Player {
 
   public void addCardToRegister(IPlayableCard card, int position) {
     if (position >= 0 && position < 4) {
-      registers[position] = card;
-      //session.sendKartenAuswahlBestätigen();
-      checkRegisterStatus();
+      IPlayableCard existingCard = registers[position];
+
+      if (card != null) {
+        registers[position] = card;
+        session.sendCardSelected(getPlayerController().getPlayerID(), position, true);
+        checkRegisterStatus();
+      } else if (card == null) {
+        registers[position] = null;
+        session.sendCardSelected(getPlayerController().getPlayerID(), position, false);
+      }
     }
   }
 
@@ -256,13 +276,38 @@ public class Player {
       }
     }
     if (isFull) {
-      //session.sendAuswahlBeenden();
+      //session.sendSelectionEndConfirmation()
     }
   }
 
+  public void handleIncompleteProgramming() {
 
+      discardPile.addAll(playerHand);
+      playerHand.clear();
+      shuffleAndRefillDeck();
 
-
-
+      for (int i = 0; i < registers.length; i++) {
+        if (registers[i] == null) {
+            registers[i] = playerDeck.remove(0);
+        }
+      }
+      session.sendCardsYouGotNow(getPlayerController(), getRegistersAsStringArray());
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

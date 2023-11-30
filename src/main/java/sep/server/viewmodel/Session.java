@@ -382,8 +382,8 @@ public final class Session
             notYourCardsModel.send();
 
             if (playerController == targetPlayerController) {
-                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(playerController.getClientInstance(),hand);
-                cardsYouGotNowModel.send();
+                YourCardsModel yourCardsModel = new YourCardsModel(playerController.getClientInstance(),hand);
+                yourCardsModel.send();
             }
         }
     }
@@ -413,6 +413,15 @@ public final class Session
         }
     }
 
+    public void sendCardsYouGotNow(PlayerController targetPlayerController,String[] hand ){
+        for (PlayerController playerController : this.playerControllers) {
+            if (playerController == targetPlayerController) {
+                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(playerController.getClientInstance(),hand);
+                cardsYouGotNowModel.send();
+            }
+        }
+    }
+
     public void sendTimerStarted() {
         for (PlayerController playerController : this.playerControllers) {
             TimerStartedModel timerStartedModel = new TimerStartedModel(playerController.getClientInstance());
@@ -429,6 +438,7 @@ public final class Session
             timerEndedModel.send();
         }
     }
+
 
 
 
