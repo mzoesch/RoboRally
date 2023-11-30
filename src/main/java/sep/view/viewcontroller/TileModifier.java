@@ -9,6 +9,7 @@ import javafx.scene.image.ImageView;
 import org.json.JSONArray;
 import javafx.scene.transform.Translate;
 import javafx.scene.transform.Rotate;
+import org.json.JSONException;
 
 public class TileModifier
 {
@@ -293,7 +294,15 @@ public class TileModifier
 
     private int getOrientationsCount()
     {
-        return this.tile.getJSONArray("orientations").length();
+        try
+        {
+            return this.tile.getJSONArray("orientations").length();
+        }
+        catch (JSONException e)
+        {
+           l.fatal(this.tile.toString(4));
+            throw new RuntimeException(e);
+        }
     }
 
     // endregion Getters and Setters
