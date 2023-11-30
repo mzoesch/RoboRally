@@ -1,9 +1,6 @@
 package sep.server.model.game;
 
-import sep.server.json.game.effects.EnergyModel;
-import sep.server.json.game.effects.MovementModel;
-import sep.server.json.game.effects.PlayerTurningModel;
-import sep.server.model.game.cards.upgrade.AUpgradeCard;
+import sep.server.json.game.effects.*;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
@@ -22,11 +19,10 @@ import org.json.JSONObject;
 public class GameMode
 {
     private final Course course;
-    int playerNum;
     ArrayList<Player> players;
     int energyBank;
-    AUpgradeCard[] upgradeShop;
     GameState gameState;
+    int availableCheckPoints;
 
 
     public GameMode(String course, PlayerController[] playerControllers)
@@ -37,7 +33,7 @@ public class GameMode
 
         //TODO hier Spieler erstellen; Roboter erstellen
         for(PlayerController pc : playerControllers){
-            players.add(new Player());
+            players.add(new Player(this.course));
         }
         /* Just temporary. This is for helping to develop the front-end. */
         for (PlayerController pc : playerControllers) {
@@ -64,6 +60,10 @@ public class GameMode
         return players;
     }
 
+    public void setAvailableCheckPoints(int availableCheckPoints) {
+        this.availableCheckPoints = availableCheckPoints;
+    }
+
     public void programmingPhase() {
         distributeCards(players);
     }
@@ -81,8 +81,8 @@ public class GameMode
             for(int j = 0; j < players.size(); currentRegister++) {
                 players.get(j).registers[currentRegister].playCard();
             }
-            activateConveyorBelt(2);
-            activateConveyorBelt(1);
+            activateConveyorBelts(2);
+            activateConveyorBelts(1);
             activatePushPanels(currentRegister);
             activateGears();
             shootBoardLasers();
@@ -90,6 +90,7 @@ public class GameMode
             checkEnergySpaces(currentRegister);
             checkCheckpoints();
         }
+        endRound();
     }
 
     /**
@@ -157,7 +158,7 @@ public class GameMode
      * The robot is moved in the outcoming flow direction of the conveyor belt.
      * @param speed determines the amount of fields the robot is moved
      */
-    private void activateConveyorBelt(int speed) {
+    private void activateConveyorBelts(int speed) {
         for (Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -169,9 +170,8 @@ public class GameMode
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                        Coordinate newCoordinate = oldCoordinate;
 
-                        newCoordinate = calculateNewCoordinate(speed, outDirection, oldCoordinate);
+                        Coordinate newCoordinate = calculateNewCoordinate(speed, outDirection, oldCoordinate);
 
                         if (!course.isCoordinateWithinBounds(newCoordinate)) {
                             player.getPlayerRobot().reboot();
@@ -186,7 +186,7 @@ public class GameMode
 
                         for(Player player1 : players) {
                             new MovementModel(player1.getPlayerController().getClientInstance(),
-                                    player1.getPlayerController().getPlayerID(),
+                                    player.getPlayerController().getPlayerID(),
                                     newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
                         }
                     }
@@ -213,9 +213,8 @@ public class GameMode
                         if(register == currentRegister) {
                             String pushOrientation = pushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
-                            Coordinate newCoordinate = oldCoordinate;
 
-                            newCoordinate = calculateNewCoordinate(1, pushOrientation, oldCoordinate);
+                            Coordinate newCoordinate = calculateNewCoordinate(1, pushOrientation, oldCoordinate);
 
                             if (!course.isCoordinateWithinBounds(newCoordinate)) {
                                 player.getPlayerRobot().reboot();
@@ -230,7 +229,7 @@ public class GameMode
 
                             for(Player player1 : players) {
                                 new MovementModel(player1.getPlayerController().getClientInstance(),
-                                        player1.getPlayerController().getPlayerID(),
+                                        player.getPlayerController().getPlayerID(),
                                         newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
                             }
                         }
@@ -274,7 +273,7 @@ public class GameMode
 
                     for(Player player1 : players) {
                         new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                player1.getPlayerController().getPlayerID(), rotationalDirection).send();
+                                player.getPlayerController().getPlayerID(), rotationalDirection).send();
                     }
                 }
             }
@@ -308,7 +307,7 @@ public class GameMode
 
                     for(Player player1 : players) {
                         new EnergyModel(player1.getPlayerController().getClientInstance(),
-                                player1.getPlayerController().getPlayerID(),
+                                player.getPlayerController().getPlayerID(),
                                 player.getEnergyCollected(),
                                 "EnergySpace").send();
                     }
@@ -316,7 +315,41 @@ public class GameMode
             }
         }
     }
-    public void checkCheckpoints() {}
+
+    /**
+     * The following method checks if any robot has reached a checkpoint. If yes, the method
+     * checks if it is the correct checkpoint according to numerical order. If it is the last
+     * checkpoint it ends the game. The method also sends the corresponding JSON message.
+     */
+    public void checkCheckpoints() {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof CheckPoint) {
+                    CheckPoint checkPoint = (CheckPoint) fieldType;
+                    int checkpointNumber = checkPoint.getCheckpointNumber();
+                    if(player.getCheckpointsCollected() == checkpointNumber-1) {
+                        player.setCheckpointsCollected(player.getCheckpointsCollected()+1);
+                    }
+
+                    for(Player player1 : players) {
+                        new CheckPointModel(player1.getPlayerController().getClientInstance(),
+                                player.getPlayerController().getPlayerID(),
+                                player.getCheckpointsCollected()).send();
+                    }
+
+                    if(player.getCheckpointsCollected() == availableCheckPoints) {
+                        endGame();
+                        for(Player player1 : players) {
+                            new GameFinishedModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID()).send();
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * The following method calculates the new coordinates for activating conveyor belts and push panels.
@@ -375,10 +408,10 @@ public class GameMode
 
     }
 
-
-
-
-
+    /**
+     * The following method is called whenever the activation phase is ended. It empties the registers
+     * and calls a method that refills the player deck.
+     */
     public void endRound() {
         for(int i = 0; i<5; i++) {
             for(Player player : players) {
@@ -387,11 +420,11 @@ public class GameMode
             }
         }
 
-        //TODO: check if game is finished
-
         for(Player player : players) {
             player.shuffleAndRefillDeck();
         }
     }
+
+    public void endGame() {}
 
 }
