@@ -373,16 +373,17 @@ public final class Session
 
 
     /**
-     * Sends a set of hand cards to a specified player controller and notifies other players
+     * Sends a set of hand cards to a specified player controller and notifies all players
      */
     public void sendHandCardsToPlayer(PlayerController targetPlayerController, String[] hand) {
         for (PlayerController playerController : this.playerControllers) {
+
+            NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), targetPlayerController.getPlayerID(), hand.length);
+            notYourCardsModel.send();
+
             if (playerController == targetPlayerController) {
                 CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(playerController.getClientInstance(),hand);
                 cardsYouGotNowModel.send();
-            } else {
-                NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), playerController.getPlayerID(), hand.length);
-                notYourCardsModel.send();
             }
         }
     }
