@@ -3,7 +3,7 @@ package sep.server.model.game;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sep.server.json.common.ErrorMsgModel;
-import sep.server.json.game.ActivePhaseModel;
+import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.GameStartedModel;
 import sep.server.json.game.effects.*;
 import sep.server.model.game.tiles.*;

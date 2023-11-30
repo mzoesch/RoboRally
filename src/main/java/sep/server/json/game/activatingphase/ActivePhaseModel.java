@@ -1,4 +1,4 @@
-package sep.server.json.game;
+package sep.server.json.game.activatingphase;
 
 import org.json.JSONObject;
 import sep.server.json.AModel;
