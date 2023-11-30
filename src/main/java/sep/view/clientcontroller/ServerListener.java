@@ -1,7 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
-import sep.view.viewcontroller.ViewLauncher;
+import sep.view.viewcontroller.ViewSupervisor;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -138,7 +138,7 @@ public class ServerListener implements Runnable
         if (Objects.equals(dsrp.getType_v2(), "ReceivedChat"))
         {
             l.debug("Received chat message from server.");
-            ViewLauncher.handleChatMessage(dsrp);
+            ViewSupervisor.handleChatMessage(dsrp);
             return;
         }
 
@@ -146,7 +146,7 @@ public class ServerListener implements Runnable
         {
             l.debug("Received player status update.");
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setReady(dsrp.isLobbyPlayerStatusReady());
-            ViewLauncher.updatePlayerStatus(dsrp);
+            ViewSupervisor.updatePlayerStatus(dsrp);
             return;
         }
 
@@ -154,7 +154,7 @@ public class ServerListener implements Runnable
         {
             l.debug("Received course selected from server.");
             EGameState.INSTANCE.setServerCourses(dsrp.getAvailableCourses());
-            ViewLauncher.updateAvailableCourses(true);
+            ViewSupervisor.updateAvailableCourses(true);
             return;
         }
 
@@ -162,7 +162,7 @@ public class ServerListener implements Runnable
         {
             l.debug("Received course selected from server.");
             EGameState.INSTANCE.setCurrentServerCourse(dsrp.getCourseName());
-            ViewLauncher.updateCourseSelected();
+            ViewSupervisor.updateCourseSelected();
             return;
         }
 
@@ -170,7 +170,7 @@ public class ServerListener implements Runnable
         if (Objects.equals(dsrp.getType_v2(), "GameStarted"))
         {
             l.debug("Received start game from server.");
-            ViewLauncher.startGame(dsrp.getGameCourse());
+            ViewSupervisor.startGame(dsrp.getGameCourse());
             return;
         }
 
@@ -205,7 +205,7 @@ public class ServerListener implements Runnable
         if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken")) {
             l.debug("Received starting point from server.");
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
-            ViewLauncher.updatePlayerPosition();
+            ViewSupervisor.updatePlayerPosition();
             return;
         }
 

@@ -3,7 +3,7 @@ package sep.view.scenecontrollers;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
-import sep.view.viewcontroller.ViewLauncher;
+import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.Coordinate;
 import sep.view.json.game.SetStartingPointModel;
 
@@ -49,7 +49,7 @@ public class GameJFXController
     {
         super();
 
-        this.tileDimensions = ViewLauncher.TILE_DIMENSIONS;
+        this.tileDimensions = ViewSupervisor.TILE_DIMENSIONS;
         this.bClickedOnTile = false;
 
         this.files = 0;
@@ -248,8 +248,8 @@ public class GameJFXController
         }
 
         // TODO Only works with rectangle courses
-        this.minXTranslation = this.tiles[0][0].getTranslateX() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_HORIZONTAL / 2;
-        this.maxXTranslation = this.tiles[this.files - 1][0].getTranslateX() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_HORIZONTAL / 2;
+        this.minXTranslation = this.tiles[0][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        this.maxXTranslation = this.tiles[this.files - 1][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
         this.centralXTranslation = ((this.courseScrollPane.getWidth() - this.maxXTranslation) - this.minXTranslation) / 2 - (double) this.tileDimensions / 2;
 
         return;
@@ -257,8 +257,8 @@ public class GameJFXController
 
     private void setStyleOfCourseViewContent()
     {
-        double viewWidth = this.files * this.tileDimensions + ViewLauncher.VIRTUAL_SPACE_HORIZONTAL;
-        double viewHeight = this.ranks * this.tileDimensions + ViewLauncher.VIRTUAL_SPACE_VERTICAL;
+        double viewWidth = this.files * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL;
+        double viewHeight = this.ranks * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_VERTICAL;
         this.courseScrollPaneContent.setStyle(String.format("-fx-background-color: #000000ff; -fx-min-width: %spx; -fx-min-height: %spx;", (int) viewWidth, (int) viewHeight));
 
         return;
@@ -268,9 +268,9 @@ public class GameJFXController
     {
         AP.getStyleClass().add("tile");
 
-        double xTranslation = c.getX() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_HORIZONTAL / 2;
+        double xTranslation = c.getX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
         AP.setTranslateX(this.centralXTranslation < 0 ? xTranslation : xTranslation + this.centralXTranslation);
-        AP.setTranslateY(c.getY() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_VERTICAL / 2);
+        AP.setTranslateY(c.getY() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
 
         if (!this.courseScrollPaneContent.getChildren().contains(AP))
         {

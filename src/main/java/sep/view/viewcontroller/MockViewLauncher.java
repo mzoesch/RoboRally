@@ -2,7 +2,6 @@ package sep.view.viewcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.clientcontroller.EGameState;
-import sep.view.clientcontroller.RemotePlayer;
 import sep.view.clientcontroller.EClientInformation;
 
 import org.apache.logging.log4j.LogManager;
@@ -957,7 +956,7 @@ public final class MockViewLauncher
             // endregion Course creation
 
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
-            ViewLauncher.updateCourseView();
+            ViewSupervisor.updateCourseView();
             EGameState.INSTANCE.setCurrentPhase(0);
             EGameState.INSTANCE.setCurrentPlayer(0);
 
@@ -966,7 +965,7 @@ public final class MockViewLauncher
 
         t.start();
 
-        ViewLauncher.run();
+        ViewSupervisor.run();
 
         l.info("Mock view killed.");
 

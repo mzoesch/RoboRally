@@ -42,7 +42,7 @@ public class RobotView
         this.position = c;
         if (bUpdateInView)
         {
-            ViewLauncher.updatePlayerPosition();
+            ViewSupervisor.updatePlayerPosition();
         }
         return;
     }
@@ -56,8 +56,8 @@ public class RobotView
     private void generateIMG()
     {
         this.IV = new ImageView();
-        this.IV.setFitHeight(( (GameJFXController) ViewLauncher.getSceneController().getCurrentController() ).getCurrentTileDimensions());
-        this.IV.setFitWidth(( (GameJFXController) ViewLauncher.getSceneController().getCurrentController() ).getCurrentTileDimensions());
+        this.IV.setFitHeight(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
+        this.IV.setFitWidth(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
         this.IV.setPreserveRatio(true);
         this.IV.setSmooth(true);
         this.IV.setCache(true);
@@ -82,7 +82,7 @@ public class RobotView
             this.generateIMG();
         }
 
-        ( (GameJFXController) ViewLauncher.getSceneController().getCurrentController() ).renderOnPosition(this.AP, this.position);
+        ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).renderOnPosition(this.AP, this.position);
 
         return;
     }
