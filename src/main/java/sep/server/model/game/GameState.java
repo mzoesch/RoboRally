@@ -91,6 +91,9 @@ public class GameState
     public void sendShuffle(Player player){
         session.sendShuffleCodingNotification(player.getPlayerController().getPlayerID());
     }
+
+
+
     // endregion Getters and Setters
 
 
