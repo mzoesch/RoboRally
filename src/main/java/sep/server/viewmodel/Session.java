@@ -8,6 +8,7 @@ import sep.server.json.lobby.PlayerReadyModel;
 import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
+import sep.server.json.game.programmingphase.SelectionFinishedModel;
 
 
 import java.util.ArrayList;
@@ -440,8 +441,8 @@ public final class Session
 
     public void sendSelectionFinished(int playerID) {
         for (PlayerController playerController : this.playerControllers) {
-            //NOCH AUSFÜLLEN; JEDOCH IST DAS JSON-OBEKT SELECTIONFINISHED NOCH UNTER VIEW ABGESPEICHERT
-
+            SelectionFinishedModel selectionFinishedModel = new SelectionFinishedModel(playerController.getClientInstance(), playerID);
+            selectionFinishedModel.send();
         }
     }
 
