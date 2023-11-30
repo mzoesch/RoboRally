@@ -9,7 +9,6 @@ import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
 
-import sep.server.model.game.cards.*;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -436,6 +435,13 @@ public final class Session
         for (PlayerController playerController : this.playerControllers) {
             TimerEndedModel timerEndedModel = new TimerEndedModel(playerController.getClientInstance(), playerIDS);
             timerEndedModel.send();
+        }
+    }
+
+    public void sendSelectionFinished(int playerID) {
+        for (PlayerController playerController : this.playerControllers) {
+            //NOCH AUSFÜLLEN; JEDOCH IST DAS JSON-OBEKT SELECTIONFINISHED NOCH UNTER VIEW ABGESPEICHERT
+
         }
     }
 
