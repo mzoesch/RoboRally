@@ -59,6 +59,8 @@ public class GameMode
         virusCardDeck = deckBuilder.buildVirusDeck();
         wormDamageDeck = deckBuilder.buildWormDeck();
 
+        setAvailableCheckPoints(courseName);
+
         this.players = new ArrayList<>();
         for(PlayerController pc : playerControllers)
         {
@@ -165,8 +167,12 @@ public class GameMode
         }
         return true;
     }
-    public void setAvailableCheckPoints(int availableCheckPoints) {
-        this.availableCheckPoints = availableCheckPoints;
+    public void setAvailableCheckPoints(String courseName) {
+        switch(courseName) {
+            case ("DizzyHighway") -> {
+                availableCheckPoints = 1;
+            }
+        }
     }
 
     public void programmingPhase() {
