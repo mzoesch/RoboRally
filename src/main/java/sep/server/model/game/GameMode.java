@@ -81,8 +81,8 @@ public class GameMode
             for(int j = 0; j < players.size(); currentRegister++) {
                 players.get(j).registers[currentRegister].playCard();
             }
-            activateConveyorBelt(2);
-            activateConveyorBelt(1);
+            activateConveyorBelts(2);
+            activateConveyorBelts(1);
             activatePushPanels(currentRegister);
             activateGears();
             shootBoardLasers();
@@ -158,7 +158,7 @@ public class GameMode
      * The robot is moved in the outcoming flow direction of the conveyor belt.
      * @param speed determines the amount of fields the robot is moved
      */
-    private void activateConveyorBelt(int speed) {
+    private void activateConveyorBelts(int speed) {
         for (Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -170,9 +170,8 @@ public class GameMode
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                        Coordinate newCoordinate = oldCoordinate;
 
-                        newCoordinate = calculateNewCoordinate(speed, outDirection, oldCoordinate);
+                        Coordinate newCoordinate = calculateNewCoordinate(speed, outDirection, oldCoordinate);
 
                         if (!course.isCoordinateWithinBounds(newCoordinate)) {
                             player.getPlayerRobot().reboot();
@@ -214,9 +213,8 @@ public class GameMode
                         if(register == currentRegister) {
                             String pushOrientation = pushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
-                            Coordinate newCoordinate = oldCoordinate;
 
-                            newCoordinate = calculateNewCoordinate(1, pushOrientation, oldCoordinate);
+                            Coordinate newCoordinate = calculateNewCoordinate(1, pushOrientation, oldCoordinate);
 
                             if (!course.isCoordinateWithinBounds(newCoordinate)) {
                                 player.getPlayerRobot().reboot();
