@@ -34,7 +34,6 @@ public class GameMode
     Player currentPlayer; //aktuell nur in setup-phase benutzt
 
     int energyBank;
-    static GameState gameState;
     int availableCheckPoints;
     ArrayList<SpamDamage> spamCardDeck;
     ArrayList<TrojanHorseDamage> trojanCardDeck;
@@ -152,7 +151,7 @@ public class GameMode
     }
 
     public void startTimer() {
-        gameState.sendStartTimer();
+        this.session.getGameState().sendStartTimer();
 
         try {
             Thread.sleep(30000); //30 sekunden
@@ -172,7 +171,7 @@ public class GameMode
             playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
         }
 
-       gameState.sendStopTimer(playerIdWhoNotFinished);
+        this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
     }
 
 
@@ -642,13 +641,13 @@ public class GameMode
             for (int i = 0; i < 9; i++) {
                 if (player.getPlayerDeck().isEmpty()) {
                     player.shuffleAndRefillDeck();
-                    gameState.sendShuffle(player);
+                    this.session.getGameState().sendShuffle(player);
                 }
                 IPlayableCard card = player.getPlayerDeck().remove(0);
                 player.getPlayerHand().add(card);
             }
 
-            gameState.sendHandCards(player);
+            this.session.getGameState().sendHandCards(player);
         }
 
     }
