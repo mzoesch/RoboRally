@@ -22,7 +22,7 @@ public class StartingPointModel extends AModel {
         JSONObject body = new JSONObject();
         body.put("x", this.x);
         body.put("y", this.y);
-        body.put("cientID", this.playerID);
+        body.put("clientID", this.playerID);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "StartingPointTaken");
