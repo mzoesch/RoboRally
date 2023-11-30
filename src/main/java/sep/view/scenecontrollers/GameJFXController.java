@@ -227,17 +227,16 @@ public class GameJFXController
      * */
     private void updateGlobalVariables()
     {
-
-        /* This is not safe at all. This only works with rectangle courses. */
-        this.files = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
-        this.ranks = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
+        /* We can do this because even if there is no tile, it must always be annotated with a null json object. */
+        this.files = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
+        this.ranks = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
 
         this.tiles = new Tile[this.files][this.ranks];
         for (int i = 0; i < this.files; i++)
         {
             for (int j = 0; j < this.ranks; j++)
             {
-                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(j).getJSONArray(i));
+                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(i).getJSONArray(j));
                 t.setTranslateX(i);
                 t.setTranslateY(j);
                 tiles[i][j] = t;
