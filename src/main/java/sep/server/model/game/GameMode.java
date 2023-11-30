@@ -16,6 +16,7 @@ import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.game.cards.damage.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import org.json.JSONObject;
@@ -31,7 +32,7 @@ public class GameMode
     private final Course course;
     ArrayList<Player> players;
     int energyBank;
-    GameState gameState;
+    static GameState gameState;
     int availableCheckPoints;
 
     int gamePhase = 0; //0 => Aufbauphase, 1 => Upgradephase, 2 => Programmierphase, 3 => Aktivierungsphase
@@ -42,6 +43,8 @@ public class GameMode
     ArrayList<WormDamage> wormDamageDeck;
 
     Player currentPlayer; //aktuell nur in setup-phase benutzt
+
+
 
 
 
@@ -170,6 +173,32 @@ public class GameMode
     public void programmingPhase() {
         distributeCards(players);
     }
+
+    public void startTimer() {
+        gameState.sendStartTimer();
+
+        try {
+            Thread.sleep(30000); //30 sekunden
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        int[] playerIdWhoNotFinished = new int[players.size()];
+        int index = 0;
+
+        for (Player player : players) {
+            if (!player.checkRegisterStatus()) {
+                playerIdWhoNotFinished[index++] = player.getPlayerController().getPlayerID();
+            }
+        }
+        if (index < players.size()) {
+            playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
+        }
+
+       gameState.sendStopTimer(playerIdWhoNotFinished);
+    }
+
+
 
     /**
      * The following method handles the activation phase: it iterates over the different registers and
@@ -534,8 +563,7 @@ public class GameMode
         return new Object[] {currentRegisterIndex, newCard, clientID};
     }*/
 
-    public void distributeCards(ArrayList<Player> players)
-    {
+    public void distributeCards(ArrayList<Player> players) {
         for (Player player : players) {
             for (int i = 0; i < 9; i++) {
                 if (player.getPlayerDeck().isEmpty()) {

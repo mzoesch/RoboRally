@@ -92,6 +92,14 @@ public class GameState
         session.sendShuffleCodingNotification(player.getPlayerController().getPlayerID());
     }
 
+    public void sendStartTimer(){
+        session.sendTimerStarted();
+    }
+
+    public void sendStopTimer(int[] playerIDS) {
+        session.sendTimerEnded(playerIDS);
+    }
+
     public void setStartingPoint(PlayerController playerController, int x, int y){
         gameMode.setStartingPoint(playerController, x,y);
     }

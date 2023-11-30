@@ -253,6 +253,12 @@ public class Player {
     robot.setDirection(newDirection);
   }
 
+  /**
+   * Adds a playable card to the specified register position.
+   * If a card is added, it sends a notification to the session about the card selection,
+   * and if all registers are full after the addition, it notifies the session that the selection is finished.
+   * If a card is removed (set to null), it also sends a notification about the card deselection.
+   */
   public void addCardToRegister(IPlayableCard card, int position) {
     if (position >= 0 && position < 4) {
       IPlayableCard existingCard = registers[position];
@@ -260,7 +266,9 @@ public class Player {
       if (card != null) {
         registers[position] = card;
         session.sendCardSelected(getPlayerController().getPlayerID(), position, true);
-        checkRegisterStatus();
+        if (checkRegisterStatus()){
+          session.sendSelectionFinished(playerController.getPlayerID());
+        }
       } else if (card == null) {
         registers[position] = null;
         session.sendCardSelected(getPlayerController().getPlayerID(), position, false);
@@ -268,7 +276,11 @@ public class Player {
     }
   }
 
-  public void checkRegisterStatus() {
+  /**
+   * Checks the current status of the player's registers.
+   * @return true if all registers are full, otherwise false.
+   */
+  public boolean checkRegisterStatus() {
     boolean isFull = true;
     for (IPlayableCard card : registers) {
       if (card == null) {
@@ -277,7 +289,9 @@ public class Player {
       }
     }
     if (isFull) {
-      session.sendSelectionFinished(playerController.getPlayerID());
+      return true;
+    } else {
+      return false;
     }
   }
 
