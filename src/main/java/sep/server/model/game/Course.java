@@ -63,6 +63,16 @@ public class Course {
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
     }
 
+    public Tile getTileByNumbers(int x, int y){
+        try{
+            return course.get(x).get(y);
+        }
+        catch(ArrayIndexOutOfBoundsException e){
+            return null;
+        }
+    }
+
+
     public Tile getTopNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getTopNeighbor();
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
@@ -81,6 +91,10 @@ public class Course {
     public Tile getLeftNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getLeftNeighbor();
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+    }
+
+    public String getStartingDirection() {
+        return startingDirection;
     }
 
     public ArrayList<ArrayList<Tile>> getCourse() {

@@ -41,6 +41,19 @@ public class Tile {
         return fieldTypes;
     }
 
+    public boolean isOccupied(){
+        return occupiedBy != null;
+    }
+
+    public boolean isStartingPoint(){
+        for (FieldType fieldType : fieldTypes) {
+            if (fieldType instanceof StartPoint) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Checks if the tile contains  an antenna.
      * Returns true if any type is an instance of Antenna, otherwise returns false.
