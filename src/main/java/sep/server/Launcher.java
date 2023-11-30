@@ -26,10 +26,10 @@ public final class Launcher
      * The Server Instance is created here.
      *
      * @param args Invalid arguments will be ignored. Valid program arguments are:
-     *             <ul>
+     *              <ul>
      *              <li>[--port PORT] - The port number to listen on. Default is
      *                                  {@link sep.EPort#DEFAULT EPort.DEFAULT}.
-     *             </ul>
+     *              </ul>
      */
     public static void main(String[] args)
     {

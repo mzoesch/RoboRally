@@ -1,4 +1,4 @@
-package sep.view.json.game;
+package sep.server.json.game.programmingphase;
 
 import org.json.JSONObject;
 import sep.view.json.AServerRequestModel;
