@@ -91,7 +91,7 @@ public class GameMode
         for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
             determinePriorities();
             sortPlayersByPriority(currentRegister);
-            determineCurrentCards(currentRegister);
+            /*determineCurrentCards(currentRegister);*/
             for(int j = 0; j < players.size(); currentRegister++) {
                 players.get(j).registers[currentRegister].playCard();
             }
@@ -151,11 +151,7 @@ public class GameMode
         players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
-    /**
-     * The following method determines the current card that each player holds in the currently active register.
-     * @return client ID and card type as String
-     */
-    public HashMap<Integer, String> determineCurrentCards(int currentRegisterIndex) {
+    /*public HashMap<Integer, String> determineCurrentCards(int currentRegisterIndex) {
         //TODO adjust to JSON wrapper class once created
         HashMap<Integer, String> currentCards = new HashMap<>();
 
@@ -165,7 +161,7 @@ public class GameMode
         }
 
         return currentCards;
-    }
+    }*/
 
     /**
      * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
@@ -184,8 +180,12 @@ public class GameMode
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                        Coordinate newCoordinate = null;
 
-                        Coordinate newCoordinate = calculateNewCoordinate(speed, outDirection, oldCoordinate);
+                        for(int i = 0; i<speed; i++) {
+                            newCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                            curvedArrowCheck(player, newCoordinate);
+                        }
 
                         if (!course.isCoordinateWithinBounds(newCoordinate)) {
                             player.getPlayerRobot().reboot();
@@ -202,6 +202,35 @@ public class GameMode
                             new MovementModel(player1.getPlayerController().getClientInstance(),
                                     player.getPlayerController().getPlayerID(),
                                     newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method is required during the conveyor belt activation period.
+     * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
+     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
+     * with the outcoming flow direction. If yes, the direction of the robot is changed accordingly.
+     * @param player Owner of the current robot
+     * @param coordinate Coordinate of the new tile the robot moved onto
+     */
+    public void curvedArrowCheck(Player player, Coordinate coordinate) {
+        Tile newTile = course.getTileByCoordinate(coordinate);
+        for(FieldType newFieldType : newTile.getFieldTypes()) {
+            if(newFieldType instanceof ConveyorBelt) {
+                ConveyorBelt newConveyorBelt = (ConveyorBelt) newFieldType;
+                String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
+                String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
+                if(newInDirection != null && newOutDirection != null) {
+                    for(String direction : newInDirection) {
+                        switch(newOutDirection) {
+                            case("top") -> player.getPlayerRobot().setDirection("NORTH");
+                            case("right") -> player.getPlayerRobot().setDirection("EAST");
+                            case("bottom") -> player.getPlayerRobot().setDirection("SOUTH");
+                            case("left") -> player.getPlayerRobot().setDirection("WEST");
                         }
                     }
                 }
@@ -228,7 +257,7 @@ public class GameMode
                             String pushOrientation = pushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
 
-                            Coordinate newCoordinate = calculateNewCoordinate(1, pushOrientation, oldCoordinate);
+                            Coordinate newCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
 
                             if (!course.isCoordinateWithinBounds(newCoordinate)) {
                                 player.getPlayerRobot().reboot();
@@ -367,33 +396,26 @@ public class GameMode
 
     /**
      * The following method calculates the new coordinates for activating conveyor belts and push panels.
-     * @param distance amount of fields the robot is moved
      * @param orientation direction the robot is moved to
      * @param oldCoordinate coordinates of the current push panel pushing a robot
      * @return
      */
-    public Coordinate calculateNewCoordinate(int distance, String orientation, Coordinate oldCoordinate) {
+    public Coordinate calculateNewCoordinate(String orientation, Coordinate oldCoordinate) {
         Coordinate newCoordinate = null;
         switch (orientation) {
-            case "NORTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
-                    oldCoordinate.getYCoordinate() - distance);
-            case "EAST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + distance,
+            case "top" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() - 1);
+            case "right" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + 1,
                     oldCoordinate.getYCoordinate());
-            case "SOUTH" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
-                    oldCoordinate.getYCoordinate() + distance);
-            case "WEST" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - distance,
+            case "bottom" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() + 1);
+            case "left" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - 1,
                     oldCoordinate.getYCoordinate());
         }
         return newCoordinate;
     }
 
-    /**
-     * The following method is used whenever the current player's card in the currently active register needs to be
-     * replaced by the top card of the player deck.
-     * @return array that holds current register, new card that is now placed in the current register and ID of player
-     *  that is replacing cards
-     */
-    public Object[] replaceCardInRegister(int currentRegisterIndex, int currentPlayerIndex) {
+    /*public Object[] replaceCardInRegister(int currentRegisterIndex, int currentPlayerIndex) {
         //TODO adjust to JSON wrapper class once created
         Player player = players.get(currentPlayerIndex);
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
@@ -403,7 +425,7 @@ public class GameMode
         player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile);
 
         return new Object[] {currentRegisterIndex, newCard, clientID};
-    }
+    }*/
 
     public void distributeCards(ArrayList<Player> players)
     {
