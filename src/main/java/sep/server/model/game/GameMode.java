@@ -1,5 +1,6 @@
 package sep.server.model.game;
 
+import sep.server.json.game.ActivePhaseModel;
 import sep.server.json.game.effects.*;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
@@ -83,11 +84,17 @@ public class GameMode
     }
 
     /**
-     * The following method handles the activation phase: it iterates over the different registers and
-     * plays the current card for each player (players are sorted by priority). Once each player's
-     * card has been played the board elements activate and the robot lasers are shot.
+     * The following method handles the activation phase: It sends the corresponding JSON message.
+     * It iterates over the different registers and plays the current card for each player
+     * (players are sorted by priority). Once each player's card has been played the board
+     * elements activate and the robot lasers are shot.
      */
     public void activationPhase() {
+        for(Player player : players) {
+            new ActivePhaseModel(player.getPlayerController().getClientInstance(),
+                    3).send();
+        }
+
         for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
             determinePriorities();
             sortPlayersByPriority(currentRegister);
