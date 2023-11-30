@@ -229,6 +229,13 @@ public final class ClientInstance implements Runnable
         if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint")) {
             l.debug("Received starting point from client.");
             // TODO Here call Game to for logic and affirm the starting point.
+
+            /* To be deleted. */
+            for (PlayerController pc : this.playerController.getSession().getGameState().getAuthGameMode().getPlayerControllers())
+            {
+                pc.getClientInstance().sendMockJSON(new JSONObject(String.format("{\"messageType\":\"StartingPointTaken\",\"messageBody\":{\"clientID\":\"%s\",\"x\":\"%s\",\"y\":\"%s\"}}", this.getPlayerController().getPlayerID(), dcrp.getPosX(), dcrp.getPosY())));
+            }
+
             return true;
         }
 
