@@ -250,7 +250,8 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         board.add(arrayListY);
-        fieldtypes = new ArrayList<>();
+        arrayListY = new ArrayList<>();
+
         // (1,0)
         fieldtypes.add(new Empty());
         arrayListY.add(new Tile("StartA",new Coordinate(1,0), fieldtypes));
