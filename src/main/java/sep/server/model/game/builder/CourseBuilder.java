@@ -19,14 +19,14 @@ public class CourseBuilder {
      * @param courseName Name des Spielfelds
      * @return komplettes Spielfeld als ArrayList<ArrayList<Tile>>
      */
-    public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
+    public  ArrayList<ArrayList<Tile>> buildCourse(String name){
+        String courseName = name.trim();
         switch(courseName){
             case("DizzyHighway") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
                 settingCoordinates(entireCourse);
-                GameState.gameMode.setAvailableCheckPoints(1);
                 return entireCourse;
             }
             case("Test") -> {
@@ -38,7 +38,6 @@ public class CourseBuilder {
         ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
         ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
         settingCoordinates(entireCourse);
-        GameState.gameMode.setAvailableCheckPoints(1);
         return entireCourse;
 
     }
