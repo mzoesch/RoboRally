@@ -40,8 +40,16 @@ public class GameState
     {
         l.info("Creating Game Mode.");
 
+        //Erstellen des Spiels
         this.bGameStarted = true;
         this.gameMode = new GameMode(this.courseName, playerControllers);
+
+        //TODO an alle Clients schicken:
+        //send Map
+        //set activePhase
+        //set setActivePlayer
+        //
+
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
 

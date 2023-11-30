@@ -7,11 +7,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class DeckBuilder {
-    public ArrayList<IPlayableCard> DeckBuilder(){
-        return buildProgrammingDeck();
+    public void DeckBuilder(){
+
     }
 
-    private ArrayList<IPlayableCard> buildProgrammingDeck(){
+    public ArrayList<IPlayableCard> buildProgrammingDeck(){
         ArrayList<IPlayableCard> deck = new ArrayList<>();
 
         for(int i = 0; i < 5; i++){

@@ -1,6 +1,6 @@
 package sep.server.model.game;
 
-import sep.server.model.game.courseBuilder.CourseBuilder;
+import sep.server.model.game.builder.CourseBuilder;
 import sep.server.model.game.tiles.*;
 import java.util.ArrayList;
 
