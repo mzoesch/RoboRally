@@ -64,5 +64,7 @@ public class DefaultClientRequestParser
     {
         return this.request.getJSONObject("messageBody").get("y");
     }
+    public int getXCoordinate(){ return this.request.getJSONObject("messageBody").getInt("x");}
 
+    public int getYCoordinate(){ return this.request.getJSONObject("messageBody").getInt("y");}
 }
