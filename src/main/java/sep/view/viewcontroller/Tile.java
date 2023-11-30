@@ -103,4 +103,9 @@ public class Tile
         return false;
     }
 
+    public static Image getRobotImage(int figureID)
+    {
+        return TileModifier.getImage(String.format("Robot_%d", figureID));
+    }
+
 }
