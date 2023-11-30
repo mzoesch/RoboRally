@@ -90,6 +90,7 @@ public class GameMode
             checkEnergySpaces(currentRegister);
             checkCheckpoints();
         }
+        endRound();
     }
 
     /**
@@ -344,7 +345,7 @@ public class GameMode
                         endGame();
                         for(Player player1 : players) {
                             new GameFinishedModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID());
+                                    player.getPlayerController().getPlayerID()).send();
                         }
                     }
                 }
@@ -409,6 +410,10 @@ public class GameMode
 
     }
 
+    /**
+     * The following method is called whenever the activation phase is ended. It empties the registers
+     * and calls a method that refills the player deck.
+     */
     public void endRound() {
         for(int i = 0; i<5; i++) {
             for(Player player : players) {
