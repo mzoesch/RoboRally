@@ -244,6 +244,16 @@ public class ServerListener implements Runnable
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "CurrentCards")) {
+            l.debug("Received your current cards from server.");
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "ReplaceCard")) {
+            l.debug("Received replacing card from server.");
+            return;
+        }
+
         if (Objects.equals(dsrp.getType_v2(), "Animation")) {
             l.debug("Received animation from server.");
             return;
