@@ -1,7 +1,10 @@
 package sep.server.json.game;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.json.AModel;
 import sep.server.model.game.Course;
+import sep.server.model.game.GameState;
 import sep.server.model.game.Tile;
 import sep.server.viewmodel.ClientInstance;
 
@@ -12,7 +15,8 @@ import java.util.ArrayList;
 
 public class GameStartedModel extends AModel
 {
-    final ArrayList<ArrayList<Tile>> course;
+    private static final Logger l = LogManager.getLogger(GameState.class);
+    ArrayList<ArrayList<Tile>> course;
     public GameStartedModel(ClientInstance ci, ArrayList<ArrayList<Tile>> course)
     {
         super(ci);
@@ -34,8 +38,6 @@ public class GameStartedModel extends AModel
             for(int k = 0; k < course.get(i).size(); k++){
                 JSONArray tileInfo = course.get(i).get(k).toJSON();
                 arrayListY.put(tileInfo);
-                //arrayListY.put(i);
-                //arrayListY.put(k);
 
             }
             arrayListX.put(arrayListY);
@@ -45,7 +47,8 @@ public class GameStartedModel extends AModel
         body.put("gameMap", arrayListX);
         courseJson.put("messageType", "GameStarted");
         courseJson.put("messageBody", body);
-
+        l.debug("built JSON for Course");
+        l.debug(courseJson);
         return courseJson;
     }
 /*

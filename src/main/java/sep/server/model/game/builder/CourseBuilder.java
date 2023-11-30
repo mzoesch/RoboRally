@@ -33,7 +33,14 @@ public class CourseBuilder {
                 return buildBoard("Test");
             }
         }
-        return null;
+        //TODO Notlösung, da aktuell noch kein courseName übergeben wird
+        ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+        ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
+        ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
+        settingCoordinates(entireCourse);
+        GameState.gameMode.setAvailableCheckPoints(1);
+        return entireCourse;
+
     }
 
     /**

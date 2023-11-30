@@ -1,5 +1,7 @@
 package sep.server.model.game;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.model.game.builder.CourseBuilder;
 import sep.server.model.game.tiles.*;
 import java.util.ArrayList;
@@ -9,7 +11,8 @@ import java.util.ArrayList;
  */
 public class Course {
 
-    private final ArrayList<ArrayList<Tile>> course;
+    private static final Logger l = LogManager.getLogger(GameState.class);
+    private ArrayList<ArrayList<Tile>> course;
 
     private String startingDirection;
 
@@ -19,6 +22,7 @@ public class Course {
      * @param courseName Name des entsprechenden Spielfelds
      */
     public Course(String courseName) {
+        super();
         CourseBuilder courseBuilder = new CourseBuilder();
         course = courseBuilder.buildCourse(courseName);
         startingDirection = courseBuilder.getStartingPosition(courseName);
@@ -99,5 +103,9 @@ public class Course {
 
     public ArrayList<ArrayList<Tile>> getCourse() {
         return course;
+    }
+
+    public Course getThis(){
+        return this;
     }
 }

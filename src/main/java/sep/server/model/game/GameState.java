@@ -36,19 +36,13 @@ public class GameState
         return;
     }
 
-    public void startGame(PlayerController[] playerControllers /* etc. config */)
+    public void startGame(PlayerController[] playerControllers)
     {
         l.info("Creating Game Mode.");
 
         //Erstellen des Spiels
         this.bGameStarted = true;
-        this.gameMode = new GameMode(this.courseName, playerControllers);
-
-        //TODO an alle Clients schicken:
-        //send Map
-        //set activePhase
-        //set setActivePlayer
-        //
+        gameMode = new GameMode(this.courseName, playerControllers);
 
 
         l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
@@ -81,7 +75,7 @@ public class GameState
     public void setCourseName(String courseName)
     {
         this.courseName = courseName;
-        return;
+        l.info("CourseName set to: " + courseName);
     }
 
     public void sendHandCards(Player player) {
@@ -99,6 +93,7 @@ public class GameState
 
 
     // endregion Getters and Setters
+
 
 
 }

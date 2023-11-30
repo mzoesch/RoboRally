@@ -46,11 +46,11 @@ public class GameMode
 
 
 
-    public GameMode(String course, PlayerController[] playerControllers)
+    public GameMode(String courseName, PlayerController[] playerControllers)
     {
         super();
 
-        this.course = new Course(course);
+        this.course = new Course(courseName);
         this.gamePhase = 0;
 
         DeckBuilder deckBuilder = new DeckBuilder();
