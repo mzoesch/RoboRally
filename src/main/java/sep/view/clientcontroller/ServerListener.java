@@ -204,6 +204,8 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken")) {
             l.debug("Received starting point from server.");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
+            ViewLauncher.updatePlayerPosition();
             return;
         }
 
