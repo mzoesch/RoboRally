@@ -92,6 +92,10 @@ public class GameState
         session.sendShuffleCodingNotification(player.getPlayerController().getPlayerID());
     }
 
+    public void setStartingPoint(PlayerController playerController, int x, int y){
+        gameMode.setStartingPoint(playerController, x,y);
+    }
+
 
 
     // endregion Getters and Setters
