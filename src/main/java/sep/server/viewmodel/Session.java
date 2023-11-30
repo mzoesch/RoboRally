@@ -373,16 +373,17 @@ public final class Session
 
 
     /**
-     * Sends a set of hand cards to a specified player controller and notifies other players
+     * Sends a set of hand cards to a specified player controller and notifies all players
      */
     public void sendHandCardsToPlayer(PlayerController targetPlayerController, String[] hand) {
         for (PlayerController playerController : this.playerControllers) {
+
+            NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), targetPlayerController.getPlayerID(), hand.length);
+            notYourCardsModel.send();
+
             if (playerController == targetPlayerController) {
                 CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(playerController.getClientInstance(),hand);
                 cardsYouGotNowModel.send();
-            } else {
-                NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), playerController.getPlayerID(), hand.length);
-                notYourCardsModel.send();
             }
         }
     }
@@ -396,6 +397,36 @@ public final class Session
         for (PlayerController playerController : this.playerControllers) {
             ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(playerController.getClientInstance(), playerID);
             shuffleCodingModel.send();
+        }
+    }
+
+
+    /**
+     * @param playerID The player ID of the player who made the selection
+     * @param register The register of the selection
+     * @param filled true for placed, false for removed
+     */
+    public void sendCardSelected(int playerID, int register, boolean filled) {
+        for (PlayerController playerController : this.playerControllers) {
+            CardSelectedModel cardSelectedModel = new CardSelectedModel(playerController.getClientInstance(), playerID, register, filled);
+            cardSelectedModel.send();
+        }
+    }
+
+    public void sendTimerStarted() {
+        for (PlayerController playerController : this.playerControllers) {
+            TimerStartedModel timerStartedModel = new TimerStartedModel(playerController.getClientInstance());
+            timerStartedModel.send();
+        }
+    }
+
+    /**
+     * @param playerIDS An array of player IDs who  have responded too slowly
+     */
+    public void sendTimerEnded(int[] playerIDS) {
+        for (PlayerController playerController : this.playerControllers) {
+            TimerEndedModel timerEndedModel = new TimerEndedModel(playerController.getClientInstance(), playerIDS);
+            timerEndedModel.send();
         }
     }
 
