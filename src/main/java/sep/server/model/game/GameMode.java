@@ -3,12 +3,14 @@ package sep.server.model.game;
 import sep.server.json.game.effects.EnergyModel;
 import sep.server.json.game.effects.MovementModel;
 import sep.server.json.game.effects.PlayerTurningModel;
+import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.json.game.MockGameStartedModel;
 import sep.server.model.game.cards.Card;
+import sep.server.model.game.cards.damage.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,12 +30,24 @@ public class GameMode
     AUpgradeCard[] upgradeShop;
     GameState gameState;
 
+    ArrayList<SpamDamage> spamCardDeck;
+    ArrayList<TrojanHorseDamage> trojanCardDeck;
+    ArrayList<VirusDamage> virusCardDeck;
+    ArrayList<WormDamage> wormDamageDeck;
+
+
+
 
     public GameMode(String course, PlayerController[] playerControllers)
     {
         super();
 
         this.course = new Course(course);
+        DeckBuilder deckBuilder = new DeckBuilder();
+        spamCardDeck = deckBuilder.buildSpamDeck();
+        trojanCardDeck = deckBuilder.buildTrojanDeck();
+        virusCardDeck = deckBuilder.buildVirusDeck();
+        wormDamageDeck = deckBuilder.buildWormDeck();
 
         //TODO hier Spieler erstellen; Roboter erstellen
         for(PlayerController pc : playerControllers){
