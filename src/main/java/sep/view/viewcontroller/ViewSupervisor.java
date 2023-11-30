@@ -17,29 +17,27 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * This class is responsible for launching the JavaFX application.
- * // TODO We may want to rename this class again :). Because it will handle more than just launching the view.
- *         It will also handle updating the view. This class should be the interface between the view and the JSON
- *         parser, {@link #updatePlayerSelection()} as an example.
+ * This class is responsible for launching the JavaFX application and is
+ * the gate-way from outside the JavaFX thread to the JavaFX thread.
  */
-public final class ViewLauncher extends Application
+public final class ViewSupervisor extends Application
 {
-    private static final Logger l = LogManager.getLogger(ViewLauncher.class);
+    private static final Logger l = LogManager.getLogger(ViewSupervisor.class);
 
     /** This instance is only valid on the JFX thread. */
-    private static ViewLauncher INSTANCE;
+    private static ViewSupervisor INSTANCE;
     private SceneController sceneController;
 
-    public static final int TILE_DIMENSIONS = 128;
+    public static final int TILE_DIMENSIONS = 96;
     public static final int VIRTUAL_SPACE_VERTICAL = 128;
     public static final int VIRTUAL_SPACE_HORIZONTAL = 128;
 
-    public ViewLauncher()
+    public ViewSupervisor()
     {
         super();
 
         l.debug("Creating View Launcher instance.");
-        ViewLauncher.INSTANCE = this;
+        ViewSupervisor.INSTANCE = this;
         return;
     }
 
@@ -78,7 +76,7 @@ public final class ViewLauncher extends Application
 
     public static <T> void handleChatMessage(DefaultServerRequestParser dsrp)
     {
-        T ctrl = ViewLauncher.getSceneController().getCurrentController();
+        T ctrl = ViewSupervisor.getSceneController().getCurrentController();
 
         // TODO Here than cast to the game ctrl etc.
 
@@ -94,7 +92,7 @@ public final class ViewLauncher extends Application
 
     public static <T> void updatePlayerStatus(DefaultServerRequestParser dsrp)
     {
-        T ctrl = ViewLauncher.getSceneController().getCurrentController();
+        T ctrl = ViewSupervisor.getSceneController().getCurrentController();
 
         if (ctrl instanceof LobbyJFXController_v2 lCtrl)
         {
@@ -109,7 +107,7 @@ public final class ViewLauncher extends Application
     public static void startGame(JSONArray course)
     {
         EGameState.INSTANCE.setCurrentServerCourseJSON(course);
-        ViewLauncher.INSTANCE.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
+        ViewSupervisor.INSTANCE.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
         return;
     }
     
@@ -118,13 +116,13 @@ public final class ViewLauncher extends Application
     {
         try
         {
-            if (ViewLauncher.INSTANCE.sceneController.getCurrentController() instanceof LobbyJFXController_v2 ctrl)
+            if (ViewSupervisor.INSTANCE.sceneController.getCurrentController() instanceof LobbyJFXController_v2 ctrl)
             {
                 ctrl.updatePlayerSelection();
                 return;
             }
 
-            if (ViewLauncher.INSTANCE.sceneController.getCurrentController() instanceof GameJFXController ctrl)
+            if (ViewSupervisor.INSTANCE.sceneController.getCurrentController() instanceof GameJFXController ctrl)
             {
                 ctrl.onPlayerAdded();
                 return;
@@ -147,7 +145,7 @@ public final class ViewLauncher extends Application
     {
         try
         {
-            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewLauncher.getSceneController().getCurrentController();
+            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewSupervisor.getSceneController().getCurrentController();
             ctrl.updateAvailableCourses(bScrollToEnd);
             return;
         }
@@ -164,7 +162,7 @@ public final class ViewLauncher extends Application
     {
         try
         {
-            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewLauncher.getSceneController().getCurrentController();
+            LobbyJFXController_v2 ctrl = (LobbyJFXController_v2) ViewSupervisor.getSceneController().getCurrentController();
             ctrl.updateCourseSelected();
             return;
         }
@@ -180,7 +178,7 @@ public final class ViewLauncher extends Application
     {
         try
         {
-            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
             ctrl.onPlayerUpdate();
             return;
         }
@@ -196,8 +194,24 @@ public final class ViewLauncher extends Application
     {
         try
         {
-            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
             ctrl.onPhaseUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void updatePlayerPosition()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
+            ctrl.onPlayerPositionUpdate();
             return;
         }
         catch (ClassCastException e)
@@ -214,7 +228,7 @@ public final class ViewLauncher extends Application
     {
         try
         {
-            GameJFXController ctrl = (GameJFXController) ViewLauncher.getSceneController().getCurrentController();
+            GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
             ctrl.onCourseUpdate();
             return;
         }
@@ -233,7 +247,7 @@ public final class ViewLauncher extends Application
     /** Only valid on the JFX thread. */
     public static SceneController getSceneController()
     {
-        return ViewLauncher.INSTANCE.sceneController;
+        return ViewSupervisor.INSTANCE.sceneController;
     }
 
 }

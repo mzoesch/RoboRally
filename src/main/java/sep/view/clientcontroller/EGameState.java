@@ -1,13 +1,12 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
-import sep.view.viewcontroller.ViewLauncher;
+import sep.view.viewcontroller.ViewSupervisor;
 
 import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 import org.json.JSONArray;
 
 /**
@@ -103,7 +102,7 @@ public enum EGameState
         {
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setPlayerName(dsrp.getPlayerName());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setFigureID(dsrp.getFigureID());
-            ViewLauncher.updatePlayerSelection();
+            ViewSupervisor.updatePlayerSelection();
 
             l.debug("Remote player {} already added. Updating his name and figures.", dsrp.getPlayerID());
             return;
@@ -111,7 +110,7 @@ public enum EGameState
 
         RemotePlayer rp = new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigureID(), false);
         EGameState.INSTANCE.remotePlayers.add(rp);
-        ViewLauncher.updatePlayerSelection();
+        ViewSupervisor.updatePlayerSelection();
 
         return;
     }
@@ -255,14 +254,14 @@ public enum EGameState
     public void setCurrentPhase(int currentPhase)
     {
         this.currentPhase = currentPhase;
-        ViewLauncher.updatePhase();
+        ViewSupervisor.updatePhase();
         return;
     }
 
     public void setCurrentPlayer(int playerID)
     {
         this.currentPlayer = this.getRemotePlayer(playerID);
-        ViewLauncher.updatePlayerView();
+        ViewSupervisor.updatePlayerView();
         return;
     }
 

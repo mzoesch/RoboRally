@@ -1,12 +1,10 @@
 package sep.view.scenecontrollers;
 
-import javafx.scene.control.ScrollPane;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
-import sep.view.viewcontroller.TileModifier;
-import sep.view.viewcontroller.ViewLauncher;
-import sep.view.clientcontroller.EClientInformation;
+import sep.view.viewcontroller.ViewSupervisor;
+import sep.view.lib.Coordinate;
 import sep.view.json.game.SetStartingPointModel;
 
 import javafx.fxml.FXML;
@@ -18,6 +16,10 @@ import javafx.scene.layout.AnchorPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.scene.image.ImageView;
+import java.util.Objects;
+import javafx.scene.control.ScrollPane;
+import javafx.util.Duration;
+import javafx.animation.PauseTransition;
 
 public class GameJFXController
 {
@@ -34,13 +36,29 @@ public class GameJFXController
     private int tileDimensions;
     private static final int resizeAmount = 10;
 
-    private boolean bClickedOnTile = false;
+    private boolean bClickedOnTile;
+
+    private int files;
+    private int ranks;
+    private Tile[][] tiles;
+    private double minXTranslation;
+    private double maxXTranslation;
+    private double centralXTranslation;
 
     public GameJFXController()
     {
         super();
-        this.tileDimensions = ViewLauncher.TILE_DIMENSIONS;
+
+        this.tileDimensions = ViewSupervisor.TILE_DIMENSIONS;
         this.bClickedOnTile = false;
+
+        this.files = 0;
+        this.ranks = 0;
+        this.tiles = null;
+        this.minXTranslation = 0.0;
+        this.maxXTranslation = 0.0;
+        this.centralXTranslation = 0.0;
+
         return;
     }
 
@@ -55,11 +73,11 @@ public class GameJFXController
         this.courseScrollPane.widthProperty().addListener((obs, oldVal, newVal) ->
         {
             // TODO Only update translations not the whole course.
-            this.updateCourse();
+            this.renderCourse();
             return;
         });
 
-        this.updateView();
+        this.renderView();
 
         this.masterContainer.setOnKeyPressed(e ->
         {
@@ -69,177 +87,51 @@ public class GameJFXController
                 /* Zoom in. */
                 case W:
                     this.tileDimensions += GameJFXController.resizeAmount;
-                    this.updateCourse();
+                    this.renderCourse();
                     break;
 
                 /* Zoom out. */
                 case S:
                     this.tileDimensions -= GameJFXController.resizeAmount;
-                    this.updateCourse();
+                    this.renderCourse();
                     break;
             }
             return;
 
         });
 
-        return;
-    }
-
-    /** Update the view player area. */
-    private void updatePlayers()
-    {
-        this.playerContainer.getChildren().clear();
-        for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        // TODO Highly sketchy. Needs some testing.
+        PauseTransition p = new PauseTransition(new Duration(2_000));
+        p.setOnFinished(e ->
         {
-            Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
-            figureName.getStyleClass().add("player-box-text");
-
-            Label playerName = new Label(rp.getPlayerName());
-            playerName.getStyleClass().add("player-box-text");
-
-            VBox v = new VBox(figureName, playerName);
-            v.getStyleClass().add("player-box");
-            v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
-
-
-            this.playerContainer.getChildren().add(v);
-            continue;
-        }
-
-        return;
-    }
-
-    // TODO Updates the whole course view. Not efficient. We need to split this method up.
-    //      Many requests only want to do small updates, so we do not need to update the whole
-    //      course view.
-    private void updateCourse()
-    {
-        this.courseScrollPaneContent.getChildren().clear();
-
-        if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
-        {
-            l.warn("No course data available.");
+            l.info("Scrolling to center.");
+            this.courseScrollPane.setHvalue(0.5);
+            this.courseScrollPane.setVvalue(0.5);
             return;
-        }
-
-        /* This is not safe at all. This only works with rectangle courses. */
-        int countFiles = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
-        int countRanks = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
-        this.setStyleOfCourseViewContent();
-
-        Tile[][] tiles = new Tile[countFiles][countRanks];
-
-        /* Generate */
-        for (int i = 0; i < countFiles; i++)
-        {
-            for (int j = 0; j < countRanks; j++)
-            {
-                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(j).getJSONArray(i));
-                for (int k = 0; k < t.getModifierSize(); k++)
-                {
-                    TileModifier tm = t.getModifier(k);
-                    continue;
-                }
-
-                t.setTranslateX(i);
-                t.setTranslateY(j);
-
-                tiles[i][j] = t;
-
-                continue;
-            }
-
-            continue;
-        }
-
-        // TODO Only works with rectangle courses
-        final double minXTranslate = tiles[0][0].getTranslateX() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_HORIZONTAL / 2;
-        final double maxXTranslate = tiles[countFiles - 1][0].getTranslateX() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_HORIZONTAL / 2;
-        final double centerXTranslate = ((this.courseScrollPane.getWidth() - maxXTranslate) - minXTranslate) / 2 - (double) this.tileDimensions / 2;
-
-        /* Render */
-        for (int i = 0; i < countFiles; i++)
-        {
-            for (int j = 0; j < countRanks; j++)
-            {
-                Tile t = tiles[i][j];
-
-                AnchorPane a = new AnchorPane();
-                a.getStyleClass().add("tile");
-
-                double xTranslate = t.getTranslateX() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_HORIZONTAL / 2;
-                a.setTranslateX(centerXTranslate < 0 ? xTranslate : xTranslate + centerXTranslate);
-                a.setTranslateY(t.getTranslateY() * this.tileDimensions + (double) ViewLauncher.VIRTUAL_SPACE_VERTICAL / 2);
-
-                for (int k = t.getImageViews().length - 1; k >= 0; k--)
-                {
-                    ImageView iv = t.getImageViews()[k];
-                    iv.setFitHeight(this.tileDimensions);
-                    iv.setFitWidth(this.tileDimensions);
-                    a.getChildren().add(iv);
-                    continue;
-                }
-
-                if (t.isClickable())
-                {
-                    a.setOnMouseClicked(e ->
-                    {
-                        l.info("User clicked on tile. Checking if valid move.");
-
-                        if (EGameState.INSTANCE.getCurrentPhase() == 0)
-                        {
-                            if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() != EClientInformation.INSTANCE.getPlayerID())
-                            {
-                                return;
-                            }
-
-                            if (this.bClickedOnTile)
-                            {
-                                return;
-                            }
-
-                            l.info("User wants to set starting position.");
-                            // TODO Some kind of validation.
-                            new SetStartingPointModel(t.getTranslateX(), t.getTranslateY()).send();
-                            this.bClickedOnTile = true;
-
-                            return;
-                        }
-
-                        return;
-                    });
-
-                    // Since there is AFAIK no "::before" or "::after" css
-                    // support for JavaFX. We add a pseudo elem here.
-                    AnchorPane after = new AnchorPane();
-
-                    after.getStyleClass().add("tile-after");
-
-                    after.setPrefWidth(this.tileDimensions);
-                    after.setPrefHeight(this.tileDimensions);
-
-                    a.getChildren().add(after);
-                }
-
-                this.courseScrollPaneContent.getChildren().add(a);
-
-                continue;
-            }
-
-            continue;
-        }
+        });
+        p.play();
 
         return;
     }
+
+    // region Rendering
+
+    // region Head Up Display
+
+    // region HUD Header
 
     /** Updates the UI Phase Title in the Header. */
-    private void updatePhaseTitle()
+    private void renderPhaseTitle()
     {
         this.UIHeaderPhaseLabel.setText(EGameState.PHASE_NAMES[EGameState.INSTANCE.getCurrentPhase()]);
         return;
     }
 
-    private void updateGameStateDescription()
+    /**
+     * Updates the UI Game State Description in the Header.
+     * What we are currently waiting for.
+     */
+    private void renderGameStateDescription()
     {
         if (EGameState.INSTANCE.getCurrentPlayer() == null)
         {
@@ -270,29 +162,286 @@ public class GameJFXController
         return;
     }
 
-    /** Updates every dependency of the header. */
-    private void updateUIHeader()
+    // endregion HUD Header
+
+    /**
+     * Updates every dependency of the header.
+     * No re-renders must be done after this method.
+     * */
+    private void renderHUDHeader()
     {
-        this.updatePhaseTitle();
-        this.updateGameStateDescription();
+        this.renderPhaseTitle();
+        this.renderGameStateDescription();
+
         return;
     }
 
-    private void updateView()
+    /**
+     * Displays every player in the lobby with some stats.
+     * No re-renders must be done after this method.
+     * */
+    private void renderPlayerInformationArea()
     {
-        this.updatePlayers();
-        this.updateCourse();
-        this.updatePhaseTitle();
+        this.playerContainer.getChildren().clear();
+        for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        {
+            Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
+            figureName.getStyleClass().add("player-box-text");
+
+            Label playerName = new Label(rp.getPlayerName());
+            playerName.getStyleClass().add("player-box-text");
+
+            VBox v = new VBox(figureName, playerName);
+            v.getStyleClass().add("player-box");
+            v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
+
+
+            this.playerContainer.getChildren().add(v);
+            continue;
+        }
+
         return;
     }
 
-    // region Update View Methods
+    /**
+     * Super method for all HUD updates. Will rerender everything on the HUD.
+     * No re-renders must be done after this method.
+     * */
+    public void renderHUD()
+    {
+        this.renderHUDHeader();
+        this.renderPlayerInformationArea();
+
+        return;
+    }
+
+    // endregion Head Up Display
+
+    // region Course View
+
+    // region Helper Methods
+
+    /**
+     * Updates global variable used to render the course. They may change based on
+     * the current board and size of the client's window.
+     * */
+    private void updateGlobalVariables()
+    {
+
+        /* This is not safe at all. This only works with rectangle courses. */
+        this.files = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
+        this.ranks = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
+
+        this.tiles = new Tile[this.files][this.ranks];
+        for (int i = 0; i < this.files; i++)
+        {
+            for (int j = 0; j < this.ranks; j++)
+            {
+                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(j).getJSONArray(i));
+                t.setTranslateX(i);
+                t.setTranslateY(j);
+                tiles[i][j] = t;
+                continue;
+            }
+
+            continue;
+        }
+
+        // TODO Only works with rectangle courses
+        this.minXTranslation = this.tiles[0][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        this.maxXTranslation = this.tiles[this.files - 1][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        this.centralXTranslation = ((this.courseScrollPane.getWidth() - this.maxXTranslation) - this.minXTranslation) / 2 - (double) this.tileDimensions / 2;
+
+        return;
+    }
+
+    private void setStyleOfCourseViewContent()
+    {
+        double viewWidth = this.files * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL;
+        double viewHeight = this.ranks * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_VERTICAL;
+        this.courseScrollPaneContent.setStyle(String.format("-fx-background-color: #000000ff; -fx-min-width: %spx; -fx-min-height: %spx;", (int) viewWidth, (int) viewHeight));
+
+        return;
+    }
+
+    public void renderOnPosition(AnchorPane AP, Coordinate c)
+    {
+        AP.getStyleClass().add("tile");
+
+        double xTranslation = c.getX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        AP.setTranslateX(this.centralXTranslation < 0 ? xTranslation : xTranslation + this.centralXTranslation);
+        AP.setTranslateY(c.getY() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
+
+        if (!this.courseScrollPaneContent.getChildren().contains(AP))
+        {
+            this.courseScrollPaneContent.getChildren().add(AP);
+        }
+
+        return;
+    }
+
+    // endregion Helper Methods
+
+    /**
+     * Renders the actual course board. This method will take some time to execute. Do not call this method if you only
+     * want to update a small part of the view. Use the specific update methods instead.
+     *
+     * <p>It Will render everything that is static on the course board.
+     *
+     * <p>You will have to rerender the whole course view after this method (like player positions).
+     */
+    private void renderCourseBoard()
+    {
+        this.courseScrollPaneContent.getChildren().clear();
+
+        if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
+        {
+            l.warn("No course data available.");
+            return;
+        }
+
+        this.updateGlobalVariables();
+        this.setStyleOfCourseViewContent();
+
+        for (int i = 0; i < this.files; i++)
+        {
+            for (int j = 0; j < this.ranks; j++)
+            {
+                Tile t = this.tiles[i][j];
+                AnchorPane AP = new AnchorPane();
+                for (int k = t.getImageViews().length - 1; k >= 0; k--)
+                {
+                    ImageView iv = t.getImageViews()[k];
+                    iv.setFitHeight(this.tileDimensions);
+                    iv.setFitWidth(this.tileDimensions);
+                    AP.getChildren().add(iv);
+                    continue;
+                }
+                this.renderOnPosition(AP, new Coordinate(i, j));
+
+                if (t.isClickable())
+                {
+                    AP.setOnMouseClicked(e ->
+                    {
+                        l.info("User clicked on tile. Checking if valid move.");
+
+                        if (EGameState.INSTANCE.getCurrentPhase() == 0)
+                        {
+                            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasStartingPosition())
+                            {
+                                l.warn("User already has a starting position.");
+                                return;
+                            }
+
+                            if (EGameState.INSTANCE.getClientRemotePlayer() != EGameState.INSTANCE.getCurrentPlayer())
+                            {
+                                l.warn("Player can not set starting position because it is not their turn.");
+                                return;
+                            }
+
+                            /* To prevent spamming the server with requests. */
+                            if (this.bClickedOnTile)
+                            {
+                                return;
+                            }
+
+                            l.info("User wants to set starting position.");
+                            // TODO Some kind of validation.
+                            new SetStartingPointModel(t.getTranslateX(), t.getTranslateY()).send();
+                            this.bClickedOnTile = true;
+
+                            return;
+                        }
+
+                        return;
+                    });
+
+                    // Since there is AFAIK no "::before" or "::after" css
+                    // support for JavaFX. We add a pseudo elem here.
+                    AnchorPane after = new AnchorPane();
+
+                    after.getStyleClass().add("tile-after");
+
+                    after.setPrefWidth(this.tileDimensions);
+                    after.setPrefHeight(this.tileDimensions);
+
+                    AP.getChildren().add(after);
+                }
+
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
+    // TODO Rotation of the robot
+    /**
+     * Updates player positions on the course view.
+     * No re-renders must be done after this method.
+     */
+    private void renderPlayerPositions()
+    {
+        for (RemotePlayer RP : EGameState.INSTANCE.getRemotePlayers())
+        {
+            if (!RP.hasStartingPosition())
+            {
+                continue;
+            }
+
+            /* Updating the current view. */
+            if (RP.getRobotView().hasPosition())
+            {
+                RP.getRobotView().renderPosition();
+                continue;
+            }
+
+            RP.getRobotView().setPosition(RP.getStartingPosition(), false);
+            RP.getRobotView().renderPosition();
+
+            continue;
+        }
+
+        return;
+    }
+
+    /**
+     * Updates the whole course view. This is very costly. Do not call this method if you only want to update a small
+     * part of the view. Use the specific update methods instead.
+     * No re-renders must be done after this method.
+     * */
+    private void renderCourse()
+    {
+        this.renderCourseBoard();
+        this.renderPlayerPositions();
+
+        return;
+    }
+
+    // endregion Course View
+
+    /**
+     * This is the top level rendering method. It will rerender the whole view. This is very costly.
+     * Do not call this method if you only want to update a small part of the view.
+     */
+    private void renderView()
+    {
+        this.renderHUD();
+        this.renderCourse();
+        return;
+    }
+
+    // endregion Rendering
+
+    // region Update View Methods from outside
 
     public void onPhaseUpdate()
     {
         Platform.runLater(() ->
         {
-            this.updateUIHeader();
+            this.renderHUD();
             return;
         });
 
@@ -303,8 +452,7 @@ public class GameJFXController
     {
         Platform.runLater(() ->
         {
-            this.updatePlayers();
-            this.updateUIHeader();
+            this.renderHUD();
             return;
         });
 
@@ -315,7 +463,7 @@ public class GameJFXController
     {
         Platform.runLater(() ->
         {
-            this.updatePlayers();
+            this.renderPlayerInformationArea();
             return;
         });
 
@@ -326,33 +474,33 @@ public class GameJFXController
     {
         Platform.runLater(() ->
         {
-            this.updateView();
+            this.renderView();
             return;
         });
 
         return;
     }
 
-    // endregion Update View Methods
-
-    private void setStyleOfCourseViewContent()
+    public void onPlayerPositionUpdate()
     {
-        // With current scale
-        double viewWidth = this.getCountFiles() * this.tileDimensions + ViewLauncher.VIRTUAL_SPACE_HORIZONTAL;
-        double viewHeight = this.getCountRanks() * this.tileDimensions + ViewLauncher.VIRTUAL_SPACE_VERTICAL;
-        this.courseScrollPaneContent.setStyle(String.format("-fx-background-color: #000000ff; -fx-min-width: %spx; -fx-min-height: %spx;", (int) viewWidth, (int) viewHeight));
+        Platform.runLater(() ->
+        {
+            this.renderPlayerPositions();
+            return;
+        });
 
         return;
     }
 
-    private int getCountFiles()
+    // endregion Update View Methods from outside
+
+    // region Getters and Setters
+
+    public int getCurrentTileDimensions()
     {
-        return EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
+        return this.tileDimensions;
     }
 
-    private int getCountRanks()
-    {
-        return EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
-    }
+    // endregion Getters and Setters
 
 }

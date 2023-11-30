@@ -2,7 +2,7 @@ package sep.view.scenecontrollers;
 
 import sep.EArgs;
 import sep.view.clientcontroller.GameInstance;
-import sep.view.viewcontroller.ViewLauncher;
+import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.viewcontroller.SceneController;
 import sep.EPort;
 import sep.view.clientcontroller.EClientInformation;
@@ -33,7 +33,7 @@ public class MainMenuJFXController
 
         if (GameInstance.connectToServer())
         {
-            ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
+            ViewSupervisor.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
             return;
         }
 
@@ -61,7 +61,7 @@ public class MainMenuJFXController
         if (GameInstance.connectToServer())
         {
             EClientInformation.INSTANCE.setPreferredSessionID(this.sessionIDField.getText());
-            ViewLauncher.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
+            ViewSupervisor.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
             return;
         }
 

@@ -63,11 +63,11 @@ public class Launcher
                     ? new ProcessBuilder("osascript", "-e", String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher %s --nocmd%s\"", fp.substring(0, fp.lastIndexOf("/")), f, String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : " & exit"))
                     : null
                     ;
-
             /* I do not have a linux machine, therefore, I cannot test this. */
             if (pb == null)
             {
                 Launcher.stdoutForNoOSSupport(t0);
+                System.exit(EArgs.ERR);
                 return;
             }
 

@@ -11,8 +11,8 @@ import sep.server.json.lobby.PlayerReadyModel;
 import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
+import sep.server.json.game.programmingphase.SelectionFinishedModel;
 
-import sep.server.model.game.cards.*;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -457,6 +457,13 @@ public final class Session
         for (PlayerController playerController : this.playerControllers) {
             TimerEndedModel timerEndedModel = new TimerEndedModel(playerController.getClientInstance(), playerIDS);
             timerEndedModel.send();
+        }
+    }
+
+    public void sendSelectionFinished(int playerID) {
+        for (PlayerController playerController : this.playerControllers) {
+            SelectionFinishedModel selectionFinishedModel = new SelectionFinishedModel(playerController.getClientInstance(), playerID);
+            selectionFinishedModel.send();
         }
     }
 

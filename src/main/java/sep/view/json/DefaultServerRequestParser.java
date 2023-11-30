@@ -1,5 +1,7 @@
 package sep.view.json;
 
+import sep.view.lib.Coordinate;
+
 import org.json.JSONObject;
 import org.json.JSONException;
 import java.util.stream.IntStream;
@@ -75,14 +77,19 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getString("map");
     }
 
-    public JSONArray getGameCourse()
+    public JSONArray getGameCourse() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getJSONArray("gameMap");
     }
 
-    public int getPhase()
+    public int getPhase() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("phase");
+    }
+
+    public Coordinate getCoordinate() throws JSONException
+    {
+        return new Coordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
     }
 
 }
