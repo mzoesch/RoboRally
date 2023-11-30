@@ -510,4 +510,15 @@ public class GameMode
 
     public void endGame() {}
 
+    public PlayerController[] getPlayerControllers()
+    {
+        PlayerController[] playerControllers = new PlayerController[this.players.size()];
+        for (int i = 0; i < this.players.size(); i++)
+        {
+            playerControllers[i] = this.players.get(i).getPlayerController();
+            continue;
+        }
+        return playerControllers;
+    }
+
 }
