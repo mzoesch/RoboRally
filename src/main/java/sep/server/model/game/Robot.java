@@ -7,31 +7,35 @@ public class Robot {
 
   public Robot(Course course) {
     this.course = course;
+    currentTile = null;
   }
 
   /**
-   * setzt den StartPoint eines Roboters und überprüft dabei, ob entsprechendes Feld auf Course & StartingPoint & unbesetzt
+   * prüft den übergebenen Startpunkt, ob entsprechendes Feld auf Course & StartingPoint & unbesetzt
    * @param x x-Koordinate des Startfelds
    * @param y y-Koordinate des Startfelds
    * @return 1, wenn erfolgreich; 0, wenn nicht auf Course; -1, wenn besetzt; -2, wenn kein StartingPoint
    */
-  public int setStartingPoint(int x, int y){
+  public int validStartingPoint(int x, int y){
     Tile choosenStart = course.getTileByNumbers(x,y);
     if(choosenStart != null) {
-      if(choosenStart.isOccupied() == true){
+      if(choosenStart.isOccupied()){
         return -1;
-      } else if(choosenStart.isStartingPoint() != true){
+      } else if(!choosenStart.isStartingPoint()){
         return -2;
       }
-      else{
-        direction = course.getStartingDirection();
-        currentTile = choosenStart;
+      else
         return 1;
       }
-    } else{
+    else{
       return 0;
     }
   }
+   public void setStartingPoint(int x, int y){
+     Tile choosenStart = course.getTileByNumbers(x,y);
+     direction = course.getStartingDirection();
+     currentTile = choosenStart;
+   }
 
   public String getDirection() {
     return direction;

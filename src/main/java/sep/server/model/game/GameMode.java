@@ -1,6 +1,9 @@
 package sep.server.model.game;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.json.common.CurrentPlayerModel;
+import sep.server.json.common.ErrorMsgModel;
 import sep.server.json.game.ActivePhaseModel;
 import sep.server.json.game.GameStartedModel;
 import sep.server.json.game.effects.*;
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import org.json.JSONObject;
+import sep.server.viewmodel.Session;
 
 /**
  * The rules of the game are implemented here. It is a high-level manager object for one game and controls the
@@ -23,6 +27,7 @@ import org.json.JSONObject;
  */
 public class GameMode
 {
+    private static final Logger l = LogManager.getLogger(Session.class);
     private final Course course;
     ArrayList<Player> players;
     int energyBank;
@@ -68,10 +73,7 @@ public class GameMode
         }
 
         // Announcing Phase Zero.
-        for (PlayerController pc : playerControllers) {
-            new ActivePhaseModel(pc.getClientInstance(), 0).send();
-            continue;
-        }
+        playerControllers.get(0).getSession.handleActivePhase(0);
 
         //Selecting starting player. (first one in PlayerControllers ArrayList
         new CurrentPlayerModel(currentPlayer.getPlayerController().getClientInstance(),
@@ -103,6 +105,61 @@ public class GameMode
         return players;
     }
 
+    //TODO Refactoring in zwei oder mehr Methoden?
+    public void setStartingPoint(PlayerController pc, int x, int y){
+        if(gamePhase != 0){
+            l.warn("Unable to set StartPoint due to wrong GamePhase");
+            new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
+
+        } else if(pc.getPlayerID() != currentPlayer.getPlayerController().getPlayerID()){
+            l.warn("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
+            new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            //ErrorMessage an Client & Logger; falscher Spieler
+
+        } else{
+
+            int validation = currentPlayer.getPlayerRobot().validStartingPoint(x,y);
+            if(validation == 1){
+
+                currentPlayer.getPlayerRobot().setStartingPoint(x,y);
+                l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
+                pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
+
+                if(startingPointSelectionFinished()){
+                    gamePhase = 1;
+                    pc.getSession().handleActivePhase(gamePhase);
+                    l.info("StartPhase has concluded. ProgrammingPhase has started");
+                    programmingPhase();
+
+
+                } else{
+                    for(Player player : players){
+                        if (player.getPlayerRobot().getCurrentTile() == null){
+                            currentPlayer = player;
+                            l.info("Now Player with ID: " + player.getPlayerController().getPlayerID() + "has to set StartingPoint");
+                            pc.getSession().handleCurrentPlayer(player.getPlayerController().getPlayerID());
+                        }
+                    }
+                }
+            }
+            else{
+                //Antwort, dass es nicht geklappt hat. (Soll hier konkrete Message an Client?
+                l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
+                new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
+            }
+
+        }
+
+    }
+
+    public boolean startingPointSelectionFinished(){
+        for(Player player : players){
+            if(player.getPlayerRobot().getCurrentTile() == null){
+                return false;
+            }
+        }
+        return true;
+    }
     public void setAvailableCheckPoints(int availableCheckPoints) {
         this.availableCheckPoints = availableCheckPoints;
     }
