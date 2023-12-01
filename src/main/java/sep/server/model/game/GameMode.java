@@ -188,9 +188,6 @@ public class GameMode
     }
 
     public void selectCards(ArrayList<Player> players) {
-        for (Player player : players) {
-            new Thread(player.getPlayerController().getClientInstance()).start();
-        }
     }
 
     /**
@@ -199,14 +196,14 @@ public class GameMode
     public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
-        try {
+        /*try {
             for (Player player : players) {
                 new Thread(player.getPlayerController().getClientInstance()).start();
             }
             Thread.sleep(30000); // 30 Sekunden
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
         int[] playerIdWhoNotFinished = new int[players.size()];
