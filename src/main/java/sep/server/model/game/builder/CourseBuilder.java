@@ -545,7 +545,6 @@ public class CourseBuilder {
 
         // (3,3)
         fieldtypes.add(new Wall(new String[]{"top"}));
-        fieldtypes.add(new Laser("top", 1));
         arrayListY.add(new Tile("5B",new Coordinate(3,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -562,7 +561,6 @@ public class CourseBuilder {
 
         // (3,6)
         fieldtypes.add(new Wall(new String[]{"left"}));
-        fieldtypes.add(new Laser("left", 1));
         arrayListY.add(new Tile("5B",new Coordinate(3,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -709,7 +707,6 @@ public class CourseBuilder {
 
         // (6,3)
         fieldtypes.add(new Wall(new String[]{"right"}));
-        fieldtypes.add(new Laser("right", 1));
         arrayListY.add(new Tile("5B",new Coordinate(6,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -726,7 +723,6 @@ public class CourseBuilder {
 
         // (6,6)
         fieldtypes.add(new Wall(new String[]{"bottom"}));
-        fieldtypes.add(new Laser("bottom", 1));
         arrayListY.add(new Tile("5B",new Coordinate(6,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
