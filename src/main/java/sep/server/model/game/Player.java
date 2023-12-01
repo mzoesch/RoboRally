@@ -18,7 +18,7 @@ public class Player {
   Robot playerRobot;
   ArrayList<IPlayableCard> playerDeck;
   ArrayList<IPlayableCard> discardPile;
-  ArrayList<AProgrammingCard> playerHand;
+  ArrayList<IPlayableCard> playerHand;
   IPlayableCard[] registers;
   int priority; //TODO aktuell überflüssig oder?; falls nicht, muss sie im Konstruktor gesetzt werden
   int checkpointsCollected;
@@ -69,11 +69,11 @@ public class Player {
   public void setDiscardPile(ArrayList<IPlayableCard> discardPile) {
     this.discardPile = discardPile;
   }
-  public ArrayList<AProgrammingCard> getPlayerHand() {
+  public ArrayList<IPlayableCard> getPlayerHand() {
     return playerHand;
   }
 
-  public void setPlayerHand(ArrayList<AProgrammingCard> playerHand) {
+  public void setPlayerHand(ArrayList<IPlayableCard> playerHand) {
     this.playerHand = playerHand;
   }
 
@@ -268,8 +268,8 @@ public class Player {
 
   }
 
-  public AProgrammingCard getCardByName(String cardName) {
-    for (AProgrammingCard card : playerHand) {
+  public IPlayableCard getCardByName(String cardName) {
+    for (IPlayableCard card : playerHand) {
       if (card.getCardType().equals(cardName)) {
         return card;
       }
@@ -283,7 +283,7 @@ public class Player {
    * This method is necessary for creating an object of the CardsYouGotNowModel class
    */
   public String[] getPlayerHandAsStringArray() {
-    ArrayList<AProgrammingCard> hand = this.getPlayerHand();
+    ArrayList<IPlayableCard> hand = this.getPlayerHand();
     String[] handArray = new String[hand.size()];
     for (int i = 0; i < hand.size(); i++) {
       handArray[i] = hand.get(i).getCardType();
