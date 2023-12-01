@@ -12,7 +12,7 @@ import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
 import sep.server.json.game.programmingphase.SelectionFinishedModel;
-
+import sep.server.model.game.EGamePhase;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -313,9 +313,9 @@ public final class Session
         }
     }
 
-    public void handleActivePhase(int phase){
+    public void handleActivePhase(EGamePhase phase){
         for (PlayerController pc : playerControllers) {
-            new ActivePhaseModel(pc.getClientInstance(), 0).send();
+            new ActivePhaseModel(pc.getClientInstance(), phase.i).send();
         }
     }
 
