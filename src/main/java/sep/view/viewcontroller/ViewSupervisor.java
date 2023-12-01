@@ -226,6 +226,22 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void updateFooter()
+    {
+        try
+        {
+            GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
+            ctrl.onFooterUpdate();
+            return;
+        }
+        catch (ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // region Game Events
 
     public static void updateCourseView()
