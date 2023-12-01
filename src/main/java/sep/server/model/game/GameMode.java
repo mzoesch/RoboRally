@@ -101,6 +101,10 @@ public class GameMode
                 l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
                 pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
 
+                currentPlayer.getPlayerRobot().setDirection(course.getStartingDirection());
+                l.info("StartingRotation from PlayerID: " + pc.getPlayerID() + " set to: " + course.getStartingDirection());
+                pc.getSession().handlePlayerTurning(pc.getPlayerID(), "clockwise");
+
                 if(startingPointSelectionFinished()){
                     //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
                     gamePhase = 1;
