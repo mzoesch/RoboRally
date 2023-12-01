@@ -67,4 +67,12 @@ public class DefaultClientRequestParser
     public int getXCoordinate(){ return this.request.getJSONObject("messageBody").getInt("x");}
 
     public int getYCoordinate(){ return this.request.getJSONObject("messageBody").getInt("y");}
+
+    public String getSelectedCard() throws JSONException {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
+
+    public int getSelectedCardRegister() throws JSONException {
+        return this.request.getJSONObject("messageBody").getInt("register");
+    }
 }

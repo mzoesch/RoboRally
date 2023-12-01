@@ -166,6 +166,12 @@ public class GameMode
         }
     }
 
+    public void selectCards(ArrayList<Player> players) {
+        for (Player player : players) {
+            new Thread(player.getPlayerController().getClientInstance()).start();
+        }
+    }
+
     public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
