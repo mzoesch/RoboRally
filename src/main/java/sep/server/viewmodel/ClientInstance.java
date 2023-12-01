@@ -218,6 +218,9 @@ public final class ClientInstance implements Runnable
 
         if (Objects.equals(dcrp.getType_v2(), "SelectCard")) {
             l.debug("Received selected Card from client.");
+            String selectedCard = dcrp.getSelectedCard();
+            int selectedRegister = dcrp.getSelectedCardRegister();
+            this.playerController.getSelectedCard(selectedCard,selectedRegister);
             return true;
         }
 

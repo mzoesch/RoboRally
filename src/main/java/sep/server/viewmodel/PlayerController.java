@@ -93,6 +93,10 @@ public final class PlayerController
         return;
     }
 
+    public void getSelectedCard(String selectedCard, int selectedRegister){
+
+    }
+
     // endregion Getters and Setters
 
 }
