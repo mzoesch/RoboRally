@@ -171,6 +171,7 @@ public class GameMode
         distributeCards(players);
         selectCards(players);
         discardAndDrawBlind(players);
+        activationPhase();
     }
 
     public void distributeCards(ArrayList<Player> players) {
