@@ -28,6 +28,11 @@
     -fx-padding: 12px 12px 12px 12px;
 }
 
+#ui-footer-register-slots {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
 .register-slot {
     -fx-background-color: #27029d;
     -fx-border-color: #000000ff;
@@ -37,6 +42,27 @@
     -fx-max-width: 102px;
     -fx-min-height: 180px;
     -fx-max-height: 180px;
+}
+
+#got-register-cards-hbox {
+    -fx-spacing: 3px;
+    -fx-alignment: center-left;
+}
+
+.got-register-cards-vbox {
+    -fx-spacing: 3px;
+    -fx-alignment: center-left;
+}
+
+.got-register-cards-slot {
+    -fx-background-color: #27029d;
+    -fx-border-color: #000000ff;
+    -fx-border-width: 1px;
+
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 58px;
+    -fx-max-height: 58px;
 }
 
 #player-container {

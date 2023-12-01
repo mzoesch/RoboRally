@@ -60,27 +60,93 @@
             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
         >
             <children>
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot1"
+                <HBox
+                    id="ui-footer-register-slots" stylesheets="@game.css"
                 >
-                </AnchorPane>
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot2"
-                />
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot3"
-                />
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot4"
-                />
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot5"
-                />
+                    <children>
+                        <AnchorPane
+                            styleClass="register-slot" stylesheets="@game.css"
+                            fx:id="registerSlot1"
+                        >
+                        </AnchorPane>
+                        <AnchorPane
+                            styleClass="register-slot" stylesheets="@game.css"
+                            fx:id="registerSlot2"
+                        />
+                        <AnchorPane
+                            styleClass="register-slot" stylesheets="@game.css"
+                            fx:id="registerSlot3"
+                        />
+                        <AnchorPane
+                            styleClass="register-slot" stylesheets="@game.css"
+                            fx:id="registerSlot4"
+                        />
+                        <AnchorPane
+                            styleClass="register-slot" stylesheets="@game.css"
+                            fx:id="registerSlot5"
+                        />
+                    </children>
+                </HBox>
+                <HBox
+                    id="got-register-cards-hbox" stylesheets="@game.css"
+                >
+                    <children>
+                        <VBox
+                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot1"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot2"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot3"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                            </children>
+                        </VBox>
+                        <VBox
+                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot4"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot5"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot6"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                            </children>
+                        </VBox>
+                        <VBox
+                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot7"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot8"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot9"
+                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
+                                />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
             </children>
         </HBox>
     </children>
