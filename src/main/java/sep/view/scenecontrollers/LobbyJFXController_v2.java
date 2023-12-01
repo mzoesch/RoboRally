@@ -8,7 +8,7 @@ import sep.view.clientcontroller.EGameState;
 import sep.view.json.ChatMsgModel;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.clientcontroller.EClientInformation;
-import sep.view.json.lobby.ReadyPlayerModel;
+import sep.view.json.lobby.SetStatusModel;
 import sep.view.json.lobby.CourseSelectedModel;
 
 import javafx.beans.value.ChangeListener;
@@ -653,7 +653,7 @@ public final class LobbyJFXController_v2
 
         // TODO Some input validation needed.
         l.debug("Player wants to be {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "not ready" : "ready");
-        new ReadyPlayerModel(!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady()).send();
+        new SetStatusModel(!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady()).send();
         return;
     }
 
