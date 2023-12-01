@@ -4,5 +4,7 @@ public interface IPlayableCard  {
 
     void playCard();
 
+    String getCardType();
+
 
 }
