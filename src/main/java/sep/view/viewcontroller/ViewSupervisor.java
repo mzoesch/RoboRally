@@ -33,6 +33,8 @@ public final class ViewSupervisor extends Application
     public static final int VIRTUAL_SPACE_HORIZONTAL = 128;
     public static final int REGISTER_SLOT_WIDTH = 102;
     public static final int REGISTER_SLOT_HEIGHT = 180;
+    public static final int GOT_REGISTER_SLOT_WIDTH = 34;
+    public static final int GOT_REGISTER_SLOT_HEIGHT = 58;
 
     public ViewSupervisor()
     {

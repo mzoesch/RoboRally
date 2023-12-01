@@ -38,6 +38,15 @@ public class GameJFXController
     @FXML private AnchorPane registerSlot3;
     @FXML private AnchorPane registerSlot4;
     @FXML private AnchorPane registerSlot5;
+    @FXML private AnchorPane gotRegisterCardSlot1;
+    @FXML private AnchorPane gotRegisterCardSlot2;
+    @FXML private AnchorPane gotRegisterCardSlot3;
+    @FXML private AnchorPane gotRegisterCardSlot4;
+    @FXML private AnchorPane gotRegisterCardSlot5;
+    @FXML private AnchorPane gotRegisterCardSlot6;
+    @FXML private AnchorPane gotRegisterCardSlot7;
+    @FXML private AnchorPane gotRegisterCardSlot8;
+    @FXML private AnchorPane gotRegisterCardSlot9;
 
     private int tileDimensions;
     private static final int resizeAmount = 10;
@@ -172,11 +181,11 @@ public class GameJFXController
 
     // region HUD Footer
 
-    private ImageView getEmptyRegisterSlot()
+    private ImageView getEmptyRegisterSlot(final int width, final int height)
     {
-        ImageView iv = new ImageView();
-        iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
-        iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
+        final ImageView iv = new ImageView();
+        iv.setFitWidth(width);
+        iv.setFitHeight(height);
         iv.getStyleClass().add("register-slot");
         iv.setImage(TileModifier.getImage("EmptyRegisterSlot"));
         return iv;
@@ -188,7 +197,7 @@ public class GameJFXController
      */
     private void renderRegisterSlot(int idx, String cardName)
     {
-        ImageView iv = this.getEmptyRegisterSlot();
+        final ImageView iv = this.getEmptyRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT);
 
         switch (idx)
         {
@@ -221,6 +230,102 @@ public class GameJFXController
         return;
     }
 
+    /**
+     * @param idx       Index of the got register slot.
+     * @param cardName  Name of the card to render. Pass null to render an empty slot.
+     */
+    private void renderGotRegisterSlot(int idx, String cardName)
+    {
+        final ImageView iv = this.getEmptyRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT);
+
+        switch (idx)
+        {
+            case 0:
+                this.gotRegisterCardSlot1.getChildren().clear();
+                this.gotRegisterCardSlot1.getChildren().add(iv);
+                break;
+
+            case 1:
+                this.gotRegisterCardSlot2.getChildren().clear();
+                this.gotRegisterCardSlot2.getChildren().add(iv);
+                break;
+
+            case 2:
+                this.gotRegisterCardSlot3.getChildren().clear();
+                this.gotRegisterCardSlot3.getChildren().add(iv);
+                break;
+
+            case 3:
+                this.gotRegisterCardSlot4.getChildren().clear();
+                this.gotRegisterCardSlot4.getChildren().add(iv);
+                break;
+
+            case 4:
+                this.gotRegisterCardSlot5.getChildren().clear();
+                this.gotRegisterCardSlot5.getChildren().add(iv);
+                break;
+
+            case 5:
+                this.gotRegisterCardSlot6.getChildren().clear();
+                this.gotRegisterCardSlot6.getChildren().add(iv);
+                break;
+
+            case 6:
+                this.gotRegisterCardSlot7.getChildren().clear();
+                this.gotRegisterCardSlot7.getChildren().add(iv);
+                break;
+
+            case 7:
+                this.gotRegisterCardSlot8.getChildren().clear();
+                this.gotRegisterCardSlot8.getChildren().add(iv);
+                break;
+
+            case 8:
+                this.gotRegisterCardSlot9.getChildren().clear();
+                this.gotRegisterCardSlot9.getChildren().add(iv);
+                break;
+        }
+
+        return;
+    }
+
+    /**
+     * Updates the register slots.
+     * No re-renders must be done after this method.
+     */
+    private void renderRegisterSlots()
+    {
+//        this.renderRegisterSlot(0, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(0));
+//        this.renderRegisterSlot(1, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(1));
+//        this.renderRegisterSlot(2, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(2));
+//        this.renderRegisterSlot(3, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(3));
+//        this.renderRegisterSlot(4, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(4));
+        this.renderRegisterSlot(0, null);
+        this.renderRegisterSlot(1, null);
+        this.renderRegisterSlot(2, null);
+        this.renderRegisterSlot(3, null);
+        this.renderRegisterSlot(4, null);
+    }
+
+    /**
+     * Updates the got register card slots.
+     * No re-renders must be done after this method.
+     */
+    private void renderGotRegisterCardSlots()
+    {
+        this.renderGotRegisterSlot(0, null);
+        this.renderGotRegisterSlot(1, null);
+        this.renderGotRegisterSlot(2, null);
+        this.renderGotRegisterSlot(3, null);
+        this.renderGotRegisterSlot(4, null);
+        this.renderGotRegisterSlot(5, null);
+        this.renderGotRegisterSlot(6, null);
+        this.renderGotRegisterSlot(7, null);
+        this.renderGotRegisterSlot(8, null);
+
+        return;
+    }
+
     // endregion HUD Footer
 
     /**
@@ -241,16 +346,8 @@ public class GameJFXController
      * */
     private void renderHUDFooter()
     {
-//        this.renderRegisterSlot(0, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(0));
-//        this.renderRegisterSlot(1, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(1));
-//        this.renderRegisterSlot(2, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(2));
-//        this.renderRegisterSlot(3, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(3));
-//        this.renderRegisterSlot(4, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(4));
-        this.renderRegisterSlot(0, null);
-        this.renderRegisterSlot(1, null);
-        this.renderRegisterSlot(2, null);
-        this.renderRegisterSlot(3, null);
-        this.renderRegisterSlot(4, null);
+        this.renderRegisterSlots();
+        this.renderGotRegisterCardSlots();
 
         return;
     }
