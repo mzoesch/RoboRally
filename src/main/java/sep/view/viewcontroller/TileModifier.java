@@ -160,6 +160,30 @@ public class TileModifier
             return;
         }
 
+        if (Objects.equals(this.tile.get("type"), "Laser"))
+        {
+            switch (this.getOrientations().getString(0))
+            {
+                case "top":
+                    iv.setRotate(270);
+                    break;
+                case "right":
+                    iv.setRotate(0);
+                    break;
+                case "bottom":
+                    iv.setRotate(90);
+                    break;
+                case "left":
+                    iv.setRotate(180);
+                    break;
+
+                default:
+                    l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
+                    break;
+            }
+            return;
+        }
+
         return;
     }
 
@@ -274,6 +298,26 @@ public class TileModifier
         }
 
         l.error("Unknown tile type: {}", this.tile.getString("type"));
+        if (Objects.equals(this.tile.getString("type"), "Laser"))
+        {
+            // TODO We ofc have to check if the laser is on the inside or outside of a wall
+            //      and use a different image accordingly.
+            switch (this.getCount())
+            {
+                case 1:
+                    return TileModifier.getImage("LaserSingleInsetInactive");
+                case 2:
+                    return TileModifier.getImage("LaserDoubleInsetInactive");
+                case 3:
+                    return TileModifier.getImage("LaserTripleInsetInactive");
+
+                default:
+                    l.error("Unknown laser count: {}", this.getCount());
+                    break;
+            }
+        }
+
+
         return TileModifier.getImage("Empty");
     }
 
