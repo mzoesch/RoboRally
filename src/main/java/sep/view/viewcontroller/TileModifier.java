@@ -47,6 +47,7 @@ public class TileModifier
                     case "left":
                         iv.setRotate(0);
                         break;
+
                     default:
                         l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
                         break;
@@ -76,6 +77,7 @@ public class TileModifier
                     case "left":
                         iv.setRotate(270);
                         break;
+
                     default:
                         l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
                         break;
@@ -149,6 +151,7 @@ public class TileModifier
                     case "left":
                         iv.setRotate(270);
                         break;
+
                     default:
                         l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
                         break;
@@ -297,7 +300,6 @@ public class TileModifier
             return TileModifier.getImage("CheckPoint");
         }
 
-        l.error("Unknown tile type: {}", this.tile.getString("type"));
         if (Objects.equals(this.tile.getString("type"), "Laser"))
         {
             // TODO We ofc have to check if the laser is on the inside or outside of a wall
@@ -318,6 +320,7 @@ public class TileModifier
         }
 
 
+        l.error("Unknown tile type or variation: {}. Rendering empty tile.", this.tile.getString("type"));
         return TileModifier.getImage("Empty");
     }
 

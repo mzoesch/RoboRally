@@ -188,16 +188,7 @@ public class GameJFXController
      */
     private void renderRegisterSlot(int idx, String cardName)
     {
-        if (cardName == null)
-        {
-            cardName = "EmptyRegisterSlot";
-        }
-
-        ImageView iv = new ImageView();
-        iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
-        iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
-        iv.getStyleClass().add("register-slot");
-        iv.setImage(TileModifier.getImage(cardName));
+        ImageView iv = this.getEmptyRegisterSlot();
 
         switch (idx)
         {
