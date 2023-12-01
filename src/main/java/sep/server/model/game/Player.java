@@ -27,7 +27,7 @@ public class Player {
   Session session;
 
 
-  public Player(PlayerController playerController, Course currentCourse) {
+  public Player(PlayerController playerController, Course currentCourse, Session session) {
     this.playerController = playerController;
     this.playerRobot = new Robot(currentCourse);
     this.playerDeck = new DeckBuilder().buildProgrammingDeck();
@@ -36,6 +36,7 @@ public class Player {
     this.energyCollected = 5;
     this.upgradeCards = new ArrayList<>();
     this.playerHand = new ArrayList<>();
+    this.registers = new IPlayableCard[5];
   }
 
   public PlayerController getPlayerController() {
