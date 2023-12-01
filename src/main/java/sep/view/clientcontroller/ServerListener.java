@@ -303,7 +303,7 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "RebootDirection")) {
-            l.debug("Received reboot diretion from server.");
+            l.debug("Received reboot direction from server.");
             return;
         }
 
