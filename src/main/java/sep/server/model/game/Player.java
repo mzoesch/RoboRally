@@ -37,6 +37,7 @@ public class Player {
     this.upgradeCards = new ArrayList<>();
     this.playerHand = new ArrayList<>();
     this.registers = new IPlayableCard[5];
+    this.session = session;
   }
 
   public PlayerController getPlayerController() {
