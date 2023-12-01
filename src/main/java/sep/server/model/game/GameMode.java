@@ -148,6 +148,22 @@ public class GameMode
 
     public void programmingPhase() {
         distributeCards(players);
+
+        discardAndDrawBlind(players);
+    }
+
+    public void distributeCards(ArrayList<Player> players) {
+        for (Player player : players) {
+            for (int i = 0; i < 9; i++) {
+                if (player.getPlayerDeck().isEmpty()) {
+                    player.shuffleAndRefillDeck();
+                    this.session.getGameState().sendShuffle(player);
+                }
+                IPlayableCard card = player.getPlayerDeck().remove(0);
+                player.getPlayerHand().add(card);
+            }
+            this.session.getGameState().sendHandCards(player);
+        }
     }
 
     public void startTimer() {
@@ -172,6 +188,12 @@ public class GameMode
         }
 
         this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
+    }
+
+    public void discardAndDrawBlind(ArrayList<Player> players) {
+        for (Player player : players) {
+            player.handleIncompleteProgramming();
+        }
     }
 
 
@@ -636,21 +658,6 @@ public class GameMode
         return new Object[] {currentRegisterIndex, newCard, clientID};
     }*/
 
-    public void distributeCards(ArrayList<Player> players) {
-        for (Player player : players) {
-            for (int i = 0; i < 9; i++) {
-                if (player.getPlayerDeck().isEmpty()) {
-                    player.shuffleAndRefillDeck();
-                    this.session.getGameState().sendShuffle(player);
-                }
-                IPlayableCard card = player.getPlayerDeck().remove(0);
-                player.getPlayerHand().add(card);
-            }
-
-            this.session.getGameState().sendHandCards(player);
-        }
-
-    }
 
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers
