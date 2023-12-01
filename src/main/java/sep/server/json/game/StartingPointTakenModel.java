@@ -4,13 +4,13 @@ import org.json.JSONObject;
 import sep.server.json.AModel;
 import sep.server.viewmodel.ClientInstance;
 
-public class StartingPointModel extends AModel {
+public class StartingPointTakenModel extends AModel {
 
     private final int x;
     private final int y;
     private final int playerID;
 
-    public StartingPointModel(ClientInstance ci, int x, int y, int playerID) {
+    public StartingPointTakenModel(ClientInstance ci, int x, int y, int playerID) {
         super(ci);
         this.x = x;
         this.y = y;

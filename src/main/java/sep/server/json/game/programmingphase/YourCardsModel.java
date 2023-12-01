@@ -18,12 +18,9 @@ public class YourCardsModel extends AModel {
 
     @Override
     public JSONObject toJSON() {
-        JSONObject body = new JSONObject();
-        body.put("cardsInHand", new JSONArray(cards));
-
         JSONObject j = new JSONObject();
         j.put("messageType", "YourCards");
-        j.put("messageBody", body);
+        j.put("messageBody", new JSONObject().put("cardsInHand", this.cards));
 
         return j;
     }

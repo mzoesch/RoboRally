@@ -18,7 +18,6 @@ public class CurrentPlayerModel extends AModel {
 
     @Override
     public JSONObject toJSON() {
-
         JSONObject j = new JSONObject();
         j.put("messageType", "CurrentPlayer");
         j.put("messageBody", new JSONObject().put("clientID", this.playerID));
