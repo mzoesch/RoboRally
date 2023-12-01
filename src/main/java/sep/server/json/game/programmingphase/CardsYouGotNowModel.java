@@ -22,6 +22,6 @@ public class CardsYouGotNowModel extends AModel {
         JSONObject j = new JSONObject();
         j.put("messageType", "CardsYouGotNow");
         j.put("messageBody",body);
-        return null;
+        return j;
     }
 }
