@@ -220,7 +220,7 @@ public final class ClientInstance implements Runnable
             l.debug("Received selected Card from client.");
             String selectedCard = dcrp.getSelectedCard();
             int selectedRegister = dcrp.getSelectedCardRegister();
-            this.playerController.getSelectedCard(selectedCard,selectedRegister);
+            this.playerController.setSelectedCardInRegister(selectedCard,selectedRegister);
             return true;
         }
 
