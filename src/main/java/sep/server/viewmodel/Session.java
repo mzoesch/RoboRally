@@ -6,9 +6,9 @@ import sep.server.json.game.StartingPointModel;
 import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
-import sep.server.json.lobby.PlayerValuesModel;
+import sep.server.json.lobby.PlayerAddedModel;
 import sep.server.json.common.ChatMsgModel;
-import sep.server.json.lobby.PlayerReadyModel;
+import sep.server.json.lobby.PlayerStatusModel;
 import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
@@ -122,8 +122,8 @@ public final class Session
         /* Information for the new client to understand the current state of the game. */
         for (PlayerController PC : this.playerControllers)
         {
-            new PlayerValuesModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
-            new PlayerReadyModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
+            new PlayerAddedModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
+            new PlayerStatusModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
             continue;
         }
         new CourseSelectedModel(newPC, this.gameState.getCourseName()).send();
@@ -136,7 +136,7 @@ public final class Session
                 continue;
             }
 
-            new PlayerValuesModel(PC, newPC.getPlayerID(), newPC.getPlayerName(), newPC.getFigure()).send();
+            new PlayerAddedModel(PC, newPC.getPlayerID(), newPC.getPlayerName(), newPC.getFigure()).send();
 
             continue;
         }
@@ -150,7 +150,7 @@ public final class Session
     {
         for (PlayerController PC : this.playerControllers)
         {
-            new PlayerValuesModel(PC, changedPC.getPlayerID(), changedPC.getPlayerName(), changedPC.getFigure()).send();
+            new PlayerAddedModel(PC, changedPC.getPlayerID(), changedPC.getPlayerName(), changedPC.getFigure()).send();
             continue;
         }
 
@@ -183,7 +183,7 @@ public final class Session
     {
         for (PlayerController PC : this.playerControllers)
         {
-            new PlayerReadyModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
+            new PlayerStatusModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
             continue;
         }
 

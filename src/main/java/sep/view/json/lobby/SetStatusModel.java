@@ -4,11 +4,11 @@ import sep.view.json.AServerRequestModel;
 
 import org.json.JSONObject;
 
-public class ReadyPlayerModel extends AServerRequestModel
+public class SetStatusModel extends AServerRequestModel
 {
     private final boolean bReady;
 
-    public ReadyPlayerModel(boolean bReady)
+    public SetStatusModel(boolean bReady)
     {
         super();
         this.bReady = bReady;

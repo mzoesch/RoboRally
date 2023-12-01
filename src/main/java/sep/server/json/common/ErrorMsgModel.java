@@ -18,12 +18,9 @@ public class ErrorMsgModel extends AModel
 
     @Override
     public JSONObject toJSON() {
-        JSONObject body = new JSONObject();
-        body.put("error", this.msg);
-
         JSONObject j = new JSONObject();
         j.put("messageType", "Error");
-        j.put("messageBody", body);
+        j.put("messageBody", new JSONObject().put("error", this.msg));
 
         return j;
     }
