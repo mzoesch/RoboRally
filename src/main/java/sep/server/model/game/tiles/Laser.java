@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 public class Laser implements FieldType {
 
-    private static int laserCount;
+    private static int laserCount; //
 
     private final String orientation;
 

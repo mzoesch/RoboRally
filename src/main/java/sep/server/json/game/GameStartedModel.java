@@ -27,7 +27,6 @@ public class GameStartedModel extends AModel
     @Override
     public JSONObject toJSON()
     {
-        //TODO JSON-Object-Erstellung
         JSONObject body = new JSONObject();
         JSONObject courseJson = new JSONObject();
         JSONArray arrayListX = new JSONArray();
@@ -51,11 +50,4 @@ public class GameStartedModel extends AModel
         l.debug(courseJson);
         return courseJson;
     }
-/*
-    public static void main(final String[] args){
-        Course testCourse = new Course("DizzyHighway");
-        GameStartedModel testModel = new GameStartedModel(null, testCourse.getCourse());
-        JSONObject testJSON = testModel.toJSON();
-        System.out.println(testJSON);
-    }*/
 }

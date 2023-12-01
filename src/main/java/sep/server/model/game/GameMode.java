@@ -303,11 +303,11 @@ public class GameMode
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
                 if (fieldType instanceof ConveyorBelt conveyorBelt) {
-                    int beltSpeed = ConveyorBelt.getSpeed();
+                    int beltSpeed = conveyorBelt.getSpeed();
 
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
-                        String outDirection = ConveyorBelt.getOutcomingFlowDirection();
+                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
                         Coordinate newCoordinate = null;
 
                         for(int i = 0; i<speed; i++) {
@@ -350,8 +350,8 @@ public class GameMode
         Tile newTile = course.getTileByCoordinate(coordinate);
         for(FieldType newFieldType : newTile.getFieldTypes()) {
             if(newFieldType instanceof ConveyorBelt newConveyorBelt) {
-                String newOutDirection = ConveyorBelt.getOutcomingFlowDirection();
-                String[] newInDirection = ConveyorBelt.getIncomingFlowDirection();
+                String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
+                String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
                 String robotOldDirection = player.getPlayerRobot().getDirection();
                 if(newInDirection != null && newOutDirection != null) {
                     for(String direction : newInDirection) {
@@ -394,11 +394,11 @@ public class GameMode
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
                 if(fieldType instanceof PushPanel pushPanel) {
-                    int[] activateAtRegister = PushPanel.getActivateAtRegister();
+                    int[] activateAtRegister = pushPanel.getActivateAtRegister();
 
                     for(int register : activateAtRegister) {
                         if(register == currentRegister) {
-                            String pushOrientation = PushPanel.getOrientation();
+                            String pushOrientation = pushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
 
                             Coordinate newCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
@@ -436,7 +436,7 @@ public class GameMode
 
             for (FieldType fieldType : currentTile.getFieldTypes()) {
                 if(fieldType instanceof Gear gear) {
-                    String rotationalDirection = Gear.getRotationalDirection();
+                    String rotationalDirection = gear.getRotationalDirection();
                     String robotDirection = player.getPlayerRobot().getDirection();
                     String newDirection = robotDirection;
                     if(Objects.equals(rotationalDirection, "counterclockwise")) {

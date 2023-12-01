@@ -534,7 +534,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,1)
-        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"top", "right"}));
+        fieldtypes.add(new ConveyorBelt(2, "left", new String[] {"right"}));
         arrayListY.add(new Tile("5B",new Coordinate(3,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -842,7 +842,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (8,8)
-        fieldtypes.add(new ConveyorBelt(2, "right", new String[]{"bottom","left"}));
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[]{"bottom","left"}));
         arrayListY.add(new Tile("5B",new Coordinate(8,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
