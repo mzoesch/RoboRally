@@ -82,18 +82,17 @@ public class GameMode
         return players;
     }
 
-    //TODO Refactoring in zwei oder mehr Methoden?
+    /**
+     * Methode zum Setzen eines StartingPoints. Wenn StartingPoint valide, wird dieser gesetzt.
+     * Danach wird der nächste Spieler zum Wählen eines StartingPoints ausgewählt oder, wenn nicht möglich
+     * die Aufbauphase beendet
+     * @param pc Spieler, der StartingPoint setzen will
+     * @param x xKoordinate des StartingPoints
+     * @param y yKoordinate des StartingPoints
+     */
     public void setStartingPoint(PlayerController pc, int x, int y){
-        if(gamePhase != 0){
-            l.warn("Unable to set StartPoint due to wrong GamePhase");
-            new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
 
-        } else if(pc.getPlayerID() != currentPlayer.getPlayerController().getPlayerID()){
-            l.warn("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
-            new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
-            //ErrorMessage an Client & Logger; falscher Spieler
-
-        } else{
+        if(ableToSetStartPoint(pc)){
 
             int validation = currentPlayer.getPlayerRobot().validStartingPoint(x,y);
             if(validation == 1){
@@ -109,8 +108,8 @@ public class GameMode
                     l.info("StartPhase has concluded. ProgrammingPhase has started");
                     programmingPhase();
 
-
                 } else{
+                    //sonst wird der nächste Spieler, der noch keinen Roboter gesetzt hat, ausgewählt
                     for(Player player : players){
                         if (player.getPlayerRobot().getCurrentTile() == null){
                             currentPlayer = player;
@@ -128,6 +127,28 @@ public class GameMode
 
         }
 
+    }
+
+    /**
+     * Checkt, ob setzen eines StartingPoints überhaupt möglich ist (Aufbauphase & Spieler ist an der Reihe).
+     * Gibt sonst entsprechende Fehlernachrichten aus
+     * @param pc Spieler, der StartingPoint setzen will
+     * @return true, wenn möglich; false, wenn nicht
+     */
+    public boolean ableToSetStartPoint(PlayerController pc) {
+        if (gamePhase != 0) {
+            l.debug("Unable to set StartPoint due to wrong GamePhase");
+            new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
+            return false;
+
+        } else if (pc.getPlayerID() != currentPlayer.getPlayerController().getPlayerID()) {
+            l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
+            new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            return false;
+
+        } else {
+            return true;
+        }
     }
 
     public boolean startingPointSelectionFinished(){
