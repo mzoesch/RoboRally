@@ -640,7 +640,7 @@ public class GameMode
                     }
 
                     for(Player player1 : players) {
-                        new CheckPointModel(player1.getPlayerController().getClientInstance(),
+                        new CheckPointReachedModel(player1.getPlayerController().getClientInstance(),
                                 player.getPlayerController().getPlayerID(),
                                 player.getCheckpointsCollected()).send();
                     }

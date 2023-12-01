@@ -4,22 +4,22 @@ import org.json.JSONObject;
 import sep.server.json.AModel;
 import sep.server.viewmodel.ClientInstance;
 
-public class CheckPointModel extends AModel {
+public class CheckPointReachedModel extends AModel {
 
     private final int playerID;
-    private final int checkpointNumbers;
+    private final int checkPointNumbers;
 
-    public CheckPointModel(ClientInstance ci, int playerID, int checkpointNumbers) {
+    public CheckPointReachedModel(ClientInstance ci, int playerID, int checkPointNumbers) {
         super(ci);
         this.playerID = playerID;
-        this.checkpointNumbers = checkpointNumbers;
+        this.checkPointNumbers = checkPointNumbers;
     }
 
     @Override
     public JSONObject toJSON() {
         JSONObject body = new JSONObject();
         body.put("clientID", this.playerID);
-        body.put("number", this.checkpointNumbers);
+        body.put("number", this.checkPointNumbers);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "CheckPointReached");
