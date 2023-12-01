@@ -5,13 +5,13 @@ import sep.server.json.AModel;
 
 import org.json.JSONObject;
 
-public class PlayerValuesModel extends AModel
+public class PlayerAddedModel extends AModel
 {
     private final int playerID;
     private final String playerName;
     private final int figureID;
 
-    public PlayerValuesModel(PlayerController pc, int playerID, String playerName, int figureID)
+    public PlayerAddedModel(PlayerController pc, int playerID, String playerName, int figureID)
     {
         super(pc.getClientInstance());
 

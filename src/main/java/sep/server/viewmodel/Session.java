@@ -5,7 +5,7 @@ import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.StartingPointModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
-import sep.server.json.lobby.PlayerValuesModel;
+import sep.server.json.lobby.PlayerAddedModel;
 import sep.server.json.common.ChatMsgModel;
 import sep.server.json.lobby.PlayerReadyModel;
 import sep.server.json.lobby.SelectCourseModel;
@@ -121,7 +121,7 @@ public final class Session
         /* Information for the new client to understand the current state of the game. */
         for (PlayerController PC : this.playerControllers)
         {
-            new PlayerValuesModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
+            new PlayerAddedModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
             new PlayerReadyModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
             continue;
         }
@@ -135,7 +135,7 @@ public final class Session
                 continue;
             }
 
-            new PlayerValuesModel(PC, newPC.getPlayerID(), newPC.getPlayerName(), newPC.getFigure()).send();
+            new PlayerAddedModel(PC, newPC.getPlayerID(), newPC.getPlayerName(), newPC.getFigure()).send();
 
             continue;
         }
@@ -149,7 +149,7 @@ public final class Session
     {
         for (PlayerController PC : this.playerControllers)
         {
-            new PlayerValuesModel(PC, changedPC.getPlayerID(), changedPC.getPlayerName(), changedPC.getFigure()).send();
+            new PlayerAddedModel(PC, changedPC.getPlayerID(), changedPC.getPlayerName(), changedPC.getFigure()).send();
             continue;
         }
 
