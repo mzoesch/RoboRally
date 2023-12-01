@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.Arrays;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -244,8 +245,16 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* The nine cards a player gets at the beginning of a programming phase. */
         if (Objects.equals(dsrp.getType_v2(), "YourCards")) {
-            l.debug("Received your cards from server.");
+            l.debug("Received nine new programming cards from server {}.", String.join(", ", Arrays.asList(dsrp.getCardsInHand())));
+            EGameState.INSTANCE.clearAllRegisters();
+            for (String c : dsrp.getCardsInHand())
+            {
+                EGameState.INSTANCE.addGotRegister(c);
+                continue;
+            }
+            ViewSupervisor.updateFooter();
             return;
         }
 
