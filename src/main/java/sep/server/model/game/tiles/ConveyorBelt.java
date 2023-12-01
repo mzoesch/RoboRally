@@ -35,7 +35,6 @@ public class ConveyorBelt implements FieldType {
         for(String incomingDirection : incomingFlowDirection){
             orientations.put(incomingDirection);
         }
-        orientations.put(outcomingFlowDirection);
         fieldInfo.put("orientations", orientations);
         fieldInfo.put("speed", speed);
         fieldInfo.put("isOnBoard", isOnBoard);
