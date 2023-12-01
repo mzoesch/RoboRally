@@ -169,7 +169,7 @@ public class GameMode
 
     public void programmingPhase() {
         distributeCards(players);
-
+        selectCards(players);
         discardAndDrawBlind(players);
     }
 
@@ -196,15 +196,18 @@ public class GameMode
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
-
     public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
         try {
-            Thread.sleep(30000); //30 sekunden
+            for (Player player : players) {
+                new Thread(player.getPlayerController().getClientInstance()).start();
+            }
+            Thread.sleep(30000); // 30 Sekunden
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
         int[] playerIdWhoNotFinished = new int[players.size()];
         int index = 0;
