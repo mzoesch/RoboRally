@@ -59,7 +59,7 @@ public class GameMode
         this.players = new ArrayList<>();
         for(PlayerController pc : playerControllers)
         {
-            this.players.add(new Player(pc, this.course));
+            this.players.add(new Player(pc, this.course, this.session));
             continue;
         }
 
