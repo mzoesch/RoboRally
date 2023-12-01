@@ -270,7 +270,7 @@ public class Player {
 
   public IPlayableCard getCardByName(String cardName) {
     for (IPlayableCard card : playerHand) {
-    //  if (card.getCardType().equals(cardName))
+      if (card.getCardType().equals(cardName))
       {
         return card;
       }
