@@ -3,7 +3,9 @@ package sep.server.model.game;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.IPlayableCard;
+import sep.server.model.game.cards.programming.AProgrammingCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.Coordinate;
 import sep.server.model.game.builder.DeckBuilder;
@@ -16,7 +18,7 @@ public class Player {
   Robot playerRobot;
   ArrayList<IPlayableCard> playerDeck;
   ArrayList<IPlayableCard> discardPile;
-  ArrayList<IPlayableCard> playerHand;
+  ArrayList<AProgrammingCard> playerHand;
   IPlayableCard[] registers;
   int priority; //TODO aktuell überflüssig oder?; falls nicht, muss sie im Konstruktor gesetzt werden
   int checkpointsCollected;
@@ -67,11 +69,11 @@ public class Player {
   public void setDiscardPile(ArrayList<IPlayableCard> discardPile) {
     this.discardPile = discardPile;
   }
-  public ArrayList<IPlayableCard> getPlayerHand() {
+  public ArrayList<AProgrammingCard> getPlayerHand() {
     return playerHand;
   }
 
-  public void setPlayerHand(ArrayList<IPlayableCard> playerHand) {
+  public void setPlayerHand(ArrayList<AProgrammingCard> playerHand) {
     this.playerHand = playerHand;
   }
 
@@ -135,20 +137,6 @@ public class Player {
     Collections.shuffle(discardPile);
     playerDeck.addAll(playerDeck.size(), discardPile); // Refill playerDeck with the shuffled discardPile at the end of PlayerDeck
     discardPile.clear();
-  }
-
-  /**
-   * Converts the player's hand of playable cards into a String array.
-   *
-   * This method is necessary for creating an object of the CardsYouGotNowModel class
-   */
-  public String[] getPlayerHandAsStringArray() {
-    ArrayList<IPlayableCard> hand = this.getPlayerHand();
-    String[] handArray = new String[hand.size()];
-    for (int i = 0; i < hand.size(); i++) {
-      handArray[i] = hand.get(i).toString();
-    }
-    return handArray;
   }
 
   public String[] getRegistersAsStringArray() {
@@ -260,22 +248,50 @@ public class Player {
    * and if all registers are full after the addition, it notifies the session that the selection is finished.
    * If a card is removed (set to null), it also sends a notification about the card deselection.
    */
-  public void addCardToRegister(IPlayableCard card, int position) {
+  public void addCardToRegister(String cardName, int position) {
     if (position >= 0 && position < 4) {
-      IPlayableCard existingCard = registers[position];
+      IPlayableCard card = getCardByName(cardName);
 
       if (card != null) {
         registers[position] = card;
         session.sendCardSelected(getPlayerController().getPlayerID(), position, true);
-        if (checkRegisterStatus()){
+
+        if (checkRegisterStatus()) {
           session.sendSelectionFinished(playerController.getPlayerID());
+          session.getGameState().getAuthGameMode().startTimer();
         }
-      } else if (card == null) {
+      } else {
         registers[position] = null;
         session.sendCardSelected(getPlayerController().getPlayerID(), position, false);
       }
     }
+
   }
+
+  public AProgrammingCard getCardByName(String cardName) {
+    for (AProgrammingCard card : playerHand) {
+      if (card.getCardType().equals(cardName)) {
+        return card;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Converts the player's hand of playable cards into a String array.
+   *
+   * This method is necessary for creating an object of the CardsYouGotNowModel class
+   */
+  public String[] getPlayerHandAsStringArray() {
+    ArrayList<AProgrammingCard> hand = this.getPlayerHand();
+    String[] handArray = new String[hand.size()];
+    for (int i = 0; i < hand.size(); i++) {
+      handArray[i] = hand.get(i).getCardType();
+    }
+    return handArray;
+  }
+
+
 
   /**
    * Checks the current status of the player's registers.

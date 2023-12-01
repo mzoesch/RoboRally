@@ -193,6 +193,10 @@ public class GameMode
         }
     }
 
+    /**
+     * Called in the method addCardToRegister in the Class Player when the players register is full
+     */
+
     public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
