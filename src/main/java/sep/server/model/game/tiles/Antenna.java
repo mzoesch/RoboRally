@@ -4,8 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Antenna implements FieldType {
-    private static String direction;
-    private static String isOnBoard;
+    private String direction;
+    private String isOnBoard;
 
     public Antenna(String antennaDirection) {
         direction = antennaDirection;

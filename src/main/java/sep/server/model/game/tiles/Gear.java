@@ -4,13 +4,13 @@ import org.json.JSONObject;
 
 public class Gear implements FieldType {
 
-    private static String rotationalDirection;
+    private String rotationalDirection;
 
     public Gear(String gearRotationalDirection) {
         rotationalDirection = gearRotationalDirection;
     }
 
-    public static String getRotationalDirection() {
+    public String getRotationalDirection() {
         return rotationalDirection;
     }
 

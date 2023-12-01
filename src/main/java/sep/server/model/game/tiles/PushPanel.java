@@ -5,9 +5,9 @@ import org.json.JSONObject;
 
 public class PushPanel implements FieldType {
 
-    private static int[] activateAtRegister;
+    private int[] activateAtRegister;
 
-    private static String orientation;
+    private String orientation;
 
     public PushPanel(String pushOrientation,int[] activationRegisters) {
         orientation = pushOrientation;
@@ -15,11 +15,11 @@ public class PushPanel implements FieldType {
         activateAtRegister = activationRegisters;
     }
 
-    public static int[] getActivateAtRegister() {
+    public int[] getActivateAtRegister() {
         return activateAtRegister;
     }
 
-    public static String getOrientation() {
+    public String getOrientation() {
         return orientation;
     }
 

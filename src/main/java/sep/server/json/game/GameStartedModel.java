@@ -51,11 +51,11 @@ public class GameStartedModel extends AModel
         l.debug(courseJson);
         return courseJson;
     }
-/*
+
     public static void main(final String[] args){
         Course testCourse = new Course("DizzyHighway");
         GameStartedModel testModel = new GameStartedModel(null, testCourse.getCourse());
         JSONObject testJSON = testModel.toJSON();
         System.out.println(testJSON);
-    }*/
+    }
 }

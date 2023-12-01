@@ -5,9 +5,9 @@ import org.json.JSONObject;
 
 public class ConveyorBelt implements FieldType {
 
-    private static String[] incomingFlowDirection;
-    private static String outcomingFlowDirection;
-    private static int speed;
+    private String[] incomingFlowDirection;
+    private String outcomingFlowDirection;
+    private int speed;
 
     public ConveyorBelt(int beltSpeed, String outDirection, String [] inDirection) {
 
@@ -16,15 +16,15 @@ public class ConveyorBelt implements FieldType {
         speed = beltSpeed;
     }
 
-    public static String[] getIncomingFlowDirection() {
+    public String[] getIncomingFlowDirection() {
         return incomingFlowDirection;
     }
 
-    public static String getOutcomingFlowDirection() {
+    public String getOutcomingFlowDirection() {
         return outcomingFlowDirection;
     }
 
-    public static int getSpeed() {
+    public int getSpeed() {
         return speed;
     }
 
@@ -35,6 +35,7 @@ public class ConveyorBelt implements FieldType {
         for(String incomingDirection : incomingFlowDirection){
             orientations.put(incomingDirection);
         }
+        orientations.put(outcomingFlowDirection);
         fieldInfo.put("orientations", orientations);
         fieldInfo.put("speed", speed);
         fieldInfo.put("isOnBoard", isOnBoard);
