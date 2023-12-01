@@ -5,12 +5,12 @@ import sep.server.viewmodel.ClientInstance;
 
 import org.json.JSONObject;
 
-public class PlayerReadyModel extends AModel
+public class PlayerStatusModel extends AModel
 {
     private final int playerID;
     private final boolean bIsReady;
 
-    public PlayerReadyModel(ClientInstance ci, int playerID, boolean bIsReady)
+    public PlayerStatusModel(ClientInstance ci, int playerID, boolean bIsReady)
     {
         super(ci);
         this.playerID = playerID;
@@ -21,13 +21,13 @@ public class PlayerReadyModel extends AModel
     @Override
     public JSONObject toJSON()
     {
-        JSONObject b = new JSONObject();
-        b.put("clientID", this.playerID);
-        b.put("ready", this.bIsReady);
+        JSONObject body = new JSONObject();
+        body.put("clientID", this.playerID);
+        body.put("ready", this.bIsReady);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "PlayerStatus");
-        j.put("messageBody", b);
+        j.put("messageBody", body);
 
         return j;
     }

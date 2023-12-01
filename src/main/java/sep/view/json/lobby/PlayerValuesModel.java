@@ -6,13 +6,13 @@ import org.json.JSONObject;
 
 public final class PlayerValuesModel extends AServerRequestModel
 {
-    private final String PLAYER_NAME;
-    private final int FIGURE_ID;
+    private final String playerName;
+    private final int figureId;
 
     public PlayerValuesModel(String playerName, int figureId)
     {
-        this.PLAYER_NAME = playerName;
-        this.FIGURE_ID = figureId;
+        this.playerName = playerName;
+        this.figureId = figureId;
 
         return;
     }
@@ -21,8 +21,8 @@ public final class PlayerValuesModel extends AServerRequestModel
     public JSONObject toJSON()
     {
         JSONObject body = new JSONObject();
-        body.put("name", this.PLAYER_NAME);
-        body.put("figure", this.FIGURE_ID);
+        body.put("name", this.playerName);
+        body.put("figure", this.figureId);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "PlayerValues");

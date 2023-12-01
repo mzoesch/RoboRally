@@ -270,7 +270,8 @@ public class Player {
 
   public IPlayableCard getCardByName(String cardName) {
     for (IPlayableCard card : playerHand) {
-      if (card.getCardType().equals(cardName)) {
+    //  if (card.getCardType().equals(cardName))
+      {
         return card;
       }
     }
@@ -286,7 +287,7 @@ public class Player {
     ArrayList<IPlayableCard> hand = this.getPlayerHand();
     String[] handArray = new String[hand.size()];
     for (int i = 0; i < hand.size(); i++) {
-      handArray[i] = hand.get(i).getCardType();
+   //   handArray[i] = hand.get(i).getCardType();
     }
     return handArray;
   }
