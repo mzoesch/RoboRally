@@ -7,7 +7,7 @@ import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerAddedModel;
 import sep.server.json.common.ChatMsgModel;
-import sep.server.json.lobby.PlayerReadyModel;
+import sep.server.json.lobby.PlayerStatusModel;
 import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
@@ -122,7 +122,7 @@ public final class Session
         for (PlayerController PC : this.playerControllers)
         {
             new PlayerAddedModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
-            new PlayerReadyModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
+            new PlayerStatusModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
             continue;
         }
         new CourseSelectedModel(newPC, this.gameState.getCourseName()).send();
@@ -182,7 +182,7 @@ public final class Session
     {
         for (PlayerController PC : this.playerControllers)
         {
-            new PlayerReadyModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
+            new PlayerStatusModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
             continue;
         }
 
