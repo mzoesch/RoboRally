@@ -191,6 +191,21 @@ public class GameJFXController
         return iv;
     }
 
+    private ImageView getCardRegisterSlot(final int width, final int height, final String cardName)
+    {
+        if (cardName == null)
+        {
+            return this.getEmptyRegisterSlot(width, height);
+        }
+
+        final ImageView iv = new ImageView();
+        iv.setFitWidth(width);
+        iv.setFitHeight(height);
+        iv.getStyleClass().add("register-slot");
+        iv.setImage(TileModifier.getImage(cardName));
+        return iv;
+    }
+
     /**
      * @param idx       Index of the register slot.
      * @param cardName  Name of the card to render. Pass null to render an empty slot.
@@ -234,9 +249,9 @@ public class GameJFXController
      * @param idx       Index of the got register slot.
      * @param cardName  Name of the card to render. Pass null to render an empty slot.
      */
-    private void renderGotRegisterSlot(int idx, String cardName)
+    private void renderGotRegisterSlot(final int idx, final String cardName)
     {
-        final ImageView iv = this.getEmptyRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT);
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName);
 
         switch (idx)
         {
@@ -295,16 +310,13 @@ public class GameJFXController
      */
     private void renderRegisterSlots()
     {
-//        this.renderRegisterSlot(0, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(0));
-//        this.renderRegisterSlot(1, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(1));
-//        this.renderRegisterSlot(2, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(2));
-//        this.renderRegisterSlot(3, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(3));
-//        this.renderRegisterSlot(4, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(4));
-        this.renderRegisterSlot(0, null);
-        this.renderRegisterSlot(1, null);
-        this.renderRegisterSlot(2, null);
-        this.renderRegisterSlot(3, null);
-        this.renderRegisterSlot(4, null);
+        this.renderRegisterSlot(0, EGameState.INSTANCE.getRegister(0));
+        this.renderRegisterSlot(1, EGameState.INSTANCE.getRegister(1));
+        this.renderRegisterSlot(2, EGameState.INSTANCE.getRegister(2));
+        this.renderRegisterSlot(3, EGameState.INSTANCE.getRegister(3));
+        this.renderRegisterSlot(4, EGameState.INSTANCE.getRegister(4));
+
+        return;
     }
 
     /**
@@ -313,15 +325,15 @@ public class GameJFXController
      */
     private void renderGotRegisterCardSlots()
     {
-        this.renderGotRegisterSlot(0, null);
-        this.renderGotRegisterSlot(1, null);
-        this.renderGotRegisterSlot(2, null);
-        this.renderGotRegisterSlot(3, null);
-        this.renderGotRegisterSlot(4, null);
-        this.renderGotRegisterSlot(5, null);
-        this.renderGotRegisterSlot(6, null);
-        this.renderGotRegisterSlot(7, null);
-        this.renderGotRegisterSlot(8, null);
+        this.renderGotRegisterSlot(0, EGameState.INSTANCE.getGotRegister(0));
+        this.renderGotRegisterSlot(1, EGameState.INSTANCE.getGotRegister(1));
+        this.renderGotRegisterSlot(2, EGameState.INSTANCE.getGotRegister(2));
+        this.renderGotRegisterSlot(3, EGameState.INSTANCE.getGotRegister(3));
+        this.renderGotRegisterSlot(4, EGameState.INSTANCE.getGotRegister(4));
+        this.renderGotRegisterSlot(5, EGameState.INSTANCE.getGotRegister(5));
+        this.renderGotRegisterSlot(6, EGameState.INSTANCE.getGotRegister(6));
+        this.renderGotRegisterSlot(7, EGameState.INSTANCE.getGotRegister(7));
+        this.renderGotRegisterSlot(8, EGameState.INSTANCE.getGotRegister(8));
 
         return;
     }
@@ -662,6 +674,17 @@ public class GameJFXController
         Platform.runLater(() ->
         {
             this.renderPlayerPositions();
+            return;
+        });
+
+        return;
+    }
+
+    public void onFooterUpdate()
+    {
+        Platform.runLater(() ->
+        {
+            this.renderHUDFooter();
             return;
         });
 
