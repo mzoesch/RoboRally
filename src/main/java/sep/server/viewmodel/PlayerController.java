@@ -1,6 +1,10 @@
 package sep.server.viewmodel;
 
 import sep.server.json.common.ChatMsgModel;
+import sep.server.model.game.Player;
+
+import java.util.ArrayList;
+
 
 /**
  * The interface between the Pawn in the game and the human player controlling it. The Player Controller essentially
@@ -18,9 +22,12 @@ public final class PlayerController
     private final ClientInstance clientInstance;
     private String playerName;
     private final int playerID;
+
     private final Session session;
     private int figure;
     private boolean bIsReady;
+
+
 
     public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
     {
@@ -95,7 +102,18 @@ public final class PlayerController
 
     public void getSelectedCard(String selectedCard, int selectedRegister){
 
+        Player playerWhoSelectedCard = null;
+
+        for (Player player : session.getGameState().getAuthGameMode().getPlayers()) {
+            if (player.getPlayerController().getPlayerID() == playerID) {
+                playerWhoSelectedCard = player;
+                break;
+            }
+        }
+        playerWhoSelectedCard.addCardToRegister(selectedCard, selectedRegister);
     }
+
+
 
     // endregion Getters and Setters
 
