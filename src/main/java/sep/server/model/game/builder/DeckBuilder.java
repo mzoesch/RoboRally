@@ -1,5 +1,8 @@
 package sep.server.model.game.builder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import sep.server.model.game.GameState;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.damage.SpamDamage;
 import sep.server.model.game.cards.damage.TrojanHorseDamage;
@@ -11,6 +14,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class DeckBuilder {
+    private static final Logger l = LogManager.getLogger(GameState.class);
     public void DeckBuilder(){
 
     }
@@ -58,19 +62,19 @@ public class DeckBuilder {
     }
 
     public ArrayList<VirusDamage> buildVirusDeck(){
-        ArrayList<VirusDamage> spamDeck = new ArrayList<>();
+        ArrayList<VirusDamage> virusDeck = new ArrayList<>();
         for(int i = 0; i < 18; i++){
-            spamDeck.add(new VirusDamage("VirusDamage"));
+            virusDeck.add(new VirusDamage("VirusDamage"));
         }
-        return spamDeck;
+        return virusDeck;
     }
 
     public ArrayList<TrojanHorseDamage> buildTrojanDeck(){
-        ArrayList<TrojanHorseDamage> spamDeck = new ArrayList<>();
+        ArrayList<TrojanHorseDamage> trojanDeck = new ArrayList<>();
         for(int i = 0; i < 12; i++){
-            spamDeck.add(new TrojanHorseDamage("TrojanHorseDamage"));
+            trojanDeck.add(new TrojanHorseDamage("TrojanHorseDamage"));
         }
-        return spamDeck;
+        return trojanDeck;
     }
     public ArrayList<WormDamage> buildWormDeck(){
         ArrayList<WormDamage> spamDeck = new ArrayList<>();
