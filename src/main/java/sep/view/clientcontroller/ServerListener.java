@@ -277,7 +277,7 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CheckPoint")) {
+        if (Objects.equals(dsrp.getType_v2(), "CheckPointReached")) {
             l.debug("Received checkpoint from server.");
             return;
         }
