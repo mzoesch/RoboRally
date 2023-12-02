@@ -214,12 +214,12 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "SelecetionFinished")) {
+        if (Objects.equals(dsrp.getType_v2(), "SelectionFinished")) {
             l.debug("Received selection finished from client.");
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CardsYouGorNow")) {
+        if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
             l.debug("Received cards you got now from server.");
             return;
         }
@@ -264,7 +264,7 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CheckPoint")) {
+        if (Objects.equals(dsrp.getType_v2(), "CheckPointReached")) {
             l.debug("Received checkpoint from server.");
             return;
         }
