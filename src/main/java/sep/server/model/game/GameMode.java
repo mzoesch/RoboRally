@@ -27,7 +27,7 @@ public class GameMode
     private static final Logger l = LogManager.getLogger(Session.class);
 
     private final Course course;
-    int gamePhase = 0; //0 => Aufbauphase, 1 => Upgradephase, 2 => Programmierphase, 3 => Aktivierungsphase
+    private EGamePhase gamePhase = EGamePhase.INVALID;
     private final Session session;
 
     ArrayList<Player> players;
@@ -45,7 +45,7 @@ public class GameMode
         super();
 
         this.course = new Course(courseName);
-        this.gamePhase = 0;
+        this.gamePhase = EGamePhase.REGISTRATION;
         this.session = session;
 
         DeckBuilder deckBuilder = new DeckBuilder();
@@ -59,7 +59,7 @@ public class GameMode
         this.players = new ArrayList<>();
         for(PlayerController pc : playerControllers)
         {
-            this.players.add(new Player(pc, this.course));
+            this.players.add(new Player(pc, this.course, this.session));
             continue;
         }
 
@@ -72,7 +72,7 @@ public class GameMode
             continue;
         }
 
-        this.session.handleActivePhase(0);
+        this.session.handleActivePhase(this.gamePhase);
         this.session.handleCurrentPlayer(this.currentPlayer.getPlayerController().getPlayerID());
 
         return;
@@ -103,8 +103,8 @@ public class GameMode
 
                 if(startingPointSelectionFinished()){
                     //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
-                    gamePhase = 1;
-                    pc.getSession().handleActivePhase(gamePhase);
+                    this.gamePhase = EGamePhase.PROGRAMMING;
+                    pc.getSession().handleActivePhase(this.gamePhase);
                     l.info("StartPhase has concluded. ProgrammingPhase has started");
                     programmingPhase();
 
@@ -136,7 +136,7 @@ public class GameMode
      * @return true, wenn möglich; false, wenn nicht
      */
     public boolean ableToSetStartPoint(PlayerController pc) {
-        if (gamePhase != 0) {
+        if (gamePhase != EGamePhase.REGISTRATION) {
             l.debug("Unable to set StartPoint due to wrong GamePhase");
             new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
             return false;

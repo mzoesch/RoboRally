@@ -229,21 +229,6 @@ public final class ClientInstance implements Runnable
             int x = dcrp.getXCoordinate();
             int y = dcrp.getYCoordinate();
             this.playerController.getSession().getGameState().setStartingPoint(playerController,x,y);
-
-            /* To be deleted.
-            /* Accepting start pos.
-            for (PlayerController PC : this.playerController.getSession().getGameState().getAuthGameMode().getPlayerControllers())
-            {
-                PC.getClientInstance().sendMockJSON(new JSONObject(String.format("{\"messageType\":\"StartingPointTaken\",\"messageBody\":{\"clientID\":\"%s\",\"x\":\"%s\",\"y\":\"%s\"}}", this.getPlayerController().getPlayerID(), dcrp.getPosX(), dcrp.getPosY())));
-            }
-
-            /* Select the next player.
-            /* Selecting starting player.
-            for (PlayerController PC : this.playerController.getSession().getGameState().getAuthGameMode().getPlayerControllers()) {
-                PC.getClientInstance().sendMockJSON(new JSONObject(String.format("{\"messageType\":\"CurrentPlayer\",\"messageBody\":{\"clientID\":%d}}", this.playerController.getSession().getGameState().getAuthGameMode().getPlayerControllers()[1].getPlayerID())));
-                continue;
-            }
-            */
             return true;
         }
 

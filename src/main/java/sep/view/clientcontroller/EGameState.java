@@ -39,11 +39,8 @@ public enum EGameState
     private String currentServerCourse;
     private JSONArray currentServerCourseJSON;
 
-    // HERE
-    // The current course with its midfielders...
-    // The current programming cards of this client.
-    // The current registers of this client.
-    // ...
+    private final ArrayList<String> registers;
+    private final ArrayList<String> gotRegisters;
 
     private EGameState()
     {
@@ -52,6 +49,9 @@ public enum EGameState
         this.currentServerCourse = "";
         this.currentServerCourseJSON = null;
         this.currentPhase = 0;
+
+        this.registers = new ArrayList<String>();
+        this.gotRegisters = new ArrayList<String>();
 
         return;
     }
@@ -268,6 +268,61 @@ public enum EGameState
     public RemotePlayer getCurrentPlayer()
     {
         return this.currentPlayer;
+    }
+
+    public String getRegister(int idx)
+    {
+        if (idx < 0 || idx >= this.registers.size())
+        {
+            return null;
+        }
+
+        return this.registers.get(idx);
+    }
+
+    public String getGotRegister(int idx)
+    {
+        if (idx < 0 || idx >= this.gotRegisters.size())
+        {
+            return null;
+        }
+
+        return this.gotRegisters.get(idx);
+    }
+
+    public ArrayList<String> getRegisters()
+    {
+        return this.registers;
+    }
+
+    public ArrayList<String> getGotRegisters()
+    {
+        return this.gotRegisters;
+    }
+
+    public void clearGotRegisters()
+    {
+        this.gotRegisters.clear();
+        return;
+    }
+
+    public void clearAllRegisters()
+    {
+        this.registers.clear();
+        this.gotRegisters.clear();
+        return;
+    }
+
+    public void addRegister(String register)
+    {
+        this.registers.add(register);
+        return;
+    }
+
+    public void addGotRegister(String register)
+    {
+        this.gotRegisters.add(register);
+        return;
     }
 
     // endregion Getters and Setters

@@ -38,6 +38,15 @@ public class GameJFXController
     @FXML private AnchorPane registerSlot3;
     @FXML private AnchorPane registerSlot4;
     @FXML private AnchorPane registerSlot5;
+    @FXML private AnchorPane gotRegisterCardSlot1;
+    @FXML private AnchorPane gotRegisterCardSlot2;
+    @FXML private AnchorPane gotRegisterCardSlot3;
+    @FXML private AnchorPane gotRegisterCardSlot4;
+    @FXML private AnchorPane gotRegisterCardSlot5;
+    @FXML private AnchorPane gotRegisterCardSlot6;
+    @FXML private AnchorPane gotRegisterCardSlot7;
+    @FXML private AnchorPane gotRegisterCardSlot8;
+    @FXML private AnchorPane gotRegisterCardSlot9;
 
     private int tileDimensions;
     private static final int resizeAmount = 10;
@@ -172,13 +181,28 @@ public class GameJFXController
 
     // region HUD Footer
 
-    private ImageView getEmptyRegisterSlot()
+    private ImageView getEmptyRegisterSlot(final int width, final int height)
     {
-        ImageView iv = new ImageView();
-        iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
-        iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
+        final ImageView iv = new ImageView();
+        iv.setFitWidth(width);
+        iv.setFitHeight(height);
         iv.getStyleClass().add("register-slot");
         iv.setImage(TileModifier.getImage("EmptyRegisterSlot"));
+        return iv;
+    }
+
+    private ImageView getCardRegisterSlot(final int width, final int height, final String cardName)
+    {
+        if (cardName == null)
+        {
+            return this.getEmptyRegisterSlot(width, height);
+        }
+
+        final ImageView iv = new ImageView();
+        iv.setFitWidth(width);
+        iv.setFitHeight(height);
+        iv.getStyleClass().add("register-slot");
+        iv.setImage(TileModifier.getImage(cardName));
         return iv;
     }
 
@@ -188,16 +212,7 @@ public class GameJFXController
      */
     private void renderRegisterSlot(int idx, String cardName)
     {
-        if (cardName == null)
-        {
-            cardName = "EmptyRegisterSlot";
-        }
-
-        ImageView iv = new ImageView();
-        iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
-        iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
-        iv.getStyleClass().add("register-slot");
-        iv.setImage(TileModifier.getImage(cardName));
+        final ImageView iv = this.getEmptyRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT);
 
         switch (idx)
         {
@@ -230,6 +245,99 @@ public class GameJFXController
         return;
     }
 
+    /**
+     * @param idx       Index of the got register slot.
+     * @param cardName  Name of the card to render. Pass null to render an empty slot.
+     */
+    private void renderGotRegisterSlot(final int idx, final String cardName)
+    {
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName);
+
+        switch (idx)
+        {
+            case 0:
+                this.gotRegisterCardSlot1.getChildren().clear();
+                this.gotRegisterCardSlot1.getChildren().add(iv);
+                break;
+
+            case 1:
+                this.gotRegisterCardSlot2.getChildren().clear();
+                this.gotRegisterCardSlot2.getChildren().add(iv);
+                break;
+
+            case 2:
+                this.gotRegisterCardSlot3.getChildren().clear();
+                this.gotRegisterCardSlot3.getChildren().add(iv);
+                break;
+
+            case 3:
+                this.gotRegisterCardSlot4.getChildren().clear();
+                this.gotRegisterCardSlot4.getChildren().add(iv);
+                break;
+
+            case 4:
+                this.gotRegisterCardSlot5.getChildren().clear();
+                this.gotRegisterCardSlot5.getChildren().add(iv);
+                break;
+
+            case 5:
+                this.gotRegisterCardSlot6.getChildren().clear();
+                this.gotRegisterCardSlot6.getChildren().add(iv);
+                break;
+
+            case 6:
+                this.gotRegisterCardSlot7.getChildren().clear();
+                this.gotRegisterCardSlot7.getChildren().add(iv);
+                break;
+
+            case 7:
+                this.gotRegisterCardSlot8.getChildren().clear();
+                this.gotRegisterCardSlot8.getChildren().add(iv);
+                break;
+
+            case 8:
+                this.gotRegisterCardSlot9.getChildren().clear();
+                this.gotRegisterCardSlot9.getChildren().add(iv);
+                break;
+        }
+
+        return;
+    }
+
+    /**
+     * Updates the register slots.
+     * No re-renders must be done after this method.
+     */
+    private void renderRegisterSlots()
+    {
+        this.renderRegisterSlot(0, EGameState.INSTANCE.getRegister(0));
+        this.renderRegisterSlot(1, EGameState.INSTANCE.getRegister(1));
+        this.renderRegisterSlot(2, EGameState.INSTANCE.getRegister(2));
+        this.renderRegisterSlot(3, EGameState.INSTANCE.getRegister(3));
+        this.renderRegisterSlot(4, EGameState.INSTANCE.getRegister(4));
+
+        return;
+    }
+
+    /**
+     * Updates the got register card slots.
+     * No re-renders must be done after this method.
+     */
+    private void renderGotRegisterCardSlots()
+    {
+        this.renderGotRegisterSlot(0, EGameState.INSTANCE.getGotRegister(0));
+        this.renderGotRegisterSlot(1, EGameState.INSTANCE.getGotRegister(1));
+        this.renderGotRegisterSlot(2, EGameState.INSTANCE.getGotRegister(2));
+        this.renderGotRegisterSlot(3, EGameState.INSTANCE.getGotRegister(3));
+        this.renderGotRegisterSlot(4, EGameState.INSTANCE.getGotRegister(4));
+        this.renderGotRegisterSlot(5, EGameState.INSTANCE.getGotRegister(5));
+        this.renderGotRegisterSlot(6, EGameState.INSTANCE.getGotRegister(6));
+        this.renderGotRegisterSlot(7, EGameState.INSTANCE.getGotRegister(7));
+        this.renderGotRegisterSlot(8, EGameState.INSTANCE.getGotRegister(8));
+
+        return;
+    }
+
     // endregion HUD Footer
 
     /**
@@ -250,16 +358,8 @@ public class GameJFXController
      * */
     private void renderHUDFooter()
     {
-//        this.renderRegisterSlot(0, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(0));
-//        this.renderRegisterSlot(1, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(1));
-//        this.renderRegisterSlot(2, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(2));
-//        this.renderRegisterSlot(3, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(3));
-//        this.renderRegisterSlot(4, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getRegisterSlot(4));
-        this.renderRegisterSlot(0, null);
-        this.renderRegisterSlot(1, null);
-        this.renderRegisterSlot(2, null);
-        this.renderRegisterSlot(3, null);
-        this.renderRegisterSlot(4, null);
+        this.renderRegisterSlots();
+        this.renderGotRegisterCardSlots();
 
         return;
     }
@@ -574,6 +674,17 @@ public class GameJFXController
         Platform.runLater(() ->
         {
             this.renderPlayerPositions();
+            return;
+        });
+
+        return;
+    }
+
+    public void onFooterUpdate()
+    {
+        Platform.runLater(() ->
+        {
+            this.renderHUDFooter();
             return;
         });
 

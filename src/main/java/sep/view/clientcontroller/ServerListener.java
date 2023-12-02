@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.Arrays;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -114,7 +115,7 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {
-            l.trace("Received keep-alive from server. Responding.");
+            l.trace("Received keep-alive from server. Responding. Ok.");
             try
             {
                 GameInstance.respondToKeepAlive();
@@ -128,31 +129,35 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* Core player attributes have changed. */
         if (Objects.equals(dsrp.getType_v2(), "PlayerAdded"))
         {
-            l.debug("Received player added from server.");
+            l.debug("Received player added for client {}.", dsrp.getPlayerID());
             EGameState.addRemotePlayer(dsrp);
             return;
         }
 
+        /* New chat message. */
         if (Objects.equals(dsrp.getType_v2(), "ReceivedChat"))
         {
-            l.debug("Received chat message from server.");
+            l.debug("New chat message received: [{}] from {}.", dsrp.getChatMsg(), dsrp.getChatMsgSourceID());
             ViewSupervisor.handleChatMessage(dsrp);
             return;
         }
 
+        /* If a client is ready to start in the lobby menu. */
         if (Objects.equals(dsrp.getType_v2(), "PlayerStatus"))
         {
-            l.debug("Received player status update.");
+            l.debug("Received player status update. Client {} is ready: {}.", dsrp.getPlayerID(), dsrp.isLobbyPlayerStatusReady());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setReady(dsrp.isLobbyPlayerStatusReady());
             ViewSupervisor.updatePlayerStatus(dsrp);
             return;
         }
 
+        /* The receiving client may choose the server map. */
         if (Objects.equals(dsrp.getType_v2(), "SelectMap"))
         {
-            l.debug("Received course selected from server.");
+            l.debug("Received course selected from server. Available courses: {}.", String.join(", ", Arrays.asList(dsrp.getAvailableCourses())));
             EGameState.INSTANCE.setServerCourses(dsrp.getAvailableCourses());
             ViewSupervisor.updateAvailableCourses(true);
             return;
@@ -160,7 +165,7 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "MapSelected"))
         {
-            l.debug("Received course selected from server.");
+            l.debug("Received course selected from server. Selected course: {}.", dsrp.getCourseName() == null || dsrp.getCourseName().isEmpty() ? "none" : dsrp.getCourseName());
             EGameState.INSTANCE.setCurrentServerCourse(dsrp.getCourseName());
             ViewSupervisor.updateCourseSelected();
             return;
@@ -174,21 +179,24 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* If the game enters a new phase. */
         if (Objects.equals(dsrp.getType_v2(), "ActivePhase"))
         {
-            l.debug("Received active phase update.");
+            l.debug("Received game phase update. New phase: {}.", dsrp.getPhase());
             EGameState.INSTANCE.setCurrentPhase(dsrp.getPhase());
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CurrentPlayer")) {
-            l.debug("Received current player from server.");
+        if (Objects.equals(dsrp.getType_v2(), "CurrentPlayer"))
+        {
+            l.debug("Received current player update. New current player: {}.", dsrp.getPlayerID());
             EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "Error")) {
-            l.debug("Received an error message from server.");
+        if (Objects.equals(dsrp.getType_v2(), "Error"))
+        {
+            l.debug("Received an error message from server. Message: {}.", dsrp.getErrorMessage());
             return;
         }
 
@@ -197,13 +205,9 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "GameStarted")) {
-            l.debug("Received game started from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken")) {
-            l.debug("Received starting point from server.");
+        if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken"))
+        {
+            l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
             ViewSupervisor.updatePlayerPosition();
             return;
@@ -219,8 +223,9 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
-            l.debug("Received cards you got now from server.");
+        /* The server notifies the client about the nine programming cards from another client. */
+        if (Objects.equals(dsrp.getType_v2(), "CardsYouGorNow")) {
+            l.debug("Player {}'s hand cards are updated.", dsrp.getPlayerID());
             return;
         }
 
@@ -244,8 +249,16 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* The nine cards a player gets at the beginning of a programming phase. */
         if (Objects.equals(dsrp.getType_v2(), "YourCards")) {
-            l.debug("Received your cards from server.");
+            l.debug("Received nine new programming cards from server {}.", String.join(", ", Arrays.asList(dsrp.getCardsInHand())));
+            EGameState.INSTANCE.clearAllRegisters();
+            for (String c : dsrp.getCardsInHand())
+            {
+                EGameState.INSTANCE.addGotRegister(c);
+                continue;
+            }
+            ViewSupervisor.updateFooter();
             return;
         }
 
@@ -264,7 +277,7 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CheckPointReached")) {
+        if (Objects.equals(dsrp.getType_v2(), "CheckPoint")) {
             l.debug("Received checkpoint from server.");
             return;
         }
@@ -290,7 +303,7 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "RebootDirection")) {
-            l.debug("Received reboot diretion from server.");
+            l.debug("Received reboot direction from server.");
             return;
         }
 
