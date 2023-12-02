@@ -224,7 +224,7 @@ public class ServerListener implements Runnable
         }
 
         /* The server notifies the client about the nine programming cards from another client. */
-        if (Objects.equals(dsrp.getType_v2(), "CardsYouGorNow")) {
+        if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
             l.debug("Player {}'s hand cards are updated.", dsrp.getPlayerID());
             return;
         }
