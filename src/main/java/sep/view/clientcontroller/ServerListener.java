@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.viewcontroller.ViewSupervisor;
+import sep.view.lib.EGamePhase;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -182,8 +183,8 @@ public class ServerListener implements Runnable
         /* If the game enters a new phase. */
         if (Objects.equals(dsrp.getType_v2(), "ActivePhase"))
         {
-            l.debug("Received game phase update. New phase: {}.", dsrp.getPhase());
-            EGameState.INSTANCE.setCurrentPhase(dsrp.getPhase());
+            l.debug("Received game phase update. New phase: {}.", EGamePhase.fromInt(dsrp.getPhase()));
+            EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(dsrp.getPhase()));
             return;
         }
 
