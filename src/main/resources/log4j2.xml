@@ -2,20 +2,63 @@
 
 <Configuration status="INFO">
 
+    <Properties>
+
+        <Property name="path">logs</Property>
+
+    </Properties>
+
     <Appenders>
-        <Console name="console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level} %logger{36} - %msg%n" />
+
+        <Console name="stdout" target="SYSTEM_OUT">
+            <PatternLayout disableAnsi="false" pattern="%d{mm:ss.SSS} [%t] %highlight{%-5level} %logger{1} - %highlight{%msg}%n" />
         </Console>
 
-        <File name="wrapper" fileName="log/wrapper.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-        </File>
-        <File name="server" fileName="log/server.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-        </File>
-        <File name="client" fileName="log/client.log">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
-        </File>
+        <RollingFile name="wrapper" fileName="${path}/wrapper.log" filePattern="${path}/$${date:yyyy-MM-dd}/wrapper-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true" />
+                <SizeBasedTriggeringPolicy size="25 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="16">
+                <Delete basePath="${path}" maxDepth="3">
+                    <IfLastModified age="32d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <RollingFile name="server" fileName="${path}/sv.log" filePattern="${path}/$${date:yyyy-MM-dd}/sv-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true" />
+                <SizeBasedTriggeringPolicy size="25 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="16">
+                <Delete basePath="${path}" maxDepth="3">
+                    <IfLastModified age="32d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <RollingFile name="client" fileName="${path}/cl.log" filePattern="${path}/$${date:yyyy-MM-dd}/cl-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="6" modulate="true" />
+                <SizeBasedTriggeringPolicy size="25 MB" />
+            </Policies>
+            <DefaultRolloverStrategy max="16">
+                <Delete basePath="${path}" maxDepth="3">
+                    <IfLastModified age="32d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
     </Appenders>
 
     <Loggers>
@@ -33,7 +76,7 @@
         </Logger>
 
         <Root level="trace">
-            <AppenderRef level="debug" ref="console" />
+            <AppenderRef level="debug" ref="stdout" />
         </Root>
 
     </Loggers>
