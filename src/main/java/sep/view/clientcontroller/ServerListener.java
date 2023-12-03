@@ -214,8 +214,12 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CardSelected")) {
-            l.debug("Received card selected from server.");
+        /* If a player has set one of their five register slots. */
+        if (Objects.equals(dsrp.getType_v2(), "CardSelected"))
+        {
+            // TODO We want to update the UI-Footer with this method call. Check if the playerID is the local player.
+            //      Currently we update regardless if the select card action was affirmed by the server.
+            l.debug("Player {} updated their register {}. Filled: {}.", dsrp.getPlayerID(), dsrp.getRegister(), dsrp.getRegisterFilled() ? "true" : "false");
             return;
         }
 
@@ -224,12 +228,12 @@ public class ServerListener implements Runnable
             return;
         }
 
-        /* The server notifies the client about the nine programming cards from another client. */
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
             l.debug("Player {}'s hand cards are updated.", dsrp.getPlayerID());
             return;
         }
 
+        /* The server notifies the client about the nine programming cards from another client. */
         if (Objects.equals(dsrp.getType_v2(), "NotYourCards")) {
             l.debug("Received not yours cards from server.");
             return;
