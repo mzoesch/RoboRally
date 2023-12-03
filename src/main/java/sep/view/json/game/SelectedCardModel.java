@@ -1,23 +1,33 @@
 package sep.view.json.game;
 
-import org.json.JSONObject;
 import sep.view.json.AServerRequestModel;
 
-public class SelectedCardModel extends AServerRequestModel {
+import org.json.JSONObject;
 
+/**
+ * Model if the client has set one of their cards in their deck to one of the register slots.
+ */
+public final class SelectedCardModel extends AServerRequestModel
+{
     private final String cardName;
     private final int register;
 
-    public SelectedCardModel(String cardName, int register) {
+    /**
+     * @param register The register slot to put the card in.
+     * @param cardName The name of the card to put in the register slot (Null if the register slot is to be cleared).
+     */
+    public SelectedCardModel(int register, String cardName)
+    {
         this.cardName = cardName;
         this.register = register;
     }
 
     @Override
-    public JSONObject toJSON() {
+    public JSONObject toJSON()
+    {
         JSONObject body = new JSONObject();
-        body.put("card", this.cardName);
         body.put("register", this.register);
+        body.put("card", this.cardName);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "SelectedCard");
@@ -25,4 +35,5 @@ public class SelectedCardModel extends AServerRequestModel {
 
         return j;
     }
+
 }
