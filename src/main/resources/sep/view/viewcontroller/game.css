@@ -34,14 +34,35 @@
 }
 
 .register-slot {
-    -fx-background-color: #27029d;
+    -fx-background-color: rgba(57, 0, 255, 0.2);
     -fx-border-color: #000000ff;
     -fx-border-width: 1px;
+}
 
-    -fx-min-width: 102px;
-    -fx-max-width: 102px;
-    -fx-min-height: 180px;
-    -fx-max-height: 180px;
+.register-slot:hover {
+    -fx-background-color: rgba(39, 2, 157, 0.2);
+}
+
+.register-slot-active {
+    -fx-background-color: #ff0000ff;
+    -fx-border-color: #000000ff;
+    -fx-border-width: 1px;
+}
+
+.register-slot-disabled {
+    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-border-color: #3f0909;
+    -fx-border-width: 1px;
+}
+
+.register-slot-available {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #000000ff;
+    -fx-border-width: 1px;
+}
+
+.register-slot-available:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
 }
 
 #got-register-cards-hbox {
@@ -52,17 +73,6 @@
 .got-register-cards-vbox {
     -fx-spacing: 3px;
     -fx-alignment: center-left;
-}
-
-.got-register-cards-slot {
-    -fx-background-color: #27029d;
-    -fx-border-color: #000000ff;
-    -fx-border-width: 1px;
-
-    -fx-min-width: 34px;
-    -fx-max-width: 34px;
-    -fx-min-height: 58px;
-    -fx-max-height: 58px;
 }
 
 #player-container {

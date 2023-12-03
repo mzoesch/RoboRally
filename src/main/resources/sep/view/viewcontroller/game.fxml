@@ -65,24 +65,18 @@
                 >
                     <children>
                         <AnchorPane
-                            styleClass="register-slot" stylesheets="@game.css"
                             fx:id="registerSlot1"
-                        >
-                        </AnchorPane>
+                        />
                         <AnchorPane
-                            styleClass="register-slot" stylesheets="@game.css"
                             fx:id="registerSlot2"
                         />
                         <AnchorPane
-                            styleClass="register-slot" stylesheets="@game.css"
                             fx:id="registerSlot3"
                         />
                         <AnchorPane
-                            styleClass="register-slot" stylesheets="@game.css"
                             fx:id="registerSlot4"
                         />
                         <AnchorPane
-                            styleClass="register-slot" stylesheets="@game.css"
                             fx:id="registerSlot5"
                         />
                     </children>
@@ -97,15 +91,12 @@
                             <children>
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot1"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot2"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot3"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                             </children>
                         </VBox>
@@ -115,15 +106,12 @@
                             <children>
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot4"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot5"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot6"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                             </children>
                         </VBox>
@@ -133,15 +121,12 @@
                             <children>
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot7"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot8"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                                 <AnchorPane
                                     fx:id="gotRegisterCardSlot9"
-                                    styleClass="got-register-cards-slot" stylesheets="@game.css"
                                 />
                             </children>
                         </VBox>
