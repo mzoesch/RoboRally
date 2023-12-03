@@ -3,6 +3,7 @@ package sep.view.viewcontroller;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
+import sep.view.lib.EGamePhase;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -961,7 +962,12 @@ public final class MockViewLauncher
 
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
             ViewSupervisor.updateCourseView();
-            EGameState.INSTANCE.setCurrentPhase(0);
+            EGameState.INSTANCE.setCurrentPhase(EGamePhase.PROGRAMMING);
+            final String[] mockPCards = new String[] {"MoveI", "MoveI", "MoveI", "MoveII", "MoveII", "MoveII", "MoveIII", "MoveIII", "MoveIII"};
+            for (String s : mockPCards)
+            {
+                EGameState.INSTANCE.addGotRegister(s);
+            }
             EGameState.INSTANCE.setCurrentPlayer(0);
 
             return;
