@@ -40,7 +40,7 @@ public enum EGameState
     private String currentServerCourse;
     private JSONArray currentServerCourseJSON;
 
-    private final ArrayList<String> registers;
+    private final String[] registers;
     private final ArrayList<String> gotRegisters;
 
     private EGameState()
@@ -51,7 +51,7 @@ public enum EGameState
         this.currentServerCourseJSON = null;
         this.currentPhase = EGamePhase.INVALID;
 
-        this.registers = new ArrayList<String>();
+        this.registers = new String[5];
         this.gotRegisters = new ArrayList<String>();
 
         return;
@@ -252,8 +252,6 @@ public enum EGameState
         return this.currentPhase;
     }
 
-    public void setCurrentPhase(int currentPhase)
-    {
     public void setCurrentPhase(EGamePhase currentPhase)
     {
         if (this.currentPhase == currentPhase)
@@ -295,12 +293,12 @@ public enum EGameState
 
     public String getRegister(int idx)
     {
-        if (idx < 0 || idx >= this.registers.size())
+        if (idx < 0 || idx >= this.registers.length)
         {
             return null;
         }
 
-        return this.registers.get(idx);
+        return this.registers[idx];
     }
 
     public String getGotRegister(int idx)
@@ -313,7 +311,7 @@ public enum EGameState
         return this.gotRegisters.get(idx);
     }
 
-    public ArrayList<String> getRegisters()
+    public String[] getRegisters()
     {
         return this.registers;
     }
@@ -323,22 +321,26 @@ public enum EGameState
         return this.gotRegisters;
     }
 
-    public void clearGotRegisters()
-    {
-        this.gotRegisters.clear();
-        return;
-    }
-
     public void clearAllRegisters()
     {
-        this.registers.clear();
+        this.registers[0] = null;
+        this.registers[1] = null;
+        this.registers[2] = null;
+        this.registers[3] = null;
+        this.registers[4] = null;
         this.gotRegisters.clear();
         return;
     }
 
-    public void addRegister(String register)
+    public void addRegister(int idx, String register)
     {
-        this.registers.add(register);
+        if (idx < 0 || idx >= this.registers.length)
+        {
+            return;
+        }
+
+        this.registers[idx] = register;
+
         return;
     }
 
