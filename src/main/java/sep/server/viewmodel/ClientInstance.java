@@ -216,11 +216,11 @@ public final class ClientInstance implements Runnable
             return true;
         }
 
-        if (Objects.equals(dcrp.getType_v2(), "SelectedCard")) {
-            l.debug("Received selected Card from client.");
-            String selectedCard = dcrp.getSelectedCard();
-            int selectedRegister = dcrp.getSelectedCardRegister();
-            this.playerController.setSelectedCardInRegister(selectedCard,selectedRegister);
+        /* If the client has set one of their five registers. */
+        if (Objects.equals(dcrp.getType_v2(), "SelectedCard"))
+        {
+            l.debug("Player {} selected card {} in register {}.", this.playerController.getPlayerID(), dcrp.getSelectedCard(), dcrp.getSelectedCardRegister());
+            this.playerController.setSelectedCardInRegister(dcrp.getSelectedCard(), dcrp.getSelectedCardRegister());
             return true;
         }
 
