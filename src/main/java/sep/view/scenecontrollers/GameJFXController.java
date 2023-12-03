@@ -7,6 +7,7 @@ import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.Coordinate;
 import sep.view.json.game.SetStartingPointModel;
 import sep.view.viewcontroller.TileModifier;
+import sep.view.lib.EGamePhase;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
@@ -138,7 +139,13 @@ public class GameJFXController
     /** Updates the UI Phase Title in the Header. */
     private void renderPhaseTitle()
     {
-        this.UIHeaderPhaseLabel.setText(EGameState.PHASE_NAMES[EGameState.INSTANCE.getCurrentPhase()]);
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.INVALID)
+        {
+            this.UIHeaderPhaseLabel.setText("Waiting for server.");
+            return;
+        }
+
+        this.UIHeaderPhaseLabel.setText(EGameState.PHASE_NAMES[EGameState.INSTANCE.getCurrentPhase().i]);
         return;
     }
 
@@ -156,20 +163,26 @@ public class GameJFXController
 
         switch (EGameState.INSTANCE.getCurrentPhase())
         {
-            case 0:
+            case REGISTRATION:
                 this.UIHeaderGameStateDescriptionLabel.setText(String.format("Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
                 return;
 
             case 1:
                 this.UIHeaderGameStateDescriptionLabel.setText("PHASE 1");
+            case UPGRADE:
+                this.UIHeaderGameStateDescriptionLabel.setText("Upgrade Phase");
                 return;
 
             case 2:
                 this.UIHeaderGameStateDescriptionLabel.setText("PHASE 2");
+            case PROGRAMMING:
+                this.UIHeaderGameStateDescriptionLabel.setText("Programming Phase");
                 return;
 
             case 3:
                 this.UIHeaderGameStateDescriptionLabel.setText("PHASE 3");
+            case ACTIVATION:
+                this.UIHeaderGameStateDescriptionLabel.setText("Activation Phase");
                 return;
         }
 

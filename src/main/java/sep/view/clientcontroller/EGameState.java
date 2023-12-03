@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.viewcontroller.ViewSupervisor;
+import sep.view.lib.EGamePhase;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -25,7 +26,7 @@ public enum EGameState
     public static final int MAX_CHAT_MESSAGE_LENGTH = 64;
 
     public static final String[] PHASE_NAMES = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
-    private int currentPhase;
+    private EGamePhase currentPhase;
 
     /**
      * Stores information that is shared for all players. The player cards for one client are unique to them and must
@@ -48,7 +49,7 @@ public enum EGameState
         this.serverCourses = new String[0];
         this.currentServerCourse = "";
         this.currentServerCourseJSON = null;
-        this.currentPhase = 0;
+        this.currentPhase = EGamePhase.INVALID;
 
         this.registers = new ArrayList<String>();
         this.gotRegisters = new ArrayList<String>();
@@ -246,14 +247,36 @@ public enum EGameState
         return;
     }
 
-    public int getCurrentPhase()
+    public EGamePhase getCurrentPhase()
     {
         return this.currentPhase;
     }
 
     public void setCurrentPhase(int currentPhase)
     {
+    public void setCurrentPhase(EGamePhase currentPhase)
+    {
+        if (this.currentPhase == currentPhase)
+        {
+            return;
+        }
+
+        // TODO
+        //      We exited the registration phase, and there will be no more clickable actions on the course view,
+        //      therefore, we re-render the course view to remove the hover effect. Note, this is not efficient, we
+        //      must implement a faster way, where we just remove the hover effect and not re-render the whole
+        //      course view.
+        if (this.currentPhase == EGamePhase.REGISTRATION)
+        {
+            ViewSupervisor.updateCourseView();
+        }
+
         this.currentPhase = currentPhase;
+        if (this.currentPhase == EGamePhase.PROGRAMMING)
+        {
+//            this.clearAllRegisters();
+            this.currentPlayer = null;
+        }
         ViewSupervisor.updatePhase();
         return;
     }
