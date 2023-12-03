@@ -7,6 +7,7 @@ import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.GameStartedModel;
 import sep.server.json.game.activatingphase.CardInfo;
 import sep.server.json.game.activatingphase.CurrentCardsModel;
+import sep.server.json.game.activatingphase.ReplaceCardModel;
 import sep.server.json.game.effects.*;
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.*;
@@ -35,6 +36,7 @@ public class GameMode
 
     ArrayList<Player> players;
     Player currentPlayer; //aktuell nur in setup-phase benutzt
+    int currentRegister;
 
     int energyBank;
     int availableCheckPoints;
@@ -67,6 +69,7 @@ public class GameMode
         }
 
         this.currentPlayer = players.get(0);
+        this.currentRegister = 0;
 
         //Real methods
         //send the built Course to all Clients
@@ -83,6 +86,14 @@ public class GameMode
 
     public ArrayList<Player> getPlayers() {
         return players;
+    }
+
+    public int getCurrentRegister() {
+        return currentRegister;
+    }
+
+    public void setCurrentRegister(int currentRegister) {
+        this.currentRegister = currentRegister;
     }
 
     /**
@@ -245,10 +256,10 @@ public class GameMode
                     3).send();
         }
 
-        for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
+        for(currentRegister=0; currentRegister < 5; currentRegister++) {
             determinePriorities();
-            sortPlayersByPriority(currentRegister);
-            determineCurrentCards(currentRegister);
+            sortPlayersByPriority();
+            determineCurrentCards();
             for(int j = 0; j < players.size(); currentRegister++) {
                 if(players.get(j).registers[currentRegister] != null) {
                     players.get(j).registers[currentRegister].playCard();
@@ -256,11 +267,11 @@ public class GameMode
             }
             activateConveyorBelts(2);
             activateConveyorBelts(1);
-            activatePushPanels(currentRegister);
+            activatePushPanels();
             activateGears();
             findLasers();
             shootRobotLasers();
-            checkEnergySpaces(currentRegister);
+            checkEnergySpaces();
             checkCheckpoints();
         }
         endRound();
@@ -306,7 +317,7 @@ public class GameMode
     /**
      * The following method sorts all players from highest to lowest priority.
      */
-    public void sortPlayersByPriority(int currentRegisterIndex) {
+    public void sortPlayersByPriority() {
         players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
@@ -314,13 +325,12 @@ public class GameMode
      * The following method takes the currently active card (type as String)
      * and the player ID for each player, saves them in an array activeCards and
      * sends it as JSON object to all clients.
-     * @param currentRegisterIndex register that is currently active
      */
-    public void determineCurrentCards(int currentRegisterIndex) {
+    public void determineCurrentCards() {
         CardInfo[] activeCards = new CardInfo[players.size()];
         for(int i = 0; i<activeCards.length; i++) {
             for(Player player : players) {
-                String card = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
+                String card = ((Card) player.getCardInRegister(currentRegister)).getCardType();
                 CardInfo cardInfo = new CardInfo(player.getPlayerController().getPlayerID(), card);
                 activeCards[i] = cardInfo;
             }
@@ -427,9 +437,8 @@ public class GameMode
     /**
      * The following method handles the activation of push panels and sends the corresponding JSON messages.
      * The robot is moved to the next field in the direction of the panel's pushOrientation.
-     * @param currentRegister the register that is currently active
      */
-    public void activatePushPanels(int currentRegister) {
+    public void activatePushPanels() {
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -609,9 +618,8 @@ public class GameMode
     /**
      * The following method checks if any robot ended their register on an energy space, if
      * they receive an energy cube, and sends the corresponding JSON messages.
-     * @param currentRegister the register that is currently active
      */
-    public void checkEnergySpaces(int currentRegister) {
+    public void checkEnergySpaces() {
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -694,17 +702,24 @@ public class GameMode
         return newCoordinate;
     }
 
-    /*public Object[] replaceCardInRegister(int currentRegisterIndex, int currentPlayerIndex) {
-        Player player = players.get(currentPlayerIndex);
+    /**
+     * The following method is called whenever a card in a register needs to be replaced by
+     * another card (by default, top card of player deck).
+     * @param player player who needs to replace their cards
+     * @param card card that will be added instead
+     */
+    public void replaceCardInRegister(Player player, IPlayableCard card) {
+        player.getDiscardPile().add(player.getCardInRegister(currentRegister));
+        player.getRegisters()[currentRegister] = null;
+
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
-        int clientID = player.getPlayerController().getPlayerID();
+        player.setCardInRegister(currentRegister, topCardFromDiscardPile);
 
-        player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile);
-
-        return new Object[] {currentRegisterIndex, newCard, clientID};
-    }*/
-
+        new ReplaceCardModel(player.getPlayerController().getClientInstance(),
+                currentRegister, player.getPlayerController().getPlayerID(),
+                newCard).send();
+    }
 
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers
