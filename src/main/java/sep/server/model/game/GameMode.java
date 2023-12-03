@@ -5,7 +5,10 @@ import org.apache.logging.log4j.Logger;
 import sep.server.json.common.ErrorMsgModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.GameStartedModel;
+import sep.server.json.game.activatingphase.CardInfo;
+import sep.server.json.game.activatingphase.CurrentCardsModel;
 import sep.server.json.game.effects.*;
+import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
@@ -245,7 +248,7 @@ public class GameMode
         for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
             determinePriorities();
             sortPlayersByPriority(currentRegister);
-            /*determineCurrentCards(currentRegister);*/
+            determineCurrentCards(currentRegister);
             for(int j = 0; j < players.size(); currentRegister++) {
                 if(players.get(j).registers[currentRegister] != null) {
                     players.get(j).registers[currentRegister].playCard();
@@ -307,16 +310,28 @@ public class GameMode
         players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
-    /*public HashMap<Integer, String> determineCurrentCards(int currentRegisterIndex) {
-        HashMap<Integer, String> currentCards = new HashMap<>();
-
-        for(Player player : players) {
-            String cardInRegister = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
-            currentCards.put(player.getPlayerController().getPlayerID(), cardInRegister);
+    /**
+     * The following method takes the currently active card (type as String)
+     * and the player ID for each player, saves them in an array activeCards and
+     * sends it as JSON object to all clients.
+     * @param currentRegisterIndex register that is currently active
+     */
+    public void determineCurrentCards(int currentRegisterIndex) {
+        CardInfo[] activeCards = new CardInfo[players.size()];
+        for(int i = 0; i<activeCards.length; i++) {
+            for(Player player : players) {
+                String card = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
+                CardInfo cardInfo = new CardInfo(player.getPlayerController().getPlayerID(), card);
+                activeCards[i] = cardInfo;
+            }
         }
 
-        return currentCards;
-    }*/
+        for(Player player : players) {
+            new CurrentCardsModel(player.getPlayerController().getClientInstance(),
+                    activeCards).send();
+        }
+
+    }
 
     /**
      * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
