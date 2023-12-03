@@ -101,4 +101,14 @@ public final class DefaultServerRequestParser
     {
         return this.request.getJSONObject("messageBody").getString("error");
     }
+
+    public int getRegister()
+    {
+        return this.request.getJSONObject("messageBody").getInt("register");
+    }
+
+    public boolean getRegisterFilled()
+    {
+        return this.request.getJSONObject("messageBody").getBoolean("filled");
+    }
 }
