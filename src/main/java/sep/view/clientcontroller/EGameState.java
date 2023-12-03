@@ -350,6 +350,66 @@ public enum EGameState
         return;
     }
 
+
+    /**
+     * Sets a register slot from a given got register slot.
+     *
+     * @param tIdx Target index
+     * @param oIdx Origin index
+     */
+    public void setRegister(int tIdx, int oIdx)
+    {
+        if (tIdx < 0 || tIdx >= this.registers.length)
+        {
+            return;
+        }
+
+        if (oIdx < 0 || oIdx >= this.gotRegisters.size())
+        {
+            return;
+        }
+
+        if (this.registers[tIdx] != null)
+        {
+            return;
+        }
+
+        this.registers[tIdx] = this.gotRegisters.get(oIdx);
+        this.gotRegisters.set(oIdx, null);
+
+        return;
+    }
+
+    /**
+     * Undoes a set register slot and add it back to the got registers.
+     *
+     * @param oIdx     Origin index from register
+     */
+    public void undoRegister(int oIdx)
+    {
+        if (oIdx < 0 || oIdx >= this.registers.length)
+        {
+            return;
+        }
+
+        if (this.registers[oIdx] == null)
+        {
+            return;
+        }
+
+        if (!this.gotRegisters.contains(null))
+        {
+            l.error("Could not undo register. Got registers are full.");
+            return;
+        }
+
+        this.gotRegisters.set(this.gotRegisters.indexOf(null), this.registers[oIdx]);
+        this.registers[oIdx] = null;
+
+        return;
+
+    }
+
     // endregion Getters and Setters
 
 }
