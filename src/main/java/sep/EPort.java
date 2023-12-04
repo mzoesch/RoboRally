@@ -9,7 +9,7 @@ public enum EPort
 
     public final int i;
 
-    EPort(int i)
+    private EPort(int i)
     {
         this.i = i;
         return;

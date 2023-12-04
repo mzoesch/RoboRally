@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.viewcontroller.ViewSupervisor;
+import sep.view.lib.EGamePhase;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -25,7 +26,7 @@ public enum EGameState
     public static final int MAX_CHAT_MESSAGE_LENGTH = 64;
 
     public static final String[] PHASE_NAMES = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
-    private int currentPhase;
+    private EGamePhase currentPhase;
 
     /**
      * Stores information that is shared for all players. The player cards for one client are unique to them and must
@@ -39,11 +40,8 @@ public enum EGameState
     private String currentServerCourse;
     private JSONArray currentServerCourseJSON;
 
-    // HERE
-    // The current course with its midfielders...
-    // The current programming cards of this client.
-    // The current registers of this client.
-    // ...
+    private final String[] registers;
+    private final ArrayList<String> gotRegisters;
 
     private EGameState()
     {
@@ -51,7 +49,10 @@ public enum EGameState
         this.serverCourses = new String[0];
         this.currentServerCourse = "";
         this.currentServerCourseJSON = null;
-        this.currentPhase = 0;
+        this.currentPhase = EGamePhase.INVALID;
+
+        this.registers = new String[5];
+        this.gotRegisters = new ArrayList<String>();
 
         return;
     }
@@ -246,14 +247,34 @@ public enum EGameState
         return;
     }
 
-    public int getCurrentPhase()
+    public EGamePhase getCurrentPhase()
     {
         return this.currentPhase;
     }
 
-    public void setCurrentPhase(int currentPhase)
+    public void setCurrentPhase(EGamePhase currentPhase)
     {
+        if (this.currentPhase == currentPhase)
+        {
+            return;
+        }
+
+        // TODO
+        //      We exited the registration phase, and there will be no more clickable actions on the course view,
+        //      therefore, we re-render the course view to remove the hover effect. Note, this is not efficient, we
+        //      must implement a faster way, where we just remove the hover effect and not re-render the whole
+        //      course view.
+        if (this.currentPhase == EGamePhase.REGISTRATION)
+        {
+            ViewSupervisor.updateCourseView();
+        }
+
         this.currentPhase = currentPhase;
+        if (this.currentPhase == EGamePhase.PROGRAMMING)
+        {
+//            this.clearAllRegisters();
+            this.currentPlayer = null;
+        }
         ViewSupervisor.updatePhase();
         return;
     }
@@ -268,6 +289,125 @@ public enum EGameState
     public RemotePlayer getCurrentPlayer()
     {
         return this.currentPlayer;
+    }
+
+    public String getRegister(int idx)
+    {
+        if (idx < 0 || idx >= this.registers.length)
+        {
+            return null;
+        }
+
+        return this.registers[idx];
+    }
+
+    public String getGotRegister(int idx)
+    {
+        if (idx < 0 || idx >= this.gotRegisters.size())
+        {
+            return null;
+        }
+
+        return this.gotRegisters.get(idx);
+    }
+
+    public String[] getRegisters()
+    {
+        return this.registers;
+    }
+
+    public ArrayList<String> getGotRegisters()
+    {
+        return this.gotRegisters;
+    }
+
+    public void clearAllRegisters()
+    {
+        this.registers[0] = null;
+        this.registers[1] = null;
+        this.registers[2] = null;
+        this.registers[3] = null;
+        this.registers[4] = null;
+        this.gotRegisters.clear();
+        return;
+    }
+
+    public void addRegister(int idx, String register)
+    {
+        if (idx < 0 || idx >= this.registers.length)
+        {
+            return;
+        }
+
+        this.registers[idx] = register;
+
+        return;
+    }
+
+    public void addGotRegister(String register)
+    {
+        this.gotRegisters.add(register);
+        return;
+    }
+
+
+    /**
+     * Sets a register slot from a given got register slot.
+     *
+     * @param tIdx Target index
+     * @param oIdx Origin index
+     */
+    public void setRegister(int tIdx, int oIdx)
+    {
+        if (tIdx < 0 || tIdx >= this.registers.length)
+        {
+            return;
+        }
+
+        if (oIdx < 0 || oIdx >= this.gotRegisters.size())
+        {
+            return;
+        }
+
+        if (this.registers[tIdx] != null)
+        {
+            return;
+        }
+
+        this.registers[tIdx] = this.gotRegisters.get(oIdx);
+        this.gotRegisters.set(oIdx, null);
+
+        return;
+    }
+
+    /**
+     * Undoes a set register slot and add it back to the got registers.
+     *
+     * @param oIdx     Origin index from register
+     */
+    public void undoRegister(int oIdx)
+    {
+        if (oIdx < 0 || oIdx >= this.registers.length)
+        {
+            return;
+        }
+
+        if (this.registers[oIdx] == null)
+        {
+            return;
+        }
+
+        if (!this.gotRegisters.contains(null))
+        {
+            l.error("Could not undo register. Got registers are full.");
+            return;
+        }
+
+        this.gotRegisters.set(this.gotRegisters.indexOf(null), this.registers[oIdx]);
+        this.registers[oIdx] = null;
+
+        return;
+
     }
 
     // endregion Getters and Setters

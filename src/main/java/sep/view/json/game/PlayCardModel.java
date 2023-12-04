@@ -14,7 +14,6 @@ public class PlayCardModel extends AServerRequestModel {
 
     @Override
     public JSONObject toJSON() {
-
         JSONObject j = new JSONObject();
         j.put("messageType", "PlayCard");
         j.put("messageBody", new JSONObject().put("card", this.cardName));

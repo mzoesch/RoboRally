@@ -100,4 +100,24 @@ public final class RemotePlayer
         return this.registerSlots[i];
     }
 
+    public int countCheckPoints() {
+        int checkpoint = 0;
+        for (String card : registerSlots) {
+            if ("CheckPoint".equals(card)) {
+                checkpoint++;
+            }
+        }
+        return checkpoint;
+    }
+
+    public int countEnergy() {
+        int energy = 0;
+        for (String card : registerSlots) {
+            if ("Energy".equals(card)) {
+                energy++;
+            }
+        }
+        return energy;
+    }
+
 }

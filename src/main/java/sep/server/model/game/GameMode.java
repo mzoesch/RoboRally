@@ -5,7 +5,11 @@ import org.apache.logging.log4j.Logger;
 import sep.server.json.common.ErrorMsgModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.GameStartedModel;
+import sep.server.json.game.activatingphase.CardInfo;
+import sep.server.json.game.activatingphase.CurrentCardsModel;
+import sep.server.json.game.activatingphase.ReplaceCardModel;
 import sep.server.json.game.effects.*;
+import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
@@ -27,11 +31,12 @@ public class GameMode
     private static final Logger l = LogManager.getLogger(Session.class);
 
     private final Course course;
-    int gamePhase = 0; //0 => Aufbauphase, 1 => Upgradephase, 2 => Programmierphase, 3 => Aktivierungsphase
+    private EGamePhase gamePhase = EGamePhase.INVALID;
     private final Session session;
 
     ArrayList<Player> players;
     Player currentPlayer; //aktuell nur in setup-phase benutzt
+    int currentRegister;
 
     int energyBank;
     int availableCheckPoints;
@@ -45,7 +50,7 @@ public class GameMode
         super();
 
         this.course = new Course(courseName);
-        this.gamePhase = 0;
+        this.gamePhase = EGamePhase.REGISTRATION;
         this.session = session;
 
         DeckBuilder deckBuilder = new DeckBuilder();
@@ -59,11 +64,12 @@ public class GameMode
         this.players = new ArrayList<>();
         for(PlayerController pc : playerControllers)
         {
-            this.players.add(new Player(pc, this.course));
+            this.players.add(new Player(pc, this.course, this.session));
             continue;
         }
 
         this.currentPlayer = players.get(0);
+        this.currentRegister = 0;
 
         //Real methods
         //send the built Course to all Clients
@@ -72,7 +78,7 @@ public class GameMode
             continue;
         }
 
-        this.session.handleActivePhase(0);
+        this.session.handleActivePhase(this.gamePhase);
         this.session.handleCurrentPlayer(this.currentPlayer.getPlayerController().getPlayerID());
 
         return;
@@ -80,6 +86,14 @@ public class GameMode
 
     public ArrayList<Player> getPlayers() {
         return players;
+    }
+
+    public int getCurrentRegister() {
+        return currentRegister;
+    }
+
+    public void setCurrentRegister(int currentRegister) {
+        this.currentRegister = currentRegister;
     }
 
     /**
@@ -105,8 +119,8 @@ public class GameMode
 
                 if(startingPointSelectionFinished()){
                     //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
-                    gamePhase = 1;
-                    pc.getSession().handleActivePhase(gamePhase);
+                    this.gamePhase = EGamePhase.PROGRAMMING;
+                    pc.getSession().handleActivePhase(this.gamePhase);
                     l.info("StartPhase has concluded. ProgrammingPhase has started");
                     programmingPhase();
 
@@ -148,7 +162,7 @@ public class GameMode
      * @return true, wenn möglich; false, wenn nicht
      */
     public boolean ableToSetStartPoint(PlayerController pc) {
-        if (gamePhase != 0) {
+        if (gamePhase != EGamePhase.REGISTRATION) {
             l.debug("Unable to set StartPoint due to wrong GamePhase");
             new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
             return false;
@@ -181,8 +195,9 @@ public class GameMode
 
     public void programmingPhase() {
         distributeCards(players);
-
+        selectCards(players);
         discardAndDrawBlind(players);
+//        activationPhase();
     }
 
     public void distributeCards(ArrayList<Player> players) {
@@ -200,23 +215,23 @@ public class GameMode
     }
 
     public void selectCards(ArrayList<Player> players) {
-        for (Player player : players) {
-            new Thread(player.getPlayerController().getClientInstance()).start();
-        }
     }
 
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
-
     public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
-        try {
-            Thread.sleep(30000); //30 sekunden
+        /*try {
+            for (Player player : players) {
+                new Thread(player.getPlayerController().getClientInstance()).start();
+            }
+            Thread.sleep(30000); // 30 Sekunden
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
+
 
         int[] playerIdWhoNotFinished = new int[players.size()];
         int index = 0;
@@ -253,10 +268,10 @@ public class GameMode
                     3).send();
         }
 
-        for(int currentRegister = 0; currentRegister < 5; currentRegister++) {
+        for(currentRegister=0; currentRegister < 5; currentRegister++) {
             determinePriorities();
-            sortPlayersByPriority(currentRegister);
-            /*determineCurrentCards(currentRegister);*/
+            sortPlayersByPriority();
+            determineCurrentCards();
             for(int j = 0; j < players.size(); currentRegister++) {
                 if(players.get(j).registers[currentRegister] != null) {
                     players.get(j).registers[currentRegister].playCard();
@@ -264,11 +279,11 @@ public class GameMode
             }
             activateConveyorBelts(2);
             activateConveyorBelts(1);
-            activatePushPanels(currentRegister);
+            activatePushPanels();
             activateGears();
             findLasers();
             shootRobotLasers();
-            checkEnergySpaces(currentRegister);
+            checkEnergySpaces();
             checkCheckpoints();
         }
         endRound();
@@ -314,20 +329,31 @@ public class GameMode
     /**
      * The following method sorts all players from highest to lowest priority.
      */
-    public void sortPlayersByPriority(int currentRegisterIndex) {
+    public void sortPlayersByPriority() {
         players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
-    /*public HashMap<Integer, String> determineCurrentCards(int currentRegisterIndex) {
-        HashMap<Integer, String> currentCards = new HashMap<>();
-
-        for(Player player : players) {
-            String cardInRegister = ((Card) player.getCardInRegister(currentRegisterIndex)).getCardType();
-            currentCards.put(player.getPlayerController().getPlayerID(), cardInRegister);
+    /**
+     * The following method takes the currently active card (type as String)
+     * and the player ID for each player, saves them in an array activeCards and
+     * sends it as JSON object to all clients.
+     */
+    public void determineCurrentCards() {
+        CardInfo[] activeCards = new CardInfo[players.size()];
+        for(int i = 0; i<activeCards.length; i++) {
+            for(Player player : players) {
+                String card = ((Card) player.getCardInRegister(currentRegister)).getCardType();
+                CardInfo cardInfo = new CardInfo(player.getPlayerController().getPlayerID(), card);
+                activeCards[i] = cardInfo;
+            }
         }
 
-        return currentCards;
-    }*/
+        for(Player player : players) {
+            new CurrentCardsModel(player.getPlayerController().getClientInstance(),
+                    activeCards).send();
+        }
+
+    }
 
     /**
      * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
@@ -423,9 +449,8 @@ public class GameMode
     /**
      * The following method handles the activation of push panels and sends the corresponding JSON messages.
      * The robot is moved to the next field in the direction of the panel's pushOrientation.
-     * @param currentRegister the register that is currently active
      */
-    public void activatePushPanels(int currentRegister) {
+    public void activatePushPanels() {
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -605,9 +630,8 @@ public class GameMode
     /**
      * The following method checks if any robot ended their register on an energy space, if
      * they receive an energy cube, and sends the corresponding JSON messages.
-     * @param currentRegister the register that is currently active
      */
-    public void checkEnergySpaces(int currentRegister) {
+    public void checkEnergySpaces() {
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -652,7 +676,7 @@ public class GameMode
                     }
 
                     for(Player player1 : players) {
-                        new CheckPointModel(player1.getPlayerController().getClientInstance(),
+                        new CheckPointReachedModel(player1.getPlayerController().getClientInstance(),
                                 player.getPlayerController().getPlayerID(),
                                 player.getCheckpointsCollected()).send();
                     }
@@ -690,17 +714,24 @@ public class GameMode
         return newCoordinate;
     }
 
-    /*public Object[] replaceCardInRegister(int currentRegisterIndex, int currentPlayerIndex) {
-        Player player = players.get(currentPlayerIndex);
+    /**
+     * The following method is called whenever a card in a register needs to be replaced by
+     * another card (by default, top card of player deck).
+     * @param player player who needs to replace their cards
+     * @param card card that will be added instead
+     */
+    public void replaceCardInRegister(Player player, IPlayableCard card) {
+        player.getDiscardPile().add(player.getCardInRegister(currentRegister));
+        player.getRegisters()[currentRegister] = null;
+
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
-        int clientID = player.getPlayerController().getPlayerID();
+        player.setCardInRegister(currentRegister, topCardFromDiscardPile);
 
-        player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile);
-
-        return new Object[] {currentRegisterIndex, newCard, clientID};
-    }*/
-
+        new ReplaceCardModel(player.getPlayerController().getClientInstance(),
+                currentRegister, player.getPlayerController().getPlayerID(),
+                newCard).send();
+    }
 
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers

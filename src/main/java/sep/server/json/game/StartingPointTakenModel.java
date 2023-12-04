@@ -1,28 +1,31 @@
-package sep.server.json.game.effects;
+package sep.server.json.game;
 
 import org.json.JSONObject;
 import sep.server.json.AModel;
 import sep.server.viewmodel.ClientInstance;
 
-public class CheckPointModel extends AModel {
+public class StartingPointTakenModel extends AModel {
 
+    private final int x;
+    private final int y;
     private final int playerID;
-    private final int checkpointNumbers;
 
-    public CheckPointModel(ClientInstance ci, int playerID, int checkpointNumbers) {
+    public StartingPointTakenModel(ClientInstance ci, int x, int y, int playerID) {
         super(ci);
+        this.x = x;
+        this.y = y;
         this.playerID = playerID;
-        this.checkpointNumbers = checkpointNumbers;
     }
 
     @Override
     public JSONObject toJSON() {
         JSONObject body = new JSONObject();
+        body.put("x", this.x);
+        body.put("y", this.y);
         body.put("clientID", this.playerID);
-        body.put("number", this.checkpointNumbers);
 
         JSONObject j = new JSONObject();
-        j.put("messageType", "CheckPointReached");
+        j.put("messageType", "StartingPointTaken");
         j.put("messageBody", body);
 
         return j;

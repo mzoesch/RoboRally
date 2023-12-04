@@ -3,8 +3,6 @@ package sep.server.viewmodel;
 import sep.server.json.common.ChatMsgModel;
 import sep.server.model.game.Player;
 
-import java.util.ArrayList;
-
 
 /**
  * The interface between the Pawn in the game and the human player controlling it. The Player Controller essentially
@@ -100,7 +98,7 @@ public final class PlayerController
         return;
     }
 
-    public void getSelectedCard(String selectedCard, int selectedRegister){
+    public void setSelectedCardInRegister(String selectedCard, int selectedRegister){
 
         Player playerWhoSelectedCard = null;
 

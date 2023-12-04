@@ -9,6 +9,7 @@ public class MovementModel extends AModel {
     private final int playerID;
     private final int x;
     private final int y;
+
     public MovementModel(ClientInstance ci, int playerID, int x, int y) {
         super(ci);
         this.playerID = playerID;

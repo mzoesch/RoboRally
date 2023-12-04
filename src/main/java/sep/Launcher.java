@@ -41,7 +41,7 @@ public class Launcher
         final double t0 = System.currentTimeMillis();
 
         l.info("Starting application.");
-        l.info("Detected operating system: " + System.getProperty("os.name"));
+        l.debug("Detected operating system: " + System.getProperty("os.name"));
 
         /* This only works with jar files because else the getPath() will return a dir. */
         final String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();

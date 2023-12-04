@@ -60,27 +60,78 @@
             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
         >
             <children>
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot1"
+                <HBox
+                    id="ui-footer-register-slots" stylesheets="@game.css"
                 >
-                </AnchorPane>
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot2"
-                />
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot3"
-                />
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot4"
-                />
-                <AnchorPane
-                    styleClass="register-slot" stylesheets="@game.css"
-                    fx:id="registerSlot5"
-                />
+                    <children>
+                        <AnchorPane
+                            fx:id="registerSlot1"
+                        />
+                        <AnchorPane
+                            fx:id="registerSlot2"
+                        />
+                        <AnchorPane
+                            fx:id="registerSlot3"
+                        />
+                        <AnchorPane
+                            fx:id="registerSlot4"
+                        />
+                        <AnchorPane
+                            fx:id="registerSlot5"
+                        />
+                    </children>
+                </HBox>
+                <HBox
+                    id="got-register-cards-hbox" stylesheets="@game.css"
+                >
+                    <children>
+                        <VBox
+                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot1"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot2"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot3"
+                                />
+                            </children>
+                        </VBox>
+                        <VBox
+                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot4"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot5"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot6"
+                                />
+                            </children>
+                        </VBox>
+                        <VBox
+                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot7"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot8"
+                                />
+                                <AnchorPane
+                                    fx:id="gotRegisterCardSlot9"
+                                />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
             </children>
         </HBox>
     </children>

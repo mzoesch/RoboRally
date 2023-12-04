@@ -14,7 +14,6 @@ public class SelectionFinishedModel extends AModel {
         this.playerId = playerId;
     }
 
-
     @Override
     public JSONObject toJSON() {
         JSONObject j = new JSONObject();

@@ -27,7 +27,7 @@ public class Player {
   Session session;
 
 
-  public Player(PlayerController playerController, Course currentCourse) {
+  public Player(PlayerController playerController, Course currentCourse, Session session) {
     this.playerController = playerController;
     this.playerRobot = new Robot(currentCourse);
     this.playerDeck = new DeckBuilder().buildProgrammingDeck();
@@ -36,6 +36,8 @@ public class Player {
     this.energyCollected = 5;
     this.upgradeCards = new ArrayList<>();
     this.playerHand = new ArrayList<>();
+    this.registers = new IPlayableCard[5];
+    this.session = session;
   }
 
   public PlayerController getPlayerController() {
@@ -270,7 +272,7 @@ public class Player {
 
   public IPlayableCard getCardByName(String cardName) {
     for (IPlayableCard card : playerHand) {
-    //  if (card.getCardType().equals(cardName))
+      if (card.getCardType().equals(cardName))
       {
         return card;
       }
@@ -287,7 +289,7 @@ public class Player {
     ArrayList<IPlayableCard> hand = this.getPlayerHand();
     String[] handArray = new String[hand.size()];
     for (int i = 0; i < hand.size(); i++) {
-   //   handArray[i] = hand.get(i).getCardType();
+      handArray[i] = hand.get(i).getCardType();
     }
     return handArray;
   }

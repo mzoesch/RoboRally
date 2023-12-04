@@ -2,8 +2,7 @@ package sep.server.viewmodel;
 
 import sep.server.json.common.CurrentPlayerModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
-import sep.server.json.game.StartingPointModel;
-import sep.server.json.game.effects.PlayerTurningModel;
+import sep.server.json.game.StartingPointTakenModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerAddedModel;
@@ -13,7 +12,7 @@ import sep.server.json.lobby.SelectCourseModel;
 import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
 import sep.server.json.game.programmingphase.SelectionFinishedModel;
-
+import sep.server.model.game.EGamePhase;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -304,13 +303,7 @@ public final class Session
     }
     public void handleSelectedStartingPoint(int playerID, int x, int y){
         for(PlayerController pc : this.playerControllers){
-            new StartingPointModel(pc.getClientInstance(), x, y, playerID).send();
-        }
-    }
-
-    public void handlePlayerTurning(int playerID, String rotationalDirection){
-        for(PlayerController pc : this.playerControllers){
-            new PlayerTurningModel(pc.getClientInstance(), playerID, rotationalDirection).send();
+            new StartingPointTakenModel(pc.getClientInstance(), x, y, playerID).send();
         }
     }
 
@@ -320,9 +313,9 @@ public final class Session
         }
     }
 
-    public void handleActivePhase(int phase){
+    public void handleActivePhase(EGamePhase phase){
         for (PlayerController pc : playerControllers) {
-            new ActivePhaseModel(pc.getClientInstance(), 0).send();
+            new ActivePhaseModel(pc.getClientInstance(), phase.i).send();
         }
     }
 

@@ -92,4 +92,23 @@ public final class DefaultServerRequestParser
         return new Coordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
     }
 
+    public String[] getCardsInHand() throws JSONException
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").getString(i)).toArray(String[]::new);
+    }
+
+    public String getErrorMessage()
+    {
+        return this.request.getJSONObject("messageBody").getString("error");
+    }
+
+    public int getRegister()
+    {
+        return this.request.getJSONObject("messageBody").getInt("register");
+    }
+
+    public boolean getRegisterFilled()
+    {
+        return this.request.getJSONObject("messageBody").getBoolean("filled");
+    }
 }
