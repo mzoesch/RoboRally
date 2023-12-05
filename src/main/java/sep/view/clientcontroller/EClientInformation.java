@@ -31,7 +31,7 @@ public enum EClientInformation
     private String SERVER_IP;
     private int SERVER_PORT;
 
-    public static final String PROTOCOL_VERSION = "0.1";
+    public static final String PROTOCOL_VERSION = "1.0";
 
     boolean bMockView;
 
