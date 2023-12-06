@@ -285,7 +285,7 @@ public final class Session
 
             try
             {
-                Thread.sleep(5000);
+                Thread.sleep(5);
             }
             catch (InterruptedException e)
             {

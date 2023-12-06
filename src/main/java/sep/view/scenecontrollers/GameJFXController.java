@@ -1,5 +1,8 @@
 package sep.view.scenecontrollers;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.TextField;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
@@ -9,6 +12,8 @@ import sep.view.json.game.SetStartingPointModel;
 import sep.view.viewcontroller.TileModifier;
 import sep.view.lib.EGamePhase;
 import sep.view.json.game.SelectedCardModel;
+import sep.view.json.ChatMsgModel;
+import sep.view.clientcontroller.EClientInformation;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
@@ -23,6 +28,8 @@ import java.util.Objects;
 import javafx.scene.control.ScrollPane;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
+import javafx.scene.layout.Priority;
+import javafx.scene.input.KeyCode;
 
 public class GameJFXController
 {
@@ -49,6 +56,10 @@ public class GameJFXController
     @FXML private AnchorPane gotRegisterCardSlot7;
     @FXML private AnchorPane gotRegisterCardSlot8;
     @FXML private AnchorPane gotRegisterCardSlot9;
+    @FXML private ScrollPane chatScrollPane;
+    @FXML private TextField chatInputTextField;
+
+    private VBox chatContainer;
 
     private int tileDimensions;
     private static final int resizeAmount = 10;
@@ -85,6 +96,8 @@ public class GameJFXController
     @FXML
     private void initialize()
     {
+        VBox.setVgrow(this.chatScrollPane, Priority.ALWAYS);
+
         this.courseScrollPane.setFitToWidth(true);
         this.courseScrollPane.setFitToHeight(true);
         this.courseScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
@@ -96,6 +109,32 @@ public class GameJFXController
             this.renderCourse();
             return;
         });
+
+        this.chatInputTextField.lengthProperty().addListener(new ChangeListener<Number>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            {
+                if (t1.intValue() > EGameState.MAX_CHAT_MESSAGE_LENGTH)
+                {
+                    chatInputTextField.setText(chatInputTextField.getText().substring(0, EGameState.MAX_CHAT_MESSAGE_LENGTH));
+                }
+
+                return;
+            }
+        });
+
+        this.chatInputTextField.setOnKeyPressed(
+        (keyEvent ->
+        {
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.ENTER)
+            {
+                this.onSubmitChatMsg();
+            }
+
+            return;
+        })
+        );
 
         this.renderView();
 
@@ -132,6 +171,10 @@ public class GameJFXController
         p.play();
 
         this.initializeButtonActions();
+
+        this.chatContainer = new VBox();
+        this.chatContainer.setId("chat-scroll-pane-inner");
+        this.chatScrollPane.setContent(this.chatContainer);
 
         return;
     }
@@ -586,6 +629,154 @@ public class GameJFXController
 
         return;
     }
+
+    // region Chat
+
+    private void onSubmitChatMsg()
+    {
+        String token = this.getChatMsg();
+        this.chatInputTextField.clear();
+
+        if (this.isChatMsgACommand(token))
+        {
+            if (this.getChatCommand(token).isEmpty() || this.getChatCommand(token).isBlank())
+            {
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Type /h for help on commands.", false);
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("w"))
+            {
+                if (!token.contains("\""))
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+                int idxBSBegin = token.indexOf("\"");
+                String sub = token.substring(idxBSBegin + 1);
+                if (!sub.contains("\""))
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+                int idxBSEnd = sub.indexOf("\"");
+
+                String targetPlayer = token.substring(idxBSBegin + 1, idxBSBegin + idxBSEnd + 1);
+                if (targetPlayer.isEmpty() || targetPlayer.isBlank())
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+
+                String msgToWhisper;
+                try
+                {
+                    msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
+                }
+                catch (IndexOutOfBoundsException e)
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid message.", false);
+                    return;
+                }
+                if (msgToWhisper.isEmpty() || msgToWhisper.isBlank())
+                {
+                    return;
+                }
+
+                RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
+                if (target == null)
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, String.format("Player %s not found.", targetPlayer), false);
+                    return;
+                }
+
+                new ChatMsgModel(msgToWhisper, target.getPlayerID()).send();
+                if (EClientInformation.INSTANCE.getPlayerID() != target.getPlayerID())
+                {
+                    this.addChatMsgToView(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
+                }
+
+                l.debug("Whispering to {}.", targetPlayer);
+
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("h"))
+            {
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Commands:", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/h - Show this help.", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/w [\"player name\"] [msg] - Whisper to a player.", false);
+
+                return;
+            }
+
+            this.addChatMsgToView(ChatMsgModel.CLIENT_ID, String.format("Unknown command: %s", this.getChatCommand(token)), false);
+
+            return;
+        }
+
+        if (!this.isChatMsgValid(token))
+        {
+            return;
+        }
+        new ChatMsgModel(token, ChatMsgModel.CHAT_MSG_BROADCAST).send();
+
+        return;
+    }
+
+    private void addChatMsgToView(int caller, String msg, boolean bIsPrivate)
+    {
+        if (caller == ChatMsgModel.SERVER_ID)
+        {
+            Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
+            l.getStyleClass().add("lobby-msg-server");
+            l.setWrapText(true);
+            this.chatContainer.getChildren().add(l);
+
+            /* Kinda sketchy. But is there a better way? */
+            PauseTransition p = new PauseTransition(Duration.millis(15));
+            p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+            p.play();
+
+            return;
+        }
+
+        if (caller == ChatMsgModel.CLIENT_ID)
+        {
+            Label l = new Label(String.format("[%s] %s", ChatMsgModel.CLIENT_NAME, msg));
+            l.getStyleClass().add("lobby-msg-client");
+            l.setWrapText(true);
+            this.chatContainer.getChildren().add(l);
+
+            /* Kinda sketchy. But is there a better way? */
+            PauseTransition p = new PauseTransition(Duration.millis(15));
+            p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+            p.play();
+
+            return;
+        }
+
+        Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
+        if (bIsPrivate)
+        {
+            l.getStyleClass().add("lobby-msg-whisper");
+        }
+        else
+        {
+            l.getStyleClass().add("lobby-msg");
+        }
+        l.setWrapText(true);
+        this.chatContainer.getChildren().add(l);
+
+        /* Kinda sketchy. But is there a better way? */
+        PauseTransition p = new PauseTransition(Duration.millis(15));
+        p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+        p.play();
+
+        return;
+    }
+
+    // endregion Chat
 
     // region Rendering
 
@@ -1317,6 +1508,17 @@ public class GameJFXController
         return;
     }
 
+    public void onChatMsgReceived(int sourceID, String msg, boolean bIsPrivate)
+    {
+        Platform.runLater(() ->
+        {
+            this.addChatMsgToView(sourceID, msg, bIsPrivate);
+            return;
+        });
+
+        return;
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters
@@ -1324,6 +1526,31 @@ public class GameJFXController
     public int getCurrentTileDimensions()
     {
         return this.tileDimensions;
+    }
+
+    private String getChatMsg()
+    {
+        return this.chatInputTextField.getText();
+    }
+
+    private boolean isChatMsgValid(String token)
+    {
+        return !token.isEmpty() && token.length() <= EGameState.MAX_CHAT_MESSAGE_LENGTH;
+    }
+
+    private boolean isChatMsgACommand(String token)
+    {
+        return token.startsWith(ChatMsgModel.COMMAND_PREFIX);
+    }
+
+    private String getChatCommand(String token)
+    {
+        if (!token.contains(" "))
+        {
+            return token.substring(1);
+        }
+
+        return token.substring(1, token.indexOf(" "));
     }
 
     // endregion Getters and Setters
