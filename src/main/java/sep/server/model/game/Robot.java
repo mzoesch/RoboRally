@@ -35,9 +35,24 @@ public class Robot {
   }
    public void setStartingPoint(int x, int y){
      Tile chosenStart = course.getTileByNumbers(x,y);
-     direction = course.getStartingTurningDirection();
+     direction = setStartDirection();
      currentTile = chosenStart;
    }
+
+  private String setStartDirection() {
+    switch(course.getStartingTurningDirection()){
+      case ("clockwise") -> {
+        return "right";
+      }
+      case("counterclockwise") -> {
+        return "left";
+      }
+      case("") -> {
+        return "top";
+      }
+     }
+     return "bottom";
+  }
 
   public String getDirection() {
     return direction;
