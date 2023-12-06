@@ -31,10 +31,6 @@ public final class ClientInstance implements Runnable
 {
     private static final Logger l = LogManager.getLogger(ClientInstance.class);
 
-    // TODO ??? In our current protocol (v0.1), this is not handled in any way. So how should we close connections???
-    /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
-    private static final int ESCAPE_CHARACTER = 36;
-
     public Thread thread;
     private final Socket socket;
     private final InputStreamReader inputStreamReader;
@@ -100,6 +96,8 @@ public final class ClientInstance implements Runnable
             l.warn(e.getMessage());
             return;
         }
+
+        l.info("Client {} disconnected successfully.", this.socket.getInetAddress());
 
         return;
     }
@@ -247,13 +245,14 @@ public final class ClientInstance implements Runnable
             }
             catch (SocketException e)
             {
+                l.warn("Client {}'s socket connection was closed unexpectedly.", this.socket.getInetAddress());
                 this.handleDisconnect();
-                l.warn("Client {} disconnected unexpectedly.", this.socket.getInetAddress());
                 return;
             }
 
             if (escapeCharacter == -1)
             {
+                l.info("Client {} requested to close the server connection in an orderly way.", this.socket.getInetAddress());
                 this.handleDisconnect();
                 return;
             }
@@ -284,24 +283,6 @@ public final class ClientInstance implements Runnable
     {
         this.bIsAlive = false;
         new KeepAliveModel(this).send();
-        return;
-    }
-
-    public void sendMockJSON(JSONObject mockJSON)
-    {
-        try
-        {
-            this.bufferedWriter.write(mockJSON.toString());
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.flush();
-        }
-        catch (IOException e)
-        {
-            l.error("Failed to send mock JSON to client {}.", this.socket.getInetAddress());
-            l.error(e.getMessage());
-            return;
-        }
-
         return;
     }
 
