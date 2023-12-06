@@ -13,7 +13,14 @@ import sep.server.viewmodel.PlayerController;
 
 import sep.server.viewmodel.Session;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
+
 public class Player {
+
+    private static final Logger l = LogManager.getLogger(Player.class);
+
   PlayerController playerController;
   Robot playerRobot;
   ArrayList<IPlayableCard> playerDeck;

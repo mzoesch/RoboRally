@@ -68,11 +68,18 @@ public class DefaultClientRequestParser
 
     public int getYCoordinate(){ return this.request.getJSONObject("messageBody").getInt("y");}
 
-    public String getSelectedCard() throws JSONException {
+    public String getSelectedCardAsString() throws JSONException
+    {
         return this.request.getJSONObject("messageBody").getString("card");
     }
 
     public int getSelectedCardRegister() throws JSONException {
         return this.request.getJSONObject("messageBody").getInt("register");
     }
+
+    public JSONObject getBody()
+    {
+        return this.request.getJSONObject("messageBody");
+    }
+
 }
