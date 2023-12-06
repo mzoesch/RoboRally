@@ -187,12 +187,6 @@ public enum EClientInformation
         return stdServerErrPipeline;
     }
 
-    public void setServerListener(ServerListener serverListener)
-    {
-        this.serverListener = serverListener;
-        return;
-    }
-
     public void setPlayerID(int playerID)
     {
         this.playerID = playerID;
@@ -212,6 +206,7 @@ public enum EClientInformation
         this.bufferedReader = null;
         this.bufferedWriter = null;
         this.stdServerErrPipeline.setLength(0);
+        this.serverListener = null;
 
         this.playerID = -1;
         this.preferredSessionID = "";
@@ -267,6 +262,28 @@ public enum EClientInformation
     public boolean isMockView()
     {
         return this.bMockView;
+    }
+
+    public void closeSocket()
+    {
+        if (this.socket == null)
+        {
+            l.warn("Tried to close socket, but socket was not initialized.");
+            return;
+        }
+
+        try
+        {
+            this.socket.close();
+        }
+        catch (IOException e)
+        {
+            l.error("Failed to close socket.");
+            l.error(e.getMessage());
+            return;
+        }
+
+        return;
     }
 
     // endregion Getters and Setters
