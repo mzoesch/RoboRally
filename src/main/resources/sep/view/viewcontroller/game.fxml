@@ -134,5 +134,21 @@
                 </HBox>
             </children>
         </HBox>
+        <VBox
+            id="chat-container" stylesheets="@game.css"
+            AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="300.0"
+        >
+            <children>
+                <ScrollPane
+                    id="chat-scroll-pane" stylesheets="@game.css"
+                    fx:id="chatScrollPane"
+                />
+                <TextField
+                    promptText="Write global chat message"
+                    id="chat-input-text-field" stylesheets="@game.css"
+                    fx:id="chatInputTextField"
+                />
+            </children>
+        </VBox>
     </children>
 </AnchorPane>
