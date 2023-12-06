@@ -3,6 +3,7 @@ package sep.server.viewmodel;
 import sep.server.json.common.CurrentPlayerModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.StartingPointTakenModel;
+import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerAddedModel;
@@ -467,7 +468,11 @@ public final class Session
         }
     }
 
-    public void handlePlayerTurning(int playerID, String startingDirection) {
+    public void handlePlayerTurning(int playerID, String startingTurn) {
+        for (PlayerController pc : this.playerControllers) {
+            PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
+            playerTurningModel.send();
+        }
     }
 
 
