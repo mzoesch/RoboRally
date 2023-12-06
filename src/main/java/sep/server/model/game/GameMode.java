@@ -78,6 +78,15 @@ public class GameMode
             continue;
         }
 
+        for (PlayerController pc : playerControllers) {
+            for(Player p : players) {
+                if (p.getPlayerController() == pc) {
+                    pc.setPlayer(p);
+                }
+            }
+        }
+
+
         this.session.handleActivePhase(this.gamePhase);
         this.session.handleCurrentPlayer(this.currentPlayer.getPlayerController().getPlayerID());
 
@@ -234,6 +243,9 @@ public class GameMode
         }
 
         this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
+
+        //Ab hier test.
+
     }
 
     public void discardAndDrawBlind(ArrayList<Player> players) {

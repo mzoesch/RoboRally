@@ -25,6 +25,8 @@ public final class PlayerController
     private int figure;
     private boolean bIsReady;
 
+    private Player player;
+
 
 
     public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
@@ -65,6 +67,8 @@ public final class PlayerController
         return;
     }
 
+
+
     public int getPlayerID()
     {
         return this.playerID;
@@ -79,6 +83,10 @@ public final class PlayerController
     {
         this.figure = figure;
         return;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
     public ClientInstance getClientInstance()
@@ -99,16 +107,7 @@ public final class PlayerController
     }
 
     public void setSelectedCardInRegister(String selectedCard, int selectedRegister){
-
-        Player playerWhoSelectedCard = null;
-
-        for (Player player : session.getGameState().getAuthGameMode().getPlayers()) {
-            if (player.getPlayerController().getPlayerID() == playerID) {
-                playerWhoSelectedCard = player;
-                break;
-            }
-        }
-        playerWhoSelectedCard.addCardToRegister(selectedCard, selectedRegister);
+        player.addCardToRegister(selectedCard, selectedRegister);
     }
 
 
