@@ -27,7 +27,7 @@ public final class SelectedCardModel extends AServerRequestModel
     {
         JSONObject body = new JSONObject();
         body.put("register", this.register);
-        body.put("card", this.cardName);
+        body.put("card", this.cardName == null ? JSONObject.NULL : this.cardName);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "SelectedCard");
