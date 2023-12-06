@@ -220,8 +220,9 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* If this client's hand cards are being forced updated. */
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
-            l.debug("Player {}'s hand cards are updated.", dsrp.getPlayerID());
+            l.debug("Player {} has not submitted their selection in time. Received new cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(dsrp.getForcedCards())));
             return;
         }
 

@@ -97,6 +97,11 @@ public final class DefaultServerRequestParser
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").getString(i)).toArray(String[]::new);
     }
 
+    public String[] getForcedCards() throws JSONException
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cards").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cards").getString(i)).toArray(String[]::new);
+    }
+
     public String getErrorMessage()
     {
         return this.request.getJSONObject("messageBody").getString("error");
