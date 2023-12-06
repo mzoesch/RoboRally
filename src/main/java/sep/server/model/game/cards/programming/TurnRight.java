@@ -1,26 +1,24 @@
 package sep.server.model.game.cards.programming;
 
+import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.json.game.effects.PlayerTurningModel;
 
-public class LeftTurn extends AProgrammingCard implements IPlayableCard {
-    public LeftTurn(String cardType) {
+public class TurnRight extends AProgrammingCard implements IPlayableCard {
+
+    public TurnRight(String cardType) {
         super(cardType);
-        this.cardType = "LeftTurn";
+        this.cardType = "TurnRight";
     }
 
     @Override
     public void playCard(Player player, int currentRoundNumber) {
         player.rotateRobotOneTileToTheRight();
-        player.rotateRobotOneTileToTheRight();
-        player.rotateRobotOneTileToTheRight();
         for(Player player1 : GameState.gameMode.getPlayers()) {
             new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                     player.getPlayerController().getPlayerID(),
-                    "counterclockwise").send();
+                    "clockwise").send();
         }
     }
-
 }
