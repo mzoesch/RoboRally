@@ -77,7 +77,7 @@ public final class ClientInstance implements Runnable
         }
         this.bDisconnecting = true;
 
-        l.info("Client {} is disconnecting.", this.socket.getInetAddress());
+        l.debug("Client {} is disconnecting.", this.getAddr());
 
         if (this.bIsRegistered)
         {
@@ -92,12 +92,12 @@ public final class ClientInstance implements Runnable
         }
         catch (IOException e)
         {
-            l.warn("Could not close client {} socket connection in an orderly way.", this.socket.getInetAddress());
+            l.warn("Could not close client {} socket connection in an orderly way.", this.getAddr());
             l.warn(e.getMessage());
             return;
         }
 
-        l.info("Client {} disconnected successfully.", this.socket.getInetAddress());
+        l.info("Client {} disconnected successfully.", this.getAddr());
 
         return;
     }
@@ -127,7 +127,7 @@ public final class ClientInstance implements Runnable
         this.playerController.getSession().joinSession(this.playerController);
         this.bIsRegistered = true;
 
-        l.info("Client {} registered successfully.", this.socket.getInetAddress());
+        l.info("Client {} registered successfully.", this.getAddr());
 
         return true;
     }
@@ -151,13 +151,13 @@ public final class ClientInstance implements Runnable
         }
         catch (IOException e)
         {
-            l.error("Failed to read from client {}. Disconnecting them.", this.socket.getInetAddress());
+            l.error("Failed to read from client {}. Disconnecting them.", this.getAddr());
             l.error(e.getMessage());
             return null;
         }
         catch (JSONException e)
         {
-            l.error("Received invalid JSON from client {}. Disconnecting them.", this.socket.getInetAddress());
+            l.error("Received invalid JSON from client {}. Disconnecting them.", this.getAddr());
             l.error(e.getMessage());
             return null;
         }
@@ -167,49 +167,57 @@ public final class ClientInstance implements Runnable
     {
         if (Objects.equals(dcrp.getType_v2(), "Alive"))
         {
-            l.trace("Ok keep-alive from client {}.", this.socket.getInetAddress());
+            l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
             this.setAlive(true);
             return true;
         }
 
+        /* If core player information is being changed. */
         if (Objects.equals(dcrp.getType_v2(), "PlayerValues"))
         {
-            String oldName = this.playerController.getPlayerName();
+            final String oldName = this.playerController.getPlayerName();
 
             // TODO We have to do some validation here.
             this.playerController.setPlayerName(dcrp.getPlayerName());
             this.playerController.setFigure(dcrp.getFigureID());
-            l.debug("Player {} selected figure {}.", this.playerController.getPlayerName(), this.playerController.getFigure());
+            l.debug("Client {} selected figure {}.", this.getAddr(), this.playerController.getFigure());
 
             this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
             if (!Objects.equals(oldName, this.playerController.getPlayerName()))
             {
                 this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oldName, this.playerController.getPlayerName()));
+                l.debug("Client {} changed their name from {} to {}.", this.getAddr(), oldName, this.playerController.getPlayerName());
             }
 
             return true;
         }
 
+        /* If this client wants to send a chat message. */
         if (Objects.equals(dcrp.getType_v2(), "SendChat"))
         {
+            l.debug("Client {} wants to send chat message [{}] to lobby {}.", this.getAddr(), dcrp.getChatMessage_v2(), this.getPlayerController().getSession().getSessionID());
             // TODO Validate chat message.
             this.playerController.getSession().handleChatMessage(this.playerController, dcrp.getChatMessage_v2(), dcrp.getReceiverID());
             return true;
         }
 
+        /* If the client has set their ready status in the lobby. */
         if (Objects.equals(dcrp.getType_v2(), "SetStatus"))
         {
+            l.debug("Client {} set ready status to {}.", this.getAddr(), dcrp.getIsReadyInLobby());
             this.playerController.getSession().handlePlayerReadyStatus(this.playerController, dcrp.getIsReadyInLobby());
             return true;
         }
 
         if (Objects.equals(dcrp.getType_v2(), "MapSelected"))
         {
+            l.debug("Client {} selected course {}.", this.getAddr(), dcrp.getCourseName());
             this.playerController.getSession().handleSelectCourseName(this.playerController, dcrp.getCourseName());
             return true;
         }
 
-        if (Objects.equals(dcrp.getType_v2(), "PlayCard")) {
+        if (Objects.equals(dcrp.getType_v2(), "PlayCard"))
+        {
             l.debug("Received play Card from client.");
             return true;
         }
@@ -217,16 +225,15 @@ public final class ClientInstance implements Runnable
         /* If the client has set one of their five registers. */
         if (Objects.equals(dcrp.getType_v2(), "SelectedCard"))
         {
-            l.debug("Player {} selected card {} in register {}.", this.playerController.getPlayerID(), dcrp.getSelectedCard(), dcrp.getSelectedCardRegister());
+            l.debug("Client {} selected card {} in register {}.", this.getAddr(), dcrp.getSelectedCard(), dcrp.getSelectedCardRegister());
             this.playerController.setSelectedCardInRegister(dcrp.getSelectedCard(), dcrp.getSelectedCardRegister());
             return true;
         }
 
-        if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint")) {
-            l.debug("Received starting point from client.");
-            int x = dcrp.getXCoordinate();
-            int y = dcrp.getYCoordinate();
-            this.playerController.getSession().getGameState().setStartingPoint(playerController,x,y);
+        if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint"))
+        {
+            l.debug("Client {} set starting point to ({},{})", this.getAddr(), dcrp.getXCoordinate(), dcrp.getYCoordinate());
+            this.playerController.getSession().getGameState().setStartingPoint(playerController, dcrp.getXCoordinate(), dcrp.getYCoordinate());
             return true;
         }
 
@@ -237,7 +244,7 @@ public final class ClientInstance implements Runnable
     {
         while (true)
         {
-            int escapeCharacter;
+            final int escapeCharacter;
             try
             {
                 // If the client closed the connection in an orderly way, the server will receive -1.
@@ -245,27 +252,29 @@ public final class ClientInstance implements Runnable
             }
             catch (SocketException e)
             {
-                l.warn("Client {}'s socket connection was closed unexpectedly.", this.socket.getInetAddress());
+                l.warn("Client {}'s socket connection was closed unexpectedly.", this.getAddr());
                 this.handleDisconnect();
                 return;
             }
 
             if (escapeCharacter == -1)
             {
-                l.info("Client {} requested to close the server connection in an orderly way.", this.socket.getInetAddress());
+                l.debug("Client {} requested to close the server connection in an orderly way.", this.getAddr());
                 this.handleDisconnect();
                 return;
             }
 
-            boolean bAccepted;
+            final String s = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+            final boolean bAccepted;
             try
             {
-                bAccepted = this.parseRequest(new DefaultClientRequestParser(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine()))));
+                bAccepted = this.parseRequest(new DefaultClientRequestParser(new JSONObject(s)));
             }
             catch (JSONException e)
             {
-                l.warn("Received invalid JSON from client {}. Ignoring.", this.socket.getInetAddress());
+                l.warn("Received invalid JSON from client {}. Ignoring.", this.getAddr());
                 l.warn(e.getMessage());
+                l.warn(s);
                 continue;
             }
 
@@ -274,7 +283,7 @@ public final class ClientInstance implements Runnable
                 continue;
             }
 
-            l.warn("Received unknown request from client {}. Ignoring.", this.socket.getInetAddress());
+            l.warn("Received unknown request from client {}. Ignoring.", this.getAddr());
             continue;
         }
     }
@@ -338,6 +347,11 @@ public final class ClientInstance implements Runnable
     public PlayerController getPlayerController()
     {
         return this.playerController;
+    }
+
+    public String getAddr()
+    {
+        return this.socket.getRemoteSocketAddress().toString();
     }
 
     // endregion Getters and Setters
