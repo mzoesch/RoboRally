@@ -111,8 +111,7 @@ public class GameInstance
 
     public static void handleServerDisconnect()
     {
-        ServerListener.closeSocket(EClientInformation.INSTANCE.getBufferedWriter());
-        EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
+        ServerListener.closeSocket();
         return;
     }
 

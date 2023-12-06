@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,30 +41,10 @@ public class ServerListener implements Runnable
         return;
     }
 
-    public static void closeSocket(BufferedWriter bufferedWriter)
+    public static void closeSocket()
     {
-        if (bufferedWriter == null)
-        {
-            return;
-        }
-
-        // TODO ALL DEPRECATED PLEASE REMOVE IF WE KNOW HOW TO DISCONNECT FROM SERVER!
-        //      This is not to the norm of Protocol v0.1!
-        try
-        {
-            bufferedWriter.write((char) ServerListener.ESCAPE_CHARACTER);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        }
-        catch (IOException e)
-        {
-            l.error("Failed to send escape character.");
-            EClientInformation.INSTANCE.setServerListener(null);
-            return;
-        }
-
-        l.debug("Send closing connection request to server.");
-        EClientInformation.INSTANCE.setServerListener(null);
+        EClientInformation.INSTANCE.closeSocket();
+        EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
 
         l.info("Client disconnected from server.");
 
@@ -80,21 +59,24 @@ public class ServerListener implements Runnable
             while (true)
             {
                 // If the server closed the connection in an orderly way, we will receive -1;
-                int escapeCharacter = this.bufferedReader.read();
+                final int escapeCharacter = this.bufferedReader.read();
                 if (escapeCharacter == -1)
                 {
                     GameInstance.handleServerDisconnect();
                     return;
                 }
 
+                final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+
                 try
                 {
-                    this.parseJSONRequestFromServer(new DefaultServerRequestParser(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine()))));
+                    this.parseJSONRequestFromServer(new DefaultServerRequestParser(new JSONObject(r)));
                 }
                 catch (JSONException e)
                 {
                     l.warn("Failed to parse JSON request from server. Ignoring.");
                     l.warn(e.getMessage());
+                    l.warn(r);
                     continue;
                 }
 
@@ -164,6 +146,7 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* The server notifies the client about the nwe selected map. */
         if (Objects.equals(dsrp.getType_v2(), "MapSelected"))
         {
             l.debug("Received course selected from server. Selected course: {}.", dsrp.getCourseName() == null || dsrp.getCourseName().isEmpty() ? "none" : dsrp.getCourseName());
@@ -230,8 +213,10 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* If one client has finished selecting their programming cards. */
         if (Objects.equals(dsrp.getType_v2(), "SelectionFinished")) {
-            l.debug("Received selection finished from client.");
+            l.debug("Player {} finished their selection.", dsrp.getPlayerID());
+            EGameState.INSTANCE.setSelectionFinished(dsrp.getPlayerID());
             return;
         }
 
