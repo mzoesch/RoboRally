@@ -144,7 +144,7 @@ public class Player {
   public String[] getRegistersAsStringArray() {
     String[] registersArray = new String[registers.length];
     for (int i = 0; i < registers.length; i++) {
-      registersArray[i] = registers[i].toString();
+      registersArray[i] = registers[i].getCardType();
     }
     return registersArray;
   }
