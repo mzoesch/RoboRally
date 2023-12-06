@@ -470,6 +470,7 @@ public final class Session
 
     public void handlePlayerTurning(int playerID, String startingTurn) {
         for (PlayerController pc : this.playerControllers) {
+            l.debug("Player " + playerID + " has turned: " + startingTurn);
             PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
             playerTurningModel.send();
         }

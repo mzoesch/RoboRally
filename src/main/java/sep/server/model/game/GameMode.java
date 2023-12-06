@@ -45,10 +45,11 @@ public class GameMode
     ArrayList<VirusDamage> virusCardDeck;
     ArrayList<WormDamage> wormDamageDeck;
 
-    public GameMode(String courseName, PlayerController[] playerControllers, Session session)
+    public GameMode(String name, PlayerController[] playerControllers, Session session)
     {
         super();
-
+        String courseName = name.trim();
+        l.debug("Map Name: " + courseName);
         this.course = new Course(courseName);
         this.gamePhase = EGamePhase.REGISTRATION;
         this.session = session;
