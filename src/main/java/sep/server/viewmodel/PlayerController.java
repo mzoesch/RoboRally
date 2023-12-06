@@ -107,10 +107,13 @@ public final class PlayerController
     }
 
     public void setSelectedCardInRegister(String selectedCard, int selectedRegister){
-        player.addCardToRegister(selectedCard, selectedRegister);
+        player.setCardToRegister(selectedCard, selectedRegister);
     }
 
-
+    public Player getPlayer()
+    {
+        return player;
+    }
 
     // endregion Getters and Setters
 

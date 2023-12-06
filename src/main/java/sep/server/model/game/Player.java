@@ -1,145 +1,52 @@
 package sep.server.model.game;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.model.game.cards.programming.AProgrammingCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.Coordinate;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.viewmodel.PlayerController;
-
 import sep.server.viewmodel.Session;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
 
-public class Player {
-
+public class Player
+{
     private static final Logger l = LogManager.getLogger(Player.class);
 
-    PlayerController playerController;
-    Robot playerRobot;
-    ArrayList<IPlayableCard> playerDeck;
-    ArrayList<IPlayableCard> discardPile;
-    ArrayList<IPlayableCard> playerHand;
-    IPlayableCard[] registers;
-    int priority; //TODO aktuell überflüssig oder?; falls nicht, muss sie im Konstruktor gesetzt werden
-    int checkpointsCollected;
-    int energyCollected;
-    ArrayList<AUpgradeCard> upgradeCards;
-    Session session;
+    private int priority; //TODO aktuell überflüssig oder?; falls nicht, muss sie im Konstruktor gesetzt werden
 
+    private final Session session;
+    private final PlayerController playerController;
+    private final Robot playerRobot;
 
-    public Player(PlayerController playerController, Course currentCourse, Session session) {
+    private final ArrayList<IPlayableCard> playerDeck;
+    private final ArrayList<IPlayableCard> discardPile;
+    private final ArrayList<AUpgradeCard> upgradeCards;
+    private final IPlayableCard[] registers;
+    private final ArrayList<IPlayableCard> playerHand;
+
+    private int energyCollected;
+    private int checkpointsCollected;
+
+    public Player(final PlayerController playerController, final Course currentCourse, final Session session)
+    {
+        this.session = session;
         this.playerController = playerController;
         this.playerRobot = new Robot(currentCourse);
+
         this.playerDeck = new DeckBuilder().buildProgrammingDeck();
         this.discardPile = new ArrayList<>();
-        this.checkpointsCollected = 0;
-        this.energyCollected = 5;
         this.upgradeCards = new ArrayList<>();
-        this.playerHand = new ArrayList<>();
         this.registers = new IPlayableCard[5];
-        this.session = session;
-    }
+        this.playerHand = new ArrayList<>();
 
-    public PlayerController getPlayerController() {
-        return playerController;
-    }
+        this.energyCollected = GameMode.STARTING_ENERGY;
+        this.checkpointsCollected = 0;
 
-    public void setPlayerController(PlayerController playerController) {
-        this.playerController = playerController;
-    }
-
-    public Robot getPlayerRobot() {
-        return playerRobot;
-    }
-
-    public void setPlayerRobot(Robot playerRobot) {
-        this.playerRobot = playerRobot;
-    }
-
-    public ArrayList<IPlayableCard> getPlayerDeck() {
-        return playerDeck;
-    }
-
-    public void setPlayerDeck(ArrayList<IPlayableCard> playerDeck) {
-        this.playerDeck = playerDeck;
-    }
-
-    public ArrayList<IPlayableCard> getDiscardPile() {
-        return discardPile;
-    }
-
-    public void setDiscardPile(ArrayList<IPlayableCard> discardPile) {
-        this.discardPile = discardPile;
-    }
-    public ArrayList<IPlayableCard> getPlayerHand() {
-        return playerHand;
-    }
-
-    public void setPlayerHand(ArrayList<IPlayableCard> playerHand) {
-        this.playerHand = playerHand;
-    }
-
-
-    public IPlayableCard[] getRegisters() {
-        return registers;
-    }
-
-    public void setRegisters(IPlayableCard[] registers) {
-        this.registers = registers;
-    }
-
-    public IPlayableCard getCardInRegister(int registerIndex) {
-        return registers[registerIndex];
-    }
-
-    public void setCardInRegister(int registerIndex, IPlayableCard newCard) {
-        IPlayableCard previousCard = registers[registerIndex];
-
-        if(previousCard != null) {
-            discardPile.add(previousCard);
-        }
-
-        registers[registerIndex] = null;
-        registers[registerIndex] = newCard;
-    }
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public int getCheckpointsCollected() {
-        return checkpointsCollected;
-    }
-
-    public void setCheckpointsCollected(int checkpointsCollected) {
-        this.checkpointsCollected = checkpointsCollected;
-    }
-
-    public int getEnergyCollected() {
-        return energyCollected;
-    }
-
-    public void setEnergyCollected(int energyCollected) {
-        this.energyCollected = energyCollected;
-    }
-
-    public ArrayList<AUpgradeCard> getUpgradeCards() {
-        return upgradeCards;
-    }
-
-    public void setUpgradeCards(ArrayList<AUpgradeCard> upgradeCards) {
-        this.upgradeCards = upgradeCards;
+        return;
     }
 
     public void shuffleAndRefillDeck() {
@@ -147,28 +54,6 @@ public class Player {
         playerDeck.addAll(playerDeck.size(), discardPile); // Refill playerDeck with the shuffled discardPile at the end of PlayerDeck
         discardPile.clear();
     }
-
-    public String[] getRegistersAsStringArray() {
-        String[] registersArray = new String[registers.length];
-        for (int i = 0; i < registers.length; i++) {
-            registersArray[i] = registers[i].getCardType();
-        }
-        return registersArray;
-        }
-
-
-    public String[] getPlayerHandAsStringArray() {
-        ArrayList<IPlayableCard> hand = this.getPlayerHand();
-        String[] handArray = new String[hand.size()];
-        for (int i = 0; i < hand.size(); i++) {
-            handArray[i] = hand.get(i).getCardType();
-            }
-        return handArray;
-    }
-
-
-
-
 
     /**
     * Moves the robot one tile based on the given direction.
@@ -265,62 +150,50 @@ public class Player {
     }
 
     /**
-    * Adds a playable card to the specified register position.
-    * If a card is added, it sends a notification to the session about the card selection,
-    * and if all registers are full after the addition, it notifies the session that the selection is finished.
-    * If a card is removed (set to null), it also sends a notification about the card deselection.
-    */
-    public void addCardToRegister(String cardName, int position) {
-        if (position >= 0 && position < 4) {
-            IPlayableCard card = getCardByName(cardName);
-
-            if (card != null) {
-                registers[position] = card;
-                session.sendCardSelected(getPlayerController().getPlayerID(), position, true);
-
-                if (checkRegisterStatus()) {
-                session.sendSelectionFinished(playerController.getPlayerID());
-                session.getGameState().getAuthGameMode().startTimer();
-            }
-            } else {
-                registers[position] = null;
-                session.sendCardSelected(getPlayerController().getPlayerID(), position, false);
-            }
-        }
-
-    }
-
-    public IPlayableCard getCardByName(String cardName) {
-        for (IPlayableCard card : playerHand) {
-            if (card.getCardType().equals(cardName))
-            {
-                return card;
-            }
-        }
-        return null;
-    }
-
-
-
-
-    /**
-    * Checks the current status of the player's registers.
-    * @return true if all registers are full, otherwise false.
-    */
-    public boolean checkRegisterStatus()
+     * Adds a playable card to the specified register position.
+     * If all registers are full after the addition, it notifies the session that the selection is finished. If all
+     * players have finished their selection, the next phase will be started.
+     *
+     * @param card Name of the card to be added to the register
+     * @param pos  Position of the register to add the card to (zero-based)
+     */
+    public void setCardToRegister(final String card, final int pos)
     {
-        boolean isFull = true;
-        for (IPlayableCard card : registers) {
-            if (card == null) {
-                isFull = false;
-                break;
+        if (pos < 0 || pos > 4)
+        {
+            l.error("Invalid register position: " + pos);
+            return;
+        }
+
+        final IPlayableCard playableCard = this.getCardByName(card);
+
+        if (playableCard == null)
+        {
+            this.registers[pos] = null;
+            this.session.sendCardSelected(this.playerController.getPlayerID(), pos, false);
+            return;
+        }
+
+        this.registers[pos] = playableCard;
+        this.session.sendCardSelected(getPlayerController().getPlayerID(), pos, true);
+
+        if (this.hasPlayerFinishedProgramming())
+        {
+            l.debug("Player " + this.playerController.getPlayerName() + " has finished programming.");
+            this.session.sendSelectionFinished(this.playerController.getPlayerID());
+
+            if (this.session.haveAllPlayersFinishedProgramming())
+            {
+                l.debug("All players have finished programming in time. Interrupting timer.");
+                // TODO Interrupt timer
+                // TODO Start next phase
+                return;
             }
+
+            this.session.getGameState().getAuthGameMode().startTimer();
         }
-        if (isFull) {
-            return true;
-        } else {
-            return false;
-        }
+
+        return;
     }
 
     public void handleIncompleteProgramming() {
@@ -337,20 +210,147 @@ public class Player {
         session.sendCardsYouGotNow(getPlayerController(), getRegistersAsStringArray());
     }
 
+    // region Getters and Setters
+
+    /**
+     * @return True if all registers are full, false otherwise
+     */
+    public boolean hasPlayerFinishedProgramming()
+    {
+        for (final IPlayableCard c : this.registers)
+        {
+            if (c == null)
+            {
+                return false;
+            }
+
+            continue;
+        }
+
+        return true;
+    }
+
+    public IPlayableCard getCardByName(final String cardName)
+    {
+        for (IPlayableCard c : this.playerHand)
+        {
+            if (c.getCardType().equals(cardName))
+            {
+                return c;
+            }
+
+            continue;
+        }
+
+        return null;
+    }
+
+    public PlayerController getPlayerController()
+    {
+        return this.playerController;
+    }
+
+    public Robot getPlayerRobot()
+    {
+        return this.playerRobot;
+    }
+
+    public ArrayList<IPlayableCard> getPlayerDeck()
+    {
+        return this.playerDeck;
+    }
+
+    public ArrayList<IPlayableCard> getDiscardPile()
+    {
+        return this.discardPile;
+    }
+
+    public ArrayList<IPlayableCard> getPlayerHand()
+    {
+        return this.playerHand;
+    }
+
+    public IPlayableCard[] getRegisters()
+    {
+        return this.registers;
+    }
+
+    public IPlayableCard getCardByRegisterIndex(final int idx)
+    {
+        return this.registers[idx];
+    }
+
+    public String[] getRegistersAsStringArray()
+    {
+        final String[] registersArray = new String[this.registers.length];
+        for (int i = 0; i < this.registers.length; i++)
+        {
+            registersArray[i] = this.registers[i].getCardType();
+        }
+
+        return registersArray;
+    }
+
+    public String[] getPlayerHandAsStringArray()
+    {
+        final String[] handArray = new String[this.playerHand.size()];
+        for (int i = 0; i < this.playerHand.size(); i++)
+        {
+            handArray[i] = this.playerHand.get(i).getCardType();
+        }
+
+        return handArray;
+    }
+
+    public void setCardInRegister(final int idx, final IPlayableCard newCard)
+    {
+        if (this.registers[idx] != null)
+        {
+            this.discardPile.add(this.registers[idx]);
+        }
+
+        this.registers[idx] = newCard;
+
+        return;
+    }
+
+    public int getPriority()
+    {
+        return priority;
+    }
+
+    public void setPriority(final int priority)
+    {
+        this.priority = priority;
+        return;
+    }
+
+    public int getCheckpointsCollected()
+    {
+        return checkpointsCollected;
+    }
+
+    public void setCheckpointsCollected(final int checkpointsCollected)
+    {
+        this.checkpointsCollected = checkpointsCollected;
+        return;
+    }
+
+    public int getEnergyCollected()
+    {
+        return energyCollected;
+    }
+
+    public void setEnergyCollected(int energyCollected)
+    {
+        this.energyCollected = energyCollected;
+    }
+
+    public ArrayList<AUpgradeCard> getUpgradeCards()
+    {
+        return upgradeCards;
+    }
+
+    // endregion Getters and Setters
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

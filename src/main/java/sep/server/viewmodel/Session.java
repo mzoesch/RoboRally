@@ -476,6 +476,20 @@ public final class Session
         }
     }
 
+    public boolean haveAllPlayersFinishedProgramming()
+    {
+        for (PlayerController pc : this.playerControllers)
+        {
+            if (!pc.getPlayer().hasPlayerFinishedProgramming())
+            {
+                return false;
+            }
+
+            continue;
+        }
+
+        return true;
+    }
 
     // endregion Getters and Setters
 

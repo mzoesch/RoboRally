@@ -30,6 +30,8 @@ public class GameMode
 {
     private static final Logger l = LogManager.getLogger(Session.class);
 
+    public static final int STARTING_ENERGY = 5;
+
     private final Course course;
     private EGamePhase gamePhase = EGamePhase.INVALID;
     private final Session session;
@@ -194,7 +196,7 @@ public class GameMode
     public void programmingPhase() {
         distributeCards(players);
         selectCards(players);
-        discardAndDrawBlind(players);
+//        discardAndDrawBlind(players);
 //        activationPhase();
     }
 
@@ -235,7 +237,7 @@ public class GameMode
         int index = 0;
 
         for (Player player : players) {
-            if (!player.checkRegisterStatus()) {
+            if (!player.hasPlayerFinishedProgramming()) {
                 playerIdWhoNotFinished[index++] = player.getPlayerController().getPlayerID();
             }
         }
@@ -274,8 +276,8 @@ public class GameMode
             sortPlayersByPriority();
             determineCurrentCards();
             for(int j = 0; j < players.size(); currentRegister++) {
-                if(players.get(j).registers[currentRegister] != null) {
-                    players.get(j).registers[currentRegister].playCard();
+                if(players.get(j).getRegisters()[currentRegister] != null) {
+                    players.get(j).getRegisters()[currentRegister].playCard();
                 }
             }
             activateConveyorBelts(2);
@@ -343,7 +345,7 @@ public class GameMode
         CardInfo[] activeCards = new CardInfo[players.size()];
         for(int i = 0; i<activeCards.length; i++) {
             for(Player player : players) {
-                String card = ((Card) player.getCardInRegister(currentRegister)).getCardType();
+                String card = ((Card) player.getCardByRegisterIndex(currentRegister)).getCardType();
                 CardInfo cardInfo = new CardInfo(player.getPlayerController().getPlayerID(), card);
                 activeCards[i] = cardInfo;
             }
@@ -722,7 +724,7 @@ public class GameMode
      * @param card card that will be added instead
      */
     public void replaceCardInRegister(Player player, IPlayableCard card) {
-        player.getDiscardPile().add(player.getCardInRegister(currentRegister));
+        player.getDiscardPile().add(player.getCardByRegisterIndex(currentRegister));
         player.getRegisters()[currentRegister] = null;
 
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
