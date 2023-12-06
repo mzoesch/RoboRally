@@ -35,7 +35,7 @@ public class Robot {
   }
    public void setStartingPoint(int x, int y){
      Tile chosenStart = course.getTileByNumbers(x,y);
-     direction = course.getStartingDirection();
+     direction = course.getStartingTurningDirection();
      currentTile = chosenStart;
    }
 

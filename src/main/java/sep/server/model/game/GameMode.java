@@ -123,6 +123,7 @@ public class GameMode
                 currentPlayer.getPlayerRobot().setStartingPoint(x,y);
                 l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
                 pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
+                pc.getSession().handlePlayerTurning(pc.getPlayerID(), course.getStartingTurningDirection());
 
                 if(startingPointSelectionFinished()){
                     //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase

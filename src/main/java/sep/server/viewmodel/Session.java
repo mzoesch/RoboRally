@@ -467,8 +467,8 @@ public final class Session
         }
     }
 
-
-
+    public void handlePlayerTurning(int playerID, String startingDirection) {
+    }
 
 
     // endregion Getters and Setters

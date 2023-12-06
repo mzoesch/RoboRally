@@ -94,10 +94,10 @@ public class CourseBuilder {
         }
     }
 
-    public String getStartingPosition(String courseName){
+    public String getStartingTurningDirection(String courseName){
         switch(courseName){
             case("DizzyHighway") -> {
-                return "East";}
+                return "clockwise";}
         }
         return "EAST";
     }

@@ -14,7 +14,8 @@ public class Course {
     private static final Logger l = LogManager.getLogger(GameState.class);
     private ArrayList<ArrayList<Tile>> course;
 
-    private final String startingDirection;
+
+    private final String startingTurningDirection;
 
     /**
      * Erstellt das Spielbrett abhängig vom übergebenen Kartennamen
@@ -25,7 +26,7 @@ public class Course {
         super();
         CourseBuilder courseBuilder = new CourseBuilder();
         course = courseBuilder.buildCourse(courseName);
-        startingDirection = courseBuilder.getStartingPosition(courseName);
+        startingTurningDirection = courseBuilder.getStartingTurningDirection(courseName);
     }
 
     public void activateBoard() {
@@ -107,8 +108,8 @@ public class Course {
         return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
     }
 
-    public String getStartingDirection() {
-        return startingDirection;
+    public String getStartingTurningDirection() {
+        return startingTurningDirection;
     }
 
     public ArrayList<ArrayList<Tile>> getCourse() {
