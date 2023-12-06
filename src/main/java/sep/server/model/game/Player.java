@@ -38,6 +38,7 @@ public class Player
         this.playerRobot = new Robot(currentCourse);
 
         this.playerDeck = new DeckBuilder().buildProgrammingDeck();
+        Collections.shuffle(this.playerDeck);
         this.discardPile = new ArrayList<>();
         this.upgradeCards = new ArrayList<>();
         this.registers = new IPlayableCard[5];
