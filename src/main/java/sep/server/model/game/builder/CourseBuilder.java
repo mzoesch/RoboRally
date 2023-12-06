@@ -19,8 +19,7 @@ public class CourseBuilder {
      * @param name Name des Spielfelds
      * @return komplettes Spielfeld als ArrayList<ArrayList<Tile>>
      */
-    public  ArrayList<ArrayList<Tile>> buildCourse(String name){
-        String courseName = name.trim();
+    public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
         switch(courseName){
             case("Dizzy Highway") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");

@@ -73,8 +73,7 @@ public class GameState
 
     public void setCourseName(String courseName)
     {
-        String name = courseName.trim();
-        this.courseName = name;
+        this.courseName = courseName;
         l.info("CourseName set to: " + courseName);
     }
 
