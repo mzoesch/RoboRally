@@ -1,19 +1,26 @@
 package sep.view.viewcontroller;
 
 import sep.view.clientcontroller.RemotePlayer;
-import sep.view.lib.Coordinate;
+import sep.view.lib.RCoordinate;
 import sep.view.scenecontrollers.GameJFXController;
+import sep.view.lib.RRotation;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RobotView
 {
+    private static final Logger l = LogManager.getLogger(RobotView.class);
+
     private final RemotePlayer possessor;
 
     // TODO To Remove. We want to calculate the pos with the given iv maybe?
-    Coordinate position;
+    RCoordinate position;
+    RRotation rotation;
+
     ImageView IV;
     /** The actual item in the view. */
     AnchorPane AP;
@@ -31,24 +38,31 @@ public class RobotView
         return Tile.getRobotImage(this.possessor.getFigureID());
     }
 
-    public void setPosition(Coordinate c)
+    public void setPosition(RCoordinate c)
     {
-        this.setPosition(c, true);
+        this.setPosition(c, false, true);
         return;
     }
 
-    public void setPosition(Coordinate c, boolean bUpdateInView)
+    public void setPosition(RCoordinate c, boolean bOverrideOldRotation, boolean bUpdateInView)
     {
         this.position = c;
+
+        if (bOverrideOldRotation)
+        {
+            this.rotation = new RRotation(RRotation.NORTH);
+        }
+
         if (bUpdateInView)
         {
-            ViewSupervisor.updatePlayerPosition();
+            ViewSupervisor.updatePlayerTransforms();
         }
+
         return;
     }
 
     /** With animations. */
-    public void moveToPosition(Coordinate c)
+    public void moveToPosition(RCoordinate c)
     {
         return;
     }
@@ -69,6 +83,12 @@ public class RobotView
         return;
     }
 
+    private void rotateIMG()
+    {
+        this.IV.setRotate(this.rotation.rotation());
+        return;
+    }
+
     public boolean hasPosition()
     {
         return this.position != null;
@@ -82,9 +102,27 @@ public class RobotView
             this.generateIMG();
         }
 
+        this.rotateIMG();
+
         ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).renderOnPosition(this.AP, this.position);
 
         return;
+    }
+
+    public void addRotation(String r)
+    {
+        if (this.rotation == null)
+        {
+            this.rotation = new RRotation(RRotation.NORTH);
+        }
+
+        this.rotation = this.rotation.addRotation(r);
+        return;
+    }
+
+    public int getRotation()
+    {
+        return this.rotation.rotation();
     }
 
 }
