@@ -1,6 +1,6 @@
 package sep.view.json;
 
-import sep.view.lib.Coordinate;
+import sep.view.lib.RCoordinate;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -87,9 +87,9 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getInt("phase");
     }
 
-    public Coordinate getCoordinate() throws JSONException
+    public RCoordinate getCoordinate() throws JSONException
     {
-        return new Coordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
+        return new RCoordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
     }
 
     public String[] getCardsInHand() throws JSONException

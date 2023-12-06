@@ -410,6 +410,28 @@ public enum EGameState
 
     }
 
+    public boolean areRegistersFull()
+    {
+        for (String s : this.registers)
+        {
+            if (s == null)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void setSelectionFinished(final int playerID)
+    {
+        Objects.requireNonNull(this.getRemotePlayer(playerID)).setSelectionFinished(true);
+        // TODO Also not efficient here. We must not update the whole HUD, but only the player view and if not already
+        //      existing, the new timer view.
+        ViewSupervisor.updatePlayerView();
+        return;
+    }
+
     // endregion Getters and Setters
 
 }

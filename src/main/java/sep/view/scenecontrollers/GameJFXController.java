@@ -4,7 +4,7 @@ import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.lib.Coordinate;
+import sep.view.lib.RCoordinate;
 import sep.view.json.game.SetStartingPointModel;
 import sep.view.viewcontroller.TileModifier;
 import sep.view.lib.EGamePhase;
@@ -131,12 +131,12 @@ public class GameJFXController
         });
         p.play();
 
-        this.initializeRegisterSlotButtons();
+        this.initializeButtonActions();
 
         return;
     }
 
-    private void initializeRegisterSlotButtons()
+    private void initializeButtonActions()
     {
 
         {
@@ -1079,13 +1079,13 @@ public class GameJFXController
         return;
     }
 
-    public void renderOnPosition(AnchorPane AP, Coordinate c)
+    public void renderOnPosition(AnchorPane AP, RCoordinate c)
     {
         AP.getStyleClass().add("tile");
 
-        double xTranslation = c.getX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        double xTranslation = c.x() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
         AP.setTranslateX(this.centralXTranslation < 0 ? xTranslation : xTranslation + this.centralXTranslation);
-        AP.setTranslateY(c.getY() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
+        AP.setTranslateY(c.y() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
 
         if (!this.courseScrollPaneContent.getChildren().contains(AP))
         {
@@ -1132,7 +1132,7 @@ public class GameJFXController
                     AP.getChildren().add(iv);
                     continue;
                 }
-                this.renderOnPosition(AP, new Coordinate(i, j));
+                this.renderOnPosition(AP, new RCoordinate(i, j));
 
                 if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
                 {
@@ -1192,12 +1192,11 @@ public class GameJFXController
         return;
     }
 
-    // TODO Rotation of the robot
     /**
      * Updates player positions on the course view.
      * No re-renders must be done after this method.
      */
-    private void renderPlayerPositions()
+    private void renderPlayerTransforms()
     {
         for (RemotePlayer RP : EGameState.INSTANCE.getRemotePlayers())
         {
@@ -1213,7 +1212,7 @@ public class GameJFXController
                 continue;
             }
 
-            RP.getRobotView().setPosition(RP.getStartingPosition(), false);
+            RP.getRobotView().setPosition(RP.getStartingPosition(), true, false);
             RP.getRobotView().renderPosition();
 
             continue;
@@ -1230,7 +1229,7 @@ public class GameJFXController
     private void renderCourse()
     {
         this.renderCourseBoard();
-        this.renderPlayerPositions();
+        this.renderPlayerTransforms();
 
         return;
     }
@@ -1296,11 +1295,11 @@ public class GameJFXController
         return;
     }
 
-    public void onPlayerPositionUpdate()
+    public void onPlayerTransformUpdate()
     {
         Platform.runLater(() ->
         {
-            this.renderPlayerPositions();
+            this.renderPlayerTransforms();
             return;
         });
 

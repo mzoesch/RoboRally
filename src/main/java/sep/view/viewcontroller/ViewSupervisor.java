@@ -210,12 +210,12 @@ public final class ViewSupervisor extends Application
         }
     }
 
-    public static void updatePlayerPosition()
+    public static void updatePlayerTransforms()
     {
         try
         {
             GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
-            ctrl.onPlayerPositionUpdate();
+            ctrl.onPlayerTransformUpdate();
             return;
         }
         catch (ClassCastException e)
