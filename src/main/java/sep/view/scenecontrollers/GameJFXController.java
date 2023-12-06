@@ -191,6 +191,12 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
             {
                 if (EGameState.INSTANCE.getRegister(0) == null)
@@ -230,6 +236,12 @@ public class GameJFXController
         {
             if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
             {
+                return;
+            }
+
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
                 return;
             }
 
@@ -275,6 +287,12 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
             {
                 if (EGameState.INSTANCE.getRegister(2) == null)
@@ -317,6 +335,12 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
             {
                 if (EGameState.INSTANCE.getRegister(3) == null)
@@ -356,6 +380,12 @@ public class GameJFXController
         {
             if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
             {
+                return;
+            }
+
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
                 return;
             }
 
@@ -405,6 +435,13 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == 0)
             {
                 this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
@@ -427,6 +464,13 @@ public class GameJFXController
         {
             if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
             {
+                return;
+            }
+
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
                 return;
             }
 
@@ -456,6 +500,13 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == 2)
             {
                 this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
@@ -478,6 +529,13 @@ public class GameJFXController
         {
             if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
             {
+                return;
+            }
+
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
                 return;
             }
 
@@ -506,6 +564,13 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == 4)
             {
                 this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
@@ -528,6 +593,13 @@ public class GameJFXController
         {
             if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
             {
+                return;
+            }
+
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
                 return;
             }
 
@@ -556,6 +628,13 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == 6)
             {
                 this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
@@ -578,6 +657,13 @@ public class GameJFXController
         {
             if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
             {
+                return;
+            }
+
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
                 return;
             }
 
@@ -606,13 +692,19 @@ public class GameJFXController
                 return;
             }
 
+            if (EGameState.INSTANCE.areRegistersFull())
+            {
+                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+                return;
+            }
+
             if (this.gotRegisterSlotClicked == 8)
             {
                 this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
                 this.renderHUDFooter();
                 return;
             }
-
 
             if (EGameState.INSTANCE.getGotRegister(8) == null)
             {
