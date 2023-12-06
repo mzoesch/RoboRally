@@ -111,4 +111,10 @@ public final class DefaultServerRequestParser
     {
         return this.request.getJSONObject("messageBody").getBoolean("filled");
     }
+
+    public String getRotation()
+    {
+        return this.request.getJSONObject("messageBody").getString("rotation");
+    }
+
 }

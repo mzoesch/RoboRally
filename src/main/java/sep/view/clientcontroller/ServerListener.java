@@ -210,7 +210,14 @@ public class ServerListener implements Runnable
         {
             l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
-            ViewSupervisor.updatePlayerPosition();
+            ViewSupervisor.updatePlayerTransforms();
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
+            l.debug("Player {} turned {}.", dsrp.getPlayerID(), dsrp.getRotation());
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().addRotation(dsrp.getRotation());
+            ViewSupervisor.updatePlayerTransforms();
             return;
         }
 
@@ -299,11 +306,6 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "Movement")) {
             l.debug("Received movement from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
-            l.debug("Received player turning from server.");
             return;
         }
 
