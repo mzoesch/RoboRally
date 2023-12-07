@@ -1292,7 +1292,10 @@ public class GameJFXController
             }
             playerName.getStyleClass().add("player-box-text");
 
-            VBox v = new VBox(figureName, playerName);
+            Label energyCubes = new Label("EnergyCubes: " + rp.getEnergyCubes());
+            playerName.getStyleClass().add("player-box-text");
+
+            VBox v = new VBox(figureName, playerName, energyCubes);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
 
