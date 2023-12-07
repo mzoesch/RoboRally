@@ -802,6 +802,8 @@ public class GameJFXController
                 this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Commands:", false);
                 this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/h - Show this help.", false);
                 this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/w [\"player name\"] [msg] - Whisper to a player.", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/hide - Hide ServerInfos", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/show - Show ServerInfos after again hide-command.", false);
 
                 return;
             }
