@@ -3,6 +3,7 @@ package sep.server.viewmodel;
 import sep.server.json.common.CurrentPlayerModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.StartingPointTakenModel;
+import sep.server.json.game.effects.GameFinishedModel;
 import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
@@ -473,6 +474,14 @@ public final class Session
             l.debug("Player " + playerID + " has turned: " + startingTurn);
             PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
             playerTurningModel.send();
+        }
+    }
+
+    public void handleGameFinished(int playerID){
+        l.debug("Sent GameFinished with winningPlayer: " + playerID);
+        for (PlayerController pc : this.playerControllers) {
+            GameFinishedModel gameFinishedModel = new GameFinishedModel(pc.getClientInstance(), playerID);
+            gameFinishedModel.send();
         }
     }
 
