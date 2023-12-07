@@ -310,7 +310,7 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "DeawDamage")) {
+        if (Objects.equals(dsrp.getType_v2(), "DrawDamage")) {
             l.debug("Received draw a damage card from server.");
             return;
         }
