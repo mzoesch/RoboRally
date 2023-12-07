@@ -75,15 +75,15 @@ public class Robot {
 
   public void reboot() {
     for(Player player : GameState.gameMode.getPlayers()) {
-      if(this.equals(player.getPlayerRobot()) && GameState.gameMode.spamCardDeck.size() >= 2) {
+      if(this.equals(player.getPlayerRobot()) && GameState.gameMode.getSpamDeck().size() >= 2) {
 
         for(Player player1 : GameState.gameMode.getPlayers()) {
           new RebootModel(player1.getPlayerController().getClientInstance(),
                   player.getPlayerController().getPlayerID()).send();
         }
 
-        player.getDiscardPile().add(GameState.gameMode.spamCardDeck.get(0));
-        player.getDiscardPile().add(GameState.gameMode.spamCardDeck.get(0));
+        player.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
+        player.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
 
         for (int i = 0; i < player.getRegisters().length; i++) {
             player.getDiscardPile().add(player.getCardByRegisterIndex(i));
