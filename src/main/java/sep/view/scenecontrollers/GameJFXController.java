@@ -63,6 +63,7 @@ public class GameJFXController
     @FXML private TextField chatInputTextField;
 
     private VBox chatContainer;
+    private boolean showServerInfo = true;
 
     private int tileDimensions;
     private static final int resizeAmount = 10;
@@ -840,17 +841,19 @@ public class GameJFXController
     {
         if (caller == ChatMsgModel.SERVER_ID)
         {
-            Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
-            l.getStyleClass().add("lobby-msg-server");
-            l.setWrapText(true);
-            this.chatContainer.getChildren().add(l);
+            if(showServerInfo) {
+                Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
+                l.getStyleClass().add("lobby-msg-server");
+                l.setWrapText(true);
+                this.chatContainer.getChildren().add(l);
 
-            /* Kinda sketchy. But is there a better way? */
-            PauseTransition p = new PauseTransition(Duration.millis(15));
-            p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
-            p.play();
-
+                /* Kinda sketchy. But is there a better way? */
+                PauseTransition p = new PauseTransition(Duration.millis(15));
+                p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+                p.play();
+            }
             return;
+
         }
 
         if (caller == ChatMsgModel.CLIENT_ID)
