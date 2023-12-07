@@ -1,9 +1,5 @@
 package sep.view.scenecontrollers;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.Node;
-import javafx.scene.control.TextField;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
@@ -22,10 +18,13 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.AnchorPane;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.scene.image.ImageView;
-
 import java.util.ArrayList;
 import java.util.Objects;
 import javafx.scene.control.ScrollPane;
