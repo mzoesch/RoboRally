@@ -42,6 +42,7 @@ public enum EGameState
 
     private final String[] registers;
     private final ArrayList<String> gotRegisters;
+    private String winningPlayer = "";
 
     private EGameState()
     {
@@ -430,6 +431,14 @@ public enum EGameState
         //      existing, the new timer view.
         ViewSupervisor.updatePlayerView();
         return;
+    }
+
+    public String getWinningPlayer() {
+        return winningPlayer;
+    }
+
+    public void setWinningPlayer(String winningPlayer) {
+        this.winningPlayer = winningPlayer;
     }
 
     // endregion Getters and Setters
