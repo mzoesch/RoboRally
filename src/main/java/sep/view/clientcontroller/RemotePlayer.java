@@ -21,6 +21,8 @@ public final class RemotePlayer
     private static final int REGISTER_SLOTS = 5;
     private String[] registerSlots;
 
+    private int energyCubes = 5;
+
     private boolean bSelectionFinished;
 
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
@@ -135,4 +137,11 @@ public final class RemotePlayer
         return;
     }
 
+    public int getEnergyCubes() {
+        return energyCubes;
+    }
+
+    public void setEnergy(int number){
+        energyCubes = number;
+    }
 }

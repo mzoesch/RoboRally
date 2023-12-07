@@ -124,4 +124,6 @@ public final class DefaultServerRequestParser
 
     public int getWinningPlayer(){ return this.request.getJSONObject("messageBody").getInt("clientID");}
 
+    public int getEnergyCount() { return this.request.getJSONObject("messageBody").getInt("count");
+    }
 }

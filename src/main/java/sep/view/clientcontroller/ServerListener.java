@@ -282,7 +282,9 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Energy")) {
-            l.debug("Received energy from server.");
+            l.debug("Player {} EnergyCubeAmmount has been set to {}", dsrp.getPlayerID(), dsrp.getEnergyCount());
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setEnergy(dsrp.getEnergyCount());
+
             return;
         }
 
