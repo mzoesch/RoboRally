@@ -1287,6 +1287,9 @@ public class GameJFXController
             figureName.getStyleClass().add("player-box-text");
 
             Label playerName = new Label(rp.getPlayerName());
+            if(rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()) {
+                playerName.setText(rp.getPlayerName() + " (You)");
+            }
             playerName.getStyleClass().add("player-box-text");
 
             VBox v = new VBox(figureName, playerName);
