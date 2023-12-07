@@ -1006,13 +1006,15 @@ public class GameJFXController
                 this.registerSlot1.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(0) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(0) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(0) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(0) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1024,13 +1026,15 @@ public class GameJFXController
                 this.registerSlot2.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(1) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(1) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(1) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(1) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1042,13 +1046,15 @@ public class GameJFXController
                 this.registerSlot3.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(2) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(2) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(2) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(2) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1060,13 +1066,15 @@ public class GameJFXController
                 this.registerSlot4.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(3) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(3) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(3) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(3) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1078,13 +1086,15 @@ public class GameJFXController
                 this.registerSlot5.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(4) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(4) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(4) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(4) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1110,11 +1120,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot1.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(0) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(0) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1126,11 +1138,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot2.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(1) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(1) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1142,11 +1156,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot3.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(2) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(2) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1158,11 +1174,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot4.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(3) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(3) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1174,11 +1192,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot5.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(4) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(4) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1190,11 +1210,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot6.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(5) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(5) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1206,11 +1228,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot7.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(6) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(6) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1222,11 +1246,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot8.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(7) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(7) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1238,11 +1264,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot9.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(8) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(8) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -1318,14 +1346,16 @@ public class GameJFXController
     private void renderPlayerInformationArea()
     {
         this.playerContainer.getChildren().clear();
+
         for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
             Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
             figureName.getStyleClass().add("player-box-text");
 
             Label playerName = new Label(rp.getPlayerName());
-            if(rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()) {
-                playerName.setText(rp.getPlayerName() + " (You)");
+            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                playerName.setText(String.format("%s (You)", rp.getPlayerName()));
             }
             playerName.getStyleClass().add("player-box-text");
 
@@ -1336,8 +1366,8 @@ public class GameJFXController
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
 
-
             this.playerContainer.getChildren().add(v);
+
             continue;
         }
 
