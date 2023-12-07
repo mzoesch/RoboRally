@@ -187,6 +187,7 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
             l.debug("Received card played from server.");
+            //TODO Handling of played Card?
             return;
         }
 
@@ -234,11 +235,15 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
+            String info = String.format("Die Karten von Spieler %s wurden gemischt", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received shuffle coding from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerEnded")) {
+            String info = String.format("");
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer ended from server.");
             return;
         }
