@@ -309,10 +309,10 @@ public final class LobbyJFXController_v2
     }
 
     /** Will add a new chat msg from another thread. */
-    public void handleChatMessage(DefaultServerRequestParser dsrp)
+    public void handleChatMessage(int sourceID, String msg, boolean bIsPrivate)
     {
         Platform.runLater(() -> {
-            this.addToChatMsgToScrollPane(dsrp.getChatMsgSourceID(), dsrp.getChatMsg(), dsrp.isChatMsgPrivate());
+            this.addToChatMsgToScrollPane(sourceID, msg, bIsPrivate);
             return;
         });
 
