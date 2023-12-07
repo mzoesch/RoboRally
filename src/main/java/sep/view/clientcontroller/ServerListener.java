@@ -305,6 +305,20 @@ public class ServerListener implements Runnable
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "ConnectionUpdate")) {
+            l.debug("Received connection update from server.");
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "DeawDamage")) {
+            l.debug("Received draw a damage card from server.");
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "SelectedDamage")) {
+            l.debug("Damage was selected.");
+        }
+
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(dsrp.getType_v2());
 
