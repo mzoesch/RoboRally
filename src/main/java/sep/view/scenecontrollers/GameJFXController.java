@@ -2,6 +2,7 @@ package sep.view.scenecontrollers;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
@@ -24,6 +25,8 @@ import javafx.scene.layout.AnchorPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.scene.image.ImageView;
+
+import java.util.ArrayList;
 import java.util.Objects;
 import javafx.scene.control.ScrollPane;
 import javafx.util.Duration;
@@ -799,6 +802,23 @@ public class GameJFXController
                 this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/h - Show this help.", false);
                 this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/w [\"player name\"] [msg] - Whisper to a player.", false);
 
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("hide"))
+            {
+                ArrayList<Node> serverInfo = new ArrayList<>();
+                for(Node node : chatContainer.getChildren()){
+                    if(node instanceof Label){
+                        Label label = (Label) node;
+                        if(label.getStyleClass().contains("lobby-msg-server")){
+                            node.setVisible(false);
+                            serverInfo.add(node);
+                            l.debug("Line added to serverInfo");
+                        }
+                    }
+                }
+                chatContainer.getChildren().removeAll(serverInfo);
                 return;
             }
 
