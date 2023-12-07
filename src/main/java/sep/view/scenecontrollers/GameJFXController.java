@@ -820,6 +820,18 @@ public class GameJFXController
                     }
                 }
                 chatContainer.getChildren().removeAll(serverInfo);
+                showServerInfo = false;
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("show"))
+            {
+                if(showServerInfo){
+                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is already shown", false);
+                } else{
+                    showServerInfo = true;
+                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is shown again", false);
+                }
                 return;
             }
 
