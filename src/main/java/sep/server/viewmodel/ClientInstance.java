@@ -237,6 +237,11 @@ public final class ClientInstance implements Runnable
             return true;
         }
 
+        if (Objects.equals(dcrp.getType_v2(), "PickDamage")) {
+            l.debug("Received a picked damage card from client.");
+            return true;
+        }
+
         return false;
     }
 
