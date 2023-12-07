@@ -42,6 +42,7 @@ public class GameMode
 
     int energyBank;
     int availableCheckPoints;
+
     ArrayList<SpamDamage> spamCardDeck;
     ArrayList<TrojanHorseDamage> trojanCardDeck;
     ArrayList<VirusDamage> virusCardDeck;
@@ -101,6 +102,14 @@ public class GameMode
 
     public int getCurrentRegister() {
         return currentRegister;
+    }
+
+    public void setSpamCardDeck(ArrayList<SpamDamage> spamCardDeck) {
+        this.spamCardDeck = spamCardDeck;
+    }
+
+    public ArrayList<SpamDamage> getSpamCardDeck() {
+        return spamCardDeck;
     }
 
     public void setCurrentRegister(int currentRegister) {
@@ -765,5 +774,7 @@ public class GameMode
         }
         return playerControllers;
     }
+
+
 
 }
