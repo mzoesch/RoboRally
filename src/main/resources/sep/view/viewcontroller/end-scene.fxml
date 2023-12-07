@@ -22,21 +22,18 @@
     </top>
     <center>
         <Label
-                styleClass="text-xl-error"
+                styleClass="text-2xl"
                 fx:id="winnerNameField"
                 BorderPane.alignment="CENTER"
         />
     </center>
     <bottom>
-        <VBox
-                id="btn-container" stylesheets="@main-menu.css"
-        >
             <Button
                     text="EXIT GAME"
                     styleClass="danger-btn" style="-fx-min-width: 300px;"
                     onAction="#onExitBtn"
+                    BorderPane.alignment="CENTER"
             />
-        </VBox>
     </bottom>
 
 </BorderPane>

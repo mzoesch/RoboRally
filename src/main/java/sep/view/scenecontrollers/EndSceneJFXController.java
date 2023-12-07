@@ -31,7 +31,7 @@ public class EndSceneJFXController{
         private void initialize()
         {
             try{
-                this.winnerNameField.setText(EGameState.INSTANCE.getWinningPlayer().getPlayerName());
+                this.winnerNameField.setText(EGameState.INSTANCE.getWinningPlayer().getPlayerName() + " has won the Game!!!");
             } catch (NullPointerException e){
                 this.winnerNameField.setText("EndGame Error");
             }
