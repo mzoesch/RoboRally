@@ -183,6 +183,545 @@ public class GameJFXController
         return;
     }
 
+    // region Slot Action Methods
+
+    // region Register Slot Action Methods
+
+    private void onRegisterSlot1Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(0) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(0);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(0) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(0, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot2Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(1) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(1);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(1) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(1, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot3Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(2) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(2);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(2) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(2, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot4Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(3) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(3);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(3) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(3, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot5Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(4) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(4);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(4) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(4, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
+
+        return;
+    }
+
+    // endregion Register Slot Action Methods
+
+    // region Got Register Slot Action Methods
+
+    private void onGotRegisterSlot1Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 0)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(0) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 0;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot2Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 1)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(1) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 1;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot3Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 2)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(2) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 2;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot4Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 3)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(3) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 3;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot5Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 4)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(4) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 4;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot6Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 5)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(5) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 5;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot7Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 6)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(6) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 6;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot8Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 7)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(7) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 7;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot9Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 8)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(8) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 8;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    // endregion Slot Action Methods
+
     private void initializeButtonActions()
     {
 
@@ -190,241 +729,31 @@ public class GameJFXController
 
         this.registerSlot1.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(0) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(0);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(0) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(0, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
-
+            this.onRegisterSlot1Clicked();
             return;
         });
 
         this.registerSlot2.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(1) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(1);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(1) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(1, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
-
+            this.onRegisterSlot2Clicked();
             return;
         });
 
         this.registerSlot3.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(2) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(2);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(2) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(2, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
-
+            this.onRegisterSlot3Clicked();
             return;
         });
 
         this.registerSlot4.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(3) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(3);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(3) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(3, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
-
+            this.onRegisterSlot4Clicked();
             return;
         });
 
         this.registerSlot5.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(4) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(4);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(4) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(4, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
-
+            this.onRegisterSlot5Clicked();
             return;
         });
 
@@ -434,290 +763,55 @@ public class GameJFXController
 
         this.gotRegisterCardSlot1.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 0)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(0) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 0;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot1Clicked();
             return;
         });
 
         this.gotRegisterCardSlot2.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 1)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(1) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 1;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot2Clicked();
             return;
         });
 
         this.gotRegisterCardSlot3.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 2)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(2) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 2;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot3Clicked();
             return;
         });
 
         this.gotRegisterCardSlot4.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 3)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(3) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 3;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot4Clicked();
             return;
         });
 
         this.gotRegisterCardSlot5.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 4)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(4) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 4;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot5Clicked();
             return;
         });
 
         this.gotRegisterCardSlot6.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 5)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(5) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 5;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot6Clicked();
             return;
         });
 
         this.gotRegisterCardSlot7.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 6)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(6) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 6;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot7Clicked();
             return;
         });
 
         this.gotRegisterCardSlot8.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 7)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(7) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 7;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot8Clicked();
             return;
         });
 
         this.gotRegisterCardSlot9.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.areRegistersFull())
-            {
-                l.debug("User tried to change one of their programming register slots, but they are already finalized.");
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 8)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(8) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 8;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot9Clicked();
             return;
         });
 
