@@ -176,6 +176,8 @@ public class ServerListener implements Runnable
         {
             l.debug("Received current player update. New current player: {}.", dsrp.getPlayerID());
             EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
+            String info = String.format("Player %s is now current Player", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             return;
         }
 
@@ -196,6 +198,8 @@ public class ServerListener implements Runnable
             l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
             ViewSupervisor.updatePlayerTransforms();
+            String info = String.format("Player %s is has selected a starting Point", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             return;
         }
 
@@ -235,20 +239,22 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
-            String info = String.format("Die Karten von Spieler %s wurden gemischt", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("The deck of player %s has been shuffled", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received shuffle coding from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerEnded")) {
-            String info = String.format("");
+            String info = String.format("Timer has ended");
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer ended from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
+            String info = String.format("Timer has started");
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer started from server.");
             return;
         }
