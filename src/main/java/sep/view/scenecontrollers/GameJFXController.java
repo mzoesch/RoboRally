@@ -127,6 +127,32 @@ public class GameJFXController
             }
         });
 
+        this.setupInputActions();
+
+        this.renderView();
+
+        // TODO Highly sketchy. Needs some testing.
+        PauseTransition p = new PauseTransition(new Duration(2_000));
+        p.setOnFinished(e ->
+        {
+            l.info("Scrolling view to center.");
+            this.courseScrollPane.setHvalue(0.5);
+            this.courseScrollPane.setVvalue(0.5);
+            return;
+        });
+        p.play();
+
+        this.initializeButtonActions();
+
+        this.chatContainer = new VBox();
+        this.chatContainer.setId("chat-scroll-pane-inner");
+        this.chatScrollPane.setContent(this.chatContainer);
+
+        return;
+    }
+
+    private void setupInputActions()
+    {
         this.chatInputTextField.setOnKeyPressed(
         (keyEvent ->
         {
@@ -138,8 +164,6 @@ public class GameJFXController
             return;
         })
         );
-
-        this.renderView();
 
         this.masterContainer.setOnKeyPressed(e ->
         {
@@ -162,22 +186,108 @@ public class GameJFXController
 
         });
 
-        // TODO Highly sketchy. Needs some testing.
-        PauseTransition p = new PauseTransition(new Duration(2_000));
-        p.setOnFinished(e ->
+        /* TODO We of course have to del these event listeners when we switch scenes. */
+        ViewSupervisor.getSceneController().getMasterScene().setOnKeyPressed(
+        (keyEvent ->
         {
-            l.info("Scrolling view to center.");
-            this.courseScrollPane.setHvalue(0.5);
-            this.courseScrollPane.setVvalue(0.5);
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT1 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD1)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot1Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot1Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT2 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD2)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot2Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot2Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT3 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD3)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot3Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot3Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT4 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD4)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot4Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot4Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT5 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD5)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot5Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot5Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT6 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD6)
+            {
+                this.onGotRegisterSlot6Clicked();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT7 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD7)
+            {
+                this.onGotRegisterSlot7Clicked();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT8 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD8)
+            {
+                this.onGotRegisterSlot8Clicked();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT9 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD9)
+            {
+                this.onGotRegisterSlot9Clicked();
+                return;
+            }
+
             return;
-        });
-        p.play();
+        })
+        );
 
-        this.initializeButtonActions();
-
-        this.chatContainer = new VBox();
-        this.chatContainer.setId("chat-scroll-pane-inner");
-        this.chatScrollPane.setContent(this.chatContainer);
 
         return;
     }
