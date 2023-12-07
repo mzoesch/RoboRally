@@ -126,4 +126,20 @@ public final class DefaultServerRequestParser
 
     public int getEnergyCount() { return this.request.getJSONObject("messageBody").getInt("count");
     }
+
+    public JSONArray getActiveCards() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("activeCards");
+    }
+
+    public String getActiveCardFromIdx(final int idx) throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getString("card");
+    }
+
+    public int getPlayerIDFromActiveCardIdx(final int idx) throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getInt("clientID");
+    }
+
 }

@@ -68,6 +68,7 @@ public class Player
     * @param forward True if the robot should move forwards, false if backwards.
     */
     public void moveRobotOneTile(boolean forward) {
+        l.debug("Player {}'s robot is moving one tile.", this.getPlayerController().getPlayerID());
         Robot robot = getPlayerRobot();
         Course course = robot.getCourse();
         String currentDirection = robot.getDirection();
@@ -77,17 +78,18 @@ public class Player
 
         int directionModifier = forward ? 1 : -1;
 
+        System.out.println("Current Direction: " + currentDirection);
         switch (currentDirection) {
-            case "NORTH":
+            case "NORTH", "top":
                 newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - directionModifier);
                 break;
-            case "SOUTH":
+            case "SOUTH", "bottom":
                 newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + directionModifier);
                 break;
-            case "EAST":
+            case "EAST", "right":
                 newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + directionModifier, currentCoordinate.getYCoordinate());
                 break;
-            case "WEST":
+            case "WEST", "left":
                 newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - directionModifier, currentCoordinate.getYCoordinate());
                 break;
             default:
@@ -96,17 +98,20 @@ public class Player
 
         // Check if the robot is still on the board
         if (!course.isCoordinateWithinBounds(newCoordinate)) {
+            l.debug("Player {}'s robot is not on the board anymore. Rebooting . . .", this.getPlayerController().getPlayerID());
             robot.reboot();
             return;
         }
 
         // Check if the move is possible
         if (!robot.isMovable(course.getTileByCoordinate(newCoordinate))) {
+            l.debug("Player {}'s robot wanted to move to an unmovable tile. Ignoring.", this.getPlayerController().getPlayerID());
             return;
         }
 
         // Update Robot Position in Course and in Robot
         course.updateRobotPosition(robot, newCoordinate);
+        l.debug("Player {}'s robot moved to ({}, {}).", this.getPlayerController().getPlayerID(), newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate());
     }
 
     /**

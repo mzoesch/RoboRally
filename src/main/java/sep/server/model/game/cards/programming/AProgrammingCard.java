@@ -10,9 +10,6 @@ public abstract class AProgrammingCard extends Card implements IPlayableCard {
     }
 
     @Override
-    public void playCard() {}
-
-    @Override
     public String getCardType() {
         return super.getCardType();
     }

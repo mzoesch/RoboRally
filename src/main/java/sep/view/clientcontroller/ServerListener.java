@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -272,8 +274,13 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CurrentCards")) {
-            l.debug("Received your current cards from server.");
+        /* The current cards in a register played by all clients. */
+        if (Objects.equals(dsrp.getType_v2(), "CurrentCards"))
+        {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(String.format("In this register %d cards were played (", dsrp.getActiveCards().length()));
+            sb.append(IntStream.range(0, dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", dsrp.getPlayerIDFromActiveCardIdx(i), dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
+            l.debug(sb.append(").").toString());
             return;
         }
 
@@ -307,8 +314,8 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Movement")) {
-            EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getRobotView().setPosition(dsrp.getCoordinate(), false, true);
             l.debug("Player {} has moved to {},{}", dsrp.getPlayerID(), dsrp.getCoordinate().x(), dsrp.getCoordinate().y());
+            EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getRobotView().setPosition(dsrp.getCoordinate(), false, true);
             return;
         }
 

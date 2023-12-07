@@ -9,8 +9,7 @@ public abstract class ASpecialProgrammingCard extends Card implements IPlayableC
         super(cardType);
     }
 
-    @Override
-    public void playCard() {}
+
 
     public abstract void playCard(Player player, int currentRoundNumber);
 }

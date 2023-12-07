@@ -18,6 +18,10 @@ import sep.server.json.game.programmingphase.SelectionFinishedModel;
 import sep.server.model.game.EGamePhase;
 import sep.server.model.game.Tile;
 import sep.server.json.game.GameStartedModel;
+import sep.server.json.game.activatingphase.CardInfo;
+import sep.server.json.game.activatingphase.CurrentCardsModel;
+import sep.server.model.game.Player;
+import sep.server.model.game.cards.Card;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -337,6 +341,31 @@ public final class Session
         for (PlayerController pc : this.playerControllers)
         {
             new GameStartedModel(pc.getClientInstance(), course).send();
+        }
+
+        return;
+    }
+
+    public void broadcastCurrentCards(final int register)
+    {
+        final CardInfo[] activeCards = new CardInfo[this.getGameState().getAuthGameMode().getPlayers().size()];
+        for (int i = 0; i < activeCards.length; i++)
+        {
+            for (Player p : this.getGameState().getAuthGameMode().getPlayers())
+            {
+                CardInfo ci = new CardInfo(p.getPlayerController().getPlayerID(), ( (Card) p.getCardByRegisterIndex(register) ).getCardType());
+                activeCards[i] = ci;
+
+                continue;
+            }
+
+            continue;
+        }
+
+        for (Player p : this.getGameState().getAuthGameMode().getPlayers())
+        {
+            new CurrentCardsModel(p.getPlayerController().getClientInstance(), activeCards).send();
+            continue;
         }
 
         return;

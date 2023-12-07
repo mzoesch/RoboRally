@@ -119,4 +119,25 @@ public class Course {
     public Course getThis(){
         return this;
     }
+
+    public Coordinate getPriorityAntennaCoordinate()
+    {
+        for (ArrayList<Tile> ts : this.course)
+        {
+            for (Tile t : ts)
+            {
+                if (t.getFieldTypes().stream().anyMatch(elem -> elem instanceof Antenna))
+                {
+                    return t.getCoordinate();
+                }
+
+                continue;
+            }
+
+            continue;
+        }
+
+        return null;
+    }
+
 }

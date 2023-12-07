@@ -44,7 +44,7 @@ public class GameMode
     private final ArrayList<WormDamage> wormDamageDeck;
 
     private final ArrayList<Player> players;
-    private Player currentPlayer; //aktuell nur in setup-phase benutzt
+    private Player curPlayerInRegistration;
     /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
     private int currentRegister;
     /** @deprecated This is currently not initialized. Fix or remove. */
@@ -53,6 +53,7 @@ public class GameMode
     public GameMode(String courseName, PlayerController[] playerControllers, Session session)
     {
         super();
+
         l.debug("Starting game with the following course: {}", courseName);
 
         this.course = new Course(courseName);
@@ -68,7 +69,7 @@ public class GameMode
 
         this.players = Arrays.stream(playerControllers).map(pc -> new Player(pc, this.course, this.session)).collect(Collectors.toCollection(ArrayList::new));
         Arrays.stream(playerControllers).forEach(pc -> this.players.stream().filter(p -> p.getPlayerController() == pc).findFirst().ifPresent(pc::setPlayer));
-        this.currentPlayer = this.players.get(0);
+        this.curPlayerInRegistration = this.players.get(0);
         this.currentRegister = 0;
 
         this.handleNewPhase(EGamePhase.REGISTRATION);
@@ -99,15 +100,66 @@ public class GameMode
             continue;
         }
 
+        l.debug("Programming Phase finished. All players have received their cards.");
+
         return;
     }
 
+    // region Activation Phase Helpers
+
     /**
-     * The following method handles the activation phase: It sends the corresponding JSON message.
-     * It iterates over the different registers and plays the current card for each player
-     * (players are sorted by priority). Once each player's card has been played the board
-     * elements activate and the robot lasers are shot.
+     * The following method calculates the priorities for all players: First the distance from each robot to the
+     * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
      */
+    private void determinePriorities()
+    {
+        l.debug("Determining priorities for all players. Found Priority Antenna at {}.", this.course.getPriorityAntennaCoordinate().toString());
+        final Coordinate antennaCoordinate = this.course.getPriorityAntennaCoordinate();
+
+        final int[] distances = new int[this.players.size()];
+        for (int i = 0; i < this.players.size(); i++)
+        {
+            Coordinate robotCoordinate = this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate();
+            distances[i] = Math.abs(antennaCoordinate.getXCoordinate() - robotCoordinate.getXCoordinate()) + Math.abs(antennaCoordinate.getYCoordinate() - robotCoordinate.getYCoordinate());
+            continue;
+        }
+
+        int currentPriority = this.players.size();
+        for (int j = 0; j < this.players.size(); j++)
+        {
+            int minDistance = Integer.MAX_VALUE;
+            int minIndex = -1;
+
+            for (int i = 0; i < distances.length; i++)
+            {
+                if (distances[i] < minDistance)
+                {
+                    minDistance = distances[i];
+                    minIndex = i;
+                }
+            }
+
+            if (minIndex != -1)
+            {
+                this.players.get(minIndex).setPriority(currentPriority);
+                currentPriority--;
+                distances[minIndex] = Integer.MAX_VALUE;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+    
+    public void sortPlayersByPriorityInDesc()
+    {
+        this.players.sort(Comparator.comparingInt(Player::getPriority).reversed());
+        return;
+    }
+
+    // endregion Activation Phase Helpers
+
     private void triggerActivationPhase()
     {
         for (this.currentRegister = 0; this.currentRegister < GameMode.REGISTER_PHASE_COUNT; currentRegister++)
@@ -115,15 +167,21 @@ public class GameMode
             l.debug("Starting register phase {}.", this.currentRegister);
 
             this.determinePriorities();
-            this.sortPlayersByPriority();
-            this.determineCurrentCards();
+            this.sortPlayersByPriorityInDesc();
+            this.session.broadcastCurrentCards(this.currentRegister);
 
             for (Player p : this.players)
             {
                 if (p.getRegisters()[this.currentRegister] != null)
                 {
-                    p.getRegisters()[this.currentRegister].playCard();
+                    l.info("Player {} is playing card {}.", p.getPlayerController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
+                    p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
+                    continue;
                 }
+
+                l.warn("Player {} does not have a card in register {}.", p.getPlayerController().getPlayerID(), this.currentRegister);
+
+                continue;
             }
 
             this.activateConveyorBelts(2);
@@ -167,7 +225,7 @@ public class GameMode
                 this.session.broadcastGameStart(this.course.getCourse());
                 this.session.broadcastNewGamePhase(this.gamePhase);
                 /* The current player is the first player that joined the game. */
-                this.session.broadcastCurrentPlayer(this.currentPlayer.getPlayerController().getPlayerID());
+                this.session.broadcastCurrentPlayer(this.curPlayerInRegistration.getPlayerController().getPlayerID());
 
                 return;
             }
@@ -217,10 +275,10 @@ public class GameMode
 
         if(ableToSetStartPoint(pc)){
 
-            int validation = currentPlayer.getPlayerRobot().validStartingPoint(x,y);
+            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
             if(validation == 1){
 
-                currentPlayer.getPlayerRobot().setStartingPoint(x,y);
+                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
                 l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
                 pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
                 pc.getSession().handlePlayerTurning(pc.getPlayerID(), course.getStartingTurningDirection());
@@ -235,7 +293,7 @@ public class GameMode
                     //sonst wird der nächste Spieler, der noch keinen Roboter gesetzt hat, ausgewählt
                     for(Player player : players){
                         if (player.getPlayerRobot().getCurrentTile() == null){
-                            currentPlayer = player;
+                            curPlayerInRegistration = player;
                             l.info("Now Player with ID: " + player.getPlayerController().getPlayerID() + "has to set StartingPoint");
                             pc.getSession().broadcastCurrentPlayer(player.getPlayerController().getPlayerID());
                         }
@@ -299,72 +357,6 @@ public class GameMode
         for (Player player : players) {
             player.handleIncompleteProgramming();
         }
-    }
-
-    /**
-     * The following method calculates the priorities for all players: First the distance from each robot to the
-     * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
-     */
-    public void determinePriorities() {
-        Coordinate antennaCoordinate = new Coordinate(0,4); //StartA board
-        int maxPriority = players.size();
-        int currentPriority = maxPriority;
-        int[] distances = new int[players.size()];
-
-        for(int i = 0; i < players.size(); i++) {
-            Robot playerRobot = players.get(i).getPlayerRobot();
-            Coordinate robotCoordinate = playerRobot.getCurrentTile().getCoordinate();
-            distances[i] = Math.abs(antennaCoordinate.getXCoordinate() - robotCoordinate.getXCoordinate())
-                    + Math.abs(antennaCoordinate.getYCoordinate() - robotCoordinate.getYCoordinate());
-        }
-
-        for(int j = 0; j < maxPriority; j++) {
-            int minDistance = Integer.MAX_VALUE;
-            int minIndex = -1;
-
-            for(int i = 0; i < distances.length; i++) {
-                if(distances[i] < minDistance) {
-                    minDistance = distances[i];
-                    minIndex = i;
-                }
-            }
-
-            if(minIndex != -1) {
-                players.get(minIndex).setPriority(currentPriority);
-                currentPriority--;
-                distances[minIndex] = Integer.MAX_VALUE;
-            }
-        }
-
-    }
-
-    /**
-     * The following method sorts all players from highest to lowest priority.
-     */
-    public void sortPlayersByPriority() {
-        players.sort(Comparator.comparingInt(Player::getPriority).reversed());
-    }
-
-    /**
-     * The following method takes the currently active card (type as String)
-     * and the player ID for each player, saves them in an array activeCards and
-     * sends it as JSON object to all clients.
-     */
-    public void determineCurrentCards() {
-        CardInfo[] activeCards = new CardInfo[players.size()];
-        for(int i = 0; i<activeCards.length; i++) {
-            for(Player player : players) {
-                String card = ((Card) player.getCardByRegisterIndex(currentRegister)).getCardType();
-                CardInfo cardInfo = new CardInfo(player.getPlayerController().getPlayerID(), card);
-                activeCards[i] = cardInfo;
-            }
-        }
-
-        for(Player player : players) {
-            new CurrentCardsModel(player.getPlayerController().getClientInstance(),
-                    activeCards).send();
-        }
-
     }
 
     /**
@@ -800,7 +792,7 @@ public class GameMode
             new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
             return false;
 
-        } else if (pc.getPlayerID() != currentPlayer.getPlayerController().getPlayerID()) {
+        } else if (pc.getPlayerID() != curPlayerInRegistration.getPlayerController().getPlayerID()) {
             l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
             new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
             return false;
