@@ -929,6 +929,8 @@ public class GameJFXController
         return;
     }
 
+    // endregion Got Register Slot Action Methods
+
     // region Chat
 
     private void onSubmitChatMsg()
