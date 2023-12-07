@@ -42,7 +42,7 @@ public enum EGameState
 
     private final String[] registers;
     private final ArrayList<String> gotRegisters;
-    private String winningPlayer = "";
+    private RemotePlayer winningPlayer;
 
     private EGameState()
     {
@@ -433,12 +433,12 @@ public enum EGameState
         return;
     }
 
-    public String getWinningPlayer() {
+    public RemotePlayer getWinningPlayer() {
         return winningPlayer;
     }
 
-    public void setWinningPlayer(String winningPlayer) {
-        this.winningPlayer = winningPlayer;
+    public void determineWinningPlayer(int playerID) {
+        this.winningPlayer = getRemotePlayerByPlayerID(playerID);
     }
 
     // endregion Getters and Setters

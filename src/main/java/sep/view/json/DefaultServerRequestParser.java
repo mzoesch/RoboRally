@@ -122,4 +122,6 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getString("rotation");
     }
 
+    public int getWinningPlayer(){ return this.request.getJSONObject("messageBody").getInt("clientID");}
+
 }

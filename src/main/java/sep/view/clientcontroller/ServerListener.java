@@ -287,6 +287,8 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "GameFinished")) {
             l.debug("Received game finished from server.");
+            EGameState.INSTANCE.determineWinningPlayer(dsrp.getWinningPlayer());
+            //TODO EndScreen aufrufen?
             return;
         }
 

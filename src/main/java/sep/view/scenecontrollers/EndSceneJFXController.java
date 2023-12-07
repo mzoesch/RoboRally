@@ -30,13 +30,11 @@ public class EndSceneJFXController{
         @FXML
         private void initialize()
         {
-            if(EGameState.INSTANCE.getWinningPlayer() == ""){
+            try{
+                this.winnerNameField.setText(EGameState.INSTANCE.getWinningPlayer().getPlayerName());
+            } catch (NullPointerException e){
                 this.winnerNameField.setText("EndGame Error");
-            } else {
-                this.winnerNameField.setText(EGameState.INSTANCE.getWinningPlayer());
             }
-
-            // TODO Here Winner will be set
             return;
         }
 }
