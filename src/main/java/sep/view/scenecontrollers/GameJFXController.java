@@ -1292,8 +1292,8 @@ public class GameJFXController
             }
             playerName.getStyleClass().add("player-box-text");
 
-            Label energyCubes = new Label("EnergyCubes: " + rp.getEnergyCubes());
-            playerName.getStyleClass().add("player-box-text");
+            Label energyCubes = new Label("Energy: " + rp.getEnergyCubes());
+            energyCubes.getStyleClass().add("player-box-text");
 
             VBox v = new VBox(figureName, playerName, energyCubes);
             v.getStyleClass().add("player-box");
