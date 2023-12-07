@@ -1,5 +1,6 @@
 package sep.server.model.game.cards.special;
 
+import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 
 public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableCard {
@@ -10,5 +11,7 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
     }
 
     @Override
-    public void playCard() {}
+    public void playCard(Player player, int currentRoundNumber){
+
+    }
 }

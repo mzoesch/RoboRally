@@ -1,5 +1,6 @@
 package sep.server.model.game.cards.special;
 
+import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 
 public class SpamFolder extends ASpecialProgrammingCard implements IPlayableCard {
@@ -8,5 +9,7 @@ public class SpamFolder extends ASpecialProgrammingCard implements IPlayableCard
         this.cardType = "SpamFolder";
     }
     @Override
-    public void playCard() {}
+    public void playCard(Player player, int currentRoundNumber)  {
+
+    }
 }

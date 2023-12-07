@@ -1,5 +1,6 @@
 package sep.server.model.game.cards.special;
 
+import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 
 public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayableCard {
@@ -8,5 +9,7 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
         this.cardType = "SandboxRoutine";
     }
     @Override
-    public void playCard() {}
+    public void playCard(Player player, int currentRoundNumber)  {
+
+    }
 }
