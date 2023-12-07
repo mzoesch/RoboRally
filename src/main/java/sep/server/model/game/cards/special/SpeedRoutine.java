@@ -11,6 +11,8 @@ public class SpeedRoutine extends ASpecialProgrammingCard implements IPlayableCa
 
     @Override
     public void playCard(Player player, int currentRoundNumber) {
-
+        player.moveRobotOneTileForwards();
+        player.moveRobotOneTileForwards();
+        player.moveRobotOneTileForwards();
     }
 }

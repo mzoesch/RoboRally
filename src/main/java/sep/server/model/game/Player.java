@@ -27,9 +27,12 @@ public class Player
     private final ArrayList<AUpgradeCard> upgradeCards;
     private final IPlayableCard[] registers;
     private final ArrayList<IPlayableCard> playerHand;
-
     private int energyCollected;
     private int checkpointsCollected;
+
+
+
+    private GameMode gameMode;
 
     public Player(final PlayerController playerController, final Course currentCourse, final Session session)
     {
@@ -46,6 +49,8 @@ public class Player
 
         this.energyCollected = GameMode.STARTING_ENERGY;
         this.checkpointsCollected = 0;
+
+        this.gameMode = session.getGameState().getAuthGameMode();
 
         return;
     }
@@ -335,6 +340,9 @@ public class Player
     {
         this.checkpointsCollected = checkpointsCollected;
         return;
+    }
+    public GameMode getGameMode() {
+        return gameMode;
     }
 
     public int getEnergyCollected()
