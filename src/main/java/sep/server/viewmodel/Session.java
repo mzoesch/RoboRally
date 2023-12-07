@@ -16,6 +16,8 @@ import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
 import sep.server.json.game.programmingphase.SelectionFinishedModel;
 import sep.server.model.game.EGamePhase;
+import sep.server.model.game.Tile;
+import sep.server.json.game.GameStartedModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -310,18 +312,35 @@ public final class Session
         }
     }
 
-    public void handleCurrentPlayer(int playerID){
-        for(PlayerController pc : this.playerControllers){
+    public void broadcastCurrentPlayer(int playerID)
+    {
+        for(PlayerController pc : this.playerControllers)
+        {
             new CurrentPlayerModel(pc.getClientInstance(), playerID).send();
         }
+
+        return;
     }
 
-    public void handleActivePhase(EGamePhase phase){
-        for (PlayerController pc : playerControllers) {
+    public void broadcastNewGamePhase(EGamePhase phase)
+    {
+        for (PlayerController pc : this.playerControllers)
+        {
             new ActivePhaseModel(pc.getClientInstance(), phase.i).send();
         }
+
+        return;
     }
 
+    public void broadcastGameStart(ArrayList<ArrayList<Tile>> course)
+    {
+        for (PlayerController pc : this.playerControllers)
+        {
+            new GameStartedModel(pc.getClientInstance(), course).send();
+        }
+
+        return;
+    }
 
     // region Getters and Setters
 
@@ -395,7 +414,6 @@ public final class Session
         return true;
     }
 
-
     /**
      * Sends a set of hand cards to a specified player controller and notifies all players
      */
@@ -423,7 +441,6 @@ public final class Session
             shuffleCodingModel.send();
         }
     }
-
 
     /**
      * @param playerID The player ID of the player who made the selection

@@ -165,6 +165,12 @@ public class Player
      */
     public void setCardToRegister(final String card, final int pos)
     {
+        if (this.hasPlayerFinishedProgramming())
+        {
+            l.warn("Player {} has already finished programming and, therefore, cannot change their programming registers anymore.", this.playerController.getPlayerName());
+            return;
+        }
+
         if (pos < 0 || pos > 4)
         {
             l.error("Invalid register position: " + pos);
@@ -192,7 +198,7 @@ public class Player
             {
                 l.debug("All players have finished programming in time. Interrupting timer.");
                 // TODO Interrupt timer
-                // TODO Start next phase
+                this.session.getGameState().getAuthGameMode().handleNewPhase(EGamePhase.ACTIVATION);
                 return;
             }
 
