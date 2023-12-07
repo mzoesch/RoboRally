@@ -906,8 +906,7 @@ public class GameJFXController
             {
                 ArrayList<Node> serverInfo = new ArrayList<>();
                 for(Node node : chatContainer.getChildren()){
-                    if(node instanceof Label){
-                        Label label = (Label) node;
+                    if(node instanceof Label label){
                         if(label.getStyleClass().contains("lobby-msg-server")){
                             node.setVisible(false);
                             serverInfo.add(node);
