@@ -106,7 +106,7 @@ public class GameJFXController
         this.courseScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         this.courseScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        this.courseScrollPane.widthProperty().addListener((obs, oldVal, newVal) ->
+        this.courseScrollPane.widthProperty().addListener((obs, val, t1) ->
         {
             // TODO Only update translations not the whole course.
             this.renderCourse();
