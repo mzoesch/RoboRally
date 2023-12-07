@@ -307,7 +307,8 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Movement")) {
-            l.debug("Received movement from server.");
+            EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getRobotView().setPosition(dsrp.getCoordinate(), false, true);
+            l.debug("Player {} has moved to {},{}", dsrp.getPlayerID(), dsrp.getCoordinate().x(), dsrp.getCoordinate().y());
             return;
         }
 
