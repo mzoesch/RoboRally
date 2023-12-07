@@ -1,6 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
+import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
 
@@ -288,7 +289,7 @@ public class ServerListener implements Runnable
         if (Objects.equals(dsrp.getType_v2(), "GameFinished")) {
             l.debug("Received game finished from server.");
             EGameState.INSTANCE.determineWinningPlayer(dsrp.getWinningPlayer());
-            //TODO EndScreen aufrufen?
+            ViewSupervisor.getSceneController().renderNewScreen(SceneController.END_SCENE_ID, SceneController.PATH_TO_END_SCENE, true);
             return;
         }
 
