@@ -4,6 +4,7 @@ import sep.server.json.common.CurrentPlayerModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.StartingPointTakenModel;
 import sep.server.json.game.effects.GameFinishedModel;
+import sep.server.json.game.effects.MovementModel;
 import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
@@ -482,6 +483,13 @@ public final class Session
         for (PlayerController pc : this.playerControllers) {
             GameFinishedModel gameFinishedModel = new GameFinishedModel(pc.getClientInstance(), playerID);
             gameFinishedModel.send();
+        }
+    }
+
+    public void handleMovement(int playerID, int x, int y){
+        for (PlayerController pc : this.playerControllers) {
+            MovementModel movementModel = new MovementModel(pc.getClientInstance(), playerID, x, y);
+            movementModel.send();
         }
     }
 
