@@ -531,10 +531,10 @@ public class GameMode
             this.currentRegister = 0;
             while (this.runActivationPhase())
             {
-                l.debug("Register {} in Activation Phase ended. Waiting 15s for the next register iteration . . .", this.currentRegister);
+                l.debug("Register {} in Activation Phase ended. Waiting 5s for the next register iteration . . .", this.currentRegister);
                 try
                 {
-                    Thread.sleep(15_000); /* Just for debugging right now. */
+                    Thread.sleep(5_000); /* Just for debugging right now. */
                 }
                 catch (InterruptedException e)
                 {
