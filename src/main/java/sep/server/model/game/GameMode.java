@@ -274,7 +274,7 @@ public class GameMode
                             return;
                         }
 
-                        if (player.getPlayerRobot().isNotTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
+                        if (player.getPlayerRobot().isUnmovable(course.getTileByCoordinate(newCoordinate))) {
                             return;
                         }
 
@@ -283,7 +283,7 @@ public class GameMode
                         for(Player player1 : players) {
                             new MovementModel(player1.getPlayerController().getClientInstance(),
                                     player.getPlayerController().getPlayerID(),
-                                    newCoordinate.getX(), newCoordinate.getY()).send();
+                                    newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
                         }
                     }
                 }
@@ -315,7 +315,7 @@ public class GameMode
                                 return;
                             }
 
-                            if (player.getPlayerRobot().isNotTraversable(null, course.getTileByCoordinate(newCoordinate))) {
+                            if (player.getPlayerRobot().isUnmovable(course.getTileByCoordinate(newCoordinate))) {
                                 return;
                             }
 
@@ -324,7 +324,7 @@ public class GameMode
                             for(Player player1 : players) {
                                 new MovementModel(player1.getPlayerController().getClientInstance(),
                                         player.getPlayerController().getPlayerID(),
-                                        newCoordinate.getX(), newCoordinate.getY()).send();
+                                        newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
                             }
                         }
                     }
@@ -580,7 +580,7 @@ public class GameMode
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
-    public void startProgrammingTimer() {
+    public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
         this.programmingCardThread = new Thread(() -> {
@@ -683,8 +683,8 @@ public class GameMode
      * @param tile tile of current laser being handled
      */
     private void handleLaserByDirection(Laser laser, Tile tile) {
-        int laserXCoordinate = tile.getCoordinate().getX();
-        int laserYCoordinate = tile.getCoordinate().getY();
+        int laserXCoordinate = tile.getCoordinate().getXCoordinate();
+        int laserYCoordinate = tile.getCoordinate().getYCoordinate();
         String laserOrientation = laser.getOrientation();
         int laserCount = Laser.getLaserCount();
 
@@ -736,10 +736,10 @@ public class GameMode
                     for (String wallOrientation : orientations) {
                         if(((laserOrientation.equals("top") || laserOrientation.equals("bottom")) &&
                                 (wallOrientation.equals("bottom") || wallOrientation.equals("top")) &&
-                                (y != tile.getCoordinate().getY())) ||
+                                (y != tile.getCoordinate().getYCoordinate())) ||
                                 ((laserOrientation.equals("left") || laserOrientation.equals("right")) &&
                                         (wallOrientation.equals("left") || wallOrientation.equals("right")) &&
-                                        (x != tile.getCoordinate().getX()))) {
+                                        (x != tile.getCoordinate().getXCoordinate()))) {
                             laserGoing = false;
                             break;
                         }
@@ -766,14 +766,14 @@ public class GameMode
     public Coordinate calculateNewCoordinate(String orientation, Coordinate oldCoordinate) {
         Coordinate newCoordinate = null;
         switch (orientation) {
-            case "top" -> newCoordinate = new Coordinate(oldCoordinate.getX(),
-                    oldCoordinate.getY() - 1);
-            case "right" -> newCoordinate = new Coordinate(oldCoordinate.getX() + 1,
-                    oldCoordinate.getY());
-            case "bottom" -> newCoordinate = new Coordinate(oldCoordinate.getX(),
-                    oldCoordinate.getY() + 1);
-            case "left" -> newCoordinate = new Coordinate(oldCoordinate.getX() - 1,
-                    oldCoordinate.getY());
+            case "top" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() - 1);
+            case "right" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + 1,
+                    oldCoordinate.getYCoordinate());
+            case "bottom" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() + 1);
+            case "left" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - 1,
+                    oldCoordinate.getYCoordinate());
         }
         return newCoordinate;
     }
