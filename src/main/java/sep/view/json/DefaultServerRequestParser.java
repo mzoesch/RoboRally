@@ -147,4 +147,7 @@ public final class DefaultServerRequestParser
 
     public String getNewCard() { return this.request.getJSONObject("messageBody").getString("newCard");
     }
+
+    public int getNumber() { return this.request.getJSONObject("messageBody").getInt("number");
+    }
 }

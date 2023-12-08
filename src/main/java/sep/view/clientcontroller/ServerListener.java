@@ -1,5 +1,6 @@
 package sep.view.clientcontroller;
 
+import sep.server.model.game.cards.programming.MoveI;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
@@ -307,7 +308,6 @@ public class ServerListener implements Runnable
                 String info = String.format("You recieved following card %s as replacement", dsrp.getNewCard());
                 ViewSupervisor.handleChatInfo(info);
                 EGameState.INSTANCE.addRegister(dsrp.getRegister(), dsrp.getNewCard());
-
             } else{
                 String info = String.format("Player %s recieved following card %s as replacement",Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(),  dsrp.getNewCard());
                 ViewSupervisor.handleChatInfo(info);
@@ -322,6 +322,9 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CheckPointReached")) {
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setCheckPointsReached(dsrp.getNumber());
+            String info = String.format("Player %s has reached %s checkpoints", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getNumber());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received checkpoint from server.");
             return;
         }
