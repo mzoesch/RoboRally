@@ -251,10 +251,11 @@ public class ServerListener implements Runnable
         }
 
         /* The server notifies the client about the nine programming cards from another client. */
-        if (Objects.equals(dsrp.getType_v2(), "NotYourCards")) {
-            String info = String.format("Player %s has %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardsInHand().length);
+        if (Objects.equals(dsrp.getType_v2(), "NotYourCards"))
+        {
+            String info = String.format("Player %s has %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardsInHandCountNYC());
             ViewSupervisor.handleChatInfo(info);
-            l.debug("Received not yours cards from server.");
+            l.debug(info);
             return;
         }
 
