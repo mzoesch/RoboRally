@@ -531,10 +531,10 @@ public class GameMode
             this.currentRegister = 0;
             while (this.runActivationPhase())
             {
-                l.debug("Activation Phase {} ended. Waiting 15s for the next activation phase . . .", this.currentRegister);
+                l.debug("Register {} in Activation Phase ended. Waiting 15s for the next register iteration . . .", this.currentRegister);
                 try
                 {
-                    Thread.sleep(15_000); // Just for debugging right now.
+                    Thread.sleep(15_000); /* Just for debugging right now. */
                 }
                 catch (InterruptedException e)
                 {
@@ -549,7 +549,7 @@ public class GameMode
 
             l.debug("Activation Phase ended successfully.");
 
-            this.handleNewPhase(EGamePhase.UPGRADE);
+            // TODO: Start next phase
 
             return;
         });
