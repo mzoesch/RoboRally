@@ -50,6 +50,8 @@ public class CourseBuilder {
             ArrayList<Tile> courseYRow = course.get(i);
             for(int a = 0; a < courseYRow.size(); a++){
                 Tile tile = courseYRow.get(a);
+                tile.setCoordinate(i,a);
+
                 int xCoordinate = tile.getCoordinate().getX();
                 int yCoordinate = tile.getCoordinate().getY();
 

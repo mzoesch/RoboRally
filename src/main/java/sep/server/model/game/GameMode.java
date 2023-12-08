@@ -155,34 +155,6 @@ public class GameMode
 
         l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
 
-        // *************************************************************************************************************
-
-        // TODO Remove this debug code, if the the coordinates are set correctly.
-
-        for (int i = 0; i < this.course.getCourse().size(); i++)
-        {
-            for (int j = 0; j < this.course.getCourse().get(i).size(); j++)
-            {
-                final Tile t = this.course.getCourse().get(i).get(j);
-                final String[] ft = new String[t.getFieldTypes().size()];
-                for (int k = 0; k < t.getFieldTypes().size(); k++)
-                {
-                    ft[k] = t.getFieldTypes().get(k).toJSON("DEBUG").toString(0);
-                    continue;
-                }
-
-                System.out.println("[" + i + "-" + j + "] Tile: (" + t.getCoordinate().getX() + ", " + t.getCoordinate().getY() + "); FieldTypes: " + Arrays.toString(ft));
-
-                continue;
-            }
-
-            continue;
-        }
-
-
-        // *************************************************************************************************************
-
-
         return;
     }
 

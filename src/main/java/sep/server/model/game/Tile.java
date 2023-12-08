@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class Tile
 {
-    private final Coordinate coordinate;
+    private Coordinate coordinate;
     private Robot occupiedBy = null;
     private ArrayList<FieldType> fieldTypes;
 
@@ -179,6 +179,10 @@ public class Tile
         }
 
         return false;
+    }
+
+    public void setCoordinate(int x, int y) {
+        this.coordinate = new Coordinate(x,y);
     }
 
     // endregion Getters and Setters
