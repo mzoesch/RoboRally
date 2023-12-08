@@ -146,7 +146,7 @@ public class Player
     * Rotates the robot 90 degrees to the right
     * Updates the robot's direction
     */
-    public void rotateRobotOneTileToTheRight(){
+    public void rotateRobotOnTileToTheRight(){
         Robot robot = getPlayerRobot();
         String currentDirection = robot.getDirection();
         String newDirection;

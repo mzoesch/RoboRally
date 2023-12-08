@@ -64,9 +64,9 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "TurnLeft":
-                player.rotateRobotOneTileToTheRight();
-                player.rotateRobotOneTileToTheRight();
-                player.rotateRobotOneTileToTheRight();
+                player.rotateRobotOnTileToTheRight();
+                player.rotateRobotOnTileToTheRight();
+                player.rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -75,7 +75,7 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "TurnRight":
-                player.rotateRobotOneTileToTheRight();
+                player.rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -84,8 +84,8 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "UTurn":
-                player.rotateRobotOneTileToTheRight();
-                player.rotateRobotOneTileToTheRight();
+                player.rotateRobotOnTileToTheRight();
+                player.rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
