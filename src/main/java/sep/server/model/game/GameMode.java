@@ -752,46 +752,6 @@ public class GameMode
                 newCard).send();
     }
 
-    public void giveRobotsInRadiusVirusCard(Player player)
-    {
-        int radius = 6;
-        Tile centerTile = player.getPlayerRobot().getCurrentTile();
-
-        for(Player p : players) {
-            if (player != p) {
-                Tile otherTile = p.getPlayerRobot().getCurrentTile();
-                if (getDistanceBetweenTwoRobots(centerTile, otherTile) <= radius) {
-                    p.getDiscardPile().add(virusCardDeck.remove(0));
-                }
-            }
-
-        }
-    }
-
-    /*public void test (Player player) {
-
-        //Karte aus Register Entfernen und in Viruskartendeck einfügen
-        IPlayableCard oldCard = player.getCardByRegisterIndex(currentRegister+1);
-        player.getRegisters()[currentRegister+1] = null;
-        virusCardDeck.add((VirusDamage) oldCard);
-
-
-        if(!player.getPlayerDeck().isEmpty()){
-            IPlayableCard newCard = player.getPlayerDeck().remove(0);
-            player.getRegisters().
-            player.getRegisters()[currentRegister]= newCard;
-
-        }
-
-
-
-    }*/
-
-    public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {
-        int xDistance = Math.abs(t1.getCoordinate().getXCoordinate() - t2.getCoordinate().getXCoordinate());
-        int yDistance = Math.abs(t1.getCoordinate().getYCoordinate() - t2.getCoordinate().getYCoordinate());
-        return xDistance + yDistance;
-    }
 
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers
