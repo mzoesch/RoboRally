@@ -292,6 +292,52 @@ public class GameMode
     }
 
     /**
+     * The following method is required during the conveyor belt activation period.
+     * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
+     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
+     * with the outcoming flow direction. If yes, the direction of the robot is changed accordingly
+     * and the corresponding JSON message is sent.
+     * @param player Owner of the current robot
+     * @param coordinate Coordinate of the new tile the robot moved onto
+     */
+    public void curvedArrowCheck(Player player, Coordinate coordinate) {
+        Tile newTile = course.getTileByCoordinate(coordinate);
+        for(FieldType newFieldType : newTile.getFieldTypes()) {
+            if(newFieldType instanceof ConveyorBelt newConveyorBelt) {
+                String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
+                String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
+                String robotOldDirection = player.getPlayerRobot().getDirection();
+                if(newInDirection != null && newOutDirection != null) {
+                    for(String direction : newInDirection) {
+                        switch(newOutDirection) {
+                            case("top") -> player.getPlayerRobot().setDirection("NORTH");
+                            case("right") -> player.getPlayerRobot().setDirection("EAST");
+                            case("bottom") -> player.getPlayerRobot().setDirection("SOUTH");
+                            case("left") -> player.getPlayerRobot().setDirection("WEST");
+                        }
+                    }
+                    if((Objects.equals(robotOldDirection, "NORTH") && Objects.equals(player.getPlayerRobot().getDirection(), "EAST")) ||
+                            (Objects.equals(robotOldDirection, "EAST") && Objects.equals(player.getPlayerRobot().getDirection(), "SOUTH")) ||
+                            (Objects.equals(robotOldDirection, "SOUTH") && Objects.equals(player.getPlayerRobot().getDirection(), "WEST")) ||
+                            (Objects.equals(robotOldDirection, "WEST") && Objects.equals(player.getPlayerRobot().getDirection(), "NORTH"))) {
+                        for(Player player1 : players) {
+                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID(),
+                                    "clockwise").send();
+                        }
+                    } else {
+                        for(Player player1 : players) {
+                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID(),
+                                    "counterclockwise").send();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * The following method handles the activation of push panels and sends the corresponding JSON messages.
      * The robot is moved to the next field in the direction of the panel's pushOrientation.
      */
@@ -331,6 +377,27 @@ public class GameMode
                 }
             }
         }
+    }
+
+    /**
+     * The following method calculates the new coordinates for activating conveyor belts and push panels.
+     * @param orientation direction the robot is moved to
+     * @param oldCoordinate coordinates of the current push panel pushing a robot
+     * @return new coordinate
+     */
+    public Coordinate calculateNewCoordinate(String orientation, Coordinate oldCoordinate) {
+        Coordinate newCoordinate = null;
+        switch (orientation) {
+            case "top" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() - 1);
+            case "right" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + 1,
+                    oldCoordinate.getYCoordinate());
+            case "bottom" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
+                    oldCoordinate.getYCoordinate() + 1);
+            case "left" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - 1,
+                    oldCoordinate.getYCoordinate());
+        }
+        return newCoordinate;
     }
 
     /**
@@ -390,6 +457,27 @@ public class GameMode
     }
 
     /**
+     * The following method determines the laser orientation. Depending on the orientation it passes different values to
+     * the handleLaserShooting method.
+     * @param laser laser object holding laser orientation and laser strength
+     * @param tile tile of current laser being handled
+     */
+    private void handleLaserByDirection(Laser laser, Tile tile) {
+        int laserXCoordinate = tile.getCoordinate().getXCoordinate();
+        int laserYCoordinate = tile.getCoordinate().getYCoordinate();
+        String laserOrientation = laser.getOrientation();
+        int laserCount = Laser.getLaserCount();
+
+
+        switch (laserOrientation) {
+            case "top" -> handleLaserShooting("top", laserCount, laserXCoordinate, laserYCoordinate, 0, -1);
+            case "right" -> handleLaserShooting("right", laserCount, laserXCoordinate, laserYCoordinate, 1, 0);
+            case "bottom" -> handleLaserShooting("bottom", laserCount, laserXCoordinate, laserYCoordinate, 0, 1);
+            case "left" -> handleLaserShooting("left", laserCount, laserXCoordinate, laserYCoordinate, -1, 0);
+        };
+    }
+
+    /**
      * The following method determines all parameters needed to shoot the robot lasers during the activation phase
      * and calls the handleLaserShooting method depending on the direction the robot is facing to.
      */
@@ -408,6 +496,66 @@ public class GameMode
                 case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate, 0, 1);
                 case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate, robotTileYCoordinate, -1, 0);
             }
+        }
+    }
+
+    /**
+     * The following method shoots the laser and checks for obstacles in its way which stop the laser.
+     * If the obstacle is a robot, they draw 1-3 spam cards, depending on the laser's strength.
+     * @param laserOrientation direction the laser is shooting into
+     * @param laserCount intensity of the laser, can vary between 1-3
+     * @param x x-coordinate of laser tile
+     * @param y y-coordinate of laser tile
+     * @param xIncrement differs depending on laser orientation
+     * @param yIncrement differs depending on laser orientation
+     */
+    private void handleLaserShooting(String laserOrientation, int laserCount, int x, int y, int xIncrement, int yIncrement) {
+        boolean laserGoing = true;
+
+        while (course.areCoordinatesWithinBounds(x, y) && laserGoing) {
+            Tile tile = course.getTileByNumbers(x, y);
+
+            if (tile.isOccupied()) {
+                Robot occupyingRobot = tile.getRobot();
+
+                for (Player player : players) {
+                    if (player.getPlayerRobot() == occupyingRobot) {
+                        for(int i = 0; i<laserCount; i++) {
+                            if(!this.spamCardDeck.isEmpty()) {
+                                player.getDiscardPile().add(this.spamCardDeck.remove(0));
+                            }
+                        }
+                        laserGoing = false;
+                        break;
+                    }
+                }
+            }
+
+            for (FieldType fieldType : tile.getFieldTypes()) {
+                if (fieldType instanceof Wall wall) {
+                    String[] orientations = wall.getOrientations();
+
+                    for (String wallOrientation : orientations) {
+                        if(((laserOrientation.equals("top") || laserOrientation.equals("bottom")) &&
+                                (wallOrientation.equals("bottom") || wallOrientation.equals("top")) &&
+                                (y != tile.getCoordinate().getYCoordinate())) ||
+                                ((laserOrientation.equals("left") || laserOrientation.equals("right")) &&
+                                        (wallOrientation.equals("left") || wallOrientation.equals("right")) &&
+                                        (x != tile.getCoordinate().getXCoordinate()))) {
+                            laserGoing = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (fieldType instanceof Antenna) {
+                    laserGoing = false;
+                    break;
+                }
+            }
+
+            x += xIncrement;
+            y += yIncrement;
         }
     }
 
@@ -493,8 +641,6 @@ public class GameMode
             player.shuffleAndRefillDeck();
         }
     }
-
-    public void endGame() {}
 
     // endregion Activation Phase Helpers
 
@@ -597,6 +743,8 @@ public class GameMode
 
     // endregion Game Phases
 
+    public void endGame() {}
+
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
@@ -648,154 +796,6 @@ public class GameMode
         for (Player player : players) {
             player.handleIncompleteProgramming();
         }
-    }
-
-    /**
-     * The following method is required during the conveyor belt activation period.
-     * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
-     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
-     * with the outcoming flow direction. If yes, the direction of the robot is changed accordingly
-     * and the corresponding JSON message is sent.
-     * @param player Owner of the current robot
-     * @param coordinate Coordinate of the new tile the robot moved onto
-     */
-    public void curvedArrowCheck(Player player, Coordinate coordinate) {
-        Tile newTile = course.getTileByCoordinate(coordinate);
-        for(FieldType newFieldType : newTile.getFieldTypes()) {
-            if(newFieldType instanceof ConveyorBelt newConveyorBelt) {
-                String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
-                String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
-                String robotOldDirection = player.getPlayerRobot().getDirection();
-                if(newInDirection != null && newOutDirection != null) {
-                    for(String direction : newInDirection) {
-                        switch(newOutDirection) {
-                            case("top") -> player.getPlayerRobot().setDirection("NORTH");
-                            case("right") -> player.getPlayerRobot().setDirection("EAST");
-                            case("bottom") -> player.getPlayerRobot().setDirection("SOUTH");
-                            case("left") -> player.getPlayerRobot().setDirection("WEST");
-                        }
-                    }
-                    if((Objects.equals(robotOldDirection, "NORTH") && Objects.equals(player.getPlayerRobot().getDirection(), "EAST")) ||
-                            (Objects.equals(robotOldDirection, "EAST") && Objects.equals(player.getPlayerRobot().getDirection(), "SOUTH")) ||
-                            (Objects.equals(robotOldDirection, "SOUTH") && Objects.equals(player.getPlayerRobot().getDirection(), "WEST")) ||
-                            (Objects.equals(robotOldDirection, "WEST") && Objects.equals(player.getPlayerRobot().getDirection(), "NORTH"))) {
-                        for(Player player1 : players) {
-                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID(),
-                                    "clockwise").send();
-                        }
-                    } else {
-                        for(Player player1 : players) {
-                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID(),
-                                    "counterclockwise").send();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The following method determines the laser orientation. Depending on the orientation it passes different values to
-     * the handleLaserShooting method.
-     * @param laser laser object holding laser orientation and laser strength
-     * @param tile tile of current laser being handled
-     */
-    private void handleLaserByDirection(Laser laser, Tile tile) {
-        int laserXCoordinate = tile.getCoordinate().getXCoordinate();
-        int laserYCoordinate = tile.getCoordinate().getYCoordinate();
-        String laserOrientation = laser.getOrientation();
-        int laserCount = Laser.getLaserCount();
-
-
-        switch (laserOrientation) {
-            case "top" -> handleLaserShooting("top", laserCount, laserXCoordinate, laserYCoordinate, 0, -1);
-            case "right" -> handleLaserShooting("right", laserCount, laserXCoordinate, laserYCoordinate, 1, 0);
-            case "bottom" -> handleLaserShooting("bottom", laserCount, laserXCoordinate, laserYCoordinate, 0, 1);
-            case "left" -> handleLaserShooting("left", laserCount, laserXCoordinate, laserYCoordinate, -1, 0);
-        };
-    }
-
-    /**
-     * The following method shoots the laser and checks for obstacles in its way which stop the laser.
-     * If the obstacle is a robot, they draw 1-3 spam cards, depending on the laser's strength.
-     * @param laserOrientation direction the laser is shooting into
-     * @param laserCount intensity of the laser, can vary between 1-3
-     * @param x x-coordinate of laser tile
-     * @param y y-coordinate of laser tile
-     * @param xIncrement differs depending on laser orientation
-     * @param yIncrement differs depending on laser orientation
-     */
-    private void handleLaserShooting(String laserOrientation, int laserCount, int x, int y, int xIncrement, int yIncrement) {
-        boolean laserGoing = true;
-
-        while (course.areCoordinatesWithinBounds(x, y) && laserGoing) {
-            Tile tile = course.getTileByNumbers(x, y);
-
-            if (tile.isOccupied()) {
-                Robot occupyingRobot = tile.getRobot();
-
-                for (Player player : players) {
-                    if (player.getPlayerRobot() == occupyingRobot) {
-                        for(int i = 0; i<laserCount; i++) {
-                            if(!this.spamCardDeck.isEmpty()) {
-                                player.getDiscardPile().add(this.spamCardDeck.remove(0));
-                            }
-                        }
-                        laserGoing = false;
-                        break;
-                    }
-                }
-            }
-
-            for (FieldType fieldType : tile.getFieldTypes()) {
-                if (fieldType instanceof Wall wall) {
-                    String[] orientations = wall.getOrientations();
-
-                    for (String wallOrientation : orientations) {
-                        if(((laserOrientation.equals("top") || laserOrientation.equals("bottom")) &&
-                                (wallOrientation.equals("bottom") || wallOrientation.equals("top")) &&
-                                (y != tile.getCoordinate().getYCoordinate())) ||
-                                ((laserOrientation.equals("left") || laserOrientation.equals("right")) &&
-                                        (wallOrientation.equals("left") || wallOrientation.equals("right")) &&
-                                        (x != tile.getCoordinate().getXCoordinate()))) {
-                            laserGoing = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (fieldType instanceof Antenna) {
-                    laserGoing = false;
-                    break;
-                }
-            }
-
-            x += xIncrement;
-            y += yIncrement;
-        }
-    }
-
-    /**
-     * The following method calculates the new coordinates for activating conveyor belts and push panels.
-     * @param orientation direction the robot is moved to
-     * @param oldCoordinate coordinates of the current push panel pushing a robot
-     * @return new coordinate
-     */
-    public Coordinate calculateNewCoordinate(String orientation, Coordinate oldCoordinate) {
-        Coordinate newCoordinate = null;
-        switch (orientation) {
-            case "top" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
-                    oldCoordinate.getYCoordinate() - 1);
-            case "right" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() + 1,
-                    oldCoordinate.getYCoordinate());
-            case "bottom" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate(),
-                    oldCoordinate.getYCoordinate() + 1);
-            case "left" -> newCoordinate = new Coordinate(oldCoordinate.getXCoordinate() - 1,
-                    oldCoordinate.getYCoordinate());
-        }
-        return newCoordinate;
     }
 
     /**
