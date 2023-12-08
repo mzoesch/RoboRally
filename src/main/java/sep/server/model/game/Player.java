@@ -68,6 +68,7 @@ public class Player
     * @param forward True if the robot should move forwards, false if backwards.
     */
     public void moveRobotOneTile(boolean forward) {
+
         Robot robot = getPlayerRobot();
         Course course = robot.getCourse();
         String currentDirection = robot.getDirection();
@@ -75,7 +76,12 @@ public class Player
         Coordinate currentCoordinate = currentTile.getCoordinate();
         Coordinate newCoordinate = null;
 
-        int directionModifier = forward ? 1 : -1;
+        int directionModifier;
+        if (forward) {
+            directionModifier = 1;
+        } else {
+            directionModifier = -1;
+        }
 
         switch (currentDirection) {
             case "NORTH", "top":
