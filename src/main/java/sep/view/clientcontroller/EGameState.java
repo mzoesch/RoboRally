@@ -257,6 +257,7 @@ public enum EGameState
     {
         if (this.currentPhase == currentPhase)
         {
+            l.warn("Tried to set the current phase to the same phase as before. Ignoring.");
             return;
         }
 
@@ -271,10 +272,11 @@ public enum EGameState
         }
 
         this.currentPhase = currentPhase;
-        if (this.currentPhase == EGamePhase.PROGRAMMING)
+        this.currentPlayer = null;
+        if (this.currentPhase != EGamePhase.PROGRAMMING && this.currentPhase != EGamePhase.ACTIVATION)
         {
-//            this.clearAllRegisters();
-            this.currentPlayer = null;
+            this.clearAllRegisters();
+            ViewSupervisor.updateFooter();
         }
         ViewSupervisor.updatePhase();
         return;
@@ -322,6 +324,7 @@ public enum EGameState
         return this.gotRegisters;
     }
 
+    /** Will not re-render the player head up display. */
     public void clearAllRegisters()
     {
         this.registers[0] = null;
