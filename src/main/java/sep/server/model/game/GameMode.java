@@ -1,8 +1,6 @@
 package sep.server.model.game;
 
 import sep.server.json.common.ErrorMsgModel;
-import sep.server.json.game.activatingphase.CardInfo;
-import sep.server.json.game.activatingphase.CurrentCardsModel;
 import sep.server.json.game.activatingphase.ReplaceCardModel;
 import sep.server.json.game.effects.*;
 import sep.server.model.game.cards.Card;
@@ -276,7 +274,7 @@ public class GameMode
                             return;
                         }
 
-                        if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
+                        if (player.getPlayerRobot().isUnmovable(course.getTileByCoordinate(newCoordinate))) {
                             return;
                         }
 
@@ -317,7 +315,7 @@ public class GameMode
                                 return;
                             }
 
-                            if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
+                            if (player.getPlayerRobot().isUnmovable(course.getTileByCoordinate(newCoordinate))) {
                                 return;
                             }
 

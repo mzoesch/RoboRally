@@ -30,8 +30,9 @@ public class Player
     private int energyCollected;
     private int checkpointsCollected;
 
-
-
+    /**
+     * @deprecated Make gateway call instead
+     */
     private GameMode gameMode;
 
     public Player(final PlayerController playerController, final Course currentCourse, final Session session)
@@ -61,66 +62,64 @@ public class Player
         discardPile.clear();
     }
 
+    // TODO This has nothing to do with the player, move it to the robot
     /**
     * Moves the robot one tile based on the given direction.
     * Updates the robot's position.
     *
     * @param forward True if the robot should move forwards, false if backwards.
     */
-    public void moveRobotOneTile(boolean forward) {
-
-        Robot robot = getPlayerRobot();
-        Course course = robot.getCourse();
-        String currentDirection = robot.getDirection();
-        Tile currentTile = robot.getCurrentTile();
-        Coordinate currentCoordinate = currentTile.getCoordinate();
-        Coordinate newCoordinate = null;
-
-        int directionModifier;
-        if (forward) {
-            directionModifier = 1;
-        } else {
-            directionModifier = -1;
-        }
-
-        switch (currentDirection) {
+    public void moveRobotOneTile(final boolean forward)
+    {
+        final int dir = forward ? 1 : -1;
+        final Coordinate currentCoordinate = this.getPlayerRobot().getCurrentTile().getCoordinate();
+        Coordinate tCoordinate = null;
+        switch (this.getPlayerRobot().getDirection())
+        {
             case "NORTH", "top":
-                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - directionModifier);
+                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - dir);
                 break;
+
             case "SOUTH", "bottom":
-                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + directionModifier);
+                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + dir);
                 break;
+
             case "EAST", "right":
-                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + directionModifier, currentCoordinate.getYCoordinate());
+                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + dir, currentCoordinate.getYCoordinate());
                 break;
+
             case "WEST", "left":
-                newCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - directionModifier, currentCoordinate.getYCoordinate());
+                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - dir, currentCoordinate.getYCoordinate());
                 break;
+
             default:
                 break;
         }
 
-        if (newCoordinate == null) {
-            l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), currentDirection);
+        if (tCoordinate == null)
+        {
+            l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
             return;
         }
 
-        // Check if the robot is still on the board
-        if (!course.isCoordinateWithinBounds(newCoordinate)) {
-            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.getPlayerController().getPlayerID(), newCoordinate.toString());
-            robot.reboot();
+        /* When this is going to work, make all debugs to trace for better readability. */
+        l.debug("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.getPlayerController().getPlayerID(), currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate(), tCoordinate.getXCoordinate(), tCoordinate.getYCoordinate());
+
+        if (!this.getPlayerRobot().getCourse().isCoordinateWithinBounds(tCoordinate))
+        {
+            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.getPlayerController().getPlayerID(), tCoordinate.toString());
+            this.getPlayerRobot().reboot();
             return;
         }
 
-        // Check if the move is possible
-        if (!robot.isMovable(course.getTileByCoordinate(newCoordinate))) {
-            l.debug("Player {}'s robot wanted to move to an unmovable tile [from {} to {}]. Ignoring.", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), newCoordinate.toString());
+        if (this.getPlayerRobot().isUnmovable(this.getPlayerRobot().getCourse().getTileByCoordinate(tCoordinate)))
+        {
+            l.debug("Player {}'s robot wanted to move to an unmovable tile [from {} to {}]. Ignoring.", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
             return;
         }
 
-        // Update Robot Position in Course and in Robot
-        course.updateRobotPosition(robot, newCoordinate);
-        l.debug("Player {}'s robot moved to ({}, {}).", this.getPlayerController().getPlayerID(), newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate());
+        this.getPlayerRobot().getCourse().updateRobotPosition(this.getPlayerRobot(), tCoordinate);
+        l.debug("Player {}'s robot moved [from {} to {}].", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
 
         return;
     }

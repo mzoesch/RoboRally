@@ -2,10 +2,19 @@ package sep.server.model.game;
 
 import sep.server.json.game.effects.RebootModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class Robot
 {
+    private static final Logger l = LogManager.getLogger(GameState.class);
+
     String direction;
     private final Course course;
+
+    /**
+     * @deprecated Make to gateway method
+     */
     private Tile currentTile;
 
     public Robot(Course course)
@@ -119,21 +128,27 @@ public class Robot
         }
     }
 
-    public boolean isMovable(Tile targetTile)
+    public boolean isUnmovable(Tile target)
     {
-        if (targetTile.hasAntenna())
+        if (target.hasAntennaModifier())
         {
-            return false;
+            l.debug("Robot is unmovable because of the antenna modifier");
+            return true;
         }
-        if (targetTile.hasWall())
+
+        if (target.hasWallModifier())
         {
-            return false;
+            l.debug("Robot is unmovable because of a wall modifier");
+            return true;
         }
-        if (targetTile.hasUnmovableRobot())
+
+        if (target.hasUnmovableRobot())
         {
-            return false;
+            l.debug("Robot is unmovable because of another unmovable robot");
+            return true;
         }
-        return true;
+
+        return false;
     }
 
 }
