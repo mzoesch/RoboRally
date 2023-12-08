@@ -74,25 +74,27 @@ public class Player
         final int dir = forward ? 1 : -1;
         final Coordinate currentCoordinate = this.getPlayerRobot().getCurrentTile().getCoordinate();
         Coordinate tCoordinate = null;
-        switch (this.getPlayerRobot().getDirection())
+        System.out.println(this.getPlayerRobot().getDirection());
+        switch (this.getPlayerRobot().getDirection().toLowerCase())
         {
-            case "NORTH", "top":
+            case "north", "top":
                 tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
                 break;
 
-            case "SOUTH", "bottom":
+            case "south", "bottom":
                 tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
                 break;
 
-            case "EAST", "right":
+            case "east", "right":
                 tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
                 break;
 
-            case "WEST", "left":
+            case "west", "left":
                 tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
                 break;
 
             default:
+                l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
                 break;
         }
 
@@ -149,22 +151,22 @@ public class Player
         String currentDirection = robot.getDirection();
         String newDirection;
 
-        switch (currentDirection) {
-            case "NORTH":
+        switch (currentDirection.toLowerCase()) {
+            case "north", "top":
                 newDirection = "EAST";
                 break;
-            case "EAST":
+            case "east", "right":
                 newDirection = "SOUTH";
                 break;
-            case "SOUTH":
+            case "south", "bottom":
                 newDirection = "WEST";
                 break;
-            case "WEST":
+            case "west", "left":
                 newDirection = "NORTH";
                 break;
             default:
-                newDirection = currentDirection;
-                break;
+                l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
+                return;
         }
 
         robot.setDirection(newDirection);
