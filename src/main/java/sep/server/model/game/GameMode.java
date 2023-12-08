@@ -752,21 +752,9 @@ public class GameMode
                 newCard).send();
     }
 
-    public void giveRobotsInRadiusVirusCard(Player player)
-    {
-        int radius = 6;
-        Tile centerTile = player.getPlayerRobot().getCurrentTile();
 
-        for(Player p : players) {
-            if (player != p) {
-                Tile otherTile = p.getPlayerRobot().getCurrentTile();
-                if (getDistanceBetweenTwoRobots(centerTile, otherTile) <= radius) {
-                    p.getDiscardPile().add(virusCardDeck.remove(0));
-                }
-            }
 
-        }
-    }
+
 
     /*public void test (Player player) {
 
@@ -787,11 +775,7 @@ public class GameMode
 
     }*/
 
-    public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {
-        int xDistance = Math.abs(t1.getCoordinate().getXCoordinate() - t2.getCoordinate().getXCoordinate());
-        int yDistance = Math.abs(t1.getCoordinate().getYCoordinate() - t2.getCoordinate().getYCoordinate());
-        return xDistance + yDistance;
-    }
+
 
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers
