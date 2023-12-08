@@ -50,6 +50,8 @@ public class GameMode
     /** @deprecated This is currently not initialized. Fix or remove. */
     private int energyBank;
 
+    private Thread programmingCardThread;
+
     public GameMode(String courseName, PlayerController[] playerControllers, Session session)
     {
         super();
@@ -325,32 +327,45 @@ public class GameMode
     public void startTimer() {
         this.session.getGameState().sendStartTimer();
 
-        /*try {
-            for (Player player : players) {
-                new Thread(player.getPlayerController().getClientInstance()).start();
+        this.programmingCardThread = new Thread(() -> {
+            try {
+                Thread.sleep(30000); // Sleep for 30 seconds
+            } catch (InterruptedException e) {
+                l.info("All Players have set their Cards");
             }
-            Thread.sleep(30000); // 30 Sekunden
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
 
+            int[] playerIdWhoNotFinished = new int[players.size()];
+            ArrayList playerWhoNotFinished = new ArrayList();
+            int index = 0;
+            for (Player player : players) {
+                if (!player.hasPlayerFinishedProgramming()) {
+                    playerIdWhoNotFinished[index++] = player.getPlayerController().getPlayerID();
+                    playerWhoNotFinished.add(player);
+                }
+            }
+            if (index < players.size()) {
+                playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
+            }
+            this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
 
-        int[] playerIdWhoNotFinished = new int[players.size()];
-        int index = 0;
+            discardAndDrawBlind(playerWhoNotFinished);
 
+            triggerActivationPhase();
+        });
+
+        this.programmingCardThread.start();
+
+        boolean haveAllPlayersSetTheirCards = true;
         for (Player player : players) {
             if (!player.hasPlayerFinishedProgramming()) {
-                playerIdWhoNotFinished[index++] = player.getPlayerController().getPlayerID();
+                haveAllPlayersSetTheirCards= false;
             }
         }
-        if (index < players.size()) {
-            playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
+
+        if (haveAllPlayersSetTheirCards) {
+            this.programmingCardThread.interrupt();
+            triggerActivationPhase();
         }
-
-        this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
-
-        //Ab hier test.
-
     }
 
     public void discardAndDrawBlind(ArrayList<Player> players) {
@@ -735,6 +750,47 @@ public class GameMode
         new ReplaceCardModel(player.getPlayerController().getClientInstance(),
                 currentRegister, player.getPlayerController().getPlayerID(),
                 newCard).send();
+    }
+
+    public void giveRobotsInRadiusVirusCard(Player player)
+    {
+        int radius = 6;
+        Tile centerTile = player.getPlayerRobot().getCurrentTile();
+
+        for(Player p : players) {
+            if (player != p) {
+                Tile otherTile = p.getPlayerRobot().getCurrentTile();
+                if (getDistanceBetweenTwoRobots(centerTile, otherTile) <= radius) {
+                    p.getDiscardPile().add(virusCardDeck.remove(0));
+                }
+            }
+
+        }
+    }
+
+    /*public void test (Player player) {
+
+        //Karte aus Register Entfernen und in Viruskartendeck einfügen
+        IPlayableCard oldCard = player.getCardByRegisterIndex(currentRegister+1);
+        player.getRegisters()[currentRegister+1] = null;
+        virusCardDeck.add((VirusDamage) oldCard);
+
+
+        if(!player.getPlayerDeck().isEmpty()){
+            IPlayableCard newCard = player.getPlayerDeck().remove(0);
+            player.getRegisters().
+            player.getRegisters()[currentRegister]= newCard;
+
+        }
+
+
+
+    }*/
+
+    public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {
+        int xDistance = Math.abs(t1.getCoordinate().getXCoordinate() - t2.getCoordinate().getXCoordinate());
+        int yDistance = Math.abs(t1.getCoordinate().getYCoordinate() - t2.getCoordinate().getYCoordinate());
+        return xDistance + yDistance;
     }
 
     /**
