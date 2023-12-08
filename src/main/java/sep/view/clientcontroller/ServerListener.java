@@ -178,7 +178,7 @@ public class ServerListener implements Runnable
         {
             l.debug("Received current player update. New current player: {}.", dsrp.getPlayerID());
             EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
-            String info = String.format("Player %s is now current Player", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("Player %s is now current Player", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             return;
         }
@@ -190,8 +190,9 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
+            String info = String.format("Player %s has played %s now current Player", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received card played from server.");
-            //TODO Handling of played Card?
             return;
         }
 
@@ -200,7 +201,7 @@ public class ServerListener implements Runnable
             l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
             ViewSupervisor.updatePlayerTransforms();
-            String info = String.format("Player %s is has selected a starting Point", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("Player %s is has selected a starting Point", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             return;
         }
@@ -223,6 +224,8 @@ public class ServerListener implements Runnable
 
         /* If one client has finished selecting their programming cards. */
         if (Objects.equals(dsrp.getType_v2(), "SelectionFinished")) {
+            String info = String.format("Player %s has finished his card selection", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Player {} finished their selection.", dsrp.getPlayerID());
             EGameState.INSTANCE.setSelectionFinished(dsrp.getPlayerID());
             return;
@@ -230,12 +233,17 @@ public class ServerListener implements Runnable
 
         /* If this client's hand cards are being forced updated. */
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
+            //TODO
+            String info = String.format("Player %s has not submitted their selection in time.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Player {} has not submitted their selection in time. Received new cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(dsrp.getForcedCards())));
             return;
         }
 
         /* The server notifies the client about the nine programming cards from another client. */
         if (Objects.equals(dsrp.getType_v2(), "NotYourCards")) {
+            String info = String.format("Player %s has %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardsInHand().length);
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received not yours cards from server.");
             return;
         }

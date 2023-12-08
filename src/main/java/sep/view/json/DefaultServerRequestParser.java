@@ -132,6 +132,8 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getJSONArray("activeCards");
     }
 
+    public String getCardName(){return this.request.getJSONObject("messageBdoy").getString("card");}
+
     public String getActiveCardFromIdx(final int idx) throws JSONException
     {
         return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getString("card");
@@ -141,5 +143,7 @@ public final class DefaultServerRequestParser
     {
         return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getInt("clientID");
     }
+
+
 
 }
