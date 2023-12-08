@@ -4,9 +4,9 @@ package sep.server.model.game.tiles;
  * Klasse, die die X und Y Koordinate eines Tiles im Course sowie die benachbarten Koordinaten speichert
  */
 public class Coordinate{
-    private final int xCoordinate;
+    private final int x;
 
-    private final int yCoordinate;
+    private final int y;
 
     private Coordinate topNeighbor;
     private Coordinate rightNeighbor;
@@ -14,16 +14,16 @@ public class Coordinate{
     private Coordinate leftNeighbor;
 
     public Coordinate(int x, int y){
-        xCoordinate = x;
-        yCoordinate = y;
+        this.x = x;
+        this.y = y;
 
     }
-    public int getXCoordinate() {
-        return xCoordinate;
+    public int getX() {
+        return x;
     }
 
-    public int getYCoordinate() {
-        return yCoordinate;
+    public int getY() {
+        return y;
     }
 
     /**
@@ -78,6 +78,6 @@ public class Coordinate{
     @Override
     public String toString()
     {
-        return String.format("(%d, %d)", this.xCoordinate, this.yCoordinate);
+        return String.format("(%d, %d)", this.x, this.y);
     }
 }

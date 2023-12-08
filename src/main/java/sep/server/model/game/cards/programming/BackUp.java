@@ -1,6 +1,5 @@
 package sep.server.model.game.cards.programming;
 
-import sep.server.model.game.GameMode;
 import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
@@ -18,8 +17,8 @@ public class BackUp extends AProgrammingCard implements IPlayableCard {
         for(Player player1 : GameState.gameMode.getPlayers()) {
             new MovementModel(player1.getPlayerController().getClientInstance(),
                     player.getPlayerController().getPlayerID(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getXCoordinate(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getYCoordinate()).send();
+                    player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
+                    player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
         }
     }
 }

@@ -77,19 +77,19 @@ public class Player
         switch (this.getPlayerRobot().getDirection())
         {
             case "NORTH", "top":
-                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() - dir);
+                tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
                 break;
 
             case "SOUTH", "bottom":
-                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate() + dir);
+                tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
                 break;
 
             case "EAST", "right":
-                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate() + dir, currentCoordinate.getYCoordinate());
+                tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
                 break;
 
             case "WEST", "left":
-                tCoordinate = new Coordinate(currentCoordinate.getXCoordinate() - dir, currentCoordinate.getYCoordinate());
+                tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
                 break;
 
             default:
@@ -103,7 +103,7 @@ public class Player
         }
 
         /* When this is going to work, make all debugs to trace for better readability. */
-        l.debug("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.getPlayerController().getPlayerID(), currentCoordinate.getXCoordinate(), currentCoordinate.getYCoordinate(), tCoordinate.getXCoordinate(), tCoordinate.getYCoordinate());
+        l.debug("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.getPlayerController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
 
         if (!this.getPlayerRobot().getCourse().isCoordinateWithinBounds(tCoordinate))
         {
@@ -112,9 +112,9 @@ public class Player
             return;
         }
 
-        if (this.getPlayerRobot().isUnmovable(this.getPlayerRobot().getCourse().getTileByCoordinate(tCoordinate)))
+        if (this.getPlayerRobot().isNotTraversable(this.getPlayerRobot().getCurrentTile(), this.getPlayerRobot().getCourse().getTileByCoordinate(tCoordinate)))
         {
-            l.debug("Player {}'s robot wanted to move to an unmovable tile [from {} to {}]. Ignoring.", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+            l.debug("Player {}'s robot wanted to traverse to an impassable tile [from {} to {}]. Ignoring.", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
             return;
         }
 
@@ -217,7 +217,8 @@ public class Player
                 return;
             }
 
-            this.session.getGameState().getAuthGameMode().startTimer();
+            // TODO We ignore this for now.
+            // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
         }
 
         return;

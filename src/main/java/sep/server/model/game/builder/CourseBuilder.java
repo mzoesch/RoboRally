@@ -1,6 +1,5 @@
 package sep.server.model.game.builder;
 
-import sep.server.model.game.GameState;
 import sep.server.model.game.Tile;
 import sep.server.model.game.tiles.*;
 
@@ -51,8 +50,8 @@ public class CourseBuilder {
             ArrayList<Tile> courseYRow = course.get(i);
             for(int a = 0; a < courseYRow.size(); a++){
                 Tile tile = courseYRow.get(a);
-                int xCoordinate = tile.getCoordinate().getXCoordinate();
-                int yCoordinate = tile.getCoordinate().getYCoordinate();
+                int xCoordinate = tile.getCoordinate().getX();
+                int yCoordinate = tile.getCoordinate().getY();
 
                 //topNeighbor
                 try{

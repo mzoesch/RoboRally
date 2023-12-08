@@ -58,8 +58,8 @@ public class Course {
      * @return True if the coordinate is within the game board bounds, otherwise false.
      */
     public boolean isCoordinateWithinBounds(Coordinate coordinate) {
-        int x = coordinate.getXCoordinate();
-        int y = coordinate.getYCoordinate();
+        int x = coordinate.getX();
+        int y = coordinate.getY();
 
         return x >= 0 && x < course.size() && y >= 0 && y < course.get(0).size();
     }
@@ -75,7 +75,7 @@ public class Course {
     }
 
     public Tile getTileByCoordinate(Coordinate coordinate){
-        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+        return course.get(coordinate.getX()).get(coordinate.getY());
     }
 
     public Tile getTileByNumbers(int x, int y){
@@ -90,22 +90,22 @@ public class Course {
 
     public Tile getTopNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getTopNeighbor();
-        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+        return course.get(coordinate.getX()).get(coordinate.getY());
     }
 
     public Tile getRightNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getRightNeighbor();
-        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+        return course.get(coordinate.getX()).get(coordinate.getY());
     }
 
     public Tile getBottomNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getBottomNeighbor();
-        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+        return course.get(coordinate.getX()).get(coordinate.getY());
     }
 
     public Tile getLeftNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getLeftNeighbor();
-        return course.get(coordinate.getXCoordinate()).get(coordinate.getYCoordinate());
+        return course.get(coordinate.getX()).get(coordinate.getY());
     }
 
     public String getStartingTurningDirection() {

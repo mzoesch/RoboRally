@@ -45,8 +45,8 @@ public class VirusDamage extends ADamageCard {
     }
 
     public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {
-        int xDistance = Math.abs(t1.getCoordinate().getXCoordinate() - t2.getCoordinate().getXCoordinate());
-        int yDistance = Math.abs(t1.getCoordinate().getYCoordinate() - t2.getCoordinate().getYCoordinate());
+        int xDistance = Math.abs(t1.getCoordinate().getX() - t2.getCoordinate().getX());
+        int yDistance = Math.abs(t1.getCoordinate().getY() - t2.getCoordinate().getY());
         return xDistance + yDistance;
     }
 }

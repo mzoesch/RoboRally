@@ -18,8 +18,8 @@ public class MoveII extends AProgrammingCard implements IPlayableCard {
         for(Player player1 : GameState.gameMode.getPlayers()) {
             new MovementModel(player1.getPlayerController().getClientInstance(),
                     player.getPlayerController().getPlayerID(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getXCoordinate(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getYCoordinate()).send();
+                    player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
+                    player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
         }
     }
 }
