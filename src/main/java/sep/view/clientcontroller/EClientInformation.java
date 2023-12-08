@@ -151,7 +151,7 @@ public enum EClientInformation
         return;
     }
 
-    public void sendServerRequest(JSONObject json)
+    public void sendServerRequest(JSONObject j)
     {
         if (this.bufferedWriter == null)
         {
@@ -159,9 +159,11 @@ public enum EClientInformation
             return;
         }
 
+        l.trace(String.format("Sending request to server: %s", j.toString(0)));
+
         try
         {
-            this.bufferedWriter.write(json.toString());
+            this.bufferedWriter.write(j.toString(0));
             this.bufferedWriter.newLine();
             this.bufferedWriter.flush();
         }
@@ -176,11 +178,6 @@ public enum EClientInformation
     }
 
     // region Getters and Setters
-
-    public BufferedWriter getBufferedWriter()
-    {
-        return bufferedWriter;
-    }
 
     public StringBuilder getStdServerErrPipeline()
     {
