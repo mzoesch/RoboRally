@@ -5,8 +5,9 @@ target/
 # Compiled class file
 *.class
 
-# Log file
+# Log files
 *.log
+*.log.*
 
 # BlueJ files
 *.ctxt
