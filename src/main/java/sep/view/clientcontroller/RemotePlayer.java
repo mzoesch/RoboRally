@@ -24,6 +24,7 @@ public final class RemotePlayer
     private int energyCubes = 5;
 
     private boolean bSelectionFinished;
+    private int checkPointsReached = 0;
 
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
     {
@@ -106,6 +107,7 @@ public final class RemotePlayer
         return this.registerSlots[i];
     }
 
+    //TODO @Refactoring was macht diese Methode bzw. kann die weg?
     public int countCheckPoints() {
         int checkpoint = 0;
         for (String card : registerSlots) {
@@ -116,6 +118,7 @@ public final class RemotePlayer
         return checkpoint;
     }
 
+    //TODO @Refactoring was macht diese Methode bzw. kann die weg?
     public int countEnergy() {
         int energy = 0;
         for (String card : registerSlots) {
@@ -144,4 +147,6 @@ public final class RemotePlayer
     public void setEnergy(int number){
         energyCubes = number;
     }
+
+    public void setCheckPointsReached(int number){ checkPointsReached = number;}
 }

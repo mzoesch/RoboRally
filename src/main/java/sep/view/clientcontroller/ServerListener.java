@@ -1,5 +1,6 @@
 package sep.view.clientcontroller;
 
+import sep.server.model.game.cards.programming.MoveI;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
@@ -178,7 +179,7 @@ public class ServerListener implements Runnable
         {
             l.debug("Received current player update. New current player: {}.", dsrp.getPlayerID());
             EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
-            String info = String.format("Player %s is now current Player", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("Player %s is now current Player", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             return;
         }
@@ -190,8 +191,9 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
+            String info = String.format("Player %s has played %s now current Player", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received card played from server.");
-            //TODO Handling of played Card?
             return;
         }
 
@@ -200,7 +202,7 @@ public class ServerListener implements Runnable
             l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
             ViewSupervisor.updatePlayerTransforms();
-            String info = String.format("Player %s is has selected a starting Point", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("Player %s is has selected a starting Point", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             return;
         }
@@ -223,6 +225,8 @@ public class ServerListener implements Runnable
 
         /* If one client has finished selecting their programming cards. */
         if (Objects.equals(dsrp.getType_v2(), "SelectionFinished")) {
+            String info = String.format("Player %s has finished his card selection", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Player {} finished their selection.", dsrp.getPlayerID());
             EGameState.INSTANCE.setSelectionFinished(dsrp.getPlayerID());
             return;
@@ -230,18 +234,29 @@ public class ServerListener implements Runnable
 
         /* If this client's hand cards are being forced updated. */
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
+            EGameState.INSTANCE.clearAllRegisters();
+            for (String c : dsrp.getForcedCards())
+            {
+                EGameState.INSTANCE.addGotRegister(c);
+                continue;
+            }
+            ViewSupervisor.updateFooter();
+            String info = ("You didnt finished card selection in time. You recieved forced cards.");
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Player {} has not submitted their selection in time. Received new cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(dsrp.getForcedCards())));
             return;
         }
 
         /* The server notifies the client about the nine programming cards from another client. */
         if (Objects.equals(dsrp.getType_v2(), "NotYourCards")) {
+            String info = String.format("Player %s has %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardsInHand().length);
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received not yours cards from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
-            String info = String.format("The deck of player %s has been shuffled", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("The deck of player %s has been shuffled", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received shuffle coding from server.");
             return;
@@ -255,7 +270,8 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
-            String info = String.format("Timer has started");
+            //TODO Timer?
+            String info = ("Timer has started");
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer started from server.");
             return;
@@ -277,14 +293,25 @@ public class ServerListener implements Runnable
         /* The current cards in a register played by all clients. */
         if (Objects.equals(dsrp.getType_v2(), "CurrentCards"))
         {
+            //TODO grafische Anzeige der jeweiligen Karte?
             final StringBuilder sb = new StringBuilder();
             sb.append(String.format("In this register %d cards were played (", dsrp.getActiveCards().length()));
             sb.append(IntStream.range(0, dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", dsrp.getPlayerIDFromActiveCardIdx(i), dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
             l.debug(sb.append(").").toString());
+            String info = sb.append(").").toString();
+            ViewSupervisor.handleChatInfo(info);
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ReplaceCard")) {
+            if(dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()){
+                String info = String.format("You recieved following card %s as replacement", dsrp.getNewCard());
+                ViewSupervisor.handleChatInfo(info);
+                EGameState.INSTANCE.addRegister(dsrp.getRegister(), dsrp.getNewCard());
+            } else{
+                String info = String.format("Player %s recieved following card %s as replacement",Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(),  dsrp.getNewCard());
+                ViewSupervisor.handleChatInfo(info);
+            }
             l.debug("Received replacing card from server.");
             return;
         }
@@ -295,6 +322,9 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "CheckPointReached")) {
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setCheckPointsReached(dsrp.getNumber());
+            String info = String.format("Player %s has reached %s checkpoints", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getNumber());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received checkpoint from server.");
             return;
         }
