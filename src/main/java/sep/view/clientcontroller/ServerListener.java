@@ -330,9 +330,9 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Energy")) {
+            //keine Chatinfo, da ja Energy in PlayerInformationen angezeigt
             l.debug("Player {} EnergyCubeAmmount has been set to {}", dsrp.getPlayerID(), dsrp.getEnergyCount());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setEnergy(dsrp.getEnergyCount());
-
             return;
         }
 
@@ -350,11 +350,14 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "RebootDirection")) {
+            //TODO die Nachricht geht doch vom Client to Server und wird von diesem dann als PlayerTurning an alle verschickt oder?
             l.debug("Received reboot direction from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Reboot")) {
+            String info = String.format("Robot of Player %s has been rebooted", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getNumber());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received reboot from server.");
             return;
         }
@@ -365,6 +368,7 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "DrawDamage")) {
+
             l.debug("Received draw a damage card from server.");
             return;
         }
