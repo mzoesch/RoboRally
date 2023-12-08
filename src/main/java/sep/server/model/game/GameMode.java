@@ -753,30 +753,6 @@ public class GameMode
     }
 
 
-
-
-
-    /*public void test (Player player) {
-
-        //Karte aus Register Entfernen und in Viruskartendeck einfügen
-        IPlayableCard oldCard = player.getCardByRegisterIndex(currentRegister+1);
-        player.getRegisters()[currentRegister+1] = null;
-        virusCardDeck.add((VirusDamage) oldCard);
-
-
-        if(!player.getPlayerDeck().isEmpty()){
-            IPlayableCard newCard = player.getPlayerDeck().remove(0);
-            player.getRegisters().
-            player.getRegisters()[currentRegister]= newCard;
-
-        }
-
-
-
-    }*/
-
-
-
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers
      * and calls a method that refills the player deck.

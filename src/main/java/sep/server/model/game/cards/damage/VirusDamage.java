@@ -1,7 +1,10 @@
 package sep.server.model.game.cards.damage;
 
+import sep.server.json.game.activatingphase.ReplaceCardModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.Tile;
+import sep.server.model.game.cards.Card;
+import sep.server.model.game.cards.IPlayableCard;
 
 public class VirusDamage extends ADamageCard {
     public VirusDamage(String cardType) {
@@ -26,6 +29,19 @@ public class VirusDamage extends ADamageCard {
             }
 
         }
+
+        //Karten akutalisieren
+        player.getGameMode().getTrojanDeck().add((TrojanHorseDamage) player.getCardByRegisterIndex(currentRoundNumber));
+        player.getRegisters()[currentRoundNumber] = null;
+
+        IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
+        player.setCardInRegister(currentRoundNumber, topCardFromDiscardPile);
+        topCardFromDiscardPile.playCard(player, currentRoundNumber);
+
+        String newCard = ((Card) topCardFromDiscardPile).getCardType();
+        new ReplaceCardModel(player.getPlayerController().getClientInstance(),
+                currentRoundNumber, player.getPlayerController().getPlayerID(),
+                newCard).send();
     }
 
     public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {
