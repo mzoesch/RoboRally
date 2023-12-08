@@ -1,7 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.viewcontroller.RobotView;
-import sep.view.lib.Coordinate;
+import sep.view.lib.RCoordinate;
 
 /**
  * Represents a player in the lobby. Not just remote players but also the client player.
@@ -15,11 +15,15 @@ public final class RemotePlayer
     private int figureID;
     private boolean bReady;
 
-    Coordinate startPos;
-    RobotView possessing;
+    private RCoordinate startPos;
+    private RobotView possessing;
 
     private static final int REGISTER_SLOTS = 5;
     private String[] registerSlots;
+
+    private int energyCubes = 5;
+
+    private boolean bSelectionFinished;
 
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
     {
@@ -32,6 +36,8 @@ public final class RemotePlayer
         this.possessing = new RobotView(this);
 
         this.registerSlots = new String[REGISTER_SLOTS];
+
+        this.bSelectionFinished = false;
 
         return;
     }
@@ -79,12 +85,12 @@ public final class RemotePlayer
         return this.startPos != null;
     }
 
-    public Coordinate getStartingPosition()
+    public RCoordinate getStartingPosition()
     {
         return this.startPos;
     }
 
-    public void setStartingPosition(Coordinate startPos)
+    public void setStartingPosition(RCoordinate startPos)
     {
         this.startPos = startPos;
         return;
@@ -120,4 +126,22 @@ public final class RemotePlayer
         return energy;
     }
 
+    public boolean hasSelectionFinished()
+    {
+        return this.bSelectionFinished;
+    }
+
+    public void setSelectionFinished(boolean b)
+    {
+        this.bSelectionFinished = b;
+        return;
+    }
+
+    public int getEnergyCubes() {
+        return energyCubes;
+    }
+
+    public void setEnergy(int number){
+        energyCubes = number;
+    }
 }

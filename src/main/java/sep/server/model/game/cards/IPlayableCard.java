@@ -1,10 +1,9 @@
 package sep.server.model.game.cards;
 
-public interface IPlayableCard  {
+import sep.server.model.game.Player;
 
-    void playCard();
-
-    String getCardType();
-
-
+public interface IPlayableCard
+{
+    public abstract void playCard(Player player, int currentRoundNumber);
+    public abstract String getCardType();
 }

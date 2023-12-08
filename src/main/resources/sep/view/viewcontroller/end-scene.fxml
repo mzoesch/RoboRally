@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane
+            id="master-container" stylesheets="@globals.css"
+            fx:controller="sep.view.scenecontrollers.EndSceneJFXController"
+            xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+>
+    <top>
+        <AnchorPane>
+            <Label
+                    text="End Screen"
+                    styleClass="text-2xl" alignment="CENTER"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+            />
+        </AnchorPane>
+    </top>
+    <center>
+        <Label
+                styleClass="text-2xl"
+                fx:id="winnerNameField"
+                BorderPane.alignment="CENTER"
+        />
+    </center>
+    <bottom>
+            <Button
+                    text="EXIT GAME"
+                    styleClass="danger-btn" style="-fx-min-width: 300px;"
+                    onAction="#onExitBtn"
+                    BorderPane.alignment="CENTER"
+            />
+    </bottom>
+
+</BorderPane>

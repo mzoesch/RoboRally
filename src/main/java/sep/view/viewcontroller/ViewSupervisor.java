@@ -1,6 +1,6 @@
 package sep.view.viewcontroller;
 
-import org.json.JSONArray;
+import sep.view.json.ChatMsgModel;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.scenecontrollers.LobbyJFXController_v2;
@@ -15,6 +15,7 @@ import javafx.stage.WindowEvent;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
 
 /**
  * This class is responsible for launching the JavaFX application and is
@@ -82,15 +83,39 @@ public final class ViewSupervisor extends Application
     {
         T ctrl = ViewSupervisor.getSceneController().getCurrentController();
 
-        // TODO Here than cast to the game ctrl etc.
-
         if (ctrl instanceof LobbyJFXController_v2 lCtrl)
         {
-            lCtrl.handleChatMessage(dsrp);
+            lCtrl.handleChatMessage(dsrp.getChatMsgSourceID(), dsrp.getChatMsg(), dsrp.isChatMsgPrivate());
+            return;
+        }
+
+        if (ctrl instanceof GameJFXController gCtrl)
+        {
+            gCtrl.onChatMsgReceived(dsrp.getChatMsgSourceID(), dsrp.getChatMsg(), dsrp.isChatMsgPrivate());
             return;
         }
 
         l.error("Received chat message but could not find the correct controller to handle it.");
+        return;
+    }
+
+    public static <T> void handleChatInfo(String info)
+    {
+        T ctrl = ViewSupervisor.getSceneController().getCurrentController();
+
+        if (ctrl instanceof LobbyJFXController_v2 lCtrl)
+        {
+            lCtrl.handleChatMessage(ChatMsgModel.SERVER_ID, info, false);
+            return;
+        }
+
+        if (ctrl instanceof GameJFXController gCtrl)
+        {
+            gCtrl.onChatMsgReceived(ChatMsgModel.SERVER_ID, info, false);
+            return;
+        }
+
+        l.error("Received chat info but could not find the correct controller to handle it.");
         return;
     }
 
@@ -210,12 +235,12 @@ public final class ViewSupervisor extends Application
         }
     }
 
-    public static void updatePlayerPosition()
+    public static void updatePlayerTransforms()
     {
         try
         {
             GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
-            ctrl.onPlayerPositionUpdate();
+            ctrl.onPlayerTransformUpdate();
             return;
         }
         catch (ClassCastException e)

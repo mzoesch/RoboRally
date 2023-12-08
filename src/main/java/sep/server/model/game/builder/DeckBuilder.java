@@ -10,7 +10,6 @@ import sep.server.model.game.cards.damage.VirusDamage;
 import sep.server.model.game.cards.damage.WormDamage;
 import sep.server.model.game.cards.programming.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class DeckBuilder {
@@ -33,11 +32,11 @@ public class DeckBuilder {
         deck.add(new MoveIII("MoveIII"));
 
         for(int i = 0; i < 3; i++){
-            deck.add(new RightTurn("RightTurn"));
+            deck.add(new TurnRight("TurnRight"));
         }
 
         for(int i = 0; i < 3; i++){
-            deck.add(new LeftTurn("LeftTurn"));
+            deck.add(new TurnLeft("TurnLeft"));
         }
 
         deck.add(new BackUp("BackUp"));

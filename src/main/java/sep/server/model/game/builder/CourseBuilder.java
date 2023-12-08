@@ -19,10 +19,9 @@ public class CourseBuilder {
      * @param name Name des Spielfelds
      * @return komplettes Spielfeld als ArrayList<ArrayList<Tile>>
      */
-    public  ArrayList<ArrayList<Tile>> buildCourse(String name){
-        String courseName = name.trim();
+    public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
         switch(courseName){
-            case("DizzyHighway") -> {
+            case("Dizzy Highway") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
@@ -33,7 +32,7 @@ public class CourseBuilder {
                 return buildBoard("Test");
             }
         }
-        //TODO Notlösung, da aktuell noch kein courseName übergeben wird
+        //TODO Notlösung, falls CourseName nicht richtig übergeben wird
         ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
         ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
         ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
@@ -94,12 +93,12 @@ public class CourseBuilder {
         }
     }
 
-    public String getStartingPosition(String courseName){
+    public String getStartingTurningDirection(String courseName){
         switch(courseName){
-            case("DizzyHighway") -> {
-                return "East";}
+            case("Dizzy Highway") -> {
+                return "clockwise";}
         }
-        return "EAST";
+        return "clockwise";
     }
     /**
      * Fügt ein Board von rechts an ein anderes Board an (funktioniert aktuell nur bei gleicher Länge)

@@ -4,11 +4,13 @@ import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.lib.Coordinate;
+import sep.view.lib.RCoordinate;
 import sep.view.json.game.SetStartingPointModel;
 import sep.view.viewcontroller.TileModifier;
 import sep.view.lib.EGamePhase;
 import sep.view.json.game.SelectedCardModel;
+import sep.view.json.ChatMsgModel;
+import sep.view.clientcontroller.EClientInformation;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.HBox;
@@ -16,13 +18,20 @@ import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.AnchorPane;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.scene.image.ImageView;
+import java.util.ArrayList;
 import java.util.Objects;
 import javafx.scene.control.ScrollPane;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
+import javafx.scene.layout.Priority;
+import javafx.scene.input.KeyCode;
 
 public class GameJFXController
 {
@@ -49,6 +58,11 @@ public class GameJFXController
     @FXML private AnchorPane gotRegisterCardSlot7;
     @FXML private AnchorPane gotRegisterCardSlot8;
     @FXML private AnchorPane gotRegisterCardSlot9;
+    @FXML private ScrollPane chatScrollPane;
+    @FXML private TextField chatInputTextField;
+
+    private VBox chatContainer;
+    private boolean showServerInfo = true;
 
     private int tileDimensions;
     private static final int resizeAmount = 10;
@@ -85,19 +99,71 @@ public class GameJFXController
     @FXML
     private void initialize()
     {
+        VBox.setVgrow(this.chatScrollPane, Priority.ALWAYS);
+
         this.courseScrollPane.setFitToWidth(true);
         this.courseScrollPane.setFitToHeight(true);
         this.courseScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         this.courseScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        this.courseScrollPane.widthProperty().addListener((obs, oldVal, newVal) ->
+        this.courseScrollPane.widthProperty().addListener((obs, val, t1) ->
         {
             // TODO Only update translations not the whole course.
             this.renderCourse();
             return;
         });
 
+        this.chatInputTextField.lengthProperty().addListener(new ChangeListener<Number>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            {
+                if (t1.intValue() > EGameState.MAX_CHAT_MESSAGE_LENGTH)
+                {
+                    chatInputTextField.setText(chatInputTextField.getText().substring(0, EGameState.MAX_CHAT_MESSAGE_LENGTH));
+                }
+
+                return;
+            }
+        });
+
+        this.setupInputActions();
+
         this.renderView();
+
+        // TODO Highly sketchy. Needs some testing.
+        PauseTransition p = new PauseTransition(new Duration(2_000));
+        p.setOnFinished(e ->
+        {
+            l.info("Scrolling view to center.");
+            this.courseScrollPane.setHvalue(0.5);
+            this.courseScrollPane.setVvalue(0.5);
+            return;
+        });
+        p.play();
+
+        this.initializeButtonActions();
+
+        this.chatContainer = new VBox();
+        this.chatContainer.setId("chat-scroll-pane-inner");
+        this.chatScrollPane.setContent(this.chatContainer);
+
+        return;
+    }
+
+    private void setupInputActions()
+    {
+        this.chatInputTextField.setOnKeyPressed(
+        (keyEvent ->
+        {
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.ENTER)
+            {
+                this.onSubmitChatMsg();
+            }
+
+            return;
+        })
+        );
 
         this.masterContainer.setOnKeyPressed(e ->
         {
@@ -120,234 +186,683 @@ public class GameJFXController
 
         });
 
-        // TODO Highly sketchy. Needs some testing.
-        PauseTransition p = new PauseTransition(new Duration(2_000));
-        p.setOnFinished(e ->
+        /* TODO We of course have to del these event listeners when we switch scenes. */
+        ViewSupervisor.getSceneController().getMasterScene().setOnKeyPressed(
+        (keyEvent ->
         {
-            l.info("Scrolling view to center.");
-            this.courseScrollPane.setHvalue(0.5);
-            this.courseScrollPane.setVvalue(0.5);
-            return;
-        });
-        p.play();
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT1 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD1)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot1Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot1Clicked();
+                }
 
-        this.initializeRegisterSlotButtons();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT2 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD2)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot2Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot2Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT3 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD3)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot3Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot3Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT4 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD4)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot4Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot4Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT5 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD5)
+            {
+                if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+                {
+                    this.onGotRegisterSlot5Clicked();
+                }
+                else
+                {
+                    this.onRegisterSlot5Clicked();
+                }
+
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT6 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD6)
+            {
+                this.onGotRegisterSlot6Clicked();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT7 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD7)
+            {
+                this.onGotRegisterSlot7Clicked();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT8 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD8)
+            {
+                this.onGotRegisterSlot8Clicked();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT9 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD9)
+            {
+                this.onGotRegisterSlot9Clicked();
+                return;
+            }
+
+            return;
+        })
+        );
+
 
         return;
     }
 
-    private void initializeRegisterSlotButtons()
+    // region Slot Action Methods
+
+    // region Register Slot Action Methods
+
+    private void onRegisterSlot1Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(0) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(0);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(0) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(0, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot2Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(1) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(1);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(1) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(1, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot3Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(2) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(2);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(2) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(2, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot4Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(3) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(3);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(3) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(3, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
+
+        return;
+    }
+
+    private void onRegisterSlot5Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
+        {
+            if (EGameState.INSTANCE.getRegister(4) == null)
+            {
+                return;
+            }
+
+            EGameState.INSTANCE.undoRegister(4);
+            this.renderHUDFooter();
+
+            new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getRegister(4) != null)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
+        {
+            return;
+        }
+
+        EGameState.INSTANCE.setRegister(4, this.gotRegisterSlotClicked);
+
+        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.renderHUDFooter();
+
+        new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
+
+        return;
+    }
+
+    // endregion Register Slot Action Methods
+
+    // region Got Register Slot Action Methods
+
+    private void onGotRegisterSlot1Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 0)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(0) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 0;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot2Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 1)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(1) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 1;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot3Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 2)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(2) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 2;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot4Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 3)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(3) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 3;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot5Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 4)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(4) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 4;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot6Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 5)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(5) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 5;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot7Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 6)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(6) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 6;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot8Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 7)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(7) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 7;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    private void onGotRegisterSlot9Clicked()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
+        {
+            return;
+        }
+
+        if (EGameState.INSTANCE.areRegistersFull())
+        {
+            l.debug("User tried to change one of their programming register slots, but they are already finalized.");
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            return;
+        }
+
+        if (this.gotRegisterSlotClicked == 8)
+        {
+            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            this.renderHUDFooter();
+            return;
+        }
+
+        if (EGameState.INSTANCE.getGotRegister(8) == null)
+        {
+            return;
+        }
+
+        this.gotRegisterSlotClicked = 8;
+        this.renderHUDFooter();
+
+        return;
+    }
+
+    // endregion Slot Action Methods
+
+    private void initializeButtonActions()
     {
 
         {
 
         this.registerSlot1.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(0) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(0);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(0) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(0, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(0, EGameState.INSTANCE.getRegister(0)).send();
-
+            this.onRegisterSlot1Clicked();
             return;
         });
 
         this.registerSlot2.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(1) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(1);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(1) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(1, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(1, EGameState.INSTANCE.getRegister(1)).send();
-
+            this.onRegisterSlot2Clicked();
             return;
         });
 
         this.registerSlot3.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(2) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(2);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(2) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(2, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(2, EGameState.INSTANCE.getRegister(2)).send();
-
+            this.onRegisterSlot3Clicked();
             return;
         });
 
         this.registerSlot4.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(3) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(3);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(3) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(3, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(3, EGameState.INSTANCE.getRegister(3)).send();
-
+            this.onRegisterSlot4Clicked();
             return;
         });
 
         this.registerSlot5.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
-            {
-                if (EGameState.INSTANCE.getRegister(4) == null)
-                {
-                    return;
-                }
-
-                EGameState.INSTANCE.undoRegister(4);
-                this.renderHUDFooter();
-
-                new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
-
-                return;
-            }
-
-            if (EGameState.INSTANCE.getRegister(4) != null)
-            {
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked) == null)
-            {
-                return;
-            }
-
-            EGameState.INSTANCE.setRegister(4, this.gotRegisterSlotClicked);
-
-            this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-            this.renderHUDFooter();
-
-            new SelectedCardModel(4, EGameState.INSTANCE.getRegister(4)).send();
-
+            this.onRegisterSlot5Clicked();
             return;
         });
 
@@ -357,228 +872,55 @@ public class GameJFXController
 
         this.gotRegisterCardSlot1.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 0)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(0) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 0;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot1Clicked();
             return;
         });
 
         this.gotRegisterCardSlot2.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 1)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(1) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 1;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot2Clicked();
             return;
         });
 
         this.gotRegisterCardSlot3.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 2)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(2) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 2;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot3Clicked();
             return;
         });
 
         this.gotRegisterCardSlot4.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 3)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(3) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 3;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot4Clicked();
             return;
         });
 
         this.gotRegisterCardSlot5.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 4)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(4) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 4;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot5Clicked();
             return;
         });
 
         this.gotRegisterCardSlot6.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 5)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(5) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 5;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot6Clicked();
             return;
         });
 
         this.gotRegisterCardSlot7.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 6)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(6) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 6;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot7Clicked();
             return;
         });
 
         this.gotRegisterCardSlot8.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 7)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-            if (EGameState.INSTANCE.getGotRegister(7) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 7;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot8Clicked();
             return;
         });
 
         this.gotRegisterCardSlot9.setOnMouseClicked(e ->
         {
-            if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
-            {
-                return;
-            }
-
-            if (this.gotRegisterSlotClicked == 8)
-            {
-                this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
-                this.renderHUDFooter();
-                return;
-            }
-
-
-            if (EGameState.INSTANCE.getGotRegister(8) == null)
-            {
-                return;
-            }
-
-            this.gotRegisterSlotClicked = 8;
-            this.renderHUDFooter();
-
+            this.onGotRegisterSlot9Clicked();
             return;
         });
 
@@ -586,6 +928,188 @@ public class GameJFXController
 
         return;
     }
+
+    // endregion Got Register Slot Action Methods
+
+    // region Chat
+
+    private void onSubmitChatMsg()
+    {
+        String token = this.getChatMsg();
+        this.chatInputTextField.clear();
+
+        if (this.isChatMsgACommand(token))
+        {
+            if (this.getChatCommand(token).isEmpty() || this.getChatCommand(token).isBlank())
+            {
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Type /h for help on commands.", false);
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("w"))
+            {
+                if (!token.contains("\""))
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+                int idxBSBegin = token.indexOf("\"");
+                String sub = token.substring(idxBSBegin + 1);
+                if (!sub.contains("\""))
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+                int idxBSEnd = sub.indexOf("\"");
+
+                String targetPlayer = token.substring(idxBSBegin + 1, idxBSBegin + idxBSEnd + 1);
+                if (targetPlayer.isEmpty() || targetPlayer.isBlank())
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+
+                String msgToWhisper;
+                try
+                {
+                    msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
+                }
+                catch (IndexOutOfBoundsException e)
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid message.", false);
+                    return;
+                }
+                if (msgToWhisper.isEmpty() || msgToWhisper.isBlank())
+                {
+                    return;
+                }
+
+                RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
+                if (target == null)
+                {
+                    this.addChatMsgToView(ChatMsgModel.CLIENT_ID, String.format("Player %s not found.", targetPlayer), false);
+                    return;
+                }
+
+                new ChatMsgModel(msgToWhisper, target.getPlayerID()).send();
+                if (EClientInformation.INSTANCE.getPlayerID() != target.getPlayerID())
+                {
+                    this.addChatMsgToView(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
+                }
+
+                l.debug("Whispering to {}.", targetPlayer);
+
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("h"))
+            {
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Commands:", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/h - Show this help.", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/w [\"player name\"] [msg] - Whisper to a player.", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/hide - Hide ServerInfos", false);
+                this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "/show - Show ServerInfos after again hide-command.", false);
+
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("hide"))
+            {
+                ArrayList<Node> serverInfo = new ArrayList<>();
+                for(Node node : chatContainer.getChildren()){
+                    if(node instanceof Label label){
+                        if(label.getStyleClass().contains("lobby-msg-server")){
+                            node.setVisible(false);
+                            serverInfo.add(node);
+                            l.debug("Line added to serverInfo");
+                        }
+                    }
+                }
+                chatContainer.getChildren().removeAll(serverInfo);
+                showServerInfo = false;
+                return;
+            }
+
+            if (this.getChatCommand(token).equals("show"))
+            {
+                if(showServerInfo){
+                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is already shown", false);
+                } else{
+                    showServerInfo = true;
+                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is shown again", false);
+                }
+                return;
+            }
+
+            this.addChatMsgToView(ChatMsgModel.CLIENT_ID, String.format("Unknown command: %s", this.getChatCommand(token)), false);
+
+            return;
+        }
+
+        if (!this.isChatMsgValid(token))
+        {
+            return;
+        }
+        new ChatMsgModel(token, ChatMsgModel.CHAT_MSG_BROADCAST).send();
+
+        return;
+    }
+
+    private void addChatMsgToView(int caller, String msg, boolean bIsPrivate)
+    {
+        if (caller == ChatMsgModel.SERVER_ID)
+        {
+            if(showServerInfo) {
+                Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
+                l.getStyleClass().add("lobby-msg-server");
+                l.setWrapText(true);
+                this.chatContainer.getChildren().add(l);
+
+                /* Kinda sketchy. But is there a better way? */
+                PauseTransition p = new PauseTransition(Duration.millis(15));
+                p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+                p.play();
+            }
+            return;
+
+        }
+
+        if (caller == ChatMsgModel.CLIENT_ID)
+        {
+            Label l = new Label(String.format("[%s] %s", ChatMsgModel.CLIENT_NAME, msg));
+            l.getStyleClass().add("lobby-msg-client");
+            l.setWrapText(true);
+            this.chatContainer.getChildren().add(l);
+
+            /* Kinda sketchy. But is there a better way? */
+            PauseTransition p = new PauseTransition(Duration.millis(15));
+            p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+            p.play();
+
+            return;
+        }
+
+        Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
+        if (bIsPrivate)
+        {
+            l.getStyleClass().add("lobby-msg-whisper");
+        }
+        else
+        {
+            l.getStyleClass().add("lobby-msg");
+        }
+        l.setWrapText(true);
+        this.chatContainer.getChildren().add(l);
+
+        /* Kinda sketchy. But is there a better way? */
+        PauseTransition p = new PauseTransition(Duration.millis(15));
+        p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
+        p.play();
+
+        return;
+    }
+
+    // endregion Chat
 
     // region Rendering
 
@@ -686,13 +1210,15 @@ public class GameJFXController
                 this.registerSlot1.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(0) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(0) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(0) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(0) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -704,13 +1230,15 @@ public class GameJFXController
                 this.registerSlot2.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(1) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(1) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(1) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(1) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -722,13 +1250,15 @@ public class GameJFXController
                 this.registerSlot3.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(2) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(2) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(2) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(2) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -740,13 +1270,15 @@ public class GameJFXController
                 this.registerSlot4.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(3) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(3) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(3) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(3) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -758,13 +1290,15 @@ public class GameJFXController
                 this.registerSlot5.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                        ? EGameState.INSTANCE.getRegister(4) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : EGameState.INSTANCE.getRegister(4) == null
-                            ? "register-slot-available"
-                            : "register-slot-disabled"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+                            ? EGameState.INSTANCE.getRegister(4) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : EGameState.INSTANCE.getRegister(4) == null
+                                ? "register-slot-available"
+                                : "register-slot-disabled"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -790,11 +1324,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot1.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(0) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(0) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -806,11 +1342,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot2.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(1) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(1) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -822,11 +1360,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot3.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(2) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(2) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -838,11 +1378,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot4.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(3) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(3) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -854,11 +1396,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot5.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(4) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(4) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -870,11 +1414,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot6.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(5) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(5) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -886,11 +1432,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot7.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(6) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(6) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -902,11 +1450,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot8.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(7) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(7) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -918,11 +1468,13 @@ public class GameJFXController
                 this.gotRegisterCardSlot9.getStyleClass()
                 .add(
                 EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? this.gotRegisterSlotClicked != idx
-                        ? EGameState.INSTANCE.getGotRegister(8) == null
-                            ? "register-slot-disabled"
-                            : "register-slot"
-                        : "register-slot-active"
+                    ? !EGameState.INSTANCE.areRegistersFull()
+                        ? this.gotRegisterSlotClicked != idx
+                            ? EGameState.INSTANCE.getGotRegister(8) == null
+                                ? "register-slot-disabled"
+                                : "register-slot"
+                            : "register-slot-active"
+                        : "register-slot-disabled"
                     : "register-slot-disabled"
                 );
                 break;
@@ -998,20 +1550,28 @@ public class GameJFXController
     private void renderPlayerInformationArea()
     {
         this.playerContainer.getChildren().clear();
+
         for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
             Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
             figureName.getStyleClass().add("player-box-text");
 
             Label playerName = new Label(rp.getPlayerName());
+            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                playerName.setText(String.format("%s (You)", rp.getPlayerName()));
+            }
             playerName.getStyleClass().add("player-box-text");
 
-            VBox v = new VBox(figureName, playerName);
+            Label energyCubes = new Label("Energy: " + rp.getEnergyCubes());
+            energyCubes.getStyleClass().add("player-box-text");
+
+            VBox v = new VBox(figureName, playerName, energyCubes);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
 
-
             this.playerContainer.getChildren().add(v);
+
             continue;
         }
 
@@ -1079,13 +1639,13 @@ public class GameJFXController
         return;
     }
 
-    public void renderOnPosition(AnchorPane AP, Coordinate c)
+    public void renderOnPosition(AnchorPane AP, RCoordinate c)
     {
         AP.getStyleClass().add("tile");
 
-        double xTranslation = c.getX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        double xTranslation = c.x() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
         AP.setTranslateX(this.centralXTranslation < 0 ? xTranslation : xTranslation + this.centralXTranslation);
-        AP.setTranslateY(c.getY() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
+        AP.setTranslateY(c.y() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
 
         if (!this.courseScrollPaneContent.getChildren().contains(AP))
         {
@@ -1132,7 +1692,7 @@ public class GameJFXController
                     AP.getChildren().add(iv);
                     continue;
                 }
-                this.renderOnPosition(AP, new Coordinate(i, j));
+                this.renderOnPosition(AP, new RCoordinate(i, j));
 
                 if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
                 {
@@ -1192,12 +1752,11 @@ public class GameJFXController
         return;
     }
 
-    // TODO Rotation of the robot
     /**
      * Updates player positions on the course view.
      * No re-renders must be done after this method.
      */
-    private void renderPlayerPositions()
+    private void renderPlayerTransforms()
     {
         for (RemotePlayer RP : EGameState.INSTANCE.getRemotePlayers())
         {
@@ -1213,7 +1772,7 @@ public class GameJFXController
                 continue;
             }
 
-            RP.getRobotView().setPosition(RP.getStartingPosition(), false);
+            RP.getRobotView().setPosition(RP.getStartingPosition(), true, false);
             RP.getRobotView().renderPosition();
 
             continue;
@@ -1230,7 +1789,7 @@ public class GameJFXController
     private void renderCourse()
     {
         this.renderCourseBoard();
-        this.renderPlayerPositions();
+        this.renderPlayerTransforms();
 
         return;
     }
@@ -1296,11 +1855,11 @@ public class GameJFXController
         return;
     }
 
-    public void onPlayerPositionUpdate()
+    public void onPlayerTransformUpdate()
     {
         Platform.runLater(() ->
         {
-            this.renderPlayerPositions();
+            this.renderPlayerTransforms();
             return;
         });
 
@@ -1318,6 +1877,17 @@ public class GameJFXController
         return;
     }
 
+    public void onChatMsgReceived(int sourceID, String msg, boolean bIsPrivate)
+    {
+        Platform.runLater(() ->
+        {
+            this.addChatMsgToView(sourceID, msg, bIsPrivate);
+            return;
+        });
+
+        return;
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters
@@ -1325,6 +1895,31 @@ public class GameJFXController
     public int getCurrentTileDimensions()
     {
         return this.tileDimensions;
+    }
+
+    private String getChatMsg()
+    {
+        return this.chatInputTextField.getText();
+    }
+
+    private boolean isChatMsgValid(String token)
+    {
+        return !token.isEmpty() && token.length() <= EGameState.MAX_CHAT_MESSAGE_LENGTH;
+    }
+
+    private boolean isChatMsgACommand(String token)
+    {
+        return token.startsWith(ChatMsgModel.COMMAND_PREFIX);
+    }
+
+    private String getChatCommand(String token)
+    {
+        if (!token.contains(" "))
+        {
+            return token.substring(1);
+        }
+
+        return token.substring(1, token.indexOf(" "));
     }
 
     // endregion Getters and Setters

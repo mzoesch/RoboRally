@@ -1,6 +1,6 @@
 package sep.view.json;
 
-import sep.view.lib.Coordinate;
+import sep.view.lib.RCoordinate;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -87,14 +87,19 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getInt("phase");
     }
 
-    public Coordinate getCoordinate() throws JSONException
+    public RCoordinate getCoordinate() throws JSONException
     {
-        return new Coordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
+        return new RCoordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
     }
 
     public String[] getCardsInHand() throws JSONException
     {
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").getString(i)).toArray(String[]::new);
+    }
+
+    public String[] getForcedCards() throws JSONException
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cards").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cards").getString(i)).toArray(String[]::new);
     }
 
     public String getErrorMessage()
@@ -111,4 +116,30 @@ public final class DefaultServerRequestParser
     {
         return this.request.getJSONObject("messageBody").getBoolean("filled");
     }
+
+    public String getRotation()
+    {
+        return this.request.getJSONObject("messageBody").getString("rotation");
+    }
+
+    public int getWinningPlayer(){ return this.request.getJSONObject("messageBody").getInt("clientID");}
+
+    public int getEnergyCount() { return this.request.getJSONObject("messageBody").getInt("count");
+    }
+
+    public JSONArray getActiveCards() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("activeCards");
+    }
+
+    public String getActiveCardFromIdx(final int idx) throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getString("card");
+    }
+
+    public int getPlayerIDFromActiveCardIdx(final int idx) throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getInt("clientID");
+    }
+
 }

@@ -1,5 +1,7 @@
 package sep.server.model.game.cards.damage;
 
+import sep.server.model.game.Player;
+
 public class SpamDamage extends ADamageCard {
     public SpamDamage(String cardType) {
         super(cardType);
@@ -7,5 +9,8 @@ public class SpamDamage extends ADamageCard {
     }
 
     @Override
-    public void playCard() {}
+    public void playCard(Player player, int currentRoundNumber)
+    {
+
+    }
 }

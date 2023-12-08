@@ -3,6 +3,9 @@ package sep.server.viewmodel;
 import sep.server.json.common.CurrentPlayerModel;
 import sep.server.json.game.activatingphase.ActivePhaseModel;
 import sep.server.json.game.StartingPointTakenModel;
+import sep.server.json.game.effects.GameFinishedModel;
+import sep.server.json.game.effects.MovementModel;
+import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.model.game.GameState;
 import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerAddedModel;
@@ -13,6 +16,12 @@ import sep.server.json.lobby.CourseSelectedModel;
 import sep.server.json.game.programmingphase.*;
 import sep.server.json.game.programmingphase.SelectionFinishedModel;
 import sep.server.model.game.EGamePhase;
+import sep.server.model.game.Tile;
+import sep.server.json.game.GameStartedModel;
+import sep.server.json.game.activatingphase.CardInfo;
+import sep.server.json.game.activatingphase.CurrentCardsModel;
+import sep.server.model.game.Player;
+import sep.server.model.game.cards.Card;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -284,7 +293,7 @@ public final class Session
 
             try
             {
-                Thread.sleep(5000);
+                Thread.sleep(5);
             }
             catch (InterruptedException e)
             {
@@ -307,18 +316,60 @@ public final class Session
         }
     }
 
-    public void handleCurrentPlayer(int playerID){
-        for(PlayerController pc : this.playerControllers){
+    public void broadcastCurrentPlayer(int playerID)
+    {
+        for(PlayerController pc : this.playerControllers)
+        {
             new CurrentPlayerModel(pc.getClientInstance(), playerID).send();
         }
+
+        return;
     }
 
-    public void handleActivePhase(EGamePhase phase){
-        for (PlayerController pc : playerControllers) {
+    public void broadcastNewGamePhase(EGamePhase phase)
+    {
+        for (PlayerController pc : this.playerControllers)
+        {
             new ActivePhaseModel(pc.getClientInstance(), phase.i).send();
         }
+
+        return;
     }
 
+    public void broadcastGameStart(ArrayList<ArrayList<Tile>> course)
+    {
+        for (PlayerController pc : this.playerControllers)
+        {
+            new GameStartedModel(pc.getClientInstance(), course).send();
+        }
+
+        return;
+    }
+
+    public void broadcastCurrentCards(final int register)
+    {
+        final CardInfo[] activeCards = new CardInfo[this.getGameState().getAuthGameMode().getPlayers().size()];
+        for (int i = 0; i < activeCards.length; i++)
+        {
+            for (Player p : this.getGameState().getAuthGameMode().getPlayers())
+            {
+                CardInfo ci = new CardInfo(p.getPlayerController().getPlayerID(), ( (Card) p.getCardByRegisterIndex(register) ).getCardType());
+                activeCards[i] = ci;
+
+                continue;
+            }
+
+            continue;
+        }
+
+        for (Player p : this.getGameState().getAuthGameMode().getPlayers())
+        {
+            new CurrentCardsModel(p.getPlayerController().getClientInstance(), activeCards).send();
+            continue;
+        }
+
+        return;
+    }
 
     // region Getters and Setters
 
@@ -392,7 +443,6 @@ public final class Session
         return true;
     }
 
-
     /**
      * Sends a set of hand cards to a specified player controller and notifies all players
      */
@@ -420,7 +470,6 @@ public final class Session
             shuffleCodingModel.send();
         }
     }
-
 
     /**
      * @param playerID The player ID of the player who made the selection
@@ -467,9 +516,43 @@ public final class Session
         }
     }
 
+    public void handlePlayerTurning(int playerID, String startingTurn) {
+        for (PlayerController pc : this.playerControllers) {
+            l.debug("Player " + playerID + " has turned: " + startingTurn);
+            PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
+            playerTurningModel.send();
+        }
+    }
 
+    public void handleGameFinished(int playerID){
+        l.debug("Sent GameFinished with winningPlayer: " + playerID);
+        for (PlayerController pc : this.playerControllers) {
+            GameFinishedModel gameFinishedModel = new GameFinishedModel(pc.getClientInstance(), playerID);
+            gameFinishedModel.send();
+        }
+    }
 
+    public void handleMovement(int playerID, int x, int y){
+        for (PlayerController pc : this.playerControllers) {
+            MovementModel movementModel = new MovementModel(pc.getClientInstance(), playerID, x, y);
+            movementModel.send();
+        }
+    }
 
+    public boolean haveAllPlayersFinishedProgramming()
+    {
+        for (PlayerController pc : this.playerControllers)
+        {
+            if (!pc.getPlayer().hasPlayerFinishedProgramming())
+            {
+                return false;
+            }
+
+            continue;
+        }
+
+        return true;
+    }
 
     // endregion Getters and Setters
 

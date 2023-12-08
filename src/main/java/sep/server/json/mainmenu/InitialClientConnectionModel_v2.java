@@ -6,10 +6,14 @@ import sep.server.model.EServerInformation;
 import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /** Handles the initial client server handshake. */
 public class InitialClientConnectionModel_v2
 {
+    private static final Logger l = LogManager.getLogger(InitialClientConnectionModel_v2.class);
+
     private final ClientInstance ci;
     private JSONObject response;
 
@@ -26,8 +30,6 @@ public class InitialClientConnectionModel_v2
         j.put("messageType", "HelloClient");
         j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", EServerInformation.PROTOCOL_VERSION)));
 
-//        System.out.printf(String.format("%s%n", j.toString(4)));
-
         try
         {
             ci.getBufferedWriter().write(j.toString());
@@ -36,8 +38,8 @@ public class InitialClientConnectionModel_v2
         }
         catch (IOException e)
         {
-            System.err.printf("[SERVER] Failed to send response to client%n");
-            System.err.printf("[SERVER] %s%n", e.getMessage());
+            l.fatal("Failed to send response to client.");
+            l.fatal(e.getMessage());
             return;
         }
 
@@ -49,7 +51,7 @@ public class InitialClientConnectionModel_v2
         String response = this.ci.waitForResponse();
         if (response == null)
         {
-            System.err.printf("[SERVER] Failed to receive response from client%n");
+            l.error("Failed to receive response from client");
             return;
         }
 
@@ -71,8 +73,8 @@ public class InitialClientConnectionModel_v2
         }
         catch (IOException e)
         {
-            System.err.printf("[SERVER] Failed to send response to client%n");
-            System.err.printf("[SERVER] %s%n", e.getMessage());
+            l.fatal("Failed to send response to client.");
+            l.fatal(e.getMessage());
             return;
         }
 
@@ -97,7 +99,7 @@ public class InitialClientConnectionModel_v2
             // Maybe we should check for legacy protocol versions in the future?
             if (!messageBody.getString("protocol").equals(String.format("Version %s", EServerInformation.PROTOCOL_VERSION)))
             {
-                System.err.println("[SERVER] Client protocol version is not compatible with server protocol version.");
+                l.fatal("Client protocol version is not compatible with server protocol version.");
                 return false;
             }
 
@@ -105,8 +107,8 @@ public class InitialClientConnectionModel_v2
         }
         catch (JSONException e)
         {
-            System.err.printf("[SERVER] Failed to parse response from client%n");
-            System.err.printf("[SERVER] %s%n", e.getMessage());
+            l.error("Failed to parse response from client");
+            l.error(e.getMessage());
             return false;
         }
 
@@ -125,10 +127,11 @@ public class InitialClientConnectionModel_v2
         }
         catch (JSONException e)
         {
-            System.err.printf("[SERVER] Failed to parse response from client%n");
-            System.err.printf("[SERVER] %s%n", e.getMessage());
+            l.error("Failed to parse response from client");
+            l.error(e.getMessage());
             return null;
         }
     }
 
 }
+

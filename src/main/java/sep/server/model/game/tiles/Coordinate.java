@@ -74,4 +74,10 @@ public class Coordinate{
     public void setLeftNeighbor(Coordinate leftNeighbor) {
         this.leftNeighbor = leftNeighbor;
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("(%d, %d)", this.xCoordinate, this.yCoordinate);
+    }
 }

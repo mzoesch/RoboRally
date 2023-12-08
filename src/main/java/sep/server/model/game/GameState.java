@@ -73,13 +73,8 @@ public class GameState
 
     public void setCourseName(String courseName)
     {
-        String name = courseName.trim();
-        this.courseName = name;
+        this.courseName = courseName;
         l.info("CourseName set to: " + courseName);
-    }
-
-    public void sendHandCards(Player player) {
-        session.sendHandCardsToPlayer(player.getPlayerController(), player.getPlayerHandAsStringArray());
     }
 
     public void sendShuffle(Player player){

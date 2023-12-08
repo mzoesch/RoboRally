@@ -132,3 +132,62 @@
 .tile-after:hover {
     -fx-background-color: rgba(176, 2, 2, 0.4);
 }
+
+#chat-container {
+    -fx-min-width: 350px;
+    -fx-min-height: 220px;
+    -fx-max-width: 350px;
+    -fx-max-height: 220px;
+    -fx-spacing: 8px;
+    -fxbackground: transparent;
+}
+
+#chat-scroll-pane {
+    -fx-border-radius: 0px;
+    -fx-border-width: 3px;
+    -fx-background: #c2c0c9;
+    -fx-background-color: #ffffffff;
+}
+
+#chat-scroll-pane-inner {
+    -fx-min-width: 320px;
+    -fx-max-width: 320px;
+    -fx-padding: 3px 3px 3px 3px;
+
+    -fx-background: #c2c0c9;
+}
+
+#chat-input-text-field {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: #f5f5f5ff;
+    -fx-background-color: #2b2a33ff;
+    -fx-border-color: #ffffff;
+}
+
+.lobby-msg-wrapper {
+    -fx-spacing: 8px;
+}
+
+.lobby-msg-whisper,
+.lobby-msg-server,
+.lobby-msg-client,
+.lobby-msg {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: #000000ff;
+    -fx-wrap-text: true;
+}
+
+.lobby-msg-whisper {
+    -fx-text-fill: #000000b2;
+}
+
+.lobby-msg-server {
+    -fx-text-fill: #a17800;
+}
+
+.lobby-msg-client {
+    -fx-text-fill: #0078a1;
+}
+

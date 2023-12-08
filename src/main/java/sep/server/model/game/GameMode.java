@@ -1,10 +1,6 @@
 package sep.server.model.game;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import sep.server.json.common.ErrorMsgModel;
-import sep.server.json.game.activatingphase.ActivePhaseModel;
-import sep.server.json.game.GameStartedModel;
 import sep.server.json.game.activatingphase.CardInfo;
 import sep.server.json.game.activatingphase.CurrentCardsModel;
 import sep.server.json.game.activatingphase.ReplaceCardModel;
@@ -21,6 +17,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import java.util.stream.Collectors;
 
 /**
  * The rules of the game are implemented here. It is a high-level manager object for one game and controls the
@@ -30,28 +29,37 @@ public class GameMode
 {
     private static final Logger l = LogManager.getLogger(Session.class);
 
+    public static final int STARTING_ENERGY = 5;
+    private static final int NEW_PROGRAMMING_CARDS = 9;
+    private static final int REGISTER_PHASE_COUNT = 5;
+
     private final Course course;
-    private EGamePhase gamePhase = EGamePhase.INVALID;
+    private final int availableCheckPoints;
     private final Session session;
+    private EGamePhase gamePhase;
 
-    ArrayList<Player> players;
-    Player currentPlayer; //aktuell nur in setup-phase benutzt
-    int currentRegister;
+    private final ArrayList<SpamDamage> spamCardDeck;
+    private final ArrayList<TrojanHorseDamage> trojanCardDeck;
+    private final ArrayList<VirusDamage> virusCardDeck;
+    private final ArrayList<WormDamage> wormDamageDeck;
 
-    int energyBank;
-    int availableCheckPoints;
-    ArrayList<SpamDamage> spamCardDeck;
-    ArrayList<TrojanHorseDamage> trojanCardDeck;
-    ArrayList<VirusDamage> virusCardDeck;
-    ArrayList<WormDamage> wormDamageDeck;
+    private final ArrayList<Player> players;
+    private Player curPlayerInRegistration;
+    /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
+    private int currentRegister;
+    /** @deprecated This is currently not initialized. Fix or remove. */
+    private int energyBank;
 
     public GameMode(String courseName, PlayerController[] playerControllers, Session session)
     {
         super();
 
+        l.debug("Starting game with the following course: {}", courseName);
+
         this.course = new Course(courseName);
-        this.gamePhase = EGamePhase.REGISTRATION;
+        this.availableCheckPoints = this.getAvailableCheckpoints(courseName);
         this.session = session;
+        this.gamePhase = EGamePhase.INVALID;
 
         DeckBuilder deckBuilder = new DeckBuilder();
         this.spamCardDeck = deckBuilder.buildSpamDeck();
@@ -59,42 +67,201 @@ public class GameMode
         this.virusCardDeck = deckBuilder.buildVirusDeck();
         this.wormDamageDeck = deckBuilder.buildWormDeck();
 
-        this.setAvailableCheckPoints(courseName);
-
-        this.players = new ArrayList<>();
-        for(PlayerController pc : playerControllers)
-        {
-            this.players.add(new Player(pc, this.course, this.session));
-            continue;
-        }
-
-        this.currentPlayer = players.get(0);
+        this.players = Arrays.stream(playerControllers).map(pc -> new Player(pc, this.course, this.session)).collect(Collectors.toCollection(ArrayList::new));
+        Arrays.stream(playerControllers).forEach(pc -> this.players.stream().filter(p -> p.getPlayerController() == pc).findFirst().ifPresent(pc::setPlayer));
+        this.curPlayerInRegistration = this.players.get(0);
         this.currentRegister = 0;
 
-        //Real methods
-        //send the built Course to all Clients
-        for (PlayerController pc : playerControllers) {
-            new GameStartedModel(pc.getClientInstance(), this.course.getCourse()).send();
-            continue;
-        }
-
-        this.session.handleActivePhase(this.gamePhase);
-        this.session.handleCurrentPlayer(this.currentPlayer.getPlayerController().getPlayerID());
+        this.handleNewPhase(EGamePhase.REGISTRATION);
 
         return;
     }
 
-    public ArrayList<Player> getPlayers() {
-        return players;
+    // region Game Phases
+
+    private void triggerProgrammingPhase()
+    {
+        for (Player p : players)
+        {
+            for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++)
+            {
+                if (p.getPlayerDeck().isEmpty())
+                {
+                    p.shuffleAndRefillDeck();
+                    this.session.getGameState().sendShuffle(p);
+                }
+                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+
+                continue;
+            }
+
+            this.session.sendHandCardsToPlayer(p.getPlayerController(), p.getPlayerHandAsStringArray());
+
+            continue;
+        }
+
+        l.debug("Programming Phase finished. All players have received their cards.");
+
+        return;
     }
 
-    public int getCurrentRegister() {
-        return currentRegister;
+    // region Activation Phase Helpers
+
+    /**
+     * The following method calculates the priorities for all players: First the distance from each robot to the
+     * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
+     */
+    private void determinePriorities()
+    {
+        l.debug("Determining priorities for all players. Found Priority Antenna at {}.", this.course.getPriorityAntennaCoordinate().toString());
+        final Coordinate antennaCoordinate = this.course.getPriorityAntennaCoordinate();
+
+        final int[] distances = new int[this.players.size()];
+        for (int i = 0; i < this.players.size(); i++)
+        {
+            Coordinate robotCoordinate = this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate();
+            distances[i] = Math.abs(antennaCoordinate.getXCoordinate() - robotCoordinate.getXCoordinate()) + Math.abs(antennaCoordinate.getYCoordinate() - robotCoordinate.getYCoordinate());
+            continue;
+        }
+
+        int currentPriority = this.players.size();
+        for (int j = 0; j < this.players.size(); j++)
+        {
+            int minDistance = Integer.MAX_VALUE;
+            int minIndex = -1;
+
+            for (int i = 0; i < distances.length; i++)
+            {
+                if (distances[i] < minDistance)
+                {
+                    minDistance = distances[i];
+                    minIndex = i;
+                }
+            }
+
+            if (minIndex != -1)
+            {
+                this.players.get(minIndex).setPriority(currentPriority);
+                currentPriority--;
+                distances[minIndex] = Integer.MAX_VALUE;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+    
+    public void sortPlayersByPriorityInDesc()
+    {
+        this.players.sort(Comparator.comparingInt(Player::getPriority).reversed());
+        return;
     }
 
-    public void setCurrentRegister(int currentRegister) {
-        this.currentRegister = currentRegister;
+    // endregion Activation Phase Helpers
+
+    private void triggerActivationPhase()
+    {
+        for (this.currentRegister = 0; this.currentRegister < GameMode.REGISTER_PHASE_COUNT; currentRegister++)
+        {
+            l.debug("Starting register phase {}.", this.currentRegister);
+
+            this.determinePriorities();
+            this.sortPlayersByPriorityInDesc();
+            this.session.broadcastCurrentCards(this.currentRegister);
+
+            for (Player p : this.players)
+            {
+                if (p.getRegisters()[this.currentRegister] != null)
+                {
+                    l.info("Player {} is playing card {}.", p.getPlayerController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
+                    p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
+                    continue;
+                }
+
+                l.warn("Player {} does not have a card in register {}.", p.getPlayerController().getPlayerID(), this.currentRegister);
+
+                continue;
+            }
+
+            this.activateConveyorBelts(2);
+            this.activateConveyorBelts(1);
+            this.activatePushPanels();
+            this.activateGears();
+            this.findLasers();
+            this.shootRobotLasers();
+            this.checkEnergySpaces();
+            this.checkCheckpoints();
+
+            continue;
+        }
+
+        this.endRound();
+
+        return;
     }
+
+    /**
+     * Interface for a new phase in the game. All phase updates should be called through this method.
+     *
+     * @param phase New phase to be set
+     */
+    public void handleNewPhase(EGamePhase phase)
+    {
+        l.info("Session [{}] is entering a new phase. From {} to {}.", this.session.getSessionID(), this.gamePhase, phase);
+
+        // Because the game screen in the client is not yet loaded at this point.
+        // Therefore, they will not be able to understand this request.
+        if (phase != EGamePhase.REGISTRATION)
+        {
+            this.session.broadcastNewGamePhase(phase);
+        }
+
+        switch (phase)
+        {
+            case REGISTRATION ->
+            {
+                this.gamePhase = EGamePhase.REGISTRATION;
+                this.session.broadcastGameStart(this.course.getCourse());
+                this.session.broadcastNewGamePhase(this.gamePhase);
+                /* The current player is the first player that joined the game. */
+                this.session.broadcastCurrentPlayer(this.curPlayerInRegistration.getPlayerController().getPlayerID());
+
+                return;
+            }
+
+            case UPGRADE ->
+            {
+                l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
+                this.handleNewPhase(EGamePhase.PROGRAMMING);
+                return;
+            }
+
+            case PROGRAMMING ->
+            {
+                this.gamePhase = EGamePhase.PROGRAMMING;
+                this.triggerProgrammingPhase();
+                return;
+            }
+
+            case ACTIVATION ->
+            {
+                this.gamePhase = EGamePhase.ACTIVATION;
+                this.triggerActivationPhase();
+                return;
+            }
+
+            default ->
+            {
+                this.gamePhase = EGamePhase.INVALID;
+                break;
+            }
+        }
+
+        return;
+    }
+
+    // endregion Game Phases
 
     /**
      * Methode zum Setzen eines StartingPoints. Wenn StartingPoint valide, wird dieser gesetzt.
@@ -108,29 +275,27 @@ public class GameMode
 
         if(ableToSetStartPoint(pc)){
 
-            int validation = currentPlayer.getPlayerRobot().validStartingPoint(x,y);
+            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
             if(validation == 1){
 
-                currentPlayer.getPlayerRobot().setStartingPoint(x,y);
+                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
                 l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
                 pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
-
-                setStartingDirection(pc);
+                pc.getSession().handlePlayerTurning(pc.getPlayerID(), course.getStartingTurningDirection());
 
                 if(startingPointSelectionFinished()){
                     //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
-                    this.gamePhase = EGamePhase.PROGRAMMING;
-                    pc.getSession().handleActivePhase(this.gamePhase);
-                    l.info("StartPhase has concluded. ProgrammingPhase has started");
-                    programmingPhase();
+
+                    l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
+                    this.handleNewPhase(EGamePhase.UPGRADE);
 
                 } else{
                     //sonst wird der nächste Spieler, der noch keinen Roboter gesetzt hat, ausgewählt
                     for(Player player : players){
                         if (player.getPlayerRobot().getCurrentTile() == null){
-                            currentPlayer = player;
+                            curPlayerInRegistration = player;
                             l.info("Now Player with ID: " + player.getPlayerController().getPlayerID() + "has to set StartingPoint");
-                            pc.getSession().handleCurrentPlayer(player.getPlayerController().getPlayerID());
+                            pc.getSession().broadcastCurrentPlayer(player.getPlayerController().getPlayerID());
                         }
                     }
                 }
@@ -145,38 +310,6 @@ public class GameMode
 
     }
 
-    /**
-     * Aktuell nur für DizzyHighway richtig!
-     * @param pc
-     */
-    public void setStartingDirection(PlayerController pc){
-        currentPlayer.getPlayerRobot().setDirection(course.getStartingDirection());
-        l.info("StartingRotation from PlayerID: " + pc.getPlayerID() + " set to: " + course.getStartingDirection());
-        pc.getSession().handlePlayerTurning(pc.getPlayerID(), "clockwise");
-    }
-
-    /**
-     * Checkt, ob setzen eines StartingPoints überhaupt möglich ist (Aufbauphase & Spieler ist an der Reihe).
-     * Gibt sonst entsprechende Fehlernachrichten aus
-     * @param pc Spieler, der StartingPoint setzen will
-     * @return true, wenn möglich; false, wenn nicht
-     */
-    public boolean ableToSetStartPoint(PlayerController pc) {
-        if (gamePhase != EGamePhase.REGISTRATION) {
-            l.debug("Unable to set StartPoint due to wrong GamePhase");
-            new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
-            return false;
-
-        } else if (pc.getPlayerID() != currentPlayer.getPlayerController().getPlayerID()) {
-            l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
-            new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
-            return false;
-
-        } else {
-            return true;
-        }
-    }
-
     public boolean startingPointSelectionFinished(){
         for(Player player : players){
             if(player.getPlayerRobot().getCurrentTile() == null){
@@ -184,37 +317,6 @@ public class GameMode
             }
         }
         return true;
-    }
-    public void setAvailableCheckPoints(String courseName) {
-        switch(courseName) {
-            case ("DizzyHighway") -> {
-                availableCheckPoints = 1;
-            }
-        }
-    }
-
-    public void programmingPhase() {
-        distributeCards(players);
-        selectCards(players);
-        discardAndDrawBlind(players);
-//        activationPhase();
-    }
-
-    public void distributeCards(ArrayList<Player> players) {
-        for (Player player : players) {
-            for (int i = 0; i < 9; i++) {
-                if (player.getPlayerDeck().isEmpty()) {
-                    player.shuffleAndRefillDeck();
-                    this.session.getGameState().sendShuffle(player);
-                }
-                IPlayableCard card = player.getPlayerDeck().remove(0);
-                player.getPlayerHand().add(card);
-            }
-            this.session.getGameState().sendHandCards(player);
-        }
-    }
-
-    public void selectCards(ArrayList<Player> players) {
     }
 
     /**
@@ -237,7 +339,7 @@ public class GameMode
         int index = 0;
 
         for (Player player : players) {
-            if (!player.checkRegisterStatus()) {
+            if (!player.hasPlayerFinishedProgramming()) {
                 playerIdWhoNotFinished[index++] = player.getPlayerController().getPlayerID();
             }
         }
@@ -246,113 +348,15 @@ public class GameMode
         }
 
         this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
+
+        //Ab hier test.
+
     }
 
     public void discardAndDrawBlind(ArrayList<Player> players) {
         for (Player player : players) {
             player.handleIncompleteProgramming();
         }
-    }
-
-
-
-    /**
-     * The following method handles the activation phase: It sends the corresponding JSON message.
-     * It iterates over the different registers and plays the current card for each player
-     * (players are sorted by priority). Once each player's card has been played the board
-     * elements activate and the robot lasers are shot.
-     */
-    public void activationPhase() {
-        for(Player player : players) {
-            new ActivePhaseModel(player.getPlayerController().getClientInstance(),
-                    3).send();
-        }
-
-        for(currentRegister=0; currentRegister < 5; currentRegister++) {
-            determinePriorities();
-            sortPlayersByPriority();
-            determineCurrentCards();
-            for(int j = 0; j < players.size(); currentRegister++) {
-                if(players.get(j).registers[currentRegister] != null) {
-                    players.get(j).registers[currentRegister].playCard();
-                }
-            }
-            activateConveyorBelts(2);
-            activateConveyorBelts(1);
-            activatePushPanels();
-            activateGears();
-            findLasers();
-            shootRobotLasers();
-            checkEnergySpaces();
-            checkCheckpoints();
-        }
-        endRound();
-    }
-
-    /**
-     * The following method calculates the priorities for all players: First the distance from each robot to the
-     * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
-     */
-    public void determinePriorities() {
-        Coordinate antennaCoordinate = new Coordinate(0,4); //StartA board
-        int maxPriority = players.size();
-        int currentPriority = maxPriority;
-        int[] distances = new int[players.size()];
-
-        for(int i = 0; i < players.size(); i++) {
-            Robot playerRobot = players.get(i).getPlayerRobot();
-            Coordinate robotCoordinate = playerRobot.getCurrentTile().getCoordinate();
-            distances[i] = Math.abs(antennaCoordinate.getXCoordinate() - robotCoordinate.getXCoordinate())
-                    + Math.abs(antennaCoordinate.getYCoordinate() - robotCoordinate.getYCoordinate());
-        }
-
-        for(int j = 0; j < maxPriority; j++) {
-            int minDistance = Integer.MAX_VALUE;
-            int minIndex = -1;
-
-            for(int i = 0; i < distances.length; i++) {
-                if(distances[i] < minDistance) {
-                    minDistance = distances[i];
-                    minIndex = i;
-                }
-            }
-
-            if(minIndex != -1) {
-                players.get(minIndex).setPriority(currentPriority);
-                currentPriority--;
-                distances[minIndex] = Integer.MAX_VALUE;
-            }
-        }
-
-    }
-
-    /**
-     * The following method sorts all players from highest to lowest priority.
-     */
-    public void sortPlayersByPriority() {
-        players.sort(Comparator.comparingInt(Player::getPriority).reversed());
-    }
-
-    /**
-     * The following method takes the currently active card (type as String)
-     * and the player ID for each player, saves them in an array activeCards and
-     * sends it as JSON object to all clients.
-     */
-    public void determineCurrentCards() {
-        CardInfo[] activeCards = new CardInfo[players.size()];
-        for(int i = 0; i<activeCards.length; i++) {
-            for(Player player : players) {
-                String card = ((Card) player.getCardInRegister(currentRegister)).getCardType();
-                CardInfo cardInfo = new CardInfo(player.getPlayerController().getPlayerID(), card);
-                activeCards[i] = cardInfo;
-            }
-        }
-
-        for(Player player : players) {
-            new CurrentCardsModel(player.getPlayerController().getClientInstance(),
-                    activeCards).send();
-        }
-
     }
 
     /**
@@ -721,7 +725,7 @@ public class GameMode
      * @param card card that will be added instead
      */
     public void replaceCardInRegister(Player player, IPlayableCard card) {
-        player.getDiscardPile().add(player.getCardInRegister(currentRegister));
+        player.getDiscardPile().add(player.getCardByRegisterIndex(currentRegister));
         player.getRegisters()[currentRegister] = null;
 
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
@@ -762,5 +766,72 @@ public class GameMode
         }
         return playerControllers;
     }
+
+
+    // region Getters and Setters
+
+    public ArrayList<Player> getPlayers()
+    {
+        return this.players;
+    }
+
+    public ArrayList<SpamDamage> getSpamCardDeck()
+    {
+        return spamCardDeck;
+    }
+
+    /**
+     * Checkt, ob setzen eines StartingPoints überhaupt möglich ist (Aufbauphase & Spieler ist an der Reihe).
+     * Gibt sonst entsprechende Fehlernachrichten aus
+     * @param pc Spieler, der StartingPoint setzen will
+     * @return true, wenn möglich; false, wenn nicht
+     */
+    public boolean ableToSetStartPoint(PlayerController pc) {
+        if (gamePhase != EGamePhase.REGISTRATION) {
+            l.debug("Unable to set StartPoint due to wrong GamePhase");
+            new ErrorMsgModel(pc.getClientInstance(), "Wrong Gamephase");
+            return false;
+
+        } else if (pc.getPlayerID() != curPlayerInRegistration.getPlayerController().getPlayerID()) {
+            l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
+            new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            return false;
+
+        } else {
+            return true;
+        }
+    }
+
+    public ArrayList<SpamDamage> getSpamDeck()
+    {
+        return spamCardDeck;
+    }
+
+    public ArrayList<TrojanHorseDamage> getTrojanDeck()
+    {
+        return trojanCardDeck;
+    }
+
+    public ArrayList<VirusDamage> getVirusDeck()
+    {
+        return virusCardDeck;
+    }
+
+    public ArrayList<WormDamage> getWormDeck()
+    {
+        return wormDamageDeck;
+    }
+
+    public int getAvailableCheckpoints(final String courseName)
+    {
+        if (courseName.equals("DizzyHighway"))
+        {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    // endregion Getters and Setters
 
 }

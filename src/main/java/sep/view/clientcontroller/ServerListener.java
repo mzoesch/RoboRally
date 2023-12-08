@@ -1,6 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.DefaultServerRequestParser;
+import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
 
@@ -8,13 +9,14 @@ import java.io.IOException;
 import java.net.Socket;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -42,30 +44,10 @@ public class ServerListener implements Runnable
         return;
     }
 
-    public static void closeSocket(BufferedWriter bufferedWriter)
+    public static void closeSocket()
     {
-        if (bufferedWriter == null)
-        {
-            return;
-        }
-
-        // TODO ALL DEPRECATED PLEASE REMOVE IF WE KNOW HOW TO DISCONNECT FROM SERVER!
-        //      This is not to the norm of Protocol v0.1!
-        try
-        {
-            bufferedWriter.write((char) ServerListener.ESCAPE_CHARACTER);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        }
-        catch (IOException e)
-        {
-            l.error("Failed to send escape character.");
-            EClientInformation.INSTANCE.setServerListener(null);
-            return;
-        }
-
-        l.debug("Send closing connection request to server.");
-        EClientInformation.INSTANCE.setServerListener(null);
+        EClientInformation.INSTANCE.closeSocket();
+        EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
 
         l.info("Client disconnected from server.");
 
@@ -80,21 +62,24 @@ public class ServerListener implements Runnable
             while (true)
             {
                 // If the server closed the connection in an orderly way, we will receive -1;
-                int escapeCharacter = this.bufferedReader.read();
+                final int escapeCharacter = this.bufferedReader.read();
                 if (escapeCharacter == -1)
                 {
                     GameInstance.handleServerDisconnect();
                     return;
                 }
 
+                final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+
                 try
                 {
-                    this.parseJSONRequestFromServer(new DefaultServerRequestParser(new JSONObject(String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine()))));
+                    this.parseJSONRequestFromServer(new DefaultServerRequestParser(new JSONObject(r)));
                 }
                 catch (JSONException e)
                 {
                     l.warn("Failed to parse JSON request from server. Ignoring.");
                     l.warn(e.getMessage());
+                    l.warn(r);
                     continue;
                 }
 
@@ -164,6 +149,7 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* The server notifies the client about the nwe selected map. */
         if (Objects.equals(dsrp.getType_v2(), "MapSelected"))
         {
             l.debug("Received course selected from server. Selected course: {}.", dsrp.getCourseName() == null || dsrp.getCourseName().isEmpty() ? "none" : dsrp.getCourseName());
@@ -192,6 +178,8 @@ public class ServerListener implements Runnable
         {
             l.debug("Received current player update. New current player: {}.", dsrp.getPlayerID());
             EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
+            String info = String.format("Player %s is now current Player", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             return;
         }
 
@@ -203,6 +191,7 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
             l.debug("Received card played from server.");
+            //TODO Handling of played Card?
             return;
         }
 
@@ -210,7 +199,16 @@ public class ServerListener implements Runnable
         {
             l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
-            ViewSupervisor.updatePlayerPosition();
+            ViewSupervisor.updatePlayerTransforms();
+            String info = String.format("Player %s is has selected a starting Point", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
+            l.debug("Player {} turned {}.", dsrp.getPlayerID(), dsrp.getRotation());
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().addRotation(dsrp.getRotation());
+            ViewSupervisor.updatePlayerTransforms();
             return;
         }
 
@@ -223,13 +221,16 @@ public class ServerListener implements Runnable
             return;
         }
 
+        /* If one client has finished selecting their programming cards. */
         if (Objects.equals(dsrp.getType_v2(), "SelectionFinished")) {
-            l.debug("Received selection finished from client.");
+            l.debug("Player {} finished their selection.", dsrp.getPlayerID());
+            EGameState.INSTANCE.setSelectionFinished(dsrp.getPlayerID());
             return;
         }
 
+        /* If this client's hand cards are being forced updated. */
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
-            l.debug("Player {}'s hand cards are updated.", dsrp.getPlayerID());
+            l.debug("Player {} has not submitted their selection in time. Received new cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(dsrp.getForcedCards())));
             return;
         }
 
@@ -240,16 +241,22 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
+            String info = String.format("The deck of player %s has been shuffled", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received shuffle coding from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerEnded")) {
+            String info = String.format("Timer has ended");
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer ended from server.");
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
+            String info = String.format("Timer has started");
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer started from server.");
             return;
         }
@@ -267,8 +274,13 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "CurrentCards")) {
-            l.debug("Received your current cards from server.");
+        /* The current cards in a register played by all clients. */
+        if (Objects.equals(dsrp.getType_v2(), "CurrentCards"))
+        {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(String.format("In this register %d cards were played (", dsrp.getActiveCards().length()));
+            sb.append(IntStream.range(0, dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", dsrp.getPlayerIDFromActiveCardIdx(i), dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
+            l.debug(sb.append(").").toString());
             return;
         }
 
@@ -288,22 +300,22 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Energy")) {
-            l.debug("Received energy from server.");
+            l.debug("Player {} EnergyCubeAmmount has been set to {}", dsrp.getPlayerID(), dsrp.getEnergyCount());
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setEnergy(dsrp.getEnergyCount());
+
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "GameFinished")) {
             l.debug("Received game finished from server.");
+            EGameState.INSTANCE.determineWinningPlayer(dsrp.getWinningPlayer());
+            ViewSupervisor.getSceneController().renderNewScreen(SceneController.END_SCENE_ID, SceneController.PATH_TO_END_SCENE, true);
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Movement")) {
-            l.debug("Received movement from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
-            l.debug("Received player turning from server.");
+            l.debug("Player {} has moved to {},{}", dsrp.getPlayerID(), dsrp.getCoordinate().x(), dsrp.getCoordinate().y());
+            EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getRobotView().setPosition(dsrp.getCoordinate(), false, true);
             return;
         }
 
@@ -315,6 +327,20 @@ public class ServerListener implements Runnable
         if (Objects.equals(dsrp.getType_v2(), "Reboot")) {
             l.debug("Received reboot from server.");
             return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "ConnectionUpdate")) {
+            l.debug("Received connection update from server.");
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "DrawDamage")) {
+            l.debug("Received draw a damage card from server.");
+            return;
+        }
+
+        if (Objects.equals(dsrp.getType_v2(), "SelectedDamage")) {
+            l.debug("Damage was selected.");
         }
 
         l.warn("Received unknown request from server. Ignoring.");
