@@ -10,6 +10,11 @@ public class TrojanHorseDamage extends ADamageCard {
     @Override
     public void playCard(Player player, int currentRoundNumber)
     {
-
+        if(!player.getGameMode().getSpamDeck().isEmpty()) {
+            player.getDiscardPile().add(player.getGameMode().getSpamDeck().remove(0));
+        }
+        if(!player.getGameMode().getSpamDeck().isEmpty()) {
+            player.getDiscardPile().add(player.getGameMode().getSpamDeck().remove(0));
+        }
     }
 }
