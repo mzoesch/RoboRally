@@ -549,7 +549,7 @@ public class GameMode
 
             l.debug("Activation Phase ended successfully.");
 
-            // TODO: Start next phase
+            this.handleNewPhase(EGamePhase.UPGRADE);
 
             return;
         });
