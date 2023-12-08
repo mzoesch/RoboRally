@@ -81,6 +81,92 @@ public class GameMode
 
     // region Game Phases
 
+    // region Registration Phase Helpers
+
+    private boolean startingPointSelectionFinished(){
+        for(Player player : players){
+            if(player.getPlayerRobot().getCurrentTile() == null){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Methode zum Setzen eines StartingPoints. Wenn StartingPoint valide, wird dieser gesetzt.
+     * Danach wird der nächste Spieler zum Wählen eines StartingPoints ausgewählt oder, wenn nicht möglich
+     * die Aufbauphase beendet
+     * @param pc Spieler, der StartingPoint setzen will
+     * @param x xKoordinate des StartingPoints
+     * @param y yKoordinate des StartingPoints
+     */
+    public void setStartingPoint(PlayerController pc, int x, int y){
+
+        if(ableToSetStartPoint(pc)){
+
+            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
+            if(validation == 1){
+
+                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
+                l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
+                pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
+                pc.getSession().handlePlayerTurning(pc.getPlayerID(), course.getStartingTurningDirection());
+
+                if(startingPointSelectionFinished()){
+                    //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
+
+                    l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
+                    this.handleNewPhase(EGamePhase.UPGRADE);
+
+                } else{
+                    //sonst wird der nächste Spieler, der noch keinen Roboter gesetzt hat, ausgewählt
+                    for(Player player : players){
+                        if (player.getPlayerRobot().getCurrentTile() == null){
+                            curPlayerInRegistration = player;
+                            l.info("Now Player with ID: " + player.getPlayerController().getPlayerID() + "has to set StartingPoint");
+                            pc.getSession().broadcastCurrentPlayer(player.getPlayerController().getPlayerID());
+                        }
+                    }
+                }
+            }
+            else{
+                //Antwort, dass es nicht geklappt hat. (Soll hier konkrete Message an Client?
+                l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
+                new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
+            }
+
+        }
+
+    }
+
+    // endregion Registration Phase Helpers
+
+    private void triggerRegistrationPhase()
+    {
+        this.session.broadcastGameStart(this.course.getCourse());
+
+        // TODO WARNING: This must stand here because the {@link Session#broadcastGameStart(ArrayList<ArrayList<Tile>>)}
+        //               method will instantiate the game screen of the client. Therefore, the client will not be able
+        //               to understand the following request if it is sent before the game screen is loaded. We may
+        //               want to fix this on the client side!
+        this.session.broadcastNewGamePhase(this.gamePhase);
+
+        /* The current player is the first player that joined the game. */
+        this.session.broadcastCurrentPlayer(this.curPlayerInRegistration.getPlayerController().getPlayerID());
+
+        l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
+
+        return;
+    }
+
+    private void triggerUpgradePhase()
+    {
+        l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
+        this.handleNewPhase(EGamePhase.PROGRAMMING);
+
+        return;
+    }
+
     private void triggerProgrammingPhase()
     {
         for (Player p : players)
@@ -102,7 +188,7 @@ public class GameMode
             continue;
         }
 
-        l.debug("Programming Phase finished. All players have received their cards.");
+        l.debug("Programming Phase started. All players have received their cards. Waiting for players to set their cards . . .");
 
         return;
     }
@@ -115,8 +201,8 @@ public class GameMode
      */
     private void determinePriorities()
     {
-        l.debug("Determining priorities for all players. Found Priority Antenna at {}.", this.course.getPriorityAntennaCoordinate().toString());
         final Coordinate antennaCoordinate = this.course.getPriorityAntennaCoordinate();
+        l.debug("Determining priorities for all players. Found Priority Antenna at {}.", antennaCoordinate.toString());
 
         final int[] distances = new int[this.players.size()];
         for (int i = 0; i < this.players.size(); i++)
@@ -139,6 +225,8 @@ public class GameMode
                     minDistance = distances[i];
                     minIndex = i;
                 }
+
+                continue;
             }
 
             if (minIndex != -1)
@@ -154,11 +242,241 @@ public class GameMode
         return;
     }
     
-    public void sortPlayersByPriorityInDesc()
+    private void sortPlayersByPriorityInDesc()
     {
         this.players.sort(Comparator.comparingInt(Player::getPriority).reversed());
         return;
     }
+
+    /**
+     * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
+     * The robot is moved in the outcoming flow direction of the conveyor belt.
+     * @param speed determines the amount of fields the robot is moved
+     */
+    private void activateConveyorBelts(int speed) {
+        for (Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                    int beltSpeed = conveyorBelt.getSpeed();
+
+                    if (beltSpeed == speed) {
+                        Coordinate oldCoordinate = currentTile.getCoordinate();
+                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                        Coordinate newCoordinate = null;
+
+                        for(int i = 0; i<speed; i++) {
+                            newCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                            curvedArrowCheck(player, newCoordinate);
+                        }
+
+                        if (!course.isCoordinateWithinBounds(newCoordinate)) {
+                            player.getPlayerRobot().reboot();
+                            return;
+                        }
+
+                        if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
+                            return;
+                        }
+
+                        course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+
+                        for(Player player1 : players) {
+                            new MovementModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID(),
+                                    newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method handles the activation of push panels and sends the corresponding JSON messages.
+     * The robot is moved to the next field in the direction of the panel's pushOrientation.
+     */
+    private void activatePushPanels() {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof PushPanel pushPanel) {
+                    int[] activateAtRegister = pushPanel.getActivateAtRegister();
+
+                    for(int register : activateAtRegister) {
+                        if(register == currentRegister) {
+                            String pushOrientation = pushPanel.getOrientation();
+                            Coordinate oldCoordinate = currentTile.getCoordinate();
+
+                            Coordinate newCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
+
+                            if (!course.isCoordinateWithinBounds(newCoordinate)) {
+                                player.getPlayerRobot().reboot();
+                                return;
+                            }
+
+                            if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
+                                return;
+                            }
+
+                            course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+
+                            for(Player player1 : players) {
+                                new MovementModel(player1.getPlayerController().getClientInstance(),
+                                        player.getPlayerController().getPlayerID(),
+                                        newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method handles the activation of gears and sends the corresponding JSON messages.
+     * The robot is rotated 90 degrees into the gear's rotational direction.
+     */
+    private void activateGears() {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof Gear gear) {
+                    String rotationalDirection = gear.getRotationalDirection();
+                    String robotDirection = player.getPlayerRobot().getDirection();
+                    String newDirection = robotDirection;
+                    if(Objects.equals(rotationalDirection, "counterclockwise")) {
+                        switch (robotDirection) {
+                            case "NORTH" -> newDirection = "WEST";
+                            case "EAST" -> newDirection = "NORTH";
+                            case "SOUTH" -> newDirection = "EAST";
+                            case "WEST" -> newDirection = "SOUTH";
+                        }
+                    } else if(Objects.equals(rotationalDirection, "clockwise")) {
+                        switch (robotDirection) {
+                            case "NORTH" -> newDirection = "EAST";
+                            case "EAST" -> newDirection = "SOUTH";
+                            case "SOUTH" -> newDirection = "WEST";
+                            case "WEST" -> newDirection = "NORTH";
+                        }
+                    }
+
+                    player.getPlayerRobot().setDirection(newDirection);
+
+                    for(Player player1 : players) {
+                        new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
+                                player.getPlayerController().getPlayerID(), rotationalDirection).send();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method checks the course for lasers and passes the respective tile including its field types to
+     * the handleLaserByDirection method.
+     */
+    private void findLasers() {
+        for (ArrayList<Tile> row : course.getCourse()) {
+            for (Tile tile : row) {
+                for (FieldType fieldType : tile.getFieldTypes()) {
+                    if (fieldType instanceof Laser) {
+                        handleLaserByDirection((Laser) fieldType, tile);
+                    }
+                }
+            }
+        }
+    }
+
+    private void shootRobotLasers() {}
+
+    /**
+     * The following method checks if any robot ended their register on an energy space, if
+     * they receive an energy cube, and sends the corresponding JSON messages.
+     */
+    private void checkEnergySpaces() {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof EnergySpace energySpace) {
+                    int availableEnergy = energySpace.getAvailableEnergy();
+                    int currentEnergy = player.getEnergyCollected();
+                    if(currentRegister == 5) {
+                        if(energyBank > 0) {
+                            player.setEnergyCollected(currentEnergy + 1);
+                            energyBank -= 1;
+                        }
+                    } else if(availableEnergy > 0) {
+                        player.setEnergyCollected(currentEnergy + 1);
+                    }
+
+                    for(Player player1 : players) {
+                        new EnergyModel(player1.getPlayerController().getClientInstance(),
+                                player.getPlayerController().getPlayerID(),
+                                player.getEnergyCollected(),
+                                "EnergySpace").send();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method checks if any robot has reached a checkpoint. If yes, the method
+     * checks if it is the correct checkpoint according to numerical order. If it is the last
+     * checkpoint it ends the game. The method also sends the corresponding JSON message.
+     */
+    private void checkCheckpoints() {
+        for(Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if(fieldType instanceof CheckPoint checkPoint) {
+                    int checkpointNumber = checkPoint.getCheckpointNumber();
+                    if(player.getCheckpointsCollected() == checkpointNumber-1) {
+                        player.setCheckpointsCollected(player.getCheckpointsCollected()+1);
+                    }
+
+                    for(Player player1 : players) {
+                        new CheckPointReachedModel(player1.getPlayerController().getClientInstance(),
+                                player.getPlayerController().getPlayerID(),
+                                player.getCheckpointsCollected()).send();
+                    }
+
+                    if(player.getCheckpointsCollected() == availableCheckPoints) {
+                        endGame();
+                        for(Player player1 : players) {
+                            new GameFinishedModel(player1.getPlayerController().getClientInstance(),
+                                    player.getPlayerController().getPlayerID()).send();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The following method is called whenever the activation phase is ended. It empties the registers
+     * and calls a method that refills the player deck.
+     */
+    public void endRound() {
+        for(int i = 0; i<5; i++) {
+            for(Player player : players) {
+                player.getDiscardPile().add(player.getRegisters()[i]);
+                player.getRegisters()[i] = null;
+            }
+        }
+
+        for(Player player : players) {
+            player.shuffleAndRefillDeck();
+        }
+    }
+
+    public void endGame() {}
 
     // endregion Activation Phase Helpers
 
@@ -224,18 +542,14 @@ public class GameMode
             case REGISTRATION ->
             {
                 this.gamePhase = EGamePhase.REGISTRATION;
-                this.session.broadcastGameStart(this.course.getCourse());
-                this.session.broadcastNewGamePhase(this.gamePhase);
-                /* The current player is the first player that joined the game. */
-                this.session.broadcastCurrentPlayer(this.curPlayerInRegistration.getPlayerController().getPlayerID());
-
+                this.triggerRegistrationPhase();
                 return;
             }
 
             case UPGRADE ->
             {
-                l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
-                this.handleNewPhase(EGamePhase.PROGRAMMING);
+                this.gamePhase = EGamePhase.UPGRADE;
+                this.triggerUpgradePhase();
                 return;
             }
 
@@ -264,62 +578,6 @@ public class GameMode
     }
 
     // endregion Game Phases
-
-    /**
-     * Methode zum Setzen eines StartingPoints. Wenn StartingPoint valide, wird dieser gesetzt.
-     * Danach wird der nächste Spieler zum Wählen eines StartingPoints ausgewählt oder, wenn nicht möglich
-     * die Aufbauphase beendet
-     * @param pc Spieler, der StartingPoint setzen will
-     * @param x xKoordinate des StartingPoints
-     * @param y yKoordinate des StartingPoints
-     */
-    public void setStartingPoint(PlayerController pc, int x, int y){
-
-        if(ableToSetStartPoint(pc)){
-
-            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
-            if(validation == 1){
-
-                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
-                l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
-                pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
-                pc.getSession().handlePlayerTurning(pc.getPlayerID(), course.getStartingTurningDirection());
-
-                if(startingPointSelectionFinished()){
-                    //Wenn alle Spieler ihre StartPosition gesetzt haben, beginnt die ProgrammingPhase
-
-                    l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
-                    this.handleNewPhase(EGamePhase.UPGRADE);
-
-                } else{
-                    //sonst wird der nächste Spieler, der noch keinen Roboter gesetzt hat, ausgewählt
-                    for(Player player : players){
-                        if (player.getPlayerRobot().getCurrentTile() == null){
-                            curPlayerInRegistration = player;
-                            l.info("Now Player with ID: " + player.getPlayerController().getPlayerID() + "has to set StartingPoint");
-                            pc.getSession().broadcastCurrentPlayer(player.getPlayerController().getPlayerID());
-                        }
-                    }
-                }
-            }
-            else{
-                //Antwort, dass es nicht geklappt hat. (Soll hier konkrete Message an Client?
-                l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
-                new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
-            }
-
-        }
-
-    }
-
-    public boolean startingPointSelectionFinished(){
-        for(Player player : players){
-            if(player.getPlayerRobot().getCurrentTile() == null){
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
@@ -375,51 +633,6 @@ public class GameMode
     }
 
     /**
-     * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
-     * The robot is moved in the outcoming flow direction of the conveyor belt.
-     * @param speed determines the amount of fields the robot is moved
-     */
-    private void activateConveyorBelts(int speed) {
-        for (Player player : players) {
-            Tile currentTile = player.getPlayerRobot().getCurrentTile();
-
-            for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if (fieldType instanceof ConveyorBelt conveyorBelt) {
-                    int beltSpeed = conveyorBelt.getSpeed();
-
-                    if (beltSpeed == speed) {
-                        Coordinate oldCoordinate = currentTile.getCoordinate();
-                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                        Coordinate newCoordinate = null;
-
-                        for(int i = 0; i<speed; i++) {
-                            newCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
-                            curvedArrowCheck(player, newCoordinate);
-                        }
-
-                        if (!course.isCoordinateWithinBounds(newCoordinate)) {
-                            player.getPlayerRobot().reboot();
-                            return;
-                        }
-
-                        if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
-                            return;
-                        }
-
-                        course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
-
-                        for(Player player1 : players) {
-                            new MovementModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID(),
-                                    newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * The following method is required during the conveyor belt activation period.
      * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
      * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
@@ -459,104 +672,6 @@ public class GameMode
                                     player.getPlayerController().getPlayerID(),
                                     "counterclockwise").send();
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The following method handles the activation of push panels and sends the corresponding JSON messages.
-     * The robot is moved to the next field in the direction of the panel's pushOrientation.
-     */
-    public void activatePushPanels() {
-        for(Player player : players) {
-            Tile currentTile = player.getPlayerRobot().getCurrentTile();
-
-            for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof PushPanel pushPanel) {
-                    int[] activateAtRegister = pushPanel.getActivateAtRegister();
-
-                    for(int register : activateAtRegister) {
-                        if(register == currentRegister) {
-                            String pushOrientation = pushPanel.getOrientation();
-                            Coordinate oldCoordinate = currentTile.getCoordinate();
-
-                            Coordinate newCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
-
-                            if (!course.isCoordinateWithinBounds(newCoordinate)) {
-                                player.getPlayerRobot().reboot();
-                                return;
-                            }
-
-                            if (!player.getPlayerRobot().isMovable(course.getTileByCoordinate(newCoordinate))) {
-                                return;
-                            }
-
-                            course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
-
-                            for(Player player1 : players) {
-                                new MovementModel(player1.getPlayerController().getClientInstance(),
-                                        player.getPlayerController().getPlayerID(),
-                                        newCoordinate.getXCoordinate(), newCoordinate.getYCoordinate()).send();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The following method handles the activation of gears and sends the corresponding JSON messages.
-     * The robot is rotated 90 degrees into the gear's rotational direction.
-     */
-    public void activateGears() {
-        for(Player player : players) {
-            Tile currentTile = player.getPlayerRobot().getCurrentTile();
-
-            for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof Gear gear) {
-                    String rotationalDirection = gear.getRotationalDirection();
-                    String robotDirection = player.getPlayerRobot().getDirection();
-                    String newDirection = robotDirection;
-                    if(Objects.equals(rotationalDirection, "counterclockwise")) {
-                        switch (robotDirection) {
-                            case "NORTH" -> newDirection = "WEST";
-                            case "EAST" -> newDirection = "NORTH";
-                            case "SOUTH" -> newDirection = "EAST";
-                            case "WEST" -> newDirection = "SOUTH";
-                        }
-                    } else if(Objects.equals(rotationalDirection, "clockwise")) {
-                        switch (robotDirection) {
-                            case "NORTH" -> newDirection = "EAST";
-                            case "EAST" -> newDirection = "SOUTH";
-                            case "SOUTH" -> newDirection = "WEST";
-                            case "WEST" -> newDirection = "NORTH";
-                        }
-                    }
-
-                    player.getPlayerRobot().setDirection(newDirection);
-
-                    for(Player player1 : players) {
-                        new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(), rotationalDirection).send();
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The following method checks the course for lasers and passes the respective tile including its field types to
-     * the handleLaserByDirection method.
-     */
-    public void findLasers() {
-        for (ArrayList<Tile> row : course.getCourse()) {
-            for (Tile tile : row) {
-                for (FieldType fieldType : tile.getFieldTypes()) {
-                    if (fieldType instanceof Laser) {
-                        handleLaserByDirection((Laser) fieldType, tile);
                     }
                 }
             }
@@ -644,74 +759,6 @@ public class GameMode
         }
     }
 
-    public void shootRobotLasers() {}
-
-    /**
-     * The following method checks if any robot ended their register on an energy space, if
-     * they receive an energy cube, and sends the corresponding JSON messages.
-     */
-    public void checkEnergySpaces() {
-        for(Player player : players) {
-            Tile currentTile = player.getPlayerRobot().getCurrentTile();
-
-            for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof EnergySpace energySpace) {
-                    int availableEnergy = energySpace.getAvailableEnergy();
-                    int currentEnergy = player.getEnergyCollected();
-                    if(currentRegister == 5) {
-                        if(energyBank > 0) {
-                            player.setEnergyCollected(currentEnergy + 1);
-                            energyBank -= 1;
-                        }
-                    } else if(availableEnergy > 0) {
-                        player.setEnergyCollected(currentEnergy + 1);
-                    }
-
-                    for(Player player1 : players) {
-                        new EnergyModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(),
-                                player.getEnergyCollected(),
-                                "EnergySpace").send();
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * The following method checks if any robot has reached a checkpoint. If yes, the method
-     * checks if it is the correct checkpoint according to numerical order. If it is the last
-     * checkpoint it ends the game. The method also sends the corresponding JSON message.
-     */
-    public void checkCheckpoints() {
-        for(Player player : players) {
-            Tile currentTile = player.getPlayerRobot().getCurrentTile();
-
-            for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof CheckPoint checkPoint) {
-                    int checkpointNumber = checkPoint.getCheckpointNumber();
-                    if(player.getCheckpointsCollected() == checkpointNumber-1) {
-                        player.setCheckpointsCollected(player.getCheckpointsCollected()+1);
-                    }
-
-                    for(Player player1 : players) {
-                        new CheckPointReachedModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(),
-                                player.getCheckpointsCollected()).send();
-                    }
-
-                    if(player.getCheckpointsCollected() == availableCheckPoints) {
-                        endGame();
-                        for(Player player1 : players) {
-                            new GameFinishedModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID()).send();
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * The following method calculates the new coordinates for activating conveyor belts and push panels.
      * @param orientation direction the robot is moved to
@@ -751,38 +798,6 @@ public class GameMode
                 currentRegister, player.getPlayerController().getPlayerID(),
                 newCard).send();
     }
-
-
-    /**
-     * The following method is called whenever the activation phase is ended. It empties the registers
-     * and calls a method that refills the player deck.
-     */
-    public void endRound() {
-        for(int i = 0; i<5; i++) {
-            for(Player player : players) {
-                player.getDiscardPile().add(player.getRegisters()[i]);
-                player.getRegisters()[i] = null;
-            }
-        }
-
-        for(Player player : players) {
-            player.shuffleAndRefillDeck();
-        }
-    }
-
-    public void endGame() {}
-
-    public PlayerController[] getPlayerControllers()
-    {
-        PlayerController[] playerControllers = new PlayerController[this.players.size()];
-        for (int i = 0; i < this.players.size(); i++)
-        {
-            playerControllers[i] = this.players.get(i).getPlayerController();
-            continue;
-        }
-        return playerControllers;
-    }
-
 
     // region Getters and Setters
 
@@ -846,6 +861,17 @@ public class GameMode
         }
 
         return 0;
+    }
+
+    public PlayerController[] getPlayerControllers()
+    {
+        PlayerController[] playerControllers = new PlayerController[this.players.size()];
+        for (int i = 0; i < this.players.size(); i++)
+        {
+            playerControllers[i] = this.players.get(i).getPlayerController();
+            continue;
+        }
+        return playerControllers;
     }
 
     // endregion Getters and Setters
