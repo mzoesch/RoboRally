@@ -1639,17 +1639,16 @@ public class GameJFXController
         return;
     }
 
-    public void renderOnPosition(AnchorPane AP, RCoordinate c)
+    public void renderOnPosition(final AnchorPane ap, final RCoordinate c)
     {
-        AP.getStyleClass().add("tile");
+        ap.getStyleClass().add("tile");
 
-        double xTranslation = c.x() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
-        AP.setTranslateX(this.centralXTranslation < 0 ? xTranslation : xTranslation + this.centralXTranslation);
-        AP.setTranslateY(c.y() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2);
+        ap.setTranslateX(this.calcXTranslation(c.x()));
+        ap.setTranslateY(this.calcYTranslation(c.y()));
 
-        if (!this.courseScrollPaneContent.getChildren().contains(AP))
+        if (!this.courseScrollPaneContent.getChildren().contains(ap))
         {
-            this.courseScrollPaneContent.getChildren().add(AP);
+            this.courseScrollPaneContent.getChildren().add(ap);
         }
 
         return;
@@ -1920,6 +1919,16 @@ public class GameJFXController
         }
 
         return token.substring(1, token.indexOf(" "));
+    }
+
+    public double calcXTranslation(final int file)
+    {
+        return this.centralXTranslation < 0 ? file * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2 : file * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2 + this.centralXTranslation;
+    }
+
+    public double calcYTranslation(final int rank)
+    {
+        return rank * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2;
     }
 
     // endregion Getters and Setters
