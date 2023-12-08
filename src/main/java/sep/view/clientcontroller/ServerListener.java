@@ -72,7 +72,10 @@ public class ServerListener implements Runnable
 
                 final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
 
-                l.trace("Received request from server: Parsing: {}", r);
+                if (!r.contains("\"messageType\":\"Alive\""))
+                {
+                    l.trace("Received request from server: Parsing: {}", r);
+                }
 
                 try
                 {
@@ -102,7 +105,7 @@ public class ServerListener implements Runnable
     {
         if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {
-            l.trace("Received keep-alive from server. Responding. Ok.");
+//            l.trace("Received keep-alive from server. Responding. Ok.");
             try
             {
                 GameInstance.respondToKeepAlive();

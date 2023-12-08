@@ -159,7 +159,10 @@ public enum EClientInformation
             return;
         }
 
-        l.trace(String.format("Sending request to server: %s", j.toString(0)));
+        if (!j.toString(0).contains("\"messageType\":\"Alive\""))
+        {
+            l.trace(String.format("Sending request to server: %s", j.toString(0)));
+        }
 
         try
         {

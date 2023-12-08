@@ -167,7 +167,7 @@ public final class ClientInstance implements Runnable
     {
         if (Objects.equals(dcrp.getType_v2(), "Alive"))
         {
-            l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
+//            l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
             this.setAlive(true);
             return true;
         }
@@ -270,7 +270,10 @@ public final class ClientInstance implements Runnable
             }
 
             final String s = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
-            l.trace("Received request from client {}. Parsing: {}", this.getAddr(), s);
+            if (!s.contains("\"messageType\":\"Alive\""))
+            {
+               l.trace("Received request from client {}. Parsing: {}", this.getAddr(), s);
+            }
             final boolean bAccepted;
             try
             {
@@ -303,7 +306,10 @@ public final class ClientInstance implements Runnable
 
     public boolean sendRemoteRequest(JSONObject j)
     {
-        l.trace("Sending remote request to client {}. {}", this.getAddr(), j.toString(0));
+        if (!j.toString(0).contains("\"messageType\":\"Alive\""))
+        {
+            l.trace("Sending remote request to client {}. {}", this.getAddr(), j.toString(0));
+        }
 
         try
         {

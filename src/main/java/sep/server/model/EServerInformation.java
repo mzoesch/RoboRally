@@ -63,7 +63,7 @@ public enum EServerInformation
 
         if (!this.sessions.isEmpty())
         {
-            l.trace("Sent keep-alive to all clients.");
+//            l.trace("Sent keep-alive to all clients.");
         }
 
         if (!dead.isEmpty())
