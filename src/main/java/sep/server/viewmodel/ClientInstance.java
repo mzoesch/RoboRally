@@ -270,6 +270,7 @@ public final class ClientInstance implements Runnable
             }
 
             final String s = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+            l.trace("Received request from client {}. Parsing: {}", this.getAddr(), s);
             final boolean bAccepted;
             try
             {
@@ -298,6 +299,26 @@ public final class ClientInstance implements Runnable
         this.bIsAlive = false;
         new KeepAliveModel(this).send();
         return;
+    }
+
+    public boolean sendRemoteRequest(JSONObject j)
+    {
+        l.trace("Sending remote request to client {}. {}", this.getAddr(), j.toString(0));
+
+        try
+        {
+            this.bufferedWriter.write(j.toString());
+            this.bufferedWriter.newLine();
+            this.bufferedWriter.flush();
+        }
+        catch (IOException e)
+        {
+            l.error("Failed to send remote request to client {}.", this.getAddr());
+            l.error(e.getMessage());
+            return false;
+        }
+
+        return true;
     }
 
     /** Life-cycle of a client connection. */
@@ -330,11 +351,6 @@ public final class ClientInstance implements Runnable
     }
 
     // region Getters and Setters
-
-    public BufferedWriter getBufferedWriter()
-    {
-        return bufferedWriter;
-    }
 
     // TODO Do we have to synchronize this? Because of multithreading?
     public boolean isAlive()

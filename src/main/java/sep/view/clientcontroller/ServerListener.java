@@ -72,6 +72,8 @@ public class ServerListener implements Runnable
 
                 final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
 
+                l.trace("Received request from server: Parsing: {}", r);
+
                 try
                 {
                     this.parseJSONRequestFromServer(new DefaultServerRequestParser(new JSONObject(r)));
@@ -98,8 +100,6 @@ public class ServerListener implements Runnable
 
     private void parseJSONRequestFromServer(DefaultServerRequestParser dsrp) throws JSONException
     {
-        l.trace("Received request from server. Parsing: {}", dsrp.getRequest().toString(2));
-
         if (Objects.equals(dsrp.getType_v2(), "Alive"))
         {
             l.trace("Received keep-alive from server. Responding. Ok.");

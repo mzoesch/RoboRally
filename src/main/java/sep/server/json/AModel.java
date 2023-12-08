@@ -25,19 +25,8 @@ public abstract class AModel implements IJSONSerializable
 
     public void send()
     {
-        try
-        {
-            this.ci.getBufferedWriter().write(this.toJSON().toString());
-            this.ci.getBufferedWriter().newLine();
-            this.ci.getBufferedWriter().flush();
-            return;
-        }
-        catch (IOException e)
-        {
-            l.error("Failed to send response to client.");
-            l.error(e.getMessage());
-            return;
-        }
+        this.ci.sendRemoteRequest(this.toJSON());
+        return;
     }
 
 }

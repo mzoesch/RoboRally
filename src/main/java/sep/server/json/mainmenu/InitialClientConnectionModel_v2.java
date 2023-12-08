@@ -30,18 +30,14 @@ public class InitialClientConnectionModel_v2
         j.put("messageType", "HelloClient");
         j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", EServerInformation.PROTOCOL_VERSION)));
 
-        try
+        if (this.ci.sendRemoteRequest(j))
         {
-            ci.getBufferedWriter().write(j.toString());
-            ci.getBufferedWriter().newLine();
-            ci.getBufferedWriter().flush();
-        }
-        catch (IOException e)
-        {
-            l.fatal("Failed to send response to client.");
-            l.fatal(e.getMessage());
+            l.debug("Sent protocol version to client.");
             return;
         }
+
+        l.fatal("Failed to send protocol version to client.");
+        this.ci.handleDisconnect();
 
         return;
     }
@@ -65,19 +61,16 @@ public class InitialClientConnectionModel_v2
         j.put("messageType", "Welcome");
         j.put("messageBody", new JSONObject().put("clientID", playerID));
 
-        try
+        if (this.ci.sendRemoteRequest(j))
         {
-            ci.getBufferedWriter().write(j.toString());
-            ci.getBufferedWriter().newLine();
-            ci.getBufferedWriter().flush();
-        }
-        catch (IOException e)
-        {
-            l.fatal("Failed to send response to client.");
-            l.fatal(e.getMessage());
+            l.debug("Sent welcome to client.");
             return;
         }
 
+        l.fatal("Failed to send welcome to client.");
+        this.ci.handleDisconnect();
+
+        return;
     }
 
     public boolean isClientProtocolVersionValid()
