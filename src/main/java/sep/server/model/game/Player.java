@@ -74,7 +74,6 @@ public class Player
         final int dir = forward ? 1 : -1;
         final Coordinate currentCoordinate = this.getPlayerRobot().getCurrentTile().getCoordinate();
         Coordinate tCoordinate = null;
-        System.out.println(this.getPlayerRobot().getDirection());
         switch (this.getPlayerRobot().getDirection().toLowerCase())
         {
             case "north", "top":
@@ -104,8 +103,7 @@ public class Player
             return;
         }
 
-        /* When this is going to work, make all debugs to trace for better readability. */
-        l.debug("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.getPlayerController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
+        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.getPlayerController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
 
         if (!this.getPlayerRobot().getCourse().isCoordinateWithinBounds(tCoordinate))
         {

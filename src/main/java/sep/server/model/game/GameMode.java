@@ -479,6 +479,12 @@ public class GameMode
 
     // endregion Activation Phase Helpers
 
+    /**
+     * One run of a register in the activation phase. This method must
+     * be called five times in a row to complete the activation phase.
+     *
+     * @return True if the activation phase should continue. False otherwise.
+     */
     private boolean runActivationPhase()
     {
         l.debug("Starting register phase {}.", this.currentRegister);
@@ -501,6 +507,7 @@ public class GameMode
             continue;
         }
 
+        // TODO Add delay between each activation phase step.
         this.activateConveyorBelts(2);
         this.activateConveyorBelts(1);
         this.activatePushPanels();
@@ -547,7 +554,17 @@ public class GameMode
 
             this.endRound();
 
-            l.debug("Activation Phase ended successfully.");
+            l.debug("Activation Phase ended successfully. Waiting 5s for the next phase . . .");
+
+            try
+            {
+                Thread.sleep(5_000); /* Just for debugging right now. */
+            }
+            catch (InterruptedException e)
+            {
+                l.error("Activation Phase was interrupted. This should not happen!", e);
+                throw new RuntimeException(e);
+            }
 
             this.handleNewPhase(EGamePhase.UPGRADE);
 

@@ -132,7 +132,7 @@ public class Robot
     {
         if (t1.hasAntennaModifier())
         {
-            l.debug("Robot is unmovable because of the antenna modifier");
+            l.trace("Robot is unmovable because of the antenna modifier");
             return true;
         }
 
@@ -140,25 +140,25 @@ public class Robot
         {
             if (source.isEastOf(t1) && source.isWallWest())
             {
-                l.debug("Robot cannot traverse west because of a wall modifier.");
+                l.trace("Robot cannot traverse west because of a wall modifier.");
                 return true;
             }
 
             if (source.isWestOf(t1) && source.isWallEast())
             {
-                l.debug("Robot cannot traverse east because of a wall modifier.");
+                l.trace("Robot cannot traverse east because of a wall modifier.");
                 return true;
             }
 
             if (source.isNorthOf(t1) && source.isWallSouth())
             {
-                l.debug("Robot cannot traverse south because of a wall modifier.");
+                l.trace("Robot cannot traverse south because of a wall modifier.");
                 return true;
             }
 
             if (source.isSouthOf(t1) && source.isWallNorth())
             {
-                l.debug("Robot cannot traverse north because of a wall modifier.");
+                l.trace("Robot cannot traverse north because of a wall modifier.");
                 return true;
             }
         }
@@ -167,32 +167,32 @@ public class Robot
         {
             if (source.isEastOf(t1) && t1.isWallEast())
             {
-                l.debug("Robot cannot traverse west because of a wall modifier.");
+                l.trace("Robot cannot traverse west because of a wall modifier.");
                 return true;
             }
 
             if (source.isWestOf(t1) && t1.isWallWest())
             {
-                l.debug("Robot cannot traverse east because of a wall modifier.");
+                l.trace("Robot cannot traverse east because of a wall modifier.");
                 return true;
             }
 
             if (source.isNorthOf(t1) && t1.isWallNorth())
             {
-                l.debug("Robot cannot traverse south because of a wall modifier.");
+                l.trace("Robot cannot traverse south because of a wall modifier.");
                 return true;
             }
 
             if (source.isSouthOf(t1) && t1.isWallSouth())
             {
-                l.debug("Robot cannot traverse north because of a wall modifier.");
+                l.trace("Robot cannot traverse north because of a wall modifier.");
                 return true;
             }
         }
 
         if (t1.hasUnmovableRobot())
         {
-            l.debug("Robot is unmovable because of another unmovable robot");
+            l.trace("Robot is unmovable because of another unmovable robot");
             return true;
         }
 

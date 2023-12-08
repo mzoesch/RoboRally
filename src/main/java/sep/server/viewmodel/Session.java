@@ -289,7 +289,7 @@ public final class Session
 
         this.awaitGameStartThread = new Thread(() ->
         {
-            l.info("Awaiting game start. . .");
+            l.info("Awaiting game start . . .");
 
             try
             {
