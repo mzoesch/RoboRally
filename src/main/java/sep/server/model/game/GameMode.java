@@ -526,7 +526,7 @@ public class GameMode
         this.activationPhaseThread = new Thread(
         () ->
         {
-            l.debug("Activation Phase started. Waiting for players to set their cards . . .");
+            l.debug("Activation Phase started.");
 
             this.currentRegister = 0;
             while (this.runActivationPhase())
