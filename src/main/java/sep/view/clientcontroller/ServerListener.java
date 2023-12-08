@@ -269,6 +269,7 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
+            //TODO Timer?
             String info = String.format("Timer has started");
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer started from server.");
@@ -291,14 +292,18 @@ public class ServerListener implements Runnable
         /* The current cards in a register played by all clients. */
         if (Objects.equals(dsrp.getType_v2(), "CurrentCards"))
         {
+            //TODO grafische Anzeige der jeweiligen Karte?
             final StringBuilder sb = new StringBuilder();
             sb.append(String.format("In this register %d cards were played (", dsrp.getActiveCards().length()));
             sb.append(IntStream.range(0, dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", dsrp.getPlayerIDFromActiveCardIdx(i), dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
             l.debug(sb.append(").").toString());
+            String info = sb.append(").").toString();
+            ViewSupervisor.handleChatInfo(info);
             return;
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ReplaceCard")) {
+
             l.debug("Received replacing card from server.");
             return;
         }
