@@ -233,8 +233,14 @@ public class ServerListener implements Runnable
 
         /* If this client's hand cards are being forced updated. */
         if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
-            //TODO
-            String info = String.format("Player %s has not submitted their selection in time.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
+            EGameState.INSTANCE.clearAllRegisters();
+            for (String c : dsrp.getForcedCards())
+            {
+                EGameState.INSTANCE.addGotRegister(c);
+                continue;
+            }
+            ViewSupervisor.updateFooter();
+            String info = ("You didnt finished card selection in time. You recieved forced cards.");
             ViewSupervisor.handleChatInfo(info);
             l.debug("Player {} has not submitted their selection in time. Received new cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(dsrp.getForcedCards())));
             return;
