@@ -5,7 +5,6 @@ import sep.server.model.game.tiles.*;
 import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 public class Tile
 {
@@ -100,6 +99,86 @@ public class Tile
         }
 
         return j;
+    }
+
+    public boolean isNorthOf(Tile t)
+    {
+        return this.coordinate.getY() > t.coordinate.getY();
+    }
+
+    public boolean isSouthOf(Tile t)
+    {
+        return this.coordinate.getY() < t.coordinate.getY();
+    }
+
+    public boolean isWestOf(Tile t)
+    {
+        return this.coordinate.getX() > t.coordinate.getX();
+    }
+
+    public boolean isEastOf(Tile t)
+    {
+        return this.coordinate.getX() < t.coordinate.getX();
+    }
+
+    public boolean isWallEast()
+    {
+        for (FieldType f : this.fieldTypes)
+        {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("east") || s.equalsIgnoreCase("right")))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
+    }
+
+    public boolean isWallWest()
+    {
+        for (FieldType f : this.fieldTypes)
+        {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("west") || s.equalsIgnoreCase("left")))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
+    }
+
+    public boolean isWallNorth()
+    {
+        for (FieldType f : this.fieldTypes)
+        {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("north") || s.equalsIgnoreCase("top")))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
+    }
+
+    public boolean isWallSouth()
+    {
+        for (FieldType f : this.fieldTypes)
+        {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("south") || s.equalsIgnoreCase("bottom")))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
     }
 
     // endregion Getters and Setters
