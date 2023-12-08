@@ -49,6 +49,7 @@ public class GameMode
     private int energyBank;
 
     private Thread programmingCardThread;
+    private Thread activationPhaseThread;
 
     public GameMode(String courseName, PlayerController[] playerControllers, Session session)
     {
@@ -478,43 +479,82 @@ public class GameMode
 
     // endregion Activation Phase Helpers
 
-    private void triggerActivationPhase()
+    private boolean runActivationPhase()
     {
-        for (this.currentRegister = 0; this.currentRegister < GameMode.REGISTER_PHASE_COUNT; currentRegister++)
+        l.debug("Starting register phase {}.", this.currentRegister);
+
+        this.determinePriorities();
+        this.sortPlayersByPriorityInDesc();
+        this.session.broadcastCurrentCards(this.currentRegister);
+
+        for (Player p : this.players)
         {
-            l.debug("Starting register phase {}.", this.currentRegister);
-
-            this.determinePriorities();
-            this.sortPlayersByPriorityInDesc();
-            this.session.broadcastCurrentCards(this.currentRegister);
-
-            for (Player p : this.players)
+            if (p.getRegisters()[this.currentRegister] != null)
             {
-                if (p.getRegisters()[this.currentRegister] != null)
-                {
-                    l.info("Player {} is playing card {}.", p.getPlayerController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
-                    p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
-                    continue;
-                }
-
-                l.warn("Player {} does not have a card in register {}.", p.getPlayerController().getPlayerID(), this.currentRegister);
-
+                l.info("Player {} is playing card {}.", p.getPlayerController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
+                p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
                 continue;
             }
 
-            this.activateConveyorBelts(2);
-            this.activateConveyorBelts(1);
-            this.activatePushPanels();
-            this.activateGears();
-            this.findLasers();
-            this.shootRobotLasers();
-            this.checkEnergySpaces();
-            this.checkCheckpoints();
+            l.warn("Player {} does not have a card in register {}.", p.getPlayerController().getPlayerID(), this.currentRegister);
 
             continue;
         }
 
-        this.endRound();
+        this.activateConveyorBelts(2);
+        this.activateConveyorBelts(1);
+        this.activatePushPanels();
+        this.activateGears();
+        this.findLasers();
+        this.shootRobotLasers();
+        this.checkEnergySpaces();
+        this.checkCheckpoints();
+
+        this.currentRegister++;
+
+        return this.currentRegister < GameMode.REGISTER_PHASE_COUNT;
+    }
+
+    private void triggerActivationPhase()
+    {
+        if (this.activationPhaseThread != null && this.activationPhaseThread.isAlive())
+        {
+            l.warn("Activation Phase is already running. Skipping . . .");
+            return;
+        }
+
+        this.activationPhaseThread = new Thread(
+        () ->
+        {
+            l.debug("Activation Phase started. Waiting for players to set their cards . . .");
+
+            this.currentRegister = 0;
+            while (this.runActivationPhase())
+            {
+                l.debug("Activation Phase {} ended. Waiting 15s for the next activation phase . . .", this.currentRegister);
+                try
+                {
+                    Thread.sleep(15_000); // Just for debugging right now.
+                }
+                catch (InterruptedException e)
+                {
+                    l.error("Activation Phase was interrupted. This should not happen!", e);
+                    throw new RuntimeException(e);
+                }
+
+                continue;
+            }
+
+            this.endRound();
+
+            l.debug("Activation Phase ended successfully.");
+
+            this.handleNewPhase(EGamePhase.UPGRADE);
+
+            return;
+        });
+
+        this.activationPhaseThread.start();
 
         return;
     }
