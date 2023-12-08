@@ -359,7 +359,6 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "Reboot")) {
-            //TODO Bug
             String info = String.format("Robot of Player %s has been rebooted", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received reboot from server.");
