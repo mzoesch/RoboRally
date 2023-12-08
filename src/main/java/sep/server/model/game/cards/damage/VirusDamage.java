@@ -1,6 +1,7 @@
 package sep.server.model.game.cards.damage;
 
 import sep.server.json.game.activatingphase.ReplaceCardModel;
+import sep.server.json.game.damage.DrawDamageModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.Tile;
 import sep.server.model.game.cards.Card;
@@ -24,6 +25,9 @@ public class VirusDamage extends ADamageCard {
                 if (getDistanceBetweenTwoRobots(centerTile, otherTile) <= RADIUS) {
                     if(!p.getGameMode().getVirusDeck().isEmpty()) {
                         p.getDiscardPile().add(player.getGameMode().getVirusDeck().remove(0));
+
+                        new DrawDamageModel(p.getPlayerController().getClientInstance(), p.getPlayerController().getPlayerID(), new String[]{"Virus"}).send();
+
                     }
                 }
             }
@@ -31,17 +35,21 @@ public class VirusDamage extends ADamageCard {
         }
 
         //Karten akutalisieren
-        player.getGameMode().getTrojanDeck().add((TrojanHorseDamage) player.getCardByRegisterIndex(currentRoundNumber));
+        player.getGameMode().getVirusDeck().add((VirusDamage) player.getCardByRegisterIndex(currentRoundNumber));
         player.getRegisters()[currentRoundNumber] = null;
 
-        IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
-        player.setCardInRegister(currentRoundNumber, topCardFromDiscardPile);
-        topCardFromDiscardPile.playCard(player, currentRoundNumber);
+        if(player.getPlayerDeck().isEmpty()){
+            player.shuffleAndRefillDeck();
+        }
 
-        String newCard = ((Card) topCardFromDiscardPile).getCardType();
+        IPlayableCard newCard = player.getPlayerDeck().remove(0);
+        player.setCardInRegister(currentRoundNumber, newCard);
+        newCard.playCard(player, currentRoundNumber);
+
+        String newCardString = ((Card) newCard).getCardType();
         new ReplaceCardModel(player.getPlayerController().getClientInstance(),
                 currentRoundNumber, player.getPlayerController().getPlayerID(),
-                newCard).send();
+                newCardString).send();
     }
 
     public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {

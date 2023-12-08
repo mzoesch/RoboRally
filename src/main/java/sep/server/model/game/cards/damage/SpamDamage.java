@@ -15,16 +15,20 @@ public class SpamDamage extends ADamageCard {
     public void playCard(Player player, int currentRoundNumber)
     {
         //Karten akutalisieren
-        player.getGameMode().getTrojanDeck().add((TrojanHorseDamage) player.getCardByRegisterIndex(currentRoundNumber));
+        player.getGameMode().getSpamDeck().add((SpamDamage) player.getCardByRegisterIndex(currentRoundNumber));
         player.getRegisters()[currentRoundNumber] = null;
 
-        IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
-        player.setCardInRegister(currentRoundNumber, topCardFromDiscardPile);
-        topCardFromDiscardPile.playCard(player, currentRoundNumber);
+        if(player.getPlayerDeck().isEmpty()){
+            player.shuffleAndRefillDeck();
+        }
 
-        String newCard = ((Card) topCardFromDiscardPile).getCardType();
+        IPlayableCard newCard = player.getPlayerDeck().remove(0);
+        player.setCardInRegister(currentRoundNumber, newCard);
+        newCard.playCard(player, currentRoundNumber);
+
+        String newCardString = ((Card) newCard).getCardType();
         new ReplaceCardModel(player.getPlayerController().getClientInstance(),
                 currentRoundNumber, player.getPlayerController().getPlayerID(),
-                newCard).send();
+                newCardString).send();
     }
 }
