@@ -150,4 +150,13 @@ public final class DefaultServerRequestParser
 
     public int getNumber() { return this.request.getJSONObject("messageBody").getInt("number");
     }
+
+    public String getCardsAsString() { return this.request.getJSONObject("messageBody").getJSONArray("cards").toString();
+    }
+
+    public String[] getAvailablePiles() { return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("availablePiles").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("availablePiles").getString(i)).toArray(String[]::new);
+    }
+
+    public String getAvailablePilesAsString() { return this.request.getJSONObject("messageBody").getJSONArray("availablePiles").toString();
+    }
 }

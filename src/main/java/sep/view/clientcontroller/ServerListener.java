@@ -368,12 +368,32 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "DrawDamage")) {
-
+            //TODO still shaky
+            final StringBuilder sb = new StringBuilder();
+            sb.append(String.format("Player %s has drawn %s damage cards. (", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), +
+                    dsrp.getForcedCards().length));
+            sb.append(dsrp.getCardsAsString());
+            l.debug(sb.append(").").toString());
+            String info = sb.append(").").toString();
+            ViewSupervisor.handleChatInfo(info);
             l.debug("Received draw a damage card from server.");
             return;
         }
 
+        if (Objects.equals(dsrp.getType_v2(), "PickDamage")) {
+            //TODO hier noch grafische Auswahl einfügen; still shaky
+            final StringBuilder sb = new StringBuilder();
+            sb.append(String.format("You need to decide which damage cards to pick. Available piles are: (", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), +
+                    dsrp.getAvailablePiles().length));
+            sb.append(dsrp.getAvailablePilesAsString());
+            l.debug(sb.append(").").toString());
+            String info = sb.append(").").toString();
+            ViewSupervisor.handleChatInfo(info);
+            l.debug("Received damage cards to select from server.");
+        }
+
         if (Objects.equals(dsrp.getType_v2(), "SelectedDamage")) {
+            //TODO geht doch auch nur von Client ot Server oder?
             l.debug("Damage was selected.");
         }
 
