@@ -255,7 +255,7 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
-            String info = String.format("The deck of player %s has been shuffled", EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getPlayerName());
+            String info = String.format("The deck of player %s has been shuffled", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received shuffle coding from server.");
             return;
@@ -270,7 +270,7 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
             //TODO Timer?
-            String info = String.format("Timer has started");
+            String info = ("Timer has started");
             ViewSupervisor.handleChatInfo(info);
             l.debug("Received timer started from server.");
             return;
@@ -303,7 +303,15 @@ public class ServerListener implements Runnable
         }
 
         if (Objects.equals(dsrp.getType_v2(), "ReplaceCard")) {
+            if(dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()){
+                String info = String.format("You recieved following card %s as replacement", dsrp.getNewCard());
+                ViewSupervisor.handleChatInfo(info);
+                EGameState.INSTANCE.addRegister(dsrp.getRegister(), dsrp.getNewCard());
 
+            } else{
+                String info = String.format("Player %s recieved following card %s as replacement",Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(),  dsrp.getNewCard());
+                ViewSupervisor.handleChatInfo(info);
+            }
             l.debug("Received replacing card from server.");
             return;
         }
