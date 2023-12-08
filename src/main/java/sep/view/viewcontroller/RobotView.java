@@ -10,6 +10,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 public class RobotView
 {
@@ -21,9 +25,10 @@ public class RobotView
     RCoordinate position;
     RRotation rotation;
 
-    ImageView IV;
+    ImageView iv;
     /** The actual item in the view. */
     AnchorPane AP;
+    AnchorPane ap;
 
     public RobotView(RemotePlayer possessor)
     {
@@ -33,10 +38,8 @@ public class RobotView
         return;
     }
 
-    public Image getRobotImage()
-    {
-        return Tile.getRobotImage(this.possessor.getFigureID());
-    }
+        this.iv = null;
+        this.ap = null;
 
     public void setPosition(RCoordinate c)
     {
@@ -44,7 +47,16 @@ public class RobotView
         return;
     }
 
-    public void setPosition(RCoordinate c, boolean bOverrideOldRotation, boolean bUpdateInView)
+    /**
+     * Sets the position of the robot. This method should only be used to override the old position. For example, if
+     * this robot should be teleported to a new position (e.g., when the robot is being rebooted). For a smooth
+     * transition, use {@link #lerpTo(RCoordinate)} instead.
+     *
+     * @param c                    The new position.
+     * @param bOverrideOldRotation If true, the rotation will be set to NORTH.
+     * @param bUpdateInView        If true, the view will be notified to update itself.
+     */
+    public void setPosition(final RCoordinate c, final boolean bOverrideOldRotation, final boolean bUpdateInView)
     {
         this.position = c;
 
@@ -61,9 +73,25 @@ public class RobotView
         return;
     }
 
-    /** With animations. */
-    public void moveToPosition(RCoordinate c)
+    /**
+     * Will lerp the robot to the given position. A position must be set before calling this method with {@link
+     * #setPosition(RCoordinate, boolean, boolean)}.
+     *
+     * @param c The new position.
+     */
+    public void lerpTo(final RCoordinate c)
     {
+        this.position = c;
+
+        final double tX = ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).calcXTranslation(c.x());
+        final double tY = ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).calcYTranslation(c.y());
+
+        final Timeline t = new Timeline();
+        final KeyFrame kf = new KeyFrame(Duration.seconds(2), new KeyValue(this.ap.translateXProperty(), tX), new KeyValue(this.ap.translateYProperty(), tY));
+        t.getKeyFrames().add(kf);
+
+        t.play();
+
         return;
     }
 
