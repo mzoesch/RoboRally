@@ -1,6 +1,5 @@
 package sep.view.clientcontroller;
 
-import sep.server.model.game.cards.programming.MoveI;
 import sep.view.json.DefaultServerRequestParser;
 import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
@@ -212,8 +211,7 @@ public class ServerListener implements Runnable
 
         if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
             l.debug("Player {} turned {}.", dsrp.getPlayerID(), dsrp.getRotation());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().addRotation(dsrp.getRotation());
-            ViewSupervisor.updatePlayerTransforms();
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().addRotationWithLerp(dsrp.getRotation());
             return;
         }
 
@@ -347,9 +345,10 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "Movement")) {
-            l.debug("Player {} has moved to {},{}", dsrp.getPlayerID(), dsrp.getCoordinate().x(), dsrp.getCoordinate().y());
-            EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID()).getRobotView().setPosition(dsrp.getCoordinate(), false, true);
+        if (Objects.equals(dsrp.getType_v2(), "Movement"))
+        {
+            l.debug("Player {} has moved to {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().lerpTo(dsrp.getCoordinate());
             return;
         }
 

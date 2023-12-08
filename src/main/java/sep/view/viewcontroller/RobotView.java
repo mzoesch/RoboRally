@@ -27,23 +27,22 @@ public class RobotView
 
     ImageView iv;
     /** The actual item in the view. */
-    AnchorPane AP;
     AnchorPane ap;
+
+    boolean bIsNextRotationLerp;
 
     public RobotView(RemotePlayer possessor)
     {
         super();
         this.possessor = possessor;
         this.position = null;
-        return;
-    }
+        this.rotation = null;
 
         this.iv = null;
         this.ap = null;
 
-    public void setPosition(RCoordinate c)
-    {
-        this.setPosition(c, false, true);
+        this.bIsNextRotationLerp = true;
+
         return;
     }
 
@@ -63,6 +62,7 @@ public class RobotView
         if (bOverrideOldRotation)
         {
             this.rotation = new RRotation(RRotation.NORTH);
+            this.bIsNextRotationLerp = false;
         }
 
         if (bUpdateInView)
@@ -95,45 +95,9 @@ public class RobotView
         return;
     }
 
-    private void generateIMG()
+    private void rotateIV()
     {
-        this.IV = new ImageView();
-        this.IV.setFitHeight(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
-        this.IV.setFitWidth(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
-        this.IV.setPreserveRatio(true);
-        this.IV.setSmooth(true);
-        this.IV.setCache(true);
-        this.IV.setImage(this.getRobotImage());
-
-        this.AP = new AnchorPane();
-        this.AP.getChildren().add(this.IV);
-
-        return;
-    }
-
-    private void rotateIMG()
-    {
-        this.IV.setRotate(this.rotation.rotation());
-        return;
-    }
-
-    public boolean hasPosition()
-    {
-        return this.position != null;
-    }
-
-    /** Will update the position in the view. */
-    public void renderPosition()
-    {
-        if (this.IV == null || this.AP == null)
-        {
-            this.generateIMG();
-        }
-
-        this.rotateIMG();
-
-        ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).renderOnPosition(this.AP, this.position);
-
+        this.iv.setRotate(this.rotation.rotation());
         return;
     }
 
@@ -145,12 +109,92 @@ public class RobotView
         }
 
         this.rotation = this.rotation.addRotation(r);
+
         return;
+    }
+
+    public void addRotationWithLerp(String r)
+    {
+        if (!this.bIsNextRotationLerp)
+        {
+            this.addRotation(r);
+            ViewSupervisor.updatePlayerTransforms();
+            this.bIsNextRotationLerp = true;
+            return;
+        }
+
+        /* The initial position of the robot. */
+        final boolean bLerp = this.rotation != null;
+        if (this.rotation == null)
+        {
+            this.rotation = new RRotation(RRotation.NORTH);
+        }
+        final RRotation oRot = this.rotation;
+        this.rotation = this.rotation.addRotation(r);
+
+        if (!bLerp)
+        {
+            ViewSupervisor.updatePlayerTransforms();
+            return;
+        }
+
+        final Timeline t = new Timeline();
+        final KeyFrame kf = new KeyFrame(Duration.seconds(2), new KeyValue(this.iv.rotateProperty(), this.rotation.rotation()));
+        t.getKeyFrames().add(kf);
+
+        t.play();
+
+        return;
+    }
+
+    /** Will update the position in the view. Must be called from the JFX Thread. */
+    public void renderPosition()
+    {
+        if (this.iv == null || this.ap == null)
+        {
+            this.generateIMG();
+        }
+
+        this.rotateIV();
+
+        ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).renderOnPosition(this.ap, this.position);
+
+        return;
+    }
+
+    // region Getters and Setters
+
+    private void generateIMG()
+    {
+        this.iv = new ImageView();
+        this.iv.setFitHeight(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
+        this.iv.setFitWidth(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
+        this.iv.setPreserveRatio(true);
+        this.iv.setSmooth(true);
+        this.iv.setCache(true);
+        this.iv.setImage(this.getRobotImage());
+
+        this.ap = new AnchorPane();
+        this.ap.getChildren().add(this.iv);
+
+        return;
+    }
+
+    public boolean hasPosition()
+    {
+        return this.position != null;
     }
 
     public int getRotation()
     {
         return this.rotation.rotation();
     }
+
+    public Image getRobotImage()
+    {
+        return Tile.getRobotImage(this.possessor.getFigureID());
+    }
+
+    // endregion Getters and Setters
 
 }
