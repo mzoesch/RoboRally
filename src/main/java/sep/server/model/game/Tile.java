@@ -103,22 +103,22 @@ public class Tile
 
     public boolean isNorthOf(Tile t)
     {
-        return this.coordinate.getY() > t.coordinate.getY();
+        return this.coordinate.getY() < t.coordinate.getY();
     }
 
     public boolean isSouthOf(Tile t)
     {
-        return this.coordinate.getY() < t.coordinate.getY();
+        return this.coordinate.getY() > t.coordinate.getY();
     }
 
     public boolean isWestOf(Tile t)
     {
-        return this.coordinate.getX() > t.coordinate.getX();
+        return this.coordinate.getX() < t.coordinate.getX();
     }
 
     public boolean isEastOf(Tile t)
     {
-        return this.coordinate.getX() < t.coordinate.getX();
+        return this.coordinate.getX() > t.coordinate.getX();
     }
 
     public boolean isWallEast()
