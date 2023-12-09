@@ -248,7 +248,7 @@ public class GameMode {
 
     /**
      * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
-     * The robot is moved in the outcoming flow direction of the conveyor belt.
+     * The robot is moved in the out-coming flow direction of the conveyor belt.
      * @param speed determines the amount of fields the robot is moved
      */
     private void activateConveyorBelts(int speed) {
@@ -316,7 +316,7 @@ public class GameMode {
      * The following method is required during the conveyor belt activation period.
      * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
      * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
-     * with the outcoming flow direction. If yes, the direction of the robot is changed accordingly
+     * with the out-coming flow direction. If yes, the direction of the robot is changed accordingly
      * and the corresponding JSON message is sent.
      * @param player Owner of the current robot
      * @param coordinate Coordinate of the new tile the robot moved onto
@@ -331,16 +331,16 @@ public class GameMode {
                 if(newInDirection != null && newOutDirection != null) {
                     for(String direction : newInDirection) {
                         switch(newOutDirection) {
-                            case("top") -> player.getPlayerRobot().setDirection("NORTH");
-                            case("right") -> player.getPlayerRobot().setDirection("EAST");
-                            case("bottom") -> player.getPlayerRobot().setDirection("SOUTH");
-                            case("left") -> player.getPlayerRobot().setDirection("WEST");
+                            case("top") -> player.getPlayerRobot().setDirection("top");
+                            case("right") -> player.getPlayerRobot().setDirection("right");
+                            case("bottom") -> player.getPlayerRobot().setDirection("bottom");
+                            case("left") -> player.getPlayerRobot().setDirection("left");
                         }
                     }
-                    if((Objects.equals(robotOldDirection, "NORTH") && Objects.equals(player.getPlayerRobot().getDirection(), "EAST")) ||
-                            (Objects.equals(robotOldDirection, "EAST") && Objects.equals(player.getPlayerRobot().getDirection(), "SOUTH")) ||
-                            (Objects.equals(robotOldDirection, "SOUTH") && Objects.equals(player.getPlayerRobot().getDirection(), "WEST")) ||
-                            (Objects.equals(robotOldDirection, "WEST") && Objects.equals(player.getPlayerRobot().getDirection(), "NORTH"))) {
+                    if((Objects.equals(robotOldDirection, "top") && Objects.equals(player.getPlayerRobot().getDirection(), "right")) ||
+                            (Objects.equals(robotOldDirection, "right") && Objects.equals(player.getPlayerRobot().getDirection(), "bottom")) ||
+                            (Objects.equals(robotOldDirection, "bottom") && Objects.equals(player.getPlayerRobot().getDirection(), "left")) ||
+                            (Objects.equals(robotOldDirection, "left") && Objects.equals(player.getPlayerRobot().getDirection(), "top"))) {
                         for(Player player1 : players) {
                             new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                                     player.getPlayerController().getPlayerID(),
@@ -416,17 +416,17 @@ public class GameMode {
 
                     if(Objects.equals(rotationalDirection, "counterclockwise")) {
                         switch (robotDirection) {
-                            case "NORTH" -> newDirection = "WEST";
-                            case "EAST" -> newDirection = "NORTH";
-                            case "SOUTH" -> newDirection = "EAST";
-                            case "WEST" -> newDirection = "SOUTH";
+                            case "top" -> newDirection = "left";
+                            case "right" -> newDirection = "top";
+                            case "bottom" -> newDirection = "right";
+                            case "left" -> newDirection = "bottom";
                         }
                     } else if(Objects.equals(rotationalDirection, "clockwise")) {
                         switch (robotDirection) {
-                            case "NORTH" -> newDirection = "EAST";
-                            case "EAST" -> newDirection = "SOUTH";
-                            case "SOUTH" -> newDirection = "WEST";
-                            case "WEST" -> newDirection = "NORTH";
+                            case "top" -> newDirection = "right";
+                            case "right" -> newDirection = "bottom";
+                            case "bottom" -> newDirection = "left";
+                            case "left" -> newDirection = "top";
                         }
                     }
 
