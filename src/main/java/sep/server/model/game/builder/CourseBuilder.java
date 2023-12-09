@@ -15,7 +15,7 @@ public class CourseBuilder {
 
     /**
      * Baut das entsprechende Spielfeld aus den einzelnen Boards
-     * @param name Name des Spielfelds
+     * @param courseName Name des Spielfelds
      * @return komplettes Spielfeld als ArrayList<ArrayList<Tile>>
      */
     public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){

@@ -390,7 +390,28 @@ public class GameMode
         }
     }
 
-    private void shootRobotLasers() {}
+    /**
+     * The following method determines all parameters needed to shoot the robot lasers during the activation phase
+     * and calls the handleLaserShooting method depending on the direction the robot is facing to.
+     */
+    private void shootRobotLasers() {
+        for(Player player : players) {
+            Robot playerRobot = player.getPlayerRobot();
+            Tile robotTile = playerRobot.getCurrentTile();
+
+            int robotTileXCoordinate = robotTile.getCoordinate().getX();
+            int robotTileYCoordinate = robotTile.getCoordinate().getY();
+            String robotDirection = playerRobot.getDirection();
+
+            switch(robotDirection) {
+                case "top" -> handleLaserShooting("top", 1, robotTileXCoordinate, robotTileYCoordinate, 0, -1);
+                case "right" -> handleLaserShooting("right", 1, robotTileXCoordinate, robotTileYCoordinate, 1, 0);
+                case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate, 0, 1);
+                case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate, robotTileYCoordinate, -1, 0);
+            }
+        }
+    }
+
 
     /**
      * The following method checks if any robot ended their register on an energy space, if
