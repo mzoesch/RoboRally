@@ -6,9 +6,9 @@ import sep.server.model.game.GameState;
 
 import org.json.JSONObject;
 
-public class SelectCourseModel extends AModel
+public class SelectMapModel extends AModel
 {
-    public SelectCourseModel(PlayerController pc)
+    public SelectMapModel(PlayerController pc)
     {
         super(pc.getClientInstance());
         return;

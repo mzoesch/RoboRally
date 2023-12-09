@@ -11,8 +11,8 @@ import sep.server.model.EServerInformation;
 import sep.server.json.lobby.PlayerAddedModel;
 import sep.server.json.common.ChatMsgModel;
 import sep.server.json.lobby.PlayerStatusModel;
-import sep.server.json.lobby.SelectCourseModel;
-import sep.server.json.lobby.CourseSelectedModel;
+import sep.server.json.lobby.SelectMapModel;
+import sep.server.json.lobby.MapSelectedModel;
 import sep.server.json.game.programmingphase.*;
 import sep.server.json.game.programmingphase.SelectionFinishedModel;
 import sep.server.model.game.EGamePhase;
@@ -134,7 +134,7 @@ public final class Session
             new PlayerStatusModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
             continue;
         }
-        new CourseSelectedModel(newPC, this.gameState.getCourseName()).send();
+        new MapSelectedModel(newPC, this.gameState.getCourseName()).send();
 
         /* Sending information about the new client to all other clients. */
         for (PlayerController PC : this.playerControllers)
@@ -202,7 +202,7 @@ public final class Session
     {
         for (PlayerController PC : this.playerControllers)
         {
-            new CourseSelectedModel(PC, this.gameState.getCourseName()).send();
+            new MapSelectedModel(PC, this.gameState.getCourseName()).send();
             continue;
         }
 
@@ -218,7 +218,7 @@ public final class Session
             return;
         }
 
-        new SelectCourseModel(this.readyPlayerControllerOrder.get(0)).send();
+        new SelectMapModel(this.readyPlayerControllerOrder.get(0)).send();
 
         return;
     }
