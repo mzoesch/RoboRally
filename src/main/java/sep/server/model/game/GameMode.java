@@ -324,17 +324,19 @@ public class GameMode {
     public void curvedArrowCheck(Player player, Coordinate coordinate) {
         Tile newTile = course.getTileByCoordinate(coordinate);
         for(FieldType newFieldType : newTile.getFieldTypes()) {
-            if(newFieldType instanceof ConveyorBelt newConveyorBelt) {
-                String newOutDirection = newConveyorBelt.getOutcomingFlowDirection();
-                String[] newInDirection = newConveyorBelt.getIncomingFlowDirection();
+            if(newFieldType instanceof ConveyorBelt conveyorBelt) {
+                String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                String[] inDirection = conveyorBelt.getIncomingFlowDirection();
                 String robotOldDirection = player.getPlayerRobot().getDirection();
-                if(newInDirection != null && newOutDirection != null) {
-                    for(String direction : newInDirection) {
-                        switch(newOutDirection) {
-                            case("top") -> player.getPlayerRobot().setDirection("top");
-                            case("right") -> player.getPlayerRobot().setDirection("right");
-                            case("bottom") -> player.getPlayerRobot().setDirection("bottom");
-                            case("left") -> player.getPlayerRobot().setDirection("left");
+                if(inDirection != null && outDirection != null) {
+                    for(String direction : inDirection) {
+                        if(direction != outDirection) {
+                            switch(outDirection) {
+                                case("top") -> player.getPlayerRobot().setDirection("top");
+                                case("right") -> player.getPlayerRobot().setDirection("right");
+                                case("bottom") -> player.getPlayerRobot().setDirection("bottom");
+                                case("left") -> player.getPlayerRobot().setDirection("left");
+                            }
                         }
                     }
                     if((Objects.equals(robotOldDirection, "top") && Objects.equals(player.getPlayerRobot().getDirection(), "right")) ||
