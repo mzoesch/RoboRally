@@ -20,7 +20,7 @@ public class GameState
     // TODO As described in Protocol v0.1, this var should be passed as a cmd program argument
     public static final int MIN_PLAYER_START = 2;
 
-    private String courseName;
+    private static String courseName;
 
     public static GameMode gameMode;
     private final Session session;
@@ -66,7 +66,7 @@ public class GameState
         return AVAILABLE_COURSES;
     }
 
-    public String getCourseName()
+    public static String getCourseName()
     {
         return courseName;
     }
