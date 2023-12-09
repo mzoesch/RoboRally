@@ -13,7 +13,6 @@ public class MapSelectedModel extends AModel
     {
         super(PC.getClientInstance());
         this.courseName = courseName;
-        return;
     }
 
     @Override
