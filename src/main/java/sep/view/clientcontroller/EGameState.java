@@ -33,7 +33,7 @@ public enum EGameState
      * be stored here in the Game State. Information that is not unique for one player like their selected robot or
      * their name is stored in the {@link RemotePlayer} object.
      */
-    private ArrayList<RemotePlayer> remotePlayers;
+    private final ArrayList<RemotePlayer> remotePlayers;
     private RemotePlayer currentPlayer;
 
     private String[] serverCourses;
@@ -46,24 +46,40 @@ public enum EGameState
 
     private EGameState()
     {
+        this.currentPhase = EGamePhase.INVALID;
+
         this.remotePlayers = new ArrayList<RemotePlayer>();
+        this.currentPlayer = null;
+
         this.serverCourses = new String[0];
         this.currentServerCourse = "";
         this.currentServerCourseJSON = null;
-        this.currentPhase = EGamePhase.INVALID;
 
         this.registers = new String[5];
         this.gotRegisters = new ArrayList<String>();
+        this.winningPlayer = null;
 
         return;
     }
 
     public static void reset()
     {
-        EGameState.INSTANCE.remotePlayers = new ArrayList<RemotePlayer>();
+        EGameState.INSTANCE.currentPhase = EGamePhase.INVALID;
+
+        EGameState.INSTANCE.remotePlayers.clear();
+        EGameState.INSTANCE.currentPlayer = null;
+
         EGameState.INSTANCE.serverCourses = new String[0];
         EGameState.INSTANCE.currentServerCourse = "";
         EGameState.INSTANCE.currentServerCourseJSON = null;
+
+        EGameState.INSTANCE.registers[0] = null;
+        EGameState.INSTANCE.registers[1] = null;
+        EGameState.INSTANCE.registers[2] = null;
+        EGameState.INSTANCE.registers[3] = null;
+        EGameState.INSTANCE.registers[4] = null;
+        EGameState.INSTANCE.gotRegisters.clear();
+        EGameState.INSTANCE.winningPlayer = null;
 
         return;
     }

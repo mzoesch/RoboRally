@@ -5,6 +5,7 @@ import sep.view.clientcontroller.GameInstance;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.viewcontroller.SceneController;
 import sep.EPort;
+import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
 
 import javafx.event.ActionEvent;
@@ -26,11 +27,16 @@ public class MainMenuJFXController
     {
         this.sessionJoinErrorField.setText("");
 
-        if (!this.parseServerAddress())
+        if (this.isServerAddressInvalid())
         {
             return;
         }
 
+        EGameState.reset();
+
+        // TODO We need to call this on a separate thread. If the connections establishment is not immediate, the
+        //      JFX Window will freeze and is unresponsive. On a longer period of time (for example during a network
+        //      timeout), the JFX Window will crash. We need to implement a callback to this class then.
         if (GameInstance.connectToServer())
         {
             ViewSupervisor.getSceneController().renderNewScreen(SceneController.LOBBY_ID, SceneController.PATH_TO_LOBBY_V2, true);
@@ -47,7 +53,7 @@ public class MainMenuJFXController
     {
         this.sessionJoinErrorField.setText("");
 
-        if (!this.parseServerAddress())
+        if (this.isServerAddressInvalid())
         {
             return;
         }
@@ -58,6 +64,11 @@ public class MainMenuJFXController
             return;
         }
 
+        EGameState.reset();
+
+        // TODO We need to call this on a separate thread. If the connections establishment is not immediate, the
+        //      JFX Window will freeze and is unresponsive. On a longer period of time (for example during a network
+        //      timeout), the JFX Window will crash. We need to implement a callback to this class then.
         if (GameInstance.connectToServer())
         {
             EClientInformation.INSTANCE.setPreferredSessionID(this.sessionIDField.getText());
@@ -84,7 +95,7 @@ public class MainMenuJFXController
         return;
     }
 
-    private boolean parseServerAddress()
+    private boolean isServerAddressInvalid()
     {
         if (!(this.serverAddressField.getText().isEmpty() || this.serverAddressField.getText().isBlank()))
         {
@@ -92,19 +103,19 @@ public class MainMenuJFXController
             if (tokens.length != 2)
             {
                 this.sessionJoinErrorField.setText("Server address is invalid.");
-                return false;
+                return true;
             }
 
             if (tokens[0].isEmpty() || tokens[0].isBlank())
             {
                 this.sessionJoinErrorField.setText("Server address is invalid.");
-                return false;
+                return true;
             }
 
             if (tokens[1].isEmpty() || tokens[1].isBlank())
             {
                 this.sessionJoinErrorField.setText("Server port is invalid.");
-                return false;
+                return true;
             }
 
             EClientInformation.INSTANCE.setServerIP(tokens[0]);
@@ -113,14 +124,14 @@ public class MainMenuJFXController
                 if (Integer.parseInt(tokens[1]) < EPort.MIN.i || Integer.parseInt(tokens[1]) > EPort.MAX.i)
                 {
                     this.sessionJoinErrorField.setText("Server port is invalid.");
-                    return false;
+                    return true;
                 }
                 EClientInformation.INSTANCE.setServerPort(Integer.parseInt(tokens[1]));
             }
             catch (NumberFormatException e)
             {
                 this.sessionJoinErrorField.setText("Server port is invalid.");
-                return false;
+                return true;
             }
         }
         else
@@ -129,7 +140,7 @@ public class MainMenuJFXController
             EClientInformation.INSTANCE.setServerPort(EArgs.PREF_SERVER_PORT.i);
         }
 
-        return true;
+        return false;
     }
 
 }
