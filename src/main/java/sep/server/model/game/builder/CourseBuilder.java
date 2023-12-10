@@ -1038,15 +1038,47 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,2)
-        fieldtypes.add(new EnergySpace(2));
+        fieldtypes.add(new EnergySpace(1));
         arrayListY.add(new Tile("1A",new Coordinate(2,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (2,3)
-        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {null}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"})); // TODO kommt top oder null rein?
         arrayListY.add(new Tile("1A",new Coordinate(2,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
+        // (2,4)
+        fieldtypes.add(new Gear("left"));
+        arrayListY.add(new Tile("1A",new Coordinate(2,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,5)
+        fieldtypes.add(new Gear("right"));
+        arrayListY.add(new Tile("1A",new Coordinate(2,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,6)
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"})); // TODO kommt bottom oder null rein?
+        arrayListY.add(new Tile("1A",new Coordinate(2,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,7)
+        fieldtypes.add(new EnergySpace(1));
+        arrayListY.add(new Tile("1A",new Coordinate(2,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,8)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(2,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,9)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(2,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
 
         return null;
     }
