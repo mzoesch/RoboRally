@@ -1,7 +1,7 @@
 package sep.view.viewcontroller;
 
 import sep.view.json.ChatMsgModel;
-import sep.view.json.DefaultServerRequestParser;
+import sep.view.json.RDefaultServerRequestParser;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.scenecontrollers.LobbyJFXController_v2;
 import sep.view.clientcontroller.GameInstance;
@@ -79,7 +79,7 @@ public final class ViewSupervisor extends Application
 
     // region Updating methods
 
-    public static <T> void handleChatMessage(DefaultServerRequestParser dsrp)
+    public static <T> void handleChatMessage(RDefaultServerRequestParser dsrp)
     {
         T ctrl = ViewSupervisor.getSceneController().getCurrentController();
 
@@ -119,7 +119,7 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    public static <T> void updatePlayerStatus(DefaultServerRequestParser dsrp)
+    public static <T> void updatePlayerStatus(RDefaultServerRequestParser dsrp)
     {
         T ctrl = ViewSupervisor.getSceneController().getCurrentController();
 

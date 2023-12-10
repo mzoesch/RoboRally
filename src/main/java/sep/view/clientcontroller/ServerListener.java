@@ -1,6 +1,6 @@
 package sep.view.clientcontroller;
 
-import sep.view.json.DefaultServerRequestParser;
+import sep.view.json.RDefaultServerRequestParser;
 import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
@@ -69,7 +69,7 @@ public class ServerListener implements Runnable
     private final InputStreamReader inputStreamReader;
     private final BufferedReader bufferedReader;
 
-    private DefaultServerRequestParser dsrp;
+    private RDefaultServerRequestParser dsrp;
 
     public ServerListener(Socket socket, InputStreamReader inputStreamReader, BufferedReader bufferedReader)
     {
@@ -118,7 +118,7 @@ public class ServerListener implements Runnable
 
                 try
                 {
-                    this.dsrp = new DefaultServerRequestParser(new JSONObject(r));
+                    this.dsrp = new RDefaultServerRequestParser(new JSONObject(r));
                     this.parseJSONRequestFromServer();
                     this.dsrp = null;
                 }
@@ -461,7 +461,7 @@ public class ServerListener implements Runnable
         }
 
         l.warn("Received unknown request from server. Ignoring.");
-        l.warn(this.dsrp.getRequest().toString(0));
+        l.warn(this.dsrp.request().toString(0));
 
         return;
     }

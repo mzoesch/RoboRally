@@ -1,6 +1,6 @@
 package sep.view.clientcontroller;
 
-import sep.view.json.DefaultServerRequestParser;
+import sep.view.json.RDefaultServerRequestParser;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
 
@@ -112,7 +112,7 @@ public enum EGameState
         return false;
     }
 
-    public static void addRemotePlayer(DefaultServerRequestParser dsrp)
+    public static void addRemotePlayer(RDefaultServerRequestParser dsrp)
     {
         // TODO This is not safe at all. More type checking needed.
 

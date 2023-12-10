@@ -12,20 +12,12 @@ import org.json.JSONArray;
  * For easier access to the JSON object received from the server. Does not contain actual logic.
  * We may want to split this into multiple classes later if it gets too messy.
  */
-public final class DefaultServerRequestParser
+public record RDefaultServerRequestParser(JSONObject request)
 {
-    private final JSONObject request;
-
-    public DefaultServerRequestParser(JSONObject request)
+    public RDefaultServerRequestParser(final JSONObject request)
     {
-        super();
         this.request = request;
         return;
-    }
-
-    public JSONObject getRequest()
-    {
-        return this.request;
     }
 
     public String getType_v2() throws JSONException
@@ -98,7 +90,9 @@ public final class DefaultServerRequestParser
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").getString(i)).toArray(String[]::new);
     }
 
-    /** Only valid for Not Your Cards request. Not the same as getCardsInHand(). */
+    /**
+     * Only valid for Not Your Cards request. Not the same as getCardsInHand().
+     */
     public int getCardsInHandCountNYC() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("cardsInHand");
@@ -109,29 +103,34 @@ public final class DefaultServerRequestParser
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cards").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cards").getString(i)).toArray(String[]::new);
     }
 
-    public String getErrorMessage()
+    public String getErrorMessage() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getString("error");
     }
 
-    public int getRegister()
+    public int getRegister() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("register");
     }
 
-    public boolean getRegisterFilled()
+    public boolean getRegisterFilled() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getBoolean("filled");
     }
 
-    public String getRotation()
+    public String getRotation() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getString("rotation");
     }
 
-    public int getWinningPlayer(){ return this.request.getJSONObject("messageBody").getInt("clientID");}
+    public int getWinningPlayer() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("clientID");
+    }
 
-    public int getEnergyCount() { return this.request.getJSONObject("messageBody").getInt("count");
+    public int getEnergyCount() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("count");
     }
 
     public JSONArray getActiveCards() throws JSONException
@@ -139,7 +138,10 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getJSONArray("activeCards");
     }
 
-    public String getCardName(){return this.request.getJSONObject("messageBody").getString("card");}
+    public String getCardName() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
 
     public String getActiveCardFromIdx(final int idx) throws JSONException
     {
@@ -151,40 +153,37 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getInt("clientID");
     }
 
-    public String getNewCard() { return this.request.getJSONObject("messageBody").getString("newCard");
+    public String getNewCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("newCard");
     }
 
-    public int getNumber() { return this.request.getJSONObject("messageBody").getInt("number");
+    public int getNumber() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("number");
     }
 
-    public String getCardsAsString() { return this.request.getJSONObject("messageBody").getJSONArray("cards").toString();
-
-    }
-
-    public String[] getDrawnDamageCards()
+    public String[] getDrawnDamageCards() throws JSONException
     {
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cards").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cards").getString(i)).toArray(String[]::new);
     }
 
-    public int getDamageCardsCountToDraw()
+    public int getDamageCardsCountToDraw() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("count");
     }
 
-    public String[] getAvailableDamagePilesToDraw()
+    public String[] getAvailableDamagePilesToDraw() throws JSONException
     {
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("availablePiles").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("availablePiles").getString(i)).toArray(String[]::new);
     }
 
-    public String getAvailablePilesAsString() { return this.request.getJSONObject("messageBody").getJSONArray("availablePiles").toString();
-    }
-
-    public boolean getIsConnected()
+    public boolean getIsConnected() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getBoolean("isConnected");
     }
 
-    public EConnectionLoss getNetAction()
+    public EConnectionLoss getNetAction() throws JSONException
     {
         return EConnectionLoss.fromString(this.request.getJSONObject("messageBody").getString("action"));
     }
