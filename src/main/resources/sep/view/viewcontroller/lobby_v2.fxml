@@ -117,6 +117,7 @@
                             <children>
                                 <Button
                                     text="Leave"
+                                    onAction="#onLeaveBtn"
                                     styleClass="danger-btn-mini"
                                 />
                                 <Button

@@ -107,6 +107,12 @@ public final class SceneController
         return;
     }
 
+    public void renderExistingScreen(final String ID)
+    {
+        this.activateScreen(ID);
+        return;
+    }
+
     public void killCurrentScreen()
     {
         RGameScene<?> currentScreen = this.getCurrentScreen();
