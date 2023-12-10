@@ -616,7 +616,7 @@ public class GameMode {
                     }
 
                     if(player.getCheckpointsCollected() == availableCheckPoints) {
-                        endGame();
+                        endGame(player);
                         for(Player player1 : players) {
                             new GameFinishedModel(player1.getPlayerController().getClientInstance(),
                                     player.getPlayerController().getPlayerID()).send();
@@ -627,7 +627,9 @@ public class GameMode {
         }
     }
 
-    public void endGame() {}
+    public void endGame(Player winner) {
+        session.handleGameFinished(winner.getPlayerController().getPlayerID());
+    }
 
     /**
      * The following method is called whenever the activation phase is ended. It empties the registers
