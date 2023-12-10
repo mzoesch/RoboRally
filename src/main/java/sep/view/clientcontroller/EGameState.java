@@ -359,6 +359,13 @@ public enum EGameState
         return;
     }
 
+    /** Will not re-render the player head up display. */
+    public void clearGotRegisters()
+    {
+        this.gotRegisters.clear();
+        return;
+    }
+
     public void addRegister(int idx, String register)
     {
         if (idx < 0 || idx >= this.registers.length)
