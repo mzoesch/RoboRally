@@ -34,6 +34,13 @@ public class CourseBuilder {
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
+            case("Extra Crispy") -> {
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> board4A = buildBoard("4A");
+                ArrayList<ArrayList<Tile>> entireCourse = appendBottom(boardStartA, board4A);
+                settingCoordinates(entireCourse);
+                return entireCourse;
+            }
             case("Test") -> {
                 return buildBoard("Test");
             }
@@ -151,6 +158,9 @@ public class CourseBuilder {
             }
             case("1A") -> {
                 return build1A();
+            }
+            case("4A") -> {
+                return build4A();
             }
         }
         return null;
@@ -912,8 +922,8 @@ public class CourseBuilder {
     }
 
     /**
-     * Builds board 5B (part of Lost Bearings)
-     * @return board 5B as ArrayList
+     * Builds board 1A (part of Lost Bearings)
+     * @return board 1A as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build1A() {
 
@@ -1452,6 +1462,15 @@ public class CourseBuilder {
 
         board.add(arrayListY);
         return board;
+    }
+
+
+    /**
+     * Builds board 4A (part of Extra Crispy)
+     * @return board 4A as ArrayList
+     */
+    public ArrayList<ArrayList<Tile>> build4A() {
+        return null;
     }
 
 }
