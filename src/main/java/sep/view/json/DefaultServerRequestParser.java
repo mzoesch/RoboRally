@@ -1,6 +1,7 @@
 package sep.view.json;
 
 import sep.view.lib.RCoordinate;
+import sep.view.clientcontroller.EConnectionLoss;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -150,7 +151,6 @@ public final class DefaultServerRequestParser
         return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getInt("clientID");
     }
 
-
     public String getNewCard() { return this.request.getJSONObject("messageBody").getString("newCard");
     }
 
@@ -165,4 +165,15 @@ public final class DefaultServerRequestParser
 
     public String getAvailablePilesAsString() { return this.request.getJSONObject("messageBody").getJSONArray("availablePiles").toString();
     }
+
+    public boolean getIsConnected()
+    {
+        return this.request.getJSONObject("messageBody").getBoolean("isConnected");
+    }
+
+    public EConnectionLoss getNetAction()
+    {
+        return EConnectionLoss.fromString(this.request.getJSONObject("messageBody").getString("action"));
+    }
+
 }

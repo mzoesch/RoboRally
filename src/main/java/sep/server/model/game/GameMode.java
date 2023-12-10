@@ -849,6 +849,13 @@ public class GameMode {
                 newCard).send();
     }
 
+    /* TODO Remove player after connection loss */
+    public void removePlayer(final int playerID)
+    {
+        l.error("Removing player with ID {} from game. Not implemented yet.", playerID);
+        return;
+    }
+
     // region Getters and Setters
 
     public ArrayList<Player> getPlayers()

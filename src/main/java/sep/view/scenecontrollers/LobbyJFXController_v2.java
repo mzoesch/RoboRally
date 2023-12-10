@@ -641,6 +641,17 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    public void onPlayerRemoved()
+    {
+        Platform.runLater(() ->
+        {
+            this.updateView();
+            return;
+        });
+
+        return;
+    }
+
     @FXML
     private void onLeaveBtn(final ActionEvent actionEvent)
     {

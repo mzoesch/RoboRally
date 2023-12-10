@@ -79,6 +79,7 @@ public final class Launcher
         {
             l.fatal("Server failed.");
             l.fatal(e.getMessage());
+            System.exit(EArgs.ERR);
         }
         finally
         {

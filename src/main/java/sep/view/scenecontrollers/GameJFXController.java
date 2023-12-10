@@ -1887,6 +1887,17 @@ public class GameJFXController
         return;
     }
 
+    public void onPlayerRemoved()
+    {
+        Platform.runLater(() ->
+        {
+            this.renderView();
+            return;
+        });
+
+        return;
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters

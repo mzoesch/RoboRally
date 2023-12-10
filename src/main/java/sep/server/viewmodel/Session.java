@@ -22,6 +22,7 @@ import sep.server.json.game.activatingphase.CardInfo;
 import sep.server.json.game.activatingphase.CurrentCardsModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.Card;
+import sep.server.json.common.ConnectionUpdateModel;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -73,9 +74,7 @@ public final class Session
         return;
     }
 
-    // TODO We handle the leaving player logic here. But we can not inform other clients about it. Because
-    //      we do not have the protocol for it yet.
-    public void leaveSession(PlayerController playerController)
+    public void leaveSession(final PlayerController playerController)
     {
         this.playerControllers.remove(playerController);
 
@@ -85,7 +84,39 @@ public final class Session
             return;
         }
 
-//        this.broadcastChatMessage("SERVER", String.format("%s left the session.", playerController.getPlayerName()));
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s left the session.", playerController.getPlayerName()));
+
+        if (this.getGameState().hasGameStarted())
+        {
+            l.debug("Client {} disconnected mid-game.", playerController.getClientInstance().getAddr());
+            this.getGameState().getAuthGameMode().removePlayer(playerController.getPlayerID());
+            this.broadcastConnectionUpdate(playerController, EConnectionLoss.REMOVE, false);
+            l.info("Client {} was successfully removed from the game.", playerController.getClientInstance().getAddr());
+            return;
+        }
+
+        /* TODO If the await thread is already running. */
+
+        l.debug("Client {} disconnected.", playerController.getClientInstance().getAddr());
+        this.broadcastConnectionUpdate(playerController, EConnectionLoss.REMOVE, false);
+        this.readyPlayerControllerOrder.remove(playerController);
+        l.info("Client {} was successfully removed from the session.", playerController.getClientInstance().getAddr());
+
+        return;
+    }
+
+    private void broadcastConnectionUpdate(final PlayerController tPC, final EConnectionLoss eCL, final boolean bConnected)
+    {
+        if (tPC == null)
+        {
+            return;
+        }
+
+        for (PlayerController PC : this.playerControllers)
+        {
+            new ConnectionUpdateModel(PC.getClientInstance(), tPC.getPlayerID(), eCL.toString(), bConnected).send();
+            continue;
+        }
 
         return;
     }

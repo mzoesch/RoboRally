@@ -267,6 +267,27 @@ public final class ViewSupervisor extends Application
         }
     }
 
+
+    public static <T> void onPlayerRemoved()
+    {
+        T ctrl = ViewSupervisor.getSceneController().getCurrentController();
+
+        if (ctrl instanceof LobbyJFXController_v2 lCtrl)
+        {
+            lCtrl.onPlayerRemoved();
+            return;
+        }
+
+        if (ctrl instanceof GameJFXController gCtrl)
+        {
+            gCtrl.onPlayerRemoved();
+            return;
+        }
+
+        l.error("Wanted to remove player but could not find the correct controller to handle it.");
+        return;
+    }
+
     // region Game Events
 
     public static void updateCourseView()
