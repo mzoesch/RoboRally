@@ -1470,6 +1470,36 @@ public class CourseBuilder {
      * @return board 4A as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build4A() {
+
+        ArrayList<ArrayList<Tile>> board = new ArrayList<>();
+        ArrayList<Tile> arrayListY = new ArrayList<>();
+        ArrayList<FieldType> fieldtypes = new ArrayList<>();
+
+        // (0,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(0,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,1)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(0,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,2)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(0,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,3)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(0,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,4)
+        fieldtypes.add(new Wall(new String[] {"bottom"}));
+        arrayListY.add(new Tile("4A",new Coordinate(0,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
         return null;
     }
 
