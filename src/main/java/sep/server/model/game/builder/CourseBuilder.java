@@ -974,8 +974,58 @@ public class CourseBuilder {
         board.add(arrayListY);
         arrayListY = new ArrayList<>();
 
+        // (1,0)
+        fieldtypes.add(new ConveyorBelt(1, "bottom", new String[] {"top"})); // TODO ist es top oder bottom
+        arrayListY.add(new Tile("1A",new Coordinate(1,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
 
+        // (1,1)
+        fieldtypes.add(new ConveyorBelt(1, "left", new String[] {"top"}));
+        arrayListY.add(new Tile("1A",new Coordinate(1,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
 
+        // (1,2)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(1,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,3)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(1,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,4)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(1,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,5)
+        fieldtypes.add(new CheckPoint(2));
+        arrayListY.add(new Tile("1A",new Coordinate(1,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,6)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(1,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,7)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("1A",new Coordinate(1,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,8)
+        fieldtypes.add(new ConveyorBelt(1, "bottom", new String[] {"left"}));
+        arrayListY.add(new Tile("1A",new Coordinate(1,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,9)
+        fieldtypes.add(new ConveyorBelt(1, "bottom", new String[] {"top"}));
+        arrayListY.add(new Tile("1A",new Coordinate(1,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
 
         return null;
     }
