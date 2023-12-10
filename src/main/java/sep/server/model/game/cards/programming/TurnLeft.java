@@ -13,9 +13,9 @@ public class TurnLeft extends AProgrammingCard implements IPlayableCard {
 
     @Override
     public void playCard(Player player, int currentRoundNumber) {
-        player.rotateRobotOnTileToTheRight();
-        player.rotateRobotOnTileToTheRight();
-        player.rotateRobotOnTileToTheRight();
+        player.getPlayerRobot().rotateRobotOnTileToTheRight();
+        player.getPlayerRobot().rotateRobotOnTileToTheRight();
+        player.getPlayerRobot().rotateRobotOnTileToTheRight();
         for(Player player1 : GameState.gameMode.getPlayers()) {
             new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                     player.getPlayerController().getPlayerID(),

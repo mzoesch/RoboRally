@@ -18,13 +18,9 @@ public class SpamFolder extends ASpecialProgrammingCard implements IPlayableCard
 
             if (currentCard instanceof SpamDamage) {
                 player.getDiscardPile().remove(i);
-
                 player.getGameMode().getSpamCardDeck().add((SpamDamage) currentCard);
-
                 break;
             }
-
-
         }
     }
 }

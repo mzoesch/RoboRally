@@ -13,9 +13,9 @@ public class EnergyRoutine extends ASpecialProgrammingCard implements IPlayableC
     @Override
     public void playCard(Player player, int currentRoundNumber){
         int currentEnergy = player.getEnergyCollected();
-        int newEnergie= currentEnergy +1;
-        player.setEnergyCollected(newEnergie);
+        int newEnergy= currentEnergy +1;
+        player.setEnergyCollected(newEnergy);
 
-        new EnergyModel(player.getPlayerController().getClientInstance(), player.getPlayerController().getPlayerID(), newEnergie,"EnergieRoutine").send();
+        new EnergyModel(player.getPlayerController().getClientInstance(), player.getPlayerController().getPlayerID(), newEnergy,"EnergieRoutine").send();
     }
 }

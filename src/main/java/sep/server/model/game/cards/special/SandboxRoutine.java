@@ -21,7 +21,7 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
         switch (auswahl) {
 
             case "Move1":
-                player.moveRobotOneTileForwards();
+                player.getPlayerRobot().moveRobotOneTileForwards();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new MovementModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -31,8 +31,8 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "Move2":
-                player.moveRobotOneTileForwards();
-                player.moveRobotOneTileForwards();
+                player.getPlayerRobot().moveRobotOneTileForwards();
+                player.getPlayerRobot().moveRobotOneTileForwards();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new MovementModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -42,9 +42,9 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "Move3":
-                player.moveRobotOneTileForwards();
-                player.moveRobotOneTileForwards();
-                player.moveRobotOneTileForwards();
+                player.getPlayerRobot().moveRobotOneTileForwards();
+                player.getPlayerRobot().moveRobotOneTileForwards();
+                player.getPlayerRobot().moveRobotOneTileForwards();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new MovementModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -54,7 +54,7 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "BackUp":
-                player.moveRobotOneTileBackwards();
+                player.getPlayerRobot().moveRobotOneTileBackwards();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new MovementModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -64,9 +64,9 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "TurnLeft":
-                player.rotateRobotOnTileToTheRight();
-                player.rotateRobotOnTileToTheRight();
-                player.rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -75,7 +75,7 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "TurnRight":
-                player.rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -84,8 +84,8 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "UTurn":
-                player.rotateRobotOnTileToTheRight();
-                player.rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),

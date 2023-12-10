@@ -13,9 +13,9 @@ public class RepeatRoutine extends ASpecialProgrammingCard implements IPlayableC
         super(cardType);
         this.cardType = "RepeatRoutine";
     }
+
     @Override
     public void playCard(Player player, int currentRoundNumber)  {
-
         if (currentRoundNumber == 0) {
             return;
         }
@@ -34,7 +34,6 @@ public class RepeatRoutine extends ASpecialProgrammingCard implements IPlayableC
     }
 
     private void handleDamageCard(Player player,  int currentRoundNumber) {
-
         if (player.getPlayerDeck().isEmpty()) {
             player.shuffleAndRefillDeck();
         }
@@ -49,7 +48,5 @@ public class RepeatRoutine extends ASpecialProgrammingCard implements IPlayableC
     private void handleUpgradeCard(Player player,  int currentRoundNumber) {
         //... Incomplete, because the Upgrade Cards still missing.
     }
-
-
 }
 

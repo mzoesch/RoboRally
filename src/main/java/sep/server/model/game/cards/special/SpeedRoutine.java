@@ -13,9 +13,9 @@ public class SpeedRoutine extends ASpecialProgrammingCard implements IPlayableCa
 
     @Override
     public void playCard(Player player, int currentRoundNumber) {
-        player.moveRobotOneTileForwards();
-        player.moveRobotOneTileForwards();
-        player.moveRobotOneTileForwards();
+        player.getPlayerRobot().moveRobotOneTileForwards();
+        player.getPlayerRobot().moveRobotOneTileForwards();
+        player.getPlayerRobot().moveRobotOneTileForwards();
 
         for(Player player1 : GameState.gameMode.getPlayers()) {
             new MovementModel(player1.getPlayerController().getClientInstance(),

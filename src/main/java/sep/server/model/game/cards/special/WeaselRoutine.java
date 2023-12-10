@@ -15,14 +15,14 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
     @Override
     public void playCard(Player player, int currentRoundNumber){
         //TODO Abfrage machen
-        String auswahl = null;
+        String selection = null;
 
-        switch (auswahl) {
+        switch (selection) {
 
             case "TurnLeft":
-                player.rotateRobotOnTileToTheRight();
-                player.rotateRobotOnTileToTheRight();
-                player.rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -31,7 +31,7 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
                 break;
 
             case "TurnRight":
-                player.rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -40,8 +40,8 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
                 break;
 
             case "UTurn":
-                player.rotateRobotOnTileToTheRight();
-                player.rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 for(Player player1 : GameState.gameMode.getPlayers()) {
                     new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
                             player.getPlayerController().getPlayerID(),
@@ -51,8 +51,6 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
                             "clockwise").send();
                 }
                 break;
-            default:
-                return;
         }
 
     }

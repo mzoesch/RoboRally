@@ -6,6 +6,7 @@ import sep.server.json.game.effects.RebootModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sep.server.model.game.tiles.Coordinate;
 
 import java.util.Objects;
 
@@ -87,6 +88,83 @@ public class Robot {
     public Course getCourse()
     {
         return course;
+    }
+
+    /**
+     * Moves the robot one tile based on the given direction.
+     * Updates the robot's position.
+     * @param forward True if the robot should move forwards, false if backwards.
+     */
+    public void moveRobotOneTile(final boolean forward) {
+        final int dir = forward ? 1 : -1;
+        final Coordinate currentCoordinate = this.getCurrentTile().getCoordinate();
+        Coordinate tCoordinate = null;
+
+        switch (this.getDirection().toLowerCase()) {
+            case "north", "top" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
+            case "south", "bottom" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
+            case "east", "right" -> tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
+            case "west", "left" -> tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
+            default -> l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getPlayerController().getPlayerID(), this.getDirection());
+        }
+
+        if (tCoordinate == null) {
+            l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getPlayerController().getPlayerID(), this.getDirection());
+            return;
+        }
+
+        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getPlayerController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
+
+        if (!this.getCourse().isCoordinateWithinBounds(tCoordinate)) {
+            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getPlayerController().getPlayerID(), tCoordinate.toString());
+            this.reboot();
+            return;
+        }
+
+        if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(tCoordinate))) {
+            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+            return;
+        }
+
+        this.getCourse().updateRobotPosition(this, tCoordinate);
+        l.debug("Player {}'s robot moved [from {} to {}].", this.determineRobotOwner().getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+    }
+
+    /**
+     * Moves the robot one tile forwards based on the robot's current direction.
+     * Updates the robot's position.
+     */
+    public void moveRobotOneTileForwards() {
+        moveRobotOneTile(true);
+    }
+
+    /**
+     * Moves the robot one tile backwards based on the robot's current direction.
+     * Updates the robot's position.
+     */
+    public void moveRobotOneTileBackwards() {
+        moveRobotOneTile(false);
+    }
+
+    /**
+     * Rotates the robot 90 degrees to the right
+     * Updates the robot's direction
+     */
+    public void rotateRobotOnTileToTheRight(){
+        String currentDirection = this.getDirection();
+        String newDirection;
+
+        switch (currentDirection.toLowerCase()) {
+            case "north", "top" -> newDirection = "right";
+            case "east", "right" -> newDirection = "bottom";
+            case "south", "bottom" -> newDirection = "left";
+            case "west", "left" -> newDirection = "top";
+            default -> {
+                l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getPlayerController().getPlayerID(), this.getDirection());
+                return;
+            }
+        }
+        this.setDirection(newDirection);
     }
 
     public void reboot() {
@@ -195,5 +273,18 @@ public class Robot {
             return false;
         }
         return true;
+    }
+
+    /**
+     * The following method is used to find the owner (player) of a robot.
+     * @return owner
+     */
+    public Player determineRobotOwner() {
+        for(Player player : GameState.gameMode.getPlayers()) {
+            if(player.getPlayerRobot() == this) {
+                return player;
+            }
+        }
+        return null;
     }
 }
