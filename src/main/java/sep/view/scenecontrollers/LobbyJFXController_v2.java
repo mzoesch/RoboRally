@@ -1,6 +1,5 @@
 package sep.view.scenecontrollers;
 
-import sep.view.json.DefaultServerRequestParser;
 import sep.view.json.lobby.PlayerValuesModel;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.clientcontroller.GameInstance;
@@ -10,6 +9,7 @@ import sep.view.clientcontroller.RemotePlayer;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.json.lobby.SetStatusModel;
 import sep.view.json.lobby.CourseSelectedModel;
+import sep.view.viewcontroller.SceneController;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -642,7 +642,17 @@ public final class LobbyJFXController_v2
     }
 
     @FXML
-    public void onReadyBtn(ActionEvent actionEvent)
+    private void onLeaveBtn(final ActionEvent actionEvent)
+    {
+        l.debug("Player clicked leave button.");
+        GameInstance.handleServerDisconnect();
+        ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
+
+        return;
+    }
+
+    @FXML
+    private void onReadyBtn(final ActionEvent actionEvent)
     {
         l.debug("Player clicked ready button.");
         if (this.bReadyBtnClicked)
@@ -659,7 +669,7 @@ public final class LobbyJFXController_v2
 
     // region Getters and Setters
 
-    private String getCommand(String token)
+    private String getCommand(final String token)
     {
         if (!token.contains(" "))
         {
@@ -669,12 +679,12 @@ public final class LobbyJFXController_v2
         return token.substring(1, token.indexOf(" "));
     }
 
-    private boolean isChatMsgACommand(String token)
+    private boolean isChatMsgACommand(final String token)
     {
         return token.startsWith(ChatMsgModel.COMMAND_PREFIX);
     }
 
-    private boolean isChatMsgValid(String token)
+    private boolean isChatMsgValid(final String token)
     {
         return !token.isEmpty() && token.length() <= EGameState.MAX_CHAT_MESSAGE_LENGTH;
     }
