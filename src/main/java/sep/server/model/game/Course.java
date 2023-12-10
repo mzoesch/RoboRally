@@ -7,20 +7,18 @@ import sep.server.model.game.tiles.*;
 import java.util.ArrayList;
 
 /**
- * Klasse, in der das aktuelle Spielbrett gespeichert ist
+ * Class saving current game course
  */
 public class Course {
-
     private static final Logger l = LogManager.getLogger(GameState.class);
-    private ArrayList<ArrayList<Tile>> course;
 
+    private final ArrayList<ArrayList<Tile>> course;
 
     private final String startingTurningDirection;
 
     /**
-     * Erstellt das Spielbrett abhängig vom übergebenen Kartennamen
-     *
-     * @param courseName Name des entsprechenden Spielfelds
+     * Creates course depending on course name passed.
+     * @param courseName name of corresponding course
      */
     public Course(String courseName) {
         super();
@@ -29,38 +27,25 @@ public class Course {
         startingTurningDirection = courseBuilder.getStartingTurningDirection(courseName);
     }
 
-    public void activateBoard() {
-    }
-
     /**
      * Updates the position of the robot on the game board.
-     *
      * @param robot The robot who get updated
      * @param newCoordinate The new coordinate where the robot is moved
      */
     public void updateRobotPosition(Robot robot, Coordinate newCoordinate) {
-
-        //Update Old Tile in Course
         getTileByCoordinate(robot.getCurrentTile().getCoordinate()).setRobot(null);
-
-        //Update New Tile in Course
         getTileByCoordinate(newCoordinate).setRobot(robot);
-
-        //Update Robot
         robot.setCurrentTile(getTileByCoordinate(newCoordinate));
-
     }
 
     /**
      * Checks if the  coordinate is within the bounds of the game board.
-     *
      * @param coordinate The coordinate to be checked
      * @return True if the coordinate is within the game board bounds, otherwise false.
      */
     public boolean isCoordinateWithinBounds(Coordinate coordinate) {
         int x = coordinate.getX();
         int y = coordinate.getY();
-
         return x >= 0 && x < course.size() && y >= 0 && y < course.get(0).size();
     }
 
@@ -86,7 +71,6 @@ public class Course {
             return null;
         }
     }
-
 
     public Tile getTopNeighbor(Tile tile){
         Coordinate coordinate = tile.getCoordinate().getTopNeighbor();
@@ -120,26 +104,15 @@ public class Course {
         return this;
     }
 
-    public Coordinate getPriorityAntennaCoordinate()
-    {
-        for (ArrayList<Tile> ts : this.course)
-        {
-            for (Tile t : ts)
-            {
-                if (t.getFieldTypes().stream().anyMatch(elem -> elem instanceof Antenna))
-                {
+    public Coordinate getPriorityAntennaCoordinate() {
+        for (ArrayList<Tile> ts : this.course) {
+            for (Tile t : ts) {
+                if (t.getFieldTypes().stream().anyMatch(elem -> elem instanceof Antenna)) {
                     return t.getCoordinate();
                 }
-
-                continue;
             }
-
-            continue;
         }
-
         return null;
     }
-
-
 
 }
