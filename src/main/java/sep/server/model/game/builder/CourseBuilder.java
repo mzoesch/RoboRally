@@ -1097,7 +1097,6 @@ public class CourseBuilder {
 
         // (3,3)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new Laser("left", 4));
         arrayListY.add(new Tile("1A",new Coordinate(3,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1151,8 +1150,23 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,3)
-        fieldtypes.add(new Laser("left", 4));
+        fieldtypes.add(new Laser("left", 1)); // TODO was muss der lasercount sein?
         arrayListY.add(new Tile("1A",new Coordinate(4,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,4)
+        fieldtypes.add(new EnergySpace(1));
+        arrayListY.add(new Tile("1A",new Coordinate(4,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,5)
+        fieldtypes.add(new Gear("right"));
+        arrayListY.add(new Tile("1A",new Coordinate(4,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,6)
+        fieldtypes.add(new Laser("right", 1)); // TODO was muss der lasercount sein?
+        arrayListY.add(new Tile("1A",new Coordinate(4,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         return null;
