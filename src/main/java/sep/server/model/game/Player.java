@@ -12,11 +12,10 @@ import java.util.Collections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Player
-{
+public class Player {
     private static final Logger l = LogManager.getLogger(Player.class);
 
-    private int priority; //TODO aktuell überflüssig oder?; falls nicht, muss sie im Konstruktor gesetzt werden
+    private int priority;
 
     private final Session session;
     private final PlayerController playerController;
@@ -35,8 +34,7 @@ public class Player
      */
     private GameMode gameMode;
 
-    public Player(final PlayerController playerController, final Course currentCourse, final Session session)
-    {
+    public Player(final PlayerController playerController, final Course currentCourse, final Session session) {
         this.session = session;
         this.playerController = playerController;
         this.playerRobot = new Robot(currentCourse);
@@ -52,13 +50,14 @@ public class Player
         this.checkpointsCollected = 0;
 
         this.gameMode = session.getGameState().getAuthGameMode();
-
-        return;
     }
 
+    /**
+     * The following method shuffles the discard pile and refills the player deck.
+     */
     public void shuffleAndRefillDeck() {
         Collections.shuffle(discardPile);
-        playerDeck.addAll(playerDeck.size(), discardPile); // Refill playerDeck with the shuffled discardPile at the end of PlayerDeck
+        playerDeck.addAll(playerDeck.size(), discardPile);
         discardPile.clear();
     }
 
@@ -66,62 +65,41 @@ public class Player
     /**
     * Moves the robot one tile based on the given direction.
     * Updates the robot's position.
-    *
     * @param forward True if the robot should move forwards, false if backwards.
     */
-    public void moveRobotOneTile(final boolean forward)
-    {
+    public void moveRobotOneTile(final boolean forward) {
         final int dir = forward ? 1 : -1;
         final Coordinate currentCoordinate = this.getPlayerRobot().getCurrentTile().getCoordinate();
         Coordinate tCoordinate = null;
-        switch (this.getPlayerRobot().getDirection().toLowerCase())
-        {
-            case "north", "top":
-                tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
-                break;
 
-            case "south", "bottom":
-                tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
-                break;
-
-            case "east", "right":
-                tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
-                break;
-
-            case "west", "left":
-                tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
-                break;
-
-            default:
-                l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
-                break;
+        switch (this.getPlayerRobot().getDirection().toLowerCase()) {
+            case "north", "top" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
+            case "south", "bottom" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
+            case "east", "right" -> tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
+            case "west", "left" -> tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
+            default -> l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
         }
 
-        if (tCoordinate == null)
-        {
+        if (tCoordinate == null) {
             l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
             return;
         }
 
         l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.getPlayerController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
 
-        if (!this.getPlayerRobot().getCourse().isCoordinateWithinBounds(tCoordinate))
-        {
+        if (!this.getPlayerRobot().getCourse().isCoordinateWithinBounds(tCoordinate)) {
             l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.getPlayerController().getPlayerID(), tCoordinate.toString());
             this.getPlayerRobot().reboot();
             return;
         }
 
-        if (this.getPlayerRobot().isNotTraversable(this.getPlayerRobot().getCurrentTile(), this.getPlayerRobot().getCourse().getTileByCoordinate(tCoordinate)))
-        {
-            l.debug("Player {}'s robot wanted to traverse to an impassable tile [from {} to {}]. Ignoring.", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+        if (!this.getPlayerRobot().isTraversable(this.getPlayerRobot().getCurrentTile(), this.getPlayerRobot().getCourse().getTileByCoordinate(tCoordinate))) {
+            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
             return;
         }
 
         this.getPlayerRobot().getCourse().updateRobotPosition(this.getPlayerRobot(), tCoordinate);
         l.debug("Player {}'s robot moved [from {} to {}].", this.getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
-
-        return;
     }
 
     /**
@@ -150,23 +128,15 @@ public class Player
         String newDirection;
 
         switch (currentDirection.toLowerCase()) {
-            case "north", "top":
-                newDirection = "EAST";
-                break;
-            case "east", "right":
-                newDirection = "SOUTH";
-                break;
-            case "south", "bottom":
-                newDirection = "WEST";
-                break;
-            case "west", "left":
-                newDirection = "NORTH";
-                break;
-            default:
+            case "north", "top" -> newDirection = "right";
+            case "east", "right" -> newDirection = "bottom";
+            case "south", "bottom" -> newDirection = "left";
+            case "west", "left" -> newDirection = "top";
+            default -> {
                 l.error("Player {}'s robot has an invalid direction: {}", this.getPlayerController().getPlayerID(), this.getPlayerRobot().getDirection());
                 return;
+            }
         }
-
         robot.setDirection(newDirection);
     }
 
@@ -174,28 +144,23 @@ public class Player
      * Adds a playable card to the specified register position.
      * If all registers are full after the addition, it notifies the session that the selection is finished. If all
      * players have finished their selection, the next phase will be started.
-     *
      * @param card Name of the card to be added to the register
      * @param pos  Position of the register to add the card to (zero-based)
      */
-    public void setCardToRegister(final String card, final int pos)
-    {
-        if (this.hasPlayerFinishedProgramming())
-        {
+    public void setCardToRegister(final String card, final int pos) {
+        if (this.hasPlayerFinishedProgramming()) {
             l.warn("Player {} has already finished programming and, therefore, cannot change their programming registers anymore.", this.playerController.getPlayerName());
             return;
         }
 
-        if (pos < 0 || pos > 4)
-        {
+        if (pos < 0 || pos > 4) {
             l.error("Invalid register position: " + pos);
             return;
         }
 
         final IPlayableCard playableCard = this.getCardByName(card);
 
-        if (playableCard == null)
-        {
+        if (playableCard == null) {
             this.registers[pos] = null;
             this.session.sendCardSelected(this.playerController.getPlayerID(), pos, false);
             return;
@@ -204,28 +169,22 @@ public class Player
         this.registers[pos] = playableCard;
         this.session.sendCardSelected(getPlayerController().getPlayerID(), pos, true);
 
-        if (this.hasPlayerFinishedProgramming())
-        {
+        if (this.hasPlayerFinishedProgramming()) {
             l.debug("Player " + this.playerController.getPlayerName() + " has finished programming.");
             this.session.sendSelectionFinished(this.playerController.getPlayerID());
 
-            if (this.session.haveAllPlayersFinishedProgramming())
-            {
+            if (this.session.haveAllPlayersFinishedProgramming()) {
                 l.debug("All players have finished programming in time. Interrupting timer.");
                 // TODO Interrupt timer
                 this.session.getGameState().getAuthGameMode().handleNewPhase(EGamePhase.ACTIVATION);
-                return;
             }
 
             // TODO We ignore this for now.
             // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
         }
-
-        return;
     }
 
     public void handleIncompleteProgramming() {
-
         discardPile.addAll(playerHand);
         playerHand.clear();
         shuffleAndRefillDeck();
@@ -238,38 +197,24 @@ public class Player
         session.sendCardsYouGotNow(getPlayerController(), getRegistersAsStringArray());
     }
 
-    // region Getters and Setters
-
     /**
      * @return True if all registers are full, false otherwise
      */
-    public boolean hasPlayerFinishedProgramming()
-    {
-        for (final IPlayableCard c : this.registers)
-        {
-            if (c == null)
-            {
+    public boolean hasPlayerFinishedProgramming() {
+        for (final IPlayableCard c : this.registers) {
+            if (c == null) {
                 return false;
             }
-
-            continue;
         }
-
         return true;
     }
 
-    public IPlayableCard getCardByName(final String cardName)
-    {
-        for (IPlayableCard c : this.playerHand)
-        {
-            if (c.getCardType().equals(cardName))
-            {
+    public IPlayableCard getCardByName(final String cardName) {
+        for (IPlayableCard c : this.playerHand) {
+            if (c.getCardType().equals(cardName)) {
                 return c;
             }
-
-            continue;
         }
-
         return null;
     }
 
@@ -308,38 +253,27 @@ public class Player
         return this.registers[idx];
     }
 
-    public String[] getRegistersAsStringArray()
-    {
+    public String[] getRegistersAsStringArray() {
         final String[] registersArray = new String[this.registers.length];
-        for (int i = 0; i < this.registers.length; i++)
-        {
+        for (int i = 0; i < this.registers.length; i++) {
             registersArray[i] = this.registers[i].getCardType();
         }
-
         return registersArray;
     }
 
-    public String[] getPlayerHandAsStringArray()
-    {
+    public String[] getPlayerHandAsStringArray() {
         final String[] handArray = new String[this.playerHand.size()];
-        for (int i = 0; i < this.playerHand.size(); i++)
-        {
+        for (int i = 0; i < this.playerHand.size(); i++) {
             handArray[i] = this.playerHand.get(i).getCardType();
         }
-
         return handArray;
     }
 
-    public void setCardInRegister(final int idx, final IPlayableCard newCard)
-    {
-        if (this.registers[idx] != null)
-        {
+    public void setCardInRegister(final int idx, final IPlayableCard newCard) {
+        if (this.registers[idx] != null) {
             this.discardPile.add(this.registers[idx]);
         }
-
         this.registers[idx] = newCard;
-
-        return;
     }
 
     public int getPriority()
@@ -347,10 +281,8 @@ public class Player
         return priority;
     }
 
-    public void setPriority(final int priority)
-    {
+    public void setPriority(final int priority) {
         this.priority = priority;
-        return;
     }
 
     public int getCheckpointsCollected()
@@ -358,10 +290,8 @@ public class Player
         return checkpointsCollected;
     }
 
-    public void setCheckpointsCollected(final int checkpointsCollected)
-    {
+    public void setCheckpointsCollected(final int checkpointsCollected) {
         this.checkpointsCollected = checkpointsCollected;
-        return;
     }
     public GameMode getGameMode() {
         return gameMode;
@@ -381,7 +311,4 @@ public class Player
     {
         return upgradeCards;
     }
-
-    // endregion Getters and Setters
-
 }
