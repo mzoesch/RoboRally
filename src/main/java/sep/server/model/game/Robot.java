@@ -24,6 +24,31 @@ public class Robot {
         currentTile = null;
     }
 
+    public String getDirection()
+    {
+        return direction;
+    }
+
+    public void setDirection(String direction)
+    {
+        this.direction = direction;
+    }
+
+    public Tile getCurrentTile()
+    {
+        return currentTile;
+    }
+
+    public void setCurrentTile(Tile currentTile)
+    {
+        this.currentTile = currentTile;
+    }
+
+    public Course getCourse()
+    {
+        return course;
+    }
+
     /**
      * Validates a passed starting point: Is it on the course? Is it a starting point? Is it still free?
      * @param x x coordinate of the starting point
@@ -63,31 +88,6 @@ public class Robot {
             }
         }
         return "bottom";
-    }
-
-    public String getDirection()
-    {
-        return direction;
-    }
-
-    public void setDirection(String direction)
-    {
-        this.direction = direction;
-    }
-
-    public Tile getCurrentTile()
-    {
-        return currentTile;
-    }
-
-    public void setCurrentTile(Tile currentTile)
-    {
-        this.currentTile = currentTile;
-    }
-
-    public Course getCourse()
-    {
-        return course;
     }
 
     /**
@@ -168,45 +168,44 @@ public class Robot {
     }
 
     public void reboot() {
-        for (Player player : GameState.gameMode.getPlayers()) {
-            if (this.equals(player.getPlayerRobot()) && GameState.gameMode.getSpamDeck().size() >= 2) {
-                Tile sourceTile = this.getCurrentTile();
-                Tile restartPoint = null;
-                //TODO get rebootDirection from client
-                String rebootDirection = null;
+        Player robotOwner = determineRobotOwner();
+        Tile sourceTile = this.getCurrentTile();
+        Tile restartPoint = null;
+        //TODO get rebootDirection from client
+        String rebootDirection = null;
 
-                player.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
-                player.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
+        if(GameState.gameMode.getSpamDeck().size() >= 2) {
+            robotOwner.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
+            robotOwner.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
+        }
 
-                for (int i = 0; i < player.getRegisters().length; i++) {
-                    player.getDiscardPile().add(player.getCardByRegisterIndex(i));
-                    player.setCardInRegister(i, null);
-                }
+        for (int i = 0; i < robotOwner.getRegisters().length; i++) {
+            robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));
+            robotOwner.setCardInRegister(i, null);
+        }
 
-                if(Objects.equals(GameState.getCourseName(), "DizzyHighway")) {
-                    restartPoint = course.getTileByNumbers(4,3);
-                    //TODO cover case when robot rebooted on Start Board
-                }
+        if(Objects.equals(GameState.getCourseName(), "DizzyHighway")) {
+            restartPoint = course.getTileByNumbers(4,3);
+            //TODO cover case when robot rebooted on Start Board
+        }
 
-                this.setCurrentTile(restartPoint);
+        this.setCurrentTile(restartPoint);
 
-                if(rebootDirection == null) {
-                    rebootDirection = "top";
-                }
-                this.setDirection(rebootDirection);
+        if(rebootDirection == null) {
+            rebootDirection = "top";
+        }
+        this.setDirection(rebootDirection);
 
-                if(restartPoint != null) {
-                    for(Player player1 : GameState.gameMode.getPlayers()) {
-                        new RebootModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID()).send();
-                        new RebootDirectionModel(player1.getPlayerController().getClientInstance(),
-                                rebootDirection).send();
-                        new MovementModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(),
-                                restartPoint.getCoordinate().getX(),
-                                restartPoint.getCoordinate().getY()).send();
-                    }
-                }
+        if(restartPoint != null) {
+            for(Player player : GameState.gameMode.getPlayers()) {
+                new RebootModel(player.getPlayerController().getClientInstance(),
+                        robotOwner.getPlayerController().getPlayerID()).send();
+                new RebootDirectionModel(player.getPlayerController().getClientInstance(),
+                        rebootDirection).send();
+                new MovementModel(player.getPlayerController().getClientInstance(),
+                        robotOwner.getPlayerController().getPlayerID(),
+                        restartPoint.getCoordinate().getX(),
+                        restartPoint.getCoordinate().getY()).send();
             }
         }
     }
