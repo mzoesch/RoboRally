@@ -271,12 +271,11 @@ public class GameMode {
 
                         if (!course.isCoordinateWithinBounds(newCoordinate)) {
                             player.getPlayerRobot().reboot();
-                            return;
                         }
 
-                        if (player.getPlayerRobot().isNotTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
+                        /*if (player.getPlayerRobot().isTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
                             return;
-                        }
+                        }*/
 
                         course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
 
@@ -330,7 +329,7 @@ public class GameMode {
                 String robotOldDirection = player.getPlayerRobot().getDirection();
                 if(inDirection != null && outDirection != null) {
                     for(String direction : inDirection) {
-                        if(direction != outDirection) {
+                        if(!Objects.equals(direction, outDirection)) {
                             switch(outDirection) {
                                 case("top") -> player.getPlayerRobot().setDirection("top");
                                 case("right") -> player.getPlayerRobot().setDirection("right");
@@ -381,12 +380,11 @@ public class GameMode {
 
                             if (!course.isCoordinateWithinBounds(newCoordinate)) {
                                 player.getPlayerRobot().reboot();
-                                return;
                             }
 
-                            if (player.getPlayerRobot().isNotTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
+                            /*if (player.getPlayerRobot().isTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
                                 return;
-                            }
+                            }*/
 
                             course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
 
