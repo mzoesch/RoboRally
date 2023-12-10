@@ -6,7 +6,7 @@ import sep.server.model.game.tiles.*;
 import java.util.ArrayList;
 
 /**
- * Klasse, die das jeweilige Spielfeld erstellt
+ * Class creating the corresponding course
  */
 public class CourseBuilder {
 
@@ -14,9 +14,9 @@ public class CourseBuilder {
     }
 
     /**
-     * Baut das entsprechende Spielfeld aus den einzelnen Boards
-     * @param courseName Name des Spielfelds
-     * @return komplettes Spielfeld als ArrayList<ArrayList<Tile>>
+     * Builds the corresponding course from the individual boards
+     * @param courseName name of the course
+     * @return complete course as ArrayList<ArrayList<Tile>>
      */
     public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
         switch(courseName){
@@ -31,18 +31,18 @@ public class CourseBuilder {
                 return buildBoard("Test");
             }
         }
+
         //TODO Notlösung, falls CourseName nicht richtig übergeben wird
         ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
         ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
         ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
         settingCoordinates(entireCourse);
         return entireCourse;
-
     }
 
     /**
-     * Bekommt ein Spielfeld übergeben und setzt die Nachbarkoordinaten der einzelnen Tiles
-     * @param course Spielfeld
+     * Is passed a course and sets the neighbour coordinates for all tiles
+     * @param course passed course
      */
     public  void settingCoordinates(ArrayList<ArrayList<Tile>> course){
         for(int i = 0; i <  course.size(); i++){
@@ -102,10 +102,10 @@ public class CourseBuilder {
         return "clockwise";
     }
     /**
-     * Fügt ein Board von rechts an ein anderes Board an (funktioniert aktuell nur bei gleicher Länge)
-     * @param leftBoard linkes Board
-     * @param rightBoard rechtes Board (wird angefügt)
-     * @return ArrayList, die das zusammengefügtes Board repräsentiert
+     * Appends a board to the right of another board. Only works for boards of the same length.
+     * @param leftBoard left board
+     * @param rightBoard right board (is appended)
+     * @return ArrayList that represents the entire board
      */
     public  ArrayList<ArrayList<Tile>> appendRight(ArrayList<ArrayList<Tile>> leftBoard, ArrayList<ArrayList<Tile>> rightBoard){
 
@@ -114,13 +114,12 @@ public class CourseBuilder {
     }
 
     /**
-     * Fügt ein Board unterhalb des anderen Boards hinzu (funktioniert aktuell nur bei gleicher Breite)
-     * @param topBoard oberes Board
-     * @param bottomBoard unteres Board
-     * @return ArrayList, die das zusammengefügte Board repräsentiert
+     * Appends a board to the bottom of another board. Only works for boards of the same width.
+     * @param topBoard top board
+     * @param bottomBoard bottom board (is appended)
+     * @return ArrayList that represents the entire board
      */
     public  ArrayList<ArrayList<Tile>> appendBottom(ArrayList<ArrayList<Tile>> topBoard, ArrayList<ArrayList<Tile>> bottomBoard){
-
         for(int i = 0; i< topBoard.size(); i++){
             topBoard.get(i).addAll(bottomBoard.get(i));
         }
@@ -128,12 +127,11 @@ public class CourseBuilder {
     }
 
     /**
-     * Baut ein Board abhängig vom Boardname
-     * @param boardName Name des zu erstellenden Boards
-     * @return erstelltes Board
+     * Builds a board depending on board name
+     * @param boardName name of the board to be created
+     * @return created board
      */
     public ArrayList<ArrayList<Tile>> buildBoard(String boardName){
-
         switch(boardName){
             case("Test") -> {
                 return buildTestA();
@@ -141,18 +139,16 @@ public class CourseBuilder {
             case("StartA") -> {
                 return buildStartA();
             }
-
             case("5B") -> {
                 return build5B();
             }
-
         }
         return null;
     }
 
     /**
-     * Baut das TestBoard aus Protokollv0.1
-     * @return ArrayList des TestBoards
+     * Builds the test board from protocol v0.1
+     * @return test board as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildTestA(){
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
@@ -190,8 +186,8 @@ public class CourseBuilder {
     }
 
     /**
-     * Baut das Board StartA (Teil von DizzyHighway)
-     * @return ArrayList des Boards StartA
+     * Builds board StartA (part of DizzyHighway)
+     * @return StartA as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildStartA()
     {
@@ -360,8 +356,8 @@ public class CourseBuilder {
     }
 
     /**
-     * Baut das Board 5B (Teil von DizzyHighway)
-     * @return ArrayList des Boards 5B
+     * Builds board 5B (part of DizzyHighway)
+     * @return board 5B as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build5B(){
 
