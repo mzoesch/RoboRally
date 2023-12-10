@@ -365,8 +365,16 @@ public class ServerListener implements Runnable
             return;
         }
 
-        if (Objects.equals(dsrp.getType_v2(), "ConnectionUpdate")) {
-            l.debug("Received connection update from server.");
+        if (Objects.equals(dsrp.getType_v2(), "ConnectionUpdate"))
+        {
+            l.debug("Client {}s's net connection status was updated. Client is connected: {}; Taking action: {}.", dsrp.getPlayerID(), dsrp.getIsConnected(), dsrp.getNetAction().toString());
+            if (Objects.requireNonNull(dsrp.getNetAction()) == EConnectionLoss.REMOVE)
+            {
+                EGameState.INSTANCE.removeRemotePlayer(dsrp.getPlayerID());
+                return;
+            }
+            
+            l.error("Received net action {}, but the client could not understand it. Ignoring.", dsrp.getNetAction().toString());
             return;
         }
 

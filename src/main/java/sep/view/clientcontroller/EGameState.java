@@ -133,6 +133,13 @@ public enum EGameState
         return;
     }
 
+    public void removeRemotePlayer(int playerID)
+    {
+        this.remotePlayers.removeIf(rp -> rp.getPlayerID() == playerID);
+        ViewSupervisor.onPlayerRemoved();
+        return;
+    }
+
     /** If the robot at a specific index is already selected by a player. */
     public boolean isPlayerRobotUnavailable(int idx)
     {
