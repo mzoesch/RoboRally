@@ -8,19 +8,19 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sep.server.model.game.tiles.Coordinate;
 
-import java.util.Objects;
-
 public class Robot {
     private static final Logger l = LogManager.getLogger(GameState.class);
 
     String direction;
     private final Course course;
+    private Tile startingPoint;
 
     /** @deprecated Make to gateway method */
     private Tile currentTile;
 
     public Robot(Course course) {
         this.course = course;
+        startingPoint = null;
         currentTile = null;
     }
 
@@ -70,9 +70,9 @@ public class Robot {
     }
 
     public void setStartingPoint(int x, int y) {
-        Tile chosenStart = course.getTileByNumbers(x, y);
+        startingPoint = course.getTileByNumbers(x, y);
         direction = setStartDirection();
-        currentTile = chosenStart;
+        currentTile = startingPoint;
     }
 
     private String setStartDirection() {
@@ -167,6 +167,10 @@ public class Robot {
         this.setDirection(newDirection);
     }
 
+    /**
+     * The following method handles the rebooting of a robot and sends all respective JSON messages.
+     * The player draws two spam cards and the robot is reset.
+     */
     public void reboot() {
         //TODO get rebootDirection from client
 
@@ -185,9 +189,10 @@ public class Robot {
             robotOwner.setCardInRegister(i, null);
         }
 
-        if(Objects.equals(GameState.getCourseName(), "DizzyHighway")) {
-            restartPoint = course.getTileByNumbers(4,3);
-            //TODO cover case when robot rebooted on Start Board
+        //TODO what if tile is occupied
+        switch(sourceTile.getBoardName()) {
+            case "StartA" -> restartPoint = startingPoint;
+            case "5B" -> restartPoint = course.getTileByNumbers(4,3);
         }
 
         this.setCurrentTile(restartPoint);
