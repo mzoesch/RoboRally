@@ -17,6 +17,8 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.function.Supplier;
+import java.util.HashMap;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -26,12 +28,48 @@ public class ServerListener implements Runnable
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
 
-    /** Escape character to close the connection to the server. In ASCII this is the dollar sign. */
-    private static final int ESCAPE_CHARACTER = 36;
+    private final HashMap<String, Supplier<Boolean>> serverReq =
+    new HashMap<String, Supplier<Boolean>>()
+    {{
+        put("Alive", ServerListener.this::onAlive);
+        put("PlayerAdded", ServerListener.this::onCorePlayerAttributesChanged);
+        put("ReceivedChat", ServerListener.this::onChatMsg);
+        put("PlayerStatus", ServerListener.this::onLobbyPlayerStatus);
+        put("SelectMap", ServerListener.this::onSelectMapRequest);
+        put("MapSelected", ServerListener.this::onMapSelected);
+        put("GameStarted", ServerListener.this::onGameStart);
+        put("ActivePhase", ServerListener.this::onPhaseChange);
+        put("CurrentPlayer", ServerListener.this::onPlayerTurnChange);
+        put("Error", ServerListener.this::onErrorMsg);
+        put("CardPlayed", ServerListener.this::onCardPlayed);
+        put("StartingPointTaken", ServerListener.this::onStartingPointTaken);
+        put("PlayerTurning", ServerListener.this::onRobotRotationUpdate);
+        put("CardSelected", ServerListener.this::onRegisterSlotUpdate);
+        put("SelectionFinished", ServerListener.this::onPlayerFinishedProgramming);
+        put("CardsYouGotNow", ServerListener.this::onForcedFinishProgramming);
+        put("NotYourCards", ServerListener.this::onPlayerProgrammingCardsReceived);
+        put("ShuffleCoding", ServerListener.this::onProgrammingDeckShuffled);
+        put("TimerStarted", ServerListener.this::onProgrammingTimerStart);
+        put("TimerEnded", ServerListener.this::onProgrammingTimerEnd);
+        put("YourCards", ServerListener.this::onProgrammingCardsReceived);
+        put("CurrentCards", ServerListener.this::onCurrentRegisterCards);
+        put("ReplaceCard", ServerListener.this::onCurrentRegisterCardReplacement);
+        put("Animation", ServerListener.this::onAnimationPlay);
+        put("CheckPointReached", ServerListener.this::onCheckpointReached);
+        put("Energy", ServerListener.this::onEnergyTokenChanged);
+        put("GameFinished", ServerListener.this::onGameEnd);
+        put("Movement", ServerListener.this::onPlayerPositionUpdate);
+        put("Reboot", ServerListener.this::onPlayerReboot);
+        put("ConnectionUpdate", ServerListener.this::onClientConnectionUpdate);
+        put("PickDamage", ServerListener.this::onPickDamageType);
+        put("DrawDamage", ServerListener.this::onDrawDamage);
+    }};
 
     private final Socket socket;
     private final InputStreamReader inputStreamReader;
     private final BufferedReader bufferedReader;
+
+    private DefaultServerRequestParser dsrp;
 
     public ServerListener(Socket socket, InputStreamReader inputStreamReader, BufferedReader bufferedReader)
     {
@@ -40,6 +78,8 @@ public class ServerListener implements Runnable
         this.socket = socket;
         this.inputStreamReader = inputStreamReader;
         this.bufferedReader = bufferedReader;
+
+        this.dsrp = null;
 
         return;
     }
@@ -78,7 +118,9 @@ public class ServerListener implements Runnable
 
                 try
                 {
-                    this.parseJSONRequestFromServer(new DefaultServerRequestParser(new JSONObject(r)));
+                    this.dsrp = new DefaultServerRequestParser(new JSONObject(r));
+                    this.parseJSONRequestFromServer();
+                    this.dsrp = null;
                 }
                 catch (JSONException e)
                 {
@@ -96,320 +138,330 @@ public class ServerListener implements Runnable
             l.fatal("Failed to read from server.");
             l.fatal(e.getMessage());
             GameInstance.handleServerDisconnect();
+
             return;
         }
     }
 
-    private void parseJSONRequestFromServer(DefaultServerRequestParser dsrp) throws JSONException
+    // region Server request handlers
+
+    private boolean onAlive() throws JSONException
     {
-        if (Objects.equals(dsrp.getType_v2(), "Alive"))
+        l.trace("Woken up by keep-alive. Responding. Ok.");
+
+        try
         {
-//            l.trace("Received keep-alive from server. Responding. Ok.");
-            try
+            GameInstance.respondToKeepAlive();
+        } catch (IOException e)
+        {
+            GameInstance.handleServerDisconnect();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean onCorePlayerAttributesChanged() throws JSONException
+    {
+        l.debug("Player {}'s core attributes have changed. Updating.", this.dsrp.getPlayerID());
+        EGameState.addRemotePlayer(this.dsrp);
+        return true;
+    }
+
+    private boolean onChatMsg() throws JSONException
+    {
+        l.debug("New chat message received: [{}] from {}.", this.dsrp.getChatMsg(), this.dsrp.getChatMsgSourceID());
+        ViewSupervisor.handleChatMessage(this.dsrp);
+        return true;
+    }
+
+    private boolean onLobbyPlayerStatus() throws JSONException
+    {
+        l.debug("Received player status update. Client {} is ready: {}.", this.dsrp.getPlayerID(), this.dsrp.isLobbyPlayerStatusReady());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setReady(this.dsrp.isLobbyPlayerStatusReady());
+        ViewSupervisor.updatePlayerStatus(this.dsrp);
+        return true;
+    }
+
+    private boolean onSelectMapRequest() throws JSONException
+    {
+        l.debug("Server requested this client to choose a course. Available courses: {}.", String.join(", ", Arrays.asList(this.dsrp.getAvailableCourses())));
+        EGameState.INSTANCE.setServerCourses(this.dsrp.getAvailableCourses());
+        ViewSupervisor.updateAvailableCourses(true);
+        return true;
+    }
+
+    private boolean onMapSelected() throws JSONException
+    {
+        l.debug("Current session course update: {}.", this.dsrp.getCourseName() == null || this.dsrp.getCourseName().isEmpty() ? "none" : this.dsrp.getCourseName());
+        EGameState.INSTANCE.setCurrentServerCourse(this.dsrp.getCourseName());
+        ViewSupervisor.updateCourseSelected();
+        return true;
+    }
+
+    private boolean onGameStart() throws JSONException
+    {
+        l.debug("Game has started. Loading game scene . . .");
+        ViewSupervisor.startGame(this.dsrp.getGameCourse());
+        return true;
+    }
+
+    public boolean onPhaseChange() throws JSONException
+    {
+        l.debug("Game phase has changed. New phase: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
+        EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
+        return true;
+    }
+
+    private boolean onPlayerTurnChange() throws JSONException
+    {
+        l.debug("It is now player {}'s turn.", this.dsrp.getPlayerID());
+        EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID());
+        ViewSupervisor.handleChatInfo(String.format("Player %s is now current Player.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        return true;
+    }
+
+    private boolean onErrorMsg() throws JSONException
+    {
+        l.debug("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
+        /* TODO Print err msg to UI Msg Scroll Pane. */
+        return true;
+    }
+
+    /**
+     * TODO For what reason does this exists in the protocol???
+     */
+    private boolean onCardPlayed() throws JSONException
+    {
+        l.debug("Player {} has played {}.", this.dsrp.getPlayerID(), this.dsrp.getCardName());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has played %s.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCardName()));
+        return true;
+    }
+
+    public boolean onStartingPointTaken() throws JSONException
+    {
+        l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
+        ViewSupervisor.updatePlayerTransforms();
+        ViewSupervisor.handleChatInfo(String.format("Player %s has selected a starting Point.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        return true;
+    }
+
+    public boolean onRobotRotationUpdate() throws JSONException
+    {
+        l.debug("Player {} has rotated {}.", this.dsrp.getPlayerID(), this.dsrp.getRotation());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getRobotView().addRotationWithLerp(this.dsrp.getRotation());
+        return true;
+    }
+
+    public boolean onRegisterSlotUpdate() throws JSONException
+    {
+        // TODO We want to update the UI-Footer with this method call. Check if the playerID is the local player.
+        //      Currently we update regardless if the select card action was affirmed by the server.
+        l.debug("Player {} has updated their register {}. Filled: {}.", this.dsrp.getPlayerID(), this.dsrp.getRegister(), this.dsrp.getRegisterFilled() ? "true" : "false");
+        return true;
+    }
+
+    private boolean onPlayerFinishedProgramming() throws JSONException
+    {
+        l.debug("Player {} has finished programming.", this.dsrp.getPlayerID());
+        EGameState.INSTANCE.setSelectionFinished(this.dsrp.getPlayerID());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has finished his card selection.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        return true;
+    }
+
+    private boolean onForcedFinishProgramming() throws JSONException
+    {
+        l.debug("Player {} has been forced to finish programming because they did not submit their selection in time. New cards: {}", this.dsrp.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
+        EGameState.INSTANCE.setSelectionFinished(this.dsrp.getPlayerID());
+        EGameState.INSTANCE.clearGotRegisters();
+        for (String c : this.dsrp.getForcedCards())
+        {
+            for (int i = 0; i < EGameState.INSTANCE.getRegisters().length; i++)
             {
-                GameInstance.respondToKeepAlive();
+                if (EGameState.INSTANCE.getRegisters()[i] == null)
+                {
+                    EGameState.INSTANCE.addRegister(i, c);
+                    break;
+                }
+
+                continue;
             }
-            catch (IOException e)
+
+            continue;
+        }
+        ViewSupervisor.updateFooter();
+        ViewSupervisor.handleChatInfo("You did not submit your cards in time. Empty registers are being filled up.");
+        return true;
+    }
+
+    private boolean onPlayerProgrammingCardsReceived() throws JSONException
+    {
+        l.debug("Player {} has received their programming cards ({}).", this.dsrp.getPlayerID(), this.dsrp.getCardsInHandCountNYC());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has received %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCardsInHandCountNYC()));
+        return true;
+    }
+
+    private boolean onProgrammingDeckShuffled() throws JSONException
+    {
+        l.debug("The programming deck of player {} has been shuffled.", this.dsrp.getPlayerID());
+        ViewSupervisor.handleChatInfo(String.format("The deck of player %s has been shuffled.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        return true;
+    }
+
+    private boolean onProgrammingTimerStart() throws JSONException
+    {
+        /* TODO Implement timer. */
+        l.debug("Programming phase timer has started.");
+        ViewSupervisor.handleChatInfo("The programming phase timer has started. Submit your cards in time!");
+        return true;
+    }
+
+    private boolean onProgrammingTimerEnd() throws JSONException
+    {
+        /* TODO Implement timer. */
+        l.debug("Programming phase timer has ended.");
+        ViewSupervisor.handleChatInfo("The programming phase timer has ended.");
+        return true;
+    }
+
+    private boolean onProgrammingCardsReceived() throws JSONException
+    {
+        l.debug("Received nine new programming cards from server: {}", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+        EGameState.INSTANCE.clearAllRegisters();
+        for (String c : this.dsrp.getCardsInHand())
+        {
+            EGameState.INSTANCE.addGotRegister(c);
+            continue;
+        }
+        ViewSupervisor.updateFooter();
+        return true;
+    }
+
+    private boolean onCurrentRegisterCards() throws JSONException
+    {
+        /* TODO Display current cards of each player in the UI. */
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.format("In this register %d cards were played (", this.dsrp.getActiveCards().length()));
+        sb.append(IntStream.range(0, this.dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", this.dsrp.getPlayerIDFromActiveCardIdx(i), this.dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
+        sb.append(").");
+        l.debug(sb.toString());
+        ViewSupervisor.handleChatInfo(sb.toString());
+        return true;
+    }
+
+    private boolean onCurrentRegisterCardReplacement() throws JSONException
+    {
+        if (this.dsrp == null)
+        {
+            return false;
+        }
+
+        l.debug("Player {} has received a new card {} as a replacement for their current register phase card.", this.dsrp.getPlayerID(), this.dsrp.getNewCard());
+        if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+        {
+            String info = String.format("You received the following card %s as a replacement.", this.dsrp.getNewCard());
+            ViewSupervisor.handleChatInfo(info);
+            EGameState.INSTANCE.addRegister(this.dsrp.getRegister(), this.dsrp.getNewCard());
+            return true;
+        }
+
+        String info = String.format("Player %s received following card %s as replacement.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getNewCard());
+        ViewSupervisor.handleChatInfo(info);
+
+        return true;
+    }
+
+    private boolean onAnimationPlay() throws JSONException
+    {
+        l.warn("Server requested this client to play an animation. But it is not implemented yet. Ignoring.");
+        return true;
+    }
+
+    private boolean onCheckpointReached() throws JSONException
+    {
+        l.debug("Player {} has reached {} checkpoints.", this.dsrp.getPlayerID(), this.dsrp.getNumber());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getNumber());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has reached %s checkpoints.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getNumber()));
+        return true;
+    }
+
+    private boolean onEnergyTokenChanged() throws JSONException
+    {
+        l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
+        return true;
+    }
+
+    private boolean onGameEnd() throws JSONException
+    {
+        l.debug("Game has ended. The winner is player {}.", this.dsrp.getWinningPlayer());
+        EGameState.INSTANCE.determineWinningPlayer(this.dsrp.getWinningPlayer());
+        ViewSupervisor.getSceneController().renderNewScreen(SceneController.END_SCENE_ID, SceneController.PATH_TO_END_SCENE, true);
+        return true;
+    }
+
+    private boolean onPlayerPositionUpdate() throws JSONException
+    {
+        l.debug("Player {} has moved to {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getRobotView().lerpTo(this.dsrp.getCoordinate());
+        return true;
+    }
+
+    private boolean onPlayerReboot() throws JSONException
+    {
+        l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
+        ViewSupervisor.handleChatInfo(String.format("Player %s was rebooted.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        return true;
+    }
+
+    private boolean onClientConnectionUpdate() throws JSONException
+    {
+        l.debug("Client {}'s net connection status was updated. Client is connected: {}; Taking action: {}.", this.dsrp.getPlayerID(), this.dsrp.getIsConnected(), this.dsrp.getNetAction().toString());
+        if (Objects.requireNonNull(this.dsrp.getNetAction()) == EConnectionLoss.REMOVE)
+        {
+            EGameState.INSTANCE.removeRemotePlayer(this.dsrp.getPlayerID());
+            return true;
+        }
+
+        l.error("Received net action {}, but the client could not understand it. Ignoring.", this.dsrp.getNetAction().toString());
+        return false;
+    }
+
+    private boolean onPickDamageType() throws JSONException
+    {
+        /* TODO Implement this to UI. */
+        final String i = String.format("Player %s needs to decide which damage cards to pick. You have to pick %d. Available piles are: (%s).", EClientInformation.INSTANCE.getPlayerID(), this.dsrp.getDamageCardsCountToDraw(), String.join(", ", Arrays.asList(this.dsrp.getAvailableDamagePilesToDraw())));
+        l.debug(i);
+        ViewSupervisor.handleChatInfo(i);
+        return true;
+    }
+
+    private boolean onDrawDamage() throws JSONException
+    {
+        /* TODO Implement this to UI. */
+        final String i = String.format("Player %s has drawn the following damage cards: %s.", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getDrawnDamageCards())));
+        l.debug(i);
+        ViewSupervisor.handleChatInfo(i);
+        return true;
+    }
+
+    // endregion Server request handlers
+
+    private void parseJSONRequestFromServer() throws JSONException
+    {
+        if (this.serverReq.containsKey(this.dsrp.getType_v2()))
+        {
+            if (this.serverReq.get(this.dsrp.getType_v2()).get())
             {
-                GameInstance.handleServerDisconnect();
                 return;
             }
 
-            return;
-        }
-
-        /* Core player attributes have changed. */
-        if (Objects.equals(dsrp.getType_v2(), "PlayerAdded"))
-        {
-            l.debug("Received player added for client {}.", dsrp.getPlayerID());
-            EGameState.addRemotePlayer(dsrp);
-            return;
-        }
-
-        /* New chat message. */
-        if (Objects.equals(dsrp.getType_v2(), "ReceivedChat"))
-        {
-            l.debug("New chat message received: [{}] from {}.", dsrp.getChatMsg(), dsrp.getChatMsgSourceID());
-            ViewSupervisor.handleChatMessage(dsrp);
-            return;
-        }
-
-        /* If a client is ready to start in the lobby menu. */
-        if (Objects.equals(dsrp.getType_v2(), "PlayerStatus"))
-        {
-            l.debug("Received player status update. Client {} is ready: {}.", dsrp.getPlayerID(), dsrp.isLobbyPlayerStatusReady());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setReady(dsrp.isLobbyPlayerStatusReady());
-            ViewSupervisor.updatePlayerStatus(dsrp);
-            return;
-        }
-
-        /* The receiving client may choose the server map. */
-        if (Objects.equals(dsrp.getType_v2(), "SelectMap"))
-        {
-            l.debug("Received course selected from server. Available courses: {}.", String.join(", ", Arrays.asList(dsrp.getAvailableCourses())));
-            EGameState.INSTANCE.setServerCourses(dsrp.getAvailableCourses());
-            ViewSupervisor.updateAvailableCourses(true);
-            return;
-        }
-
-        /* The server notifies the client about the nwe selected map. */
-        if (Objects.equals(dsrp.getType_v2(), "MapSelected"))
-        {
-            l.debug("Received course selected from server. Selected course: {}.", dsrp.getCourseName() == null || dsrp.getCourseName().isEmpty() ? "none" : dsrp.getCourseName());
-            EGameState.INSTANCE.setCurrentServerCourse(dsrp.getCourseName());
-            ViewSupervisor.updateCourseSelected();
-            return;
-        }
-
-        /* Currently only supports the mock game start. */
-        if (Objects.equals(dsrp.getType_v2(), "GameStarted"))
-        {
-            l.debug("Received start game from server.");
-            ViewSupervisor.startGame(dsrp.getGameCourse());
-            return;
-        }
-
-        /* If the game enters a new phase. */
-        if (Objects.equals(dsrp.getType_v2(), "ActivePhase"))
-        {
-            l.debug("Received game phase update. New phase: {}.", EGamePhase.fromInt(dsrp.getPhase()));
-            EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(dsrp.getPhase()));
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "CurrentPlayer"))
-        {
-            l.debug("Received current player update. New current player: {}.", dsrp.getPlayerID());
-            EGameState.INSTANCE.setCurrentPlayer(dsrp.getPlayerID());
-            String info = String.format("Player %s is now current Player", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
-            ViewSupervisor.handleChatInfo(info);
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "Error"))
-        {
-            l.debug("Received an error message from server. Message: {}.", dsrp.getErrorMessage());
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "CardPlayed")) {
-            String info = String.format("Player %s has played %s now current Player", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardName());
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received card played from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "StartingPointTaken"))
-        {
-            l.debug("Received starting point taken from server. Player {} took starting point {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setStartingPosition(dsrp.getCoordinate());
-            ViewSupervisor.updatePlayerTransforms();
-            String info = String.format("Player %s is has selected a starting Point", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
-            ViewSupervisor.handleChatInfo(info);
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "PlayerTurning")) {
-            l.debug("Player {} turned {}.", dsrp.getPlayerID(), dsrp.getRotation());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().addRotationWithLerp(dsrp.getRotation());
-            return;
-        }
-
-        /* If a player has set one of their five register slots. */
-        if (Objects.equals(dsrp.getType_v2(), "CardSelected"))
-        {
-            // TODO We want to update the UI-Footer with this method call. Check if the playerID is the local player.
-            //      Currently we update regardless if the select card action was affirmed by the server.
-            l.debug("Player {} updated their register {}. Filled: {}.", dsrp.getPlayerID(), dsrp.getRegister(), dsrp.getRegisterFilled() ? "true" : "false");
-            return;
-        }
-
-        /* If one client has finished selecting their programming cards. */
-        if (Objects.equals(dsrp.getType_v2(), "SelectionFinished")) {
-            String info = String.format("Player %s has finished his card selection", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Player {} finished their selection.", dsrp.getPlayerID());
-            EGameState.INSTANCE.setSelectionFinished(dsrp.getPlayerID());
-            return;
-        }
-
-        /* If this client's hand cards are being forced updated. */
-        if (Objects.equals(dsrp.getType_v2(), "CardsYouGotNow")) {
-            EGameState.INSTANCE.clearAllRegisters();
-            for (String c : dsrp.getForcedCards())
-            {
-                EGameState.INSTANCE.addGotRegister(c);
-                continue;
-            }
-            ViewSupervisor.updateFooter();
-            String info = ("You didnt finished card selection in time. You recieved forced cards.");
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Player {} has not submitted their selection in time. Received new cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(dsrp.getForcedCards())));
-            return;
-        }
-
-        /* The server notifies the client about the nine programming cards from another client. */
-        if (Objects.equals(dsrp.getType_v2(), "NotYourCards"))
-        {
-            String info = String.format("Player %s has %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getCardsInHandCountNYC());
-            ViewSupervisor.handleChatInfo(info);
-            l.debug(info);
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "ShuffleCoding")) {
-            String info = String.format("The deck of player %s has been shuffled", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received shuffle coding from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "TimerEnded")) {
-            String info = String.format("Timer has ended");
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received timer ended from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "TimerStarted")) {
-            //TODO Timer?
-            String info = ("Timer has started");
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received timer started from server.");
-            return;
-        }
-
-        /* The nine cards a player gets at the beginning of a programming phase. */
-        if (Objects.equals(dsrp.getType_v2(), "YourCards")) {
-            l.debug("Received nine new programming cards from server {}.", String.join(", ", Arrays.asList(dsrp.getCardsInHand())));
-            EGameState.INSTANCE.clearAllRegisters();
-            for (String c : dsrp.getCardsInHand())
-            {
-                EGameState.INSTANCE.addGotRegister(c);
-                continue;
-            }
-            ViewSupervisor.updateFooter();
-            return;
-        }
-
-        /* The current cards in a register played by all clients. */
-        if (Objects.equals(dsrp.getType_v2(), "CurrentCards"))
-        {
-            //TODO grafische Anzeige der jeweiligen Karte?
-            final StringBuilder sb = new StringBuilder();
-            sb.append(String.format("In this register %d cards were played (", dsrp.getActiveCards().length()));
-            sb.append(IntStream.range(0, dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", dsrp.getPlayerIDFromActiveCardIdx(i), dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
-            l.debug(sb.append(").").toString());
-            String info = sb.append(").").toString();
-            ViewSupervisor.handleChatInfo(info);
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "ReplaceCard")) {
-            if(dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()){
-                String info = String.format("You recieved following card %s as replacement", dsrp.getNewCard());
-                ViewSupervisor.handleChatInfo(info);
-                EGameState.INSTANCE.addRegister(dsrp.getRegister(), dsrp.getNewCard());
-            } else{
-                String info = String.format("Player %s recieved following card %s as replacement",Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(),  dsrp.getNewCard());
-                ViewSupervisor.handleChatInfo(info);
-            }
-            l.debug("Received replacing card from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "Animation")) {
-            l.debug("Received animation from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "CheckPointReached")) {
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setCheckPointsReached(dsrp.getNumber());
-            String info = String.format("Player %s has reached %s checkpoints", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), dsrp.getNumber());
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received checkpoint from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "Energy")) {
-            //keine Chatinfo, da ja Energy in PlayerInformationen angezeigt
-            l.debug("Player {} EnergyCubeAmmount has been set to {}", dsrp.getPlayerID(), dsrp.getEnergyCount());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).setEnergy(dsrp.getEnergyCount());
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "GameFinished")) {
-            l.debug("Received game finished from server.");
-            EGameState.INSTANCE.determineWinningPlayer(dsrp.getWinningPlayer());
-            ViewSupervisor.getSceneController().renderNewScreen(SceneController.END_SCENE_ID, SceneController.PATH_TO_END_SCENE, true);
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "Movement"))
-        {
-            l.debug("Player {} has moved to {}.", dsrp.getPlayerID(), dsrp.getCoordinate().toString());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getRobotView().lerpTo(dsrp.getCoordinate());
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "RebootDirection")) {
-            //TODO die Nachricht geht doch vom Client to Server und wird von diesem dann als PlayerTurning an alle verschickt oder?
-            l.debug("Received reboot direction from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "Reboot")) {
-            String info = String.format("Robot of Player %s has been rebooted", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName());
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received reboot from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "ConnectionUpdate"))
-        {
-            l.debug("Client {}s's net connection status was updated. Client is connected: {}; Taking action: {}.", dsrp.getPlayerID(), dsrp.getIsConnected(), dsrp.getNetAction().toString());
-            if (Objects.requireNonNull(dsrp.getNetAction()) == EConnectionLoss.REMOVE)
-            {
-                EGameState.INSTANCE.removeRemotePlayer(dsrp.getPlayerID());
-                return;
-            }
-            
-            l.error("Received net action {}, but the client could not understand it. Ignoring.", dsrp.getNetAction().toString());
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "DrawDamage")) {
-            //TODO still shaky
-            final StringBuilder sb = new StringBuilder();
-            sb.append(String.format("Player %s has drawn %s damage cards. (", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), +
-                    dsrp.getForcedCards().length));
-            sb.append(dsrp.getCardsAsString());
-            l.debug(sb.append(").").toString());
-            String info = sb.append(").").toString();
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received draw a damage card from server.");
-            return;
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "PickDamage")) {
-            //TODO hier noch grafische Auswahl einfügen; still shaky
-            final StringBuilder sb = new StringBuilder();
-            sb.append(String.format("You need to decide which damage cards to pick. Available piles are: (", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(dsrp.getPlayerID())).getPlayerName(), +
-                    dsrp.getAvailablePiles().length));
-            sb.append(dsrp.getAvailablePilesAsString());
-            l.debug(sb.append(").").toString());
-            String info = sb.append(").").toString();
-            ViewSupervisor.handleChatInfo(info);
-            l.debug("Received damage cards to select from server.");
-        }
-
-        if (Objects.equals(dsrp.getType_v2(), "SelectedDamage")) {
-            //TODO geht doch auch nur von Client ot Server oder?
-            l.debug("Damage was selected.");
+            throw new JSONException("Hit a wall while trying to understand the server request.");
         }
 
         l.warn("Received unknown request from server. Ignoring.");
-        l.warn(dsrp.getType_v2());
+        l.warn(this.dsrp.getRequest().toString(0));
 
         return;
     }
