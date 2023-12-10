@@ -6,8 +6,7 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class Tile
-{
+public class Tile {
     private Coordinate coordinate;
     private Robot occupiedBy = null;
     private ArrayList<FieldType> fieldTypes;
@@ -25,13 +24,18 @@ public class Tile
         return occupiedBy;
     }
 
-    //TODO setRobot verhindert aktuell nicht, dass besetzes Feld neu belegt wird!
     public void setRobot(Robot newRobot) {
-        occupiedBy = newRobot;
+        if(!isOccupied()) {
+            occupiedBy = newRobot;
+        }
     }
 
     public Coordinate getCoordinate() {
         return coordinate;
+    }
+
+    public void setCoordinate(int x, int y) {
+        this.coordinate = new Coordinate(x,y);
     }
 
     public ArrayList<FieldType> getFieldTypes() {
@@ -42,37 +46,17 @@ public class Tile
         return occupiedBy != null;
     }
 
-    public boolean isStartingPoint(){
-        for (FieldType fieldType : fieldTypes) {
-            if (fieldType instanceof StartPoint) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-
     public boolean hasUnmovableRobot() {
-
-        //Noch zu implementieren
+        //TODO implement
         return false;
     }
 
-    // region Getters and Setters
-
-    public boolean hasAntennaModifier()
-    {
-        for (FieldType t : this.fieldTypes)
-        {
-            if (t instanceof Antenna)
-            {
+    public boolean hasAntennaModifier() {
+        for (FieldType t : this.fieldTypes) {
+            if (t instanceof Antenna) {
                 return true;
             }
-
-            continue;
         }
-
         return false;
     }
 
@@ -90,14 +74,11 @@ public class Tile
         return this.boardName;
     }
 
-    public JSONArray toJSON()
-    {
+    public JSONArray toJSON() {
         JSONArray j = new JSONArray();
-        for (FieldType f : this.fieldTypes)
-        {
+        for (FieldType f : this.fieldTypes) {
             j.put(f.toJSON(this.boardName));
         }
-
         return j;
     }
 
@@ -121,70 +102,48 @@ public class Tile
         return this.coordinate.getX() > t.coordinate.getX();
     }
 
-    public boolean isWallEast()
-    {
-        for (FieldType f : this.fieldTypes)
-        {
-            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("east") || s.equalsIgnoreCase("right")))
-            {
+    public boolean isWallEast() {
+        for (FieldType f : this.fieldTypes) {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("east") || s.equalsIgnoreCase("right"))) {
                 return true;
             }
-
-            continue;
         }
-
         return false;
     }
 
-    public boolean isWallWest()
-    {
-        for (FieldType f : this.fieldTypes)
-        {
-            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("west") || s.equalsIgnoreCase("left")))
-            {
+    public boolean isWallWest() {
+        for (FieldType f : this.fieldTypes) {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("west") || s.equalsIgnoreCase("left"))) {
                 return true;
             }
-
-            continue;
         }
-
         return false;
     }
 
-    public boolean isWallNorth()
-    {
-        for (FieldType f : this.fieldTypes)
-        {
-            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("north") || s.equalsIgnoreCase("top")))
-            {
+    public boolean isWallNorth() {
+        for (FieldType f : this.fieldTypes) {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("north") || s.equalsIgnoreCase("top"))) {
                 return true;
             }
-
-            continue;
         }
-
         return false;
     }
 
-    public boolean isWallSouth()
-    {
-        for (FieldType f : this.fieldTypes)
-        {
-            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("south") || s.equalsIgnoreCase("bottom")))
-            {
+    public boolean isWallSouth() {
+        for (FieldType f : this.fieldTypes) {
+            if (f instanceof Wall w && Arrays.stream(w.getOrientations()).anyMatch(s -> s.equalsIgnoreCase("south") || s.equalsIgnoreCase("bottom"))) {
                 return true;
             }
-
-            continue;
         }
-
         return false;
     }
 
-    public void setCoordinate(int x, int y) {
-        this.coordinate = new Coordinate(x,y);
+    public boolean isStartingPoint(){
+        for (FieldType fieldType : fieldTypes) {
+            if (fieldType instanceof StartPoint) {
+                return true;
+            }
+        }
+        return false;
     }
-
-    // endregion Getters and Setters
-
 }

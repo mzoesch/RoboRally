@@ -168,10 +168,11 @@ public class Robot {
     }
 
     public void reboot() {
+        //TODO get rebootDirection from client
+
         Player robotOwner = determineRobotOwner();
         Tile sourceTile = this.getCurrentTile();
         Tile restartPoint = null;
-        //TODO get rebootDirection from client
         String rebootDirection = null;
 
         if(GameState.gameMode.getSpamDeck().size() >= 2) {
