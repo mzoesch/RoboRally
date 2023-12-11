@@ -27,6 +27,7 @@ import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -115,7 +116,9 @@ public final class Session
         }
 
         /* If a local player is removed. */
+        l.info("Agent {} was successfully removed from the session [{}]. Executing post behaviour.", ctrl.getPlayerID(), this.sessionID);
         this.broadcastConnectionUpdate(ctrl, EConnectionLoss.REMOVE, false);
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("The %s was removed from the session.", ctrl.getName().replaceAll("[\\[\\]]", "")));
 
         return;
     }
@@ -230,6 +233,13 @@ public final class Session
 
     public void handleChatMessage(final PlayerController callingPC, final String msg, final int receiverID)
     {
+        if (Session.isChatMsgARemoteCommand(msg))
+        {
+            l.debug("Detected remote command from client {}.", callingPC.getClientInstance().getAddr());
+            this.handleRemoteCommand(callingPC, msg);
+            return;
+        }
+
         if (receiverID == ChatMsgModel.CHAT_MSG_BROADCAST)
         {
             this.broadcastChatMessage(callingPC.getPlayerID(), msg);
@@ -248,6 +258,58 @@ public final class Session
         }
 
         l.warn("Client {} tried to send a private message to a non-existing remote player.", callingPC.getClientInstance().getAddr());
+
+        return;
+    }
+
+    private void handleRemoteCommand(final PlayerController callingPC, final String msg)
+    {
+        final String token = msg.substring(1, msg.indexOf(ChatMsgModel.ARG_BEGIN));
+        final String[] args = Session.getChatRemoteCommandArguments(msg);
+
+        /* DETACH */
+        if (token.equals(ChatMsgModel.remoteCommands[0]))
+        {
+            this.handleDetachCommand(callingPC, args);
+            return;
+        }
+
+        return;
+    }
+
+    private void handleDetachCommand(final PlayerController callingPC, final String[] args)
+    {
+        l.debug("Client {} is trying to detach an agent.", callingPC.getClientInstance().getAddr());
+
+        if (args.length != 1)
+        {
+            l.warn("Client {} tried to detach an agent but did not provide the correct amount of arguments.", callingPC.getClientInstance().getAddr());
+            return;
+        }
+
+        final int agentID;
+        try
+        {
+            agentID = Integer.parseInt(args[0]);
+        }
+        catch (NumberFormatException e)
+        {
+            l.warn("Client {} tried to detach an agent but provided an invalid agent ID.", callingPC.getClientInstance().getAddr());
+            return;
+        }
+
+        for (final Agent a : this.getAgents())
+        {
+            if (a.getPlayerID() == agentID)
+            {
+                this.leaveSession(a);
+                return;
+            }
+
+            continue;
+        }
+
+        l.warn("Client {} tried to detach an agent but provided an invalid agent ID.", callingPC.getClientInstance().getAddr());
 
         return;
     }
@@ -718,7 +780,7 @@ public final class Session
         this.joinSession(a);
         this.onPostJoin(a);
 
-        l.info("Agent {} was added to session [{}].", a.getName(), this.sessionID);
+        l.info("Agent {} was added to session [{}].", a.getPlayerID(), this.sessionID);
 
         return;
     }
@@ -741,6 +803,29 @@ public final class Session
         }
 
         return false;
+    }
+
+    /**
+     * This method will auto split the message into the command and the arguments.
+     * You must not parse the message in any way before passing it to this method.
+     *
+     * @param msg The chat message to check.
+     * @return    The arguments of the remote command. If the message is not a remote command, null is returned.
+     */
+    public static String[] getChatRemoteCommandArguments(final String msg)
+    {
+        return msg.substring(msg.indexOf(ChatMsgModel.ARG_BEGIN) + 1, msg.lastIndexOf(ChatMsgModel.ARG_END)).split(ChatMsgModel.ARG_SEPARATOR);
+    }
+
+    public static boolean isChatMsgARemoteCommand(final String msg)
+    {
+        return          msg.startsWith(ChatMsgModel.COMMAND_PREFIX)
+                &&      msg.length() > 1
+                &&      msg.indexOf(ChatMsgModel.ARG_BEGIN) > 0
+                &&      msg.lastIndexOf(ChatMsgModel.ARG_END) > 0
+                &&      msg.indexOf(ChatMsgModel.ARG_BEGIN) < msg.lastIndexOf(ChatMsgModel.ARG_END)
+                && !    msg.substring(1, msg.indexOf(ChatMsgModel.ARG_BEGIN)).isEmpty()
+                && !    msg.substring(msg.indexOf(ChatMsgModel.ARG_BEGIN) + 1, msg.lastIndexOf(ChatMsgModel.ARG_END) - 1).isEmpty();
     }
 
     // endregion Getters and Setters
