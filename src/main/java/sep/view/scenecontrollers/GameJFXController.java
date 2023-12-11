@@ -334,6 +334,12 @@ public class GameJFXController
             return;
         }
 
+        if (Objects.equals(EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked), "Again")){
+            l.info("Player tried setting AGAIN-card in first register slot. Refused.");
+            ViewSupervisor.handleChatInfo("You cant place a AGAIN-programmingcard in Register 1. Try another register or card.");
+            return;
+        }
+
         EGameState.INSTANCE.setRegister(0, this.gotRegisterSlotClicked);
 
         this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;

@@ -189,6 +189,7 @@ public class GameMode {
      */
     private void triggerProgrammingPhase(){
         for (Player p : players){
+            //TODO @possibleBUG muss hier nicht noch irgendwo die alte Hand bereinigt werden?
             for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++){
                 if (p.getPlayerDeck().isEmpty()){
                     p.shuffleAndRefillDeck();
