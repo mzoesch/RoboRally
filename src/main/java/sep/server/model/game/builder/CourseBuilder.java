@@ -1699,6 +1699,108 @@ public class CourseBuilder {
         arrayListY.add(new Tile("4A",new Coordinate(4,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
+        // (4,1)
+        fieldtypes.add(new ConveyorBelt(1, "left", new String[] {"right"}));
+        arrayListY.add(new Tile("4A",new Coordinate(4,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,2)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(4,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,3)
+        fieldtypes.add(new Wall(new String[] {"left"}));
+        fieldtypes.add(new Laser("right", 2));
+        arrayListY.add(new Tile("4A",new Coordinate(4,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,4)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(4,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,5)
+        fieldtypes.add(new EnergySpace(1));
+        arrayListY.add(new Tile("4A",new Coordinate(4,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,6)
+        fieldtypes.add(new Wall(new String[] {"left"}));
+        fieldtypes.add(new Laser("right", 2));
+        arrayListY.add(new Tile("4A",new Coordinate(4,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,7)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(4,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,8)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(4,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (4,9)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(4,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
+
+        // (5,0)
+        fieldtypes.add(new EnergySpace(1));
+        arrayListY.add(new Tile("4A",new Coordinate(5,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,1)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(5,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,2)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(5,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,3)
+        fieldtypes.add(new Wall(new String[] {"right"}));
+        fieldtypes.add(new Laser("left", 1)); // TODO muss hier 2 hin
+        arrayListY.add(new Tile("4A",new Coordinate(5,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,4)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(5,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,5)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(5,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,6)
+        fieldtypes.add(new Wall(new String[] {"right"}));
+        fieldtypes.add(new Laser("left", 1)); // TODO muss hier 2 hin
+        arrayListY.add(new Tile("4A",new Coordinate(5,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,7)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(5,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,8)
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[] {"left"}));
+        arrayListY.add(new Tile("4A",new Coordinate(5,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (5,9)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(5,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
         return board;
     }
 
