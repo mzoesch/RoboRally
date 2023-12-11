@@ -45,6 +45,7 @@ public final class ClientInstance implements Runnable
         put("SelectedCard", ClientInstance.this::onRegisterSlotUpdate);
         put("SetStartingPoint", ClientInstance.this::onStartingPointSet);
         put("PickDamage", ClientInstance.this::onDamageCardSelect);
+        put("HelloServer", ClientInstance.this::onAddAgentRequest);
     }};
 
     public Thread thread;
@@ -196,7 +197,7 @@ public final class ClientInstance implements Runnable
 
     private boolean onCorePlayerAttributesChanged()
     {
-        final String oName = this.playerController.getPlayerName();
+        final String oName = this.playerController.getName();
 
         // TODO We have to do some validation here.
 
@@ -205,10 +206,10 @@ public final class ClientInstance implements Runnable
         l.debug("Client {} selected figure {}.", this.getAddr(), this.playerController.getFigure());
 
         this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
-        if (!Objects.equals(oName, this.playerController.getPlayerName()))
+        if (!Objects.equals(oName, this.playerController.getName()))
         {
-            this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oName, this.playerController.getPlayerName()));
-            l.debug("Client {} changed their name from {} to {}.", this.getAddr(), oName, this.playerController.getPlayerName());
+            this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oName, this.playerController.getName()));
+            l.debug("Client {} changed their name from {} to {}.", this.getAddr(), oName, this.playerController.getName());
         }
 
         return true;
@@ -263,6 +264,14 @@ public final class ClientInstance implements Runnable
     private boolean onDamageCardSelect()
     {
         l.debug("Received a picked damage card from client.");
+        return true;
+    }
+
+    public boolean onAddAgentRequest()
+    {
+        // We may ignore all body arguments because we do not need them. If there is something unusual going on, the
+        // initial client connection already would have failed.
+        l.debug("Client {} wants to add an agent to lobby {}.", this.getAddr(), this.getPlayerController().getSession().getSessionID());
         return true;
     }
 
