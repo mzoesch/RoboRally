@@ -1,7 +1,7 @@
 package sep.server.model.game;
 
 import sep.server.json.game.effects.MovementModel;
-import sep.server.json.game.effects.RebootDirectionModel;
+import sep.server.json.game.effects.PlayerTurningModel;
 import sep.server.json.game.effects.RebootModel;
 
 import org.apache.logging.log4j.LogManager;
@@ -169,15 +169,17 @@ public class Robot {
 
     /**
      * The following method handles the rebooting of a robot and sends all respective JSON messages.
-     * The player draws two spam cards and the robot is reset.
+     * The player draws two spam cards and the registers are emptied.
      */
     public void reboot() {
-        //TODO get rebootDirection from client
-
         Player robotOwner = determineRobotOwner();
         Tile sourceTile = this.getCurrentTile();
         Tile restartPoint = null;
-        String rebootDirection = null;
+
+        for(Player player : GameState.gameMode.getPlayers()) {
+            new RebootModel(player.getPlayerController().getClientInstance(),
+                    robotOwner.getPlayerController().getPlayerID()).send();
+        }
 
         if(GameState.gameMode.getSpamDeck().size() >= 2) {
             robotOwner.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
@@ -189,33 +191,43 @@ public class Robot {
             robotOwner.setCardInRegister(i, null);
         }
 
-        //TODO what if tile is occupied
         switch(sourceTile.getBoardName()) {
             case "StartA" -> restartPoint = startingPoint;
             case "5B" -> restartPoint = course.getTileByNumbers(4,3);
         }
-
         this.setCurrentTile(restartPoint);
-
-        if(rebootDirection == null) {
-            rebootDirection = "top";
-        }
-        this.setDirection(rebootDirection);
 
         if(restartPoint != null) {
             for(Player player : GameState.gameMode.getPlayers()) {
-                new RebootModel(player.getPlayerController().getClientInstance(),
-                        robotOwner.getPlayerController().getPlayerID()).send();
-                //TODO kommt die RebootDirection nicht vom entsprechenden Client und wird dann als PlayerTurning an +
-                // alle ausgegeben?
-                new RebootDirectionModel(player.getPlayerController().getClientInstance(),
-                        rebootDirection).send();
+                switch(this.direction) {
+                    case "right" -> {
+                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
+                                robotOwner.getPlayerController().getPlayerID(),
+                                "counterclockwise").send();
+                    }
+                    case "bottom" -> {
+                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
+                                robotOwner.getPlayerController().getPlayerID(),
+                                "counterclockwise").send();
+                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
+                                robotOwner.getPlayerController().getPlayerID(),
+                                "counterclockwise").send();
+                    }
+                    case "left" -> {
+                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
+                                robotOwner.getPlayerController().getPlayerID(),
+                                "clockwise").send();
+                    }
+                }
+
                 new MovementModel(player.getPlayerController().getClientInstance(),
                         robotOwner.getPlayerController().getPlayerID(),
                         restartPoint.getCoordinate().getX(),
                         restartPoint.getCoordinate().getY()).send();
             }
         }
+
+        this.setDirection("top");
     }
 
     /**
