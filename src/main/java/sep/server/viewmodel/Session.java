@@ -181,10 +181,17 @@ public final class Session
         /* Information for the new client to understand the current state of the game. */
         if (newCtrl instanceof final PlayerController newPC)
         {
-            for (final PlayerController pc : this.getCharacters())
+            for (final IOwnershipable ow : this.ctrls)
             {
-                new PlayerAddedModel(newPC, pc.getPlayerID(), pc.getName(), pc.getFigure()).send();
-                new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
+                new PlayerAddedModel(newPC, ow.getPlayerID(), ow.getName(), ow.getFigure()).send();
+
+                if (ow instanceof final PlayerController pc)
+                {
+                    /* An Agent is always ready. */
+                    new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
+                    continue;
+                }
+
                 continue;
             }
 
