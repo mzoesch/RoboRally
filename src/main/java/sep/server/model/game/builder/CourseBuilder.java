@@ -1580,6 +1580,33 @@ public class CourseBuilder {
         arrayListY.add(new Tile("4A",new Coordinate(1,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
+
+        // (2,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(2,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,1)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("4A",new Coordinate(2,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,2)
+        fieldtypes.add(new CheckPoint(4));
+        fieldtypes.add(new Laser("bottom", 4)); // TODO muss hier jetzt noch eine wall dazu?
+        arrayListY.add(new Tile("4A",new Coordinate(2,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,3)
+        fieldtypes.add(new ConveyorBelt(2, "right", new String[] {"left"}));
+        fieldtypes.add(new Laser("bottom", 3));
+        arrayListY.add(new Tile("4A",new Coordinate(2,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+
+
         return board;
     }
 
