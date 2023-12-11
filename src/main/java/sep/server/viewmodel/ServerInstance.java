@@ -1,6 +1,7 @@
 package sep.server.viewmodel;
 
 import sep.server.model.EServerInformation;
+import sep.server.model.Agent;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import org.apache.logging.log4j.Logger;
 public final class ServerInstance
 {
     private static final Logger l = LogManager.getLogger(ServerInstance.class);
+
+    private static final int SUFFIX_LENGTH = 4;
 
     public static ServerInstance INSTANCE;
     private final ServerListener SERVER_LISTENER;
@@ -32,11 +35,12 @@ public final class ServerInstance
 
     /**
      * Will create a separate thread for itself that will send a keep-alive message
-     * to all registered clients every 5 seconds.
+     * to all registered remote clients every five seconds.
      */
     private static void keepAlive()
     {
-        new Thread(() ->
+        new Thread(
+        () ->
         {
             while (true)
             {
@@ -56,7 +60,8 @@ public final class ServerInstance
 
                 continue;
             }
-        }).start();
+        })
+        .start();
 
         return;
     }
@@ -74,20 +79,49 @@ public final class ServerInstance
         return ServerInstance.INSTANCE.SERVER_LISTENER;
     }
 
-    public static PlayerController createNewPlayerController(ClientInstance clientInstance, Session session)
+    public static PlayerController createNewPlayerController(final ClientInstance ci, final Session s)
     {
-        return new PlayerController(clientInstance, ServerInstance.createAnonymousPlayerName(), ServerInstance.createPlayerID(), session);
+        return new PlayerController(ci, ServerInstance.createAnonymousPlayerName(), ServerInstance.createCtrlID(), s);
     }
 
-    private static int createPlayerID()
+    public static Agent createNewAgent(final Session s)
     {
+        return new Agent(ServerInstance.createRandomAgentName(s), ServerInstance.createCtrlID(), s);
+    }
+
+    private static int createCtrlID()
+    {
+        /* TODO Check if already taken. Even though the chance of this happening is basically zero. But just in case :). */
         return Math.abs(UUID.randomUUID().hashCode());
     }
 
     private static String createAnonymousPlayerName()
     {
-        int SUFFIX_LENGTH = 4;
-        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0, SUFFIX_LENGTH));
+        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0, ServerInstance.SUFFIX_LENGTH));
+    }
+
+    private static String createRandomAgentName(final Session s)
+    {
+        final int rIdx = (int) (Math.random() * Agent.AGENT_NAMES.length);
+        int idx = (rIdx + 1) % Agent.AGENT_NAMES.length;
+        while (true)
+        {
+            if (idx == rIdx)
+            {
+                l.warn("Whoops, something weird happened. There are no more agent names available. This should never have happened.");
+                break;
+            }
+
+            if (s.isAgentNameTaken(Agent.AGENT_NAMES[idx]))
+            {
+                idx = (idx + 1) % Agent.AGENT_NAMES.length;
+                continue;
+            }
+
+            break;
+        }
+
+        return String.format("%s %s", Agent.AGENT_PREFIX, Agent.AGENT_NAMES[idx]);
     }
 
     // endregion Getters and Setters
