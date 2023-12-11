@@ -1135,7 +1135,7 @@ public class CourseBuilder {
 
         // (3,6)
         fieldtypes.add(new Wall(new String[] {"left"}));
-        fieldtypes.add(new Laser("right", 4));
+        fieldtypes.add(new Laser("right", 1));
         arrayListY.add(new Tile("1A",new Coordinate(3,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1173,7 +1173,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,3)
-        fieldtypes.add(new Laser("left", 1)); // TODO was muss der lasercount sein?
+        fieldtypes.add(new Empty());
         arrayListY.add(new Tile("1A",new Coordinate(4,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1188,7 +1188,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,6)
-        fieldtypes.add(new Laser("right", 1)); // TODO was muss der lasercount sein?
+        fieldtypes.add(new Empty());
         arrayListY.add(new Tile("1A",new Coordinate(4,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1226,7 +1226,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,3)
-        fieldtypes.add(new Laser("left", 1));
+        fieldtypes.add(new Empty());
         arrayListY.add(new Tile("1A",new Coordinate(5,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1241,7 +1241,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,6)
-        fieldtypes.add(new Laser("right", 1));
+        fieldtypes.add(new Empty());
         arrayListY.add(new Tile("1A",new Coordinate(5,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1280,7 +1280,7 @@ public class CourseBuilder {
 
         // (6,3)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new Laser("left", 4));
+        fieldtypes.add(new Laser("left", 1));
         arrayListY.add(new Tile("1A",new Coordinate(6,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1493,7 +1493,28 @@ public class CourseBuilder {
         arrayListY.add(new Tile("2A",new Coordinate(0,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
-        return null;
+        // (0,1)
+        fieldtypes.add(new CheckPoint(5));
+        arrayListY.add(new Tile("2A",new Coordinate(0,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("2A",new Coordinate(0,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("2A",new Coordinate(0,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("2A",new Coordinate(0,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+
+        return board;
     }
 
 
@@ -1609,7 +1630,7 @@ public class CourseBuilder {
 
         // (1,9)
         fieldtypes.add(new Wall(new String[] {"left"}));
-        fieldtypes.add(new Laser("right", 3));
+        fieldtypes.add(new Laser("right", 2));
         arrayListY.add(new Tile("4A",new Coordinate(1,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1629,7 +1650,7 @@ public class CourseBuilder {
         // (2,2)
         fieldtypes.add(new CheckPoint(4));
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new Laser("bottom", 4));
+        fieldtypes.add(new Laser("bottom", 2)); // TODO
         arrayListY.add(new Tile("4A",new Coordinate(2,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1656,8 +1677,7 @@ public class CourseBuilder {
         // (2,7)
         fieldtypes.add(new CheckPoint(2));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new Laser("top", 4));
-        arrayListY.add(new Tile("4A",new Coordinate(2,7), fieldtypes));
+        fieldtypes.add(new Laser("top", 2)); // TODO
         fieldtypes = new ArrayList<>();
 
         // (2,8)
@@ -1720,7 +1740,7 @@ public class CourseBuilder {
 
         // (3,9)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new Laser("left", 3));
+        fieldtypes.add(new Laser("left", 2));
         arrayListY.add(new Tile("4A",new Coordinate(3,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1799,7 +1819,7 @@ public class CourseBuilder {
 
         // (5,3)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new Laser("left", 2)); // TODO muss hier 1 hin
+        fieldtypes.add(new Laser("left", 2));
         arrayListY.add(new Tile("4A",new Coordinate(5,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1815,7 +1835,7 @@ public class CourseBuilder {
 
         // (5,6)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new Laser("left", 2)); // TODO muss hier 1 hin
+        fieldtypes.add(new Laser("left", 2));
         arrayListY.add(new Tile("4A",new Coordinate(5,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1839,7 +1859,7 @@ public class CourseBuilder {
 
         // (6,0)
         fieldtypes.add(new Wall(new String[] {"left"}));
-        fieldtypes.add(new Laser("right", 3));
+        fieldtypes.add(new Laser("right", 2));
         arrayListY.add(new Tile("4A",new Coordinate(6,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1902,7 +1922,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (7,2)
-        fieldtypes.add(new CheckPoint(1)); // TODO was ist dir richitge Reichemfolge?
+        fieldtypes.add(new CheckPoint(1));
         fieldtypes.add(new Wall(new String[] {"top"}));
         arrayListY.add(new Tile("4A",new Coordinate(7,2), fieldtypes));
         fieldtypes = new ArrayList<>();
@@ -1930,7 +1950,7 @@ public class CourseBuilder {
         // (7,7)
         fieldtypes.add(new CheckPoint(3));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new Laser("top", 6)); // TODO stimmt der count?
+        fieldtypes.add(new Laser("top", 2)); // TODO
         arrayListY.add(new Tile("4A",new Coordinate(7,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1949,7 +1969,7 @@ public class CourseBuilder {
 
         // (8,0)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new Laser("left", 3));
+        fieldtypes.add(new Laser("left", 2));
         arrayListY.add(new Tile("4A",new Coordinate(8,0), fieldtypes));
         fieldtypes = new ArrayList<>();
 
