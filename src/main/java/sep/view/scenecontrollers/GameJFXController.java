@@ -1142,29 +1142,23 @@ public class GameJFXController
      */
     private void renderGameStateDescription()
     {
-        if (EGameState.INSTANCE.getCurrentPlayer() == null)
-        {
-            this.UIHeaderGameStateDescriptionLabel.setText("Waiting for server.");
-            return;
-        }
-
         switch (EGameState.INSTANCE.getCurrentPhase())
         {
             case REGISTRATION:
-                this.UIHeaderGameStateDescriptionLabel.setText(String.format("Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+                this.UIHeaderGameStateDescriptionLabel.setText(String.format(": Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
                 return;
 
             case UPGRADE:
-                this.UIHeaderGameStateDescriptionLabel.setText("Upgrade Phase");
+                this.UIHeaderGameStateDescriptionLabel.setText(": Select your upgradeCards");
                 return;
 
             case PROGRAMMING:
-                this.UIHeaderGameStateDescriptionLabel.setText("Programming Phase. Select your Cards by clicking on them and then clicking on an empty register. +" +
-                        "Click on filled register to remove the selected card.");
+                this.UIHeaderGameStateDescriptionLabel.setText(": Select your cards by clicking on them and then on an empty register. " +
+                        "To empty a register, click on it without having selected a card.");
                 return;
 
             case ACTIVATION:
-                this.UIHeaderGameStateDescriptionLabel.setText("Activation Phase. Just wait until next Phase begins.");
+                this.UIHeaderGameStateDescriptionLabel.setText(": Activation Phase. Just wait until next Phase begins.");
                 return;
         }
 
