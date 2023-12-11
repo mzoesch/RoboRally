@@ -1,31 +1,32 @@
 package sep.server.json.common;
 
-import org.json.JSONObject;
 import sep.server.json.AModel;
 import sep.server.viewmodel.ClientInstance;
 
-public class ConnectionUpdateModel extends AModel {
+import org.json.JSONObject;
 
-    private final int playerID;
-
+public class ConnectionUpdateModel extends AModel
+{
+    private final int ctrlID;
     private final String action;
+    private final boolean bConnected;
 
-    private final boolean connected;
-
-    public ConnectionUpdateModel(ClientInstance ci, int playerID, String action, boolean connected) {
+    public ConnectionUpdateModel(final ClientInstance ci, final int ctrlID, String action, final boolean bConnected)
+    {
         super(ci);
 
-        this.playerID = playerID;
+        this.ctrlID = ctrlID;
         this.action = action;
-        this.connected = connected;
-    }
+        this.bConnected = bConnected;
 
+        return;
+    }
 
     @Override
     public JSONObject toJSON() {
         JSONObject body = new JSONObject();
-        body.put("clientID", this.playerID);
-        body.put("isConnected", this.connected);
+        body.put("clientID", this.ctrlID);
+        body.put("isConnected", this.bConnected);
         body.put("action", this.action);
 
         JSONObject j = new JSONObject();
@@ -34,4 +35,5 @@ public class ConnectionUpdateModel extends AModel {
 
         return j;
     }
+
 }

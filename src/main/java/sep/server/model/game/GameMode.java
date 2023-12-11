@@ -10,6 +10,7 @@ import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.game.cards.damage.*;
 import sep.server.viewmodel.Session;
+import sep.server.model.IOwnershipable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,10 +53,19 @@ public class GameMode {
 
     private Thread activationPhaseThread;
 
-    public GameMode(String courseName, PlayerController[] playerControllers, Session session) {
+    public GameMode(final String courseName, final IOwnershipable[] ctrls, final Session session) {
         super();
 
         l.debug("Starting game with the following course: {}", courseName);
+
+        // TODO WARNING
+        //      This of course does not work and will throw if agents were to join the game.
+        //      Just temporary until the interfaces are up and implemented.
+        final PlayerController[] playerControllers = new PlayerController[ctrls.length];
+        for (int i = 0; i < ctrls.length; i++)
+        {
+            playerControllers[i] = (PlayerController) ctrls[i];
+        }
 
         this.course = new Course(courseName);
         this.availableCheckPoints = this.getAvailableCheckpoints(courseName);

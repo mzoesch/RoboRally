@@ -1,7 +1,7 @@
 package sep.server.model.game;
 
 import sep.server.viewmodel.PlayerController;
-
+import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.Session;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,14 +20,14 @@ public class GameState
     // TODO As described in Protocol v0.1, this var should be passed as a cmd program argument
     public static final int MIN_PLAYER_START = 2;
 
-    private static String courseName;
+    private String courseName;
 
     public static GameMode gameMode;
     private final Session session;
 
     private boolean bGameStarted;
 
-    public GameState(Session session)
+    public GameState(final Session session)
     {
         super();
         this.courseName = "";
@@ -36,15 +36,14 @@ public class GameState
         return;
     }
 
-    public void startGame(PlayerController[] playerControllers)
+    public void startGame(final IOwnershipable[] ctrls)
     {
         l.info("Creating Game Mode.");
 
-        //Erstellen des Spiels
         this.bGameStarted = true;
-        gameMode = new GameMode(this.courseName, playerControllers, this.session);
+        this.gameMode = new GameMode(this.courseName, ctrls, this.session);
 
-        l.info("Game Mode created. The game has started with {} players.", playerControllers.length);
+        l.info("Game Mode created. The game has started with {} controllers.", ctrls.length);
 
         return;
     }
@@ -66,7 +65,7 @@ public class GameState
         return AVAILABLE_COURSES;
     }
 
-    public static String getCourseName()
+    public String getCourseName()
     {
         return courseName;
     }

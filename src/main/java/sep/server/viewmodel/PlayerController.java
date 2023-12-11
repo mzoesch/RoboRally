@@ -2,7 +2,7 @@ package sep.server.viewmodel;
 
 import sep.server.json.common.ChatMsgModel;
 import sep.server.model.game.Player;
-
+import sep.server.model.IOwnershipable;
 
 /**
  * The interface between the Pawn in the game and the human player controlling it. The Player Controller essentially
@@ -13,9 +13,8 @@ import sep.server.model.game.Player;
  * used to control the Pawn. A Player Controller could always be destroyed mid-game, for example, if the client
  * disconnects or a new one crated if a new client connects and posses an already existing pawn (e.g., a pawn that was
  * previously controlled by a bot).
- * (We know that we have to write some sort of AI in an upcoming milestone.)
  */
-public final class PlayerController
+public final class PlayerController implements IOwnershipable
 {
     private final ClientInstance clientInstance;
     private String playerName;
@@ -26,8 +25,6 @@ public final class PlayerController
     private boolean bIsReady;
 
     private Player player;
-
-
 
     public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
     {
@@ -56,7 +53,8 @@ public final class PlayerController
         return this.session;
     }
 
-    public String getPlayerName()
+    @Override
+    public String getName()
     {
         return this.playerName;
     }
@@ -67,13 +65,13 @@ public final class PlayerController
         return;
     }
 
-
-
+    @Override
     public int getPlayerID()
     {
         return this.playerID;
     }
 
+    @Override
     public int getFigure()
     {
         return this.figure;
