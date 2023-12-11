@@ -874,11 +874,6 @@ public class GameMode {
         return this.players;
     }
 
-    public ArrayList<SpamDamage> getSpamCardDeck()
-    {
-        return spamCardDeck;
-    }
-
     public ArrayList<SpamDamage> getSpamDeck()
     {
         return spamCardDeck;
