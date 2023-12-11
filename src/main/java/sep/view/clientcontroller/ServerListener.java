@@ -174,7 +174,7 @@ public class ServerListener implements Runnable
     {
         l.debug("Received player status update. Client {} is ready: {}.", this.dsrp.getPlayerID(), this.dsrp.isLobbyPlayerStatusReady());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setReady(this.dsrp.isLobbyPlayerStatusReady());
-        ViewSupervisor.updatePlayerStatus(this.dsrp);
+        ViewSupervisor.updatePlayerStatus();
         return true;
     }
 
