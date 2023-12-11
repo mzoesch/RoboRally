@@ -1053,7 +1053,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,3)
-        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"})); // TODO kommt top oder null rein?
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("1A",new Coordinate(2,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1068,7 +1068,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,6)
-        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"})); // TODO kommt bottom oder null rein?
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("1A",new Coordinate(2,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1203,7 +1203,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,1)
-        fieldtypes.add(new ConveyorBelt(1, "right", new String[] {null})); // TODO was kommt dahin?
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[] {"left"}));
         arrayListY.add(new Tile("1A",new Coordinate(5,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1320,7 +1320,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (7,3)
-        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"})); // TODO ist incoming trotzdem oben?
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("1A",new Coordinate(7,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1335,7 +1335,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (7,6)
-        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"})); // TODO ist incoming trotzdem unten?
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"bottom"}));
         arrayListY.add(new Tile("1A",new Coordinate(7,6), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1548,7 +1548,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (1,3)
-        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"right"})); // TODO stimmt das, da das andere feld in die andere Richtung geht
+        fieldtypes.add(new ConveyorBelt(2, "top", new String[] {"right"}));
         arrayListY.add(new Tile("4A",new Coordinate(1,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
