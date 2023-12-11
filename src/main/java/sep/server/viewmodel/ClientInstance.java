@@ -269,9 +269,10 @@ public final class ClientInstance implements Runnable
 
     public boolean onAddAgentRequest()
     {
-        // We may ignore all body arguments because we do not need them. If there is something unusual going on, the
-        // initial client connection already would have failed.
+        // We may ignore all body arguments because we do not need them.
+        // If there is something fishy going on, the initial client connection already would have failed.
         l.debug("Client {} wants to add an agent to lobby {}.", this.getAddr(), this.getPlayerController().getSession().getSessionID());
+        this.getPlayerController().getSession().addAgent();
         return true;
     }
 
@@ -388,7 +389,7 @@ public final class ClientInstance implements Runnable
                 return;
             }
 
-            this.playerController.getSession().defaultBehaviourAfterPostLogin(this.playerController);
+            this.playerController.getSession().onPostJoin(this.playerController);
 
             this.defaultClientListener();
 
