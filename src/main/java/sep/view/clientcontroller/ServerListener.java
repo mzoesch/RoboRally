@@ -386,7 +386,7 @@ public class ServerListener implements Runnable
     {
         l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
-        ViewSupervisor.updatePlayerStatus(dsrp);
+        ViewSupervisor.updatePlayerView();
         return true;
     }
 

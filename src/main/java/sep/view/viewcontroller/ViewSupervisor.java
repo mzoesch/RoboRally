@@ -267,7 +267,6 @@ public final class ViewSupervisor extends Application
         }
     }
 
-
     public static <T> void onPlayerRemoved()
     {
         T ctrl = ViewSupervisor.getSceneController().getCurrentController();
