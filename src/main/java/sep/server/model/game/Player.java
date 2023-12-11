@@ -2,7 +2,6 @@ package sep.server.model.game;
 
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
-import sep.server.model.game.tiles.Coordinate;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.viewmodel.PlayerController;
 import sep.server.viewmodel.Session;
@@ -70,7 +69,7 @@ public class Player {
      */
     public void setCardToRegister(final String card, final int pos) {
         if (this.hasPlayerFinishedProgramming()) {
-            l.warn("Player {} has already finished programming and, therefore, cannot change their programming registers anymore.", this.playerController.getPlayerName());
+            l.warn("Player {} has already finished programming and, therefore, cannot change their programming registers anymore.", this.playerController.getName());
             return;
         }
 
@@ -91,7 +90,7 @@ public class Player {
         this.session.sendCardSelected(getPlayerController().getPlayerID(), pos, true);
 
         if (this.hasPlayerFinishedProgramming()) {
-            l.debug("Player " + this.playerController.getPlayerName() + " has finished programming.");
+            l.debug("Player " + this.playerController.getName() + " has finished programming.");
             this.session.sendSelectionFinished(this.playerController.getPlayerID());
 
             if (this.session.haveAllPlayersFinishedProgramming()) {
