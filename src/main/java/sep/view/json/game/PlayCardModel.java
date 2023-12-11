@@ -1,7 +1,8 @@
 package sep.view.json.game;
 
-import org.json.JSONObject;
 import sep.view.json.AServerRequestModel;
+
+import org.json.JSONObject;
 
 public class PlayCardModel extends AServerRequestModel {
 
