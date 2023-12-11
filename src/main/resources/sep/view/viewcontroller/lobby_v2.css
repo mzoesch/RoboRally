@@ -41,6 +41,11 @@
     -fx-background-radius: 3px;
 }
 
+#player-in-lobby-hbox {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
 #ready-label-container {
     -fx-spacing: 8px;
 }

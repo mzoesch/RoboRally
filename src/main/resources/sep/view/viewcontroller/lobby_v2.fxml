@@ -100,10 +100,25 @@
                         fx:id="readyLabelContainerWrapper"
                     >
                         <VBox>
-                            <Label
-                                text="Players in Session:"
-                                styleClass="text-xl"
-                            />
+                            <HBox
+                                id="player-in-lobby-hbox" stylesheets="@lobby_v2.css"
+                            >
+                                <children>
+                                    <VBox
+                                        fx:id="playersInSessionLabelContainer"
+                                    >
+                                        <Label
+                                            text="Players in Session:"
+                                            styleClass="text-xl"
+                                        />
+                                    </VBox>
+                                    <Button
+                                        text="Add Bot"
+                                        onAction="#onAddAgentBtn"
+                                        styleClass="secondary-btn-tiny"
+                                    />
+                                </children>
+                            </HBox>
                             <VBox
                                 id="player-list-container" stylesheets="@lobby_v2.css"
                                 fx:id="playerListContainer"
