@@ -119,7 +119,7 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    public static <T> void updatePlayerStatus(RDefaultServerRequestParser dsrp)
+    public static <T> void updatePlayerStatus()
     {
         T ctrl = ViewSupervisor.getSceneController().getCurrentController();
 
@@ -266,7 +266,6 @@ public final class ViewSupervisor extends Application
             return;
         }
     }
-
 
     public static <T> void onPlayerRemoved()
     {

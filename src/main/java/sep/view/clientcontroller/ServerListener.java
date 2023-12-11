@@ -174,7 +174,7 @@ public class ServerListener implements Runnable
     {
         l.debug("Received player status update. Client {} is ready: {}.", this.dsrp.getPlayerID(), this.dsrp.isLobbyPlayerStatusReady());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setReady(this.dsrp.isLobbyPlayerStatusReady());
-        ViewSupervisor.updatePlayerStatus(this.dsrp);
+        ViewSupervisor.updatePlayerStatus();
         return true;
     }
 
@@ -386,7 +386,7 @@ public class ServerListener implements Runnable
     {
         l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
-        ViewSupervisor.updatePlayerStatus(dsrp);
+        ViewSupervisor.updatePlayerView();
         return true;
     }
 
