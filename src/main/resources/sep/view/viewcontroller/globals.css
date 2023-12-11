@@ -27,6 +27,7 @@
     -fx-font-weight: 400;
     -fx-text-fill: -primary-text-fill;
 }
+
 .text-base-error {
     -fx-text-fill: -text-fill-error;
 }
@@ -37,6 +38,7 @@
     -fx-font-weight: 700;
     -fx-text-fill: -primary-text-fill;
 }
+
 .text-xl-error {
     -fx-text-fill: -text-fill-error;
 }
@@ -47,6 +49,7 @@
     -fx-font-weight: 700;
     -fx-text-fill: -primary-text-fill;
 }
+
 .text-2xl-error {
     -fx-text-fill: -text-fill-error;
 }
@@ -57,6 +60,7 @@
     -fx-font-weight: 800;
     -fx-text-fill: -primary-text-fill;
 }
+
 .text-4xl-error {
     -fx-text-fill: -text-fill-error;
 }
@@ -76,16 +80,19 @@
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
 }
+
 .primary-btn-mini:hover,
 .primary-btn:hover {
     -fx-background-color: -primary-btn-color-hover;
 }
+
 .primary-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
 }
 
+.secondary-btn-tiny,
 .secondary-btn-mini,
 .secondary-btn {
     -fx-background-color: -secondary-btn-color;
@@ -97,14 +104,23 @@
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
 }
+
+.secondary-btn-tiny:hover,
 .secondary-btn-mini:hover,
 .secondary-btn:hover {
     -fx-background-color: -secondary-btn-color-hover;
 }
+
 .secondary-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+}
+
+.secondary-btn-tiny {
+    -fx-font-size: 12px;
+    -fx-font-weight: 300;
+    -fx-padding: 2px 6px 2px 6px;
 }
 
 .danger-btn-mini,
@@ -118,10 +134,12 @@
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
 }
+
 .danger-btn-mini:hover,
 .danger-btn:hover {
     -fx-background-color: -danger-btn-color-hover;
 }
+
 .danger-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
@@ -139,10 +157,12 @@
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
 }
+
 .confirm-btn-mini:hover,
 .confirm-btn:hover {
     -fx-background-color: -confirm-btn-color-hover;
 }
+
 .confirm-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
