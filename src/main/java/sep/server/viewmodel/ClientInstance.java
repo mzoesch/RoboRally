@@ -46,6 +46,7 @@ public final class ClientInstance implements Runnable
         put("SetStartingPoint", ClientInstance.this::onStartingPointSet);
         put("PickDamage", ClientInstance.this::onDamageCardSelect);
         put("HelloServer", ClientInstance.this::onAddAgentRequest);
+        put("RebootDirection", ClientInstance.this::onRebootDirection);
     }};
 
     public Thread thread;
@@ -272,6 +273,12 @@ public final class ClientInstance implements Runnable
         // We may ignore all body arguments because we do not need them. If there is something unusual going on, the
         // initial client connection already would have failed.
         l.debug("Client {} wants to add an agent to lobby {}.", this.getAddr(), this.getPlayerController().getSession().getSessionID());
+        return true;
+    }
+
+    private boolean onRebootDirection() {
+        l.debug("Client {} set their reboot direction to {}", this.getAddr(), this.dcrp.getDirection());
+        this.playerController.getSession().getGameState().setRebootDirection(playerController, this.dcrp.getDirection());
         return true;
     }
 

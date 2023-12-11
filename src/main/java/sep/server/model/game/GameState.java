@@ -92,6 +92,10 @@ public class GameState
         gameMode.setStartingPoint(playerController, x,y);
     }
 
+    public void setRebootDirection(PlayerController playerController, String direction) {
+        playerController.getPlayer().getPlayerRobot().setDirection(direction);
+    }
+
 
 
     // endregion Getters and Setters

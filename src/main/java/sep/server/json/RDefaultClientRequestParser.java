@@ -85,4 +85,8 @@ public record RDefaultClientRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody");
     }
 
+    public String getDirection() throws JSONException {
+        return this.request.getJSONObject("messageBody").getString("direction");
+    }
+
 }
