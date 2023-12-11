@@ -41,6 +41,13 @@ public class CourseBuilder {
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
+            case("Death Trap") -> {
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> board2A = buildBoard("2A");
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, boardStartA);
+                settingCoordinates(entireCourse);
+                return entireCourse;
+            }
             case("Test") -> {
                 return buildBoard("Test");
             }
@@ -115,6 +122,7 @@ public class CourseBuilder {
         }
         return "clockwise";
     }
+
     /**
      * Appends a board to the right of another board. Only works for boards of the same length.
      * @param leftBoard left board
@@ -127,6 +135,7 @@ public class CourseBuilder {
         return leftBoard;
     }
 
+    // TODO wird eigentlich nicht benutzt, kann es weg?
     /**
      * Appends a board to the bottom of another board. Only works for boards of the same width.
      * @param topBoard top board
@@ -145,6 +154,7 @@ public class CourseBuilder {
      * @param boardName name of the board to be created
      * @return created board
      */
+
     public ArrayList<ArrayList<Tile>> buildBoard(String boardName){
         switch(boardName){
             case("Test") -> {
@@ -158,6 +168,9 @@ public class CourseBuilder {
             }
             case("1A") -> {
                 return build1A();
+            }
+            case("2A") -> {
+                return build2A();
             }
             case("4A") -> {
                 return build4A();
@@ -1463,6 +1476,26 @@ public class CourseBuilder {
         board.add(arrayListY);
         return board;
     }
+
+
+    /**
+     * Builds board 2A (part of Death Trap)
+     * @return board 2A as ArrayList
+     */
+    public ArrayList<ArrayList<Tile>> build2A() {
+
+        ArrayList<ArrayList<Tile>> board = new ArrayList<>();
+        ArrayList<Tile> arrayListY = new ArrayList<>();
+        ArrayList<FieldType> fieldtypes = new ArrayList<>();
+
+        // (0,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("2A",new Coordinate(0,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        return null;
+    }
+
 
 
     /**
