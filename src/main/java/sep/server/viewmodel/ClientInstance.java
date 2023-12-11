@@ -200,7 +200,8 @@ public final class ClientInstance implements Runnable
     {
         final String oName = this.playerController.getName();
 
-        // TODO We have to do some validation here.
+        /* TODO We have to do some validation here. */
+        /* TODO Check if the client name is valid. It must not start with "[BOT]" or be empty etc. */
 
         this.playerController.setPlayerName(this.dcrp.getPlayerName());
         this.playerController.setFigure(this.dcrp.getFigureID());
