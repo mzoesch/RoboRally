@@ -23,6 +23,7 @@ import sep.server.json.game.activatingphase.CurrentCardsModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.Card;
 import sep.server.json.common.ConnectionUpdateModel;
+import sep.server.model.IOwnershipable;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -31,8 +32,7 @@ import org.apache.logging.log4j.Logger;
 
 /**
  * Handles how clients can join and leave a session and also how to communicate with each other. For example,
- * chat messages. If a client disconnects mid-game, this class must handle that as well. (Wait for reconnection
- * or replace that player by an AI. We will probably have to handle this later on in an upcoming milestone.)
+ * chat messages. If a client disconnects mid-game, this class must handle that as well.
  */
 public final class Session
 {
@@ -40,8 +40,8 @@ public final class Session
 
     private static final int DEFAULT_SESSION_ID_LENGTH = 5;
 
-    private final ArrayList<PlayerController> playerControllers;
-    private final ArrayList<PlayerController> readyPlayerControllerOrder;
+    private final ArrayList<IOwnershipable> ctrls;
+    private final ArrayList<PlayerController> readyCharacterOrder;
     private final String sessionID;
 
     private final GameState gameState;
@@ -54,12 +54,12 @@ public final class Session
         return;
     }
 
-    public Session(String sessionID)
+    public Session(final String sessionID)
     {
         super();
 
-        this.playerControllers = new ArrayList<PlayerController>();
-        this.readyPlayerControllerOrder = new ArrayList<PlayerController>();
+        this.ctrls = new ArrayList<IOwnershipable>();
+        this.readyCharacterOrder = new ArrayList<PlayerController>();
         this.sessionID = sessionID;
         this.gameState = new GameState(this);
 
@@ -68,228 +68,248 @@ public final class Session
         return;
     }
 
-    public void joinSession(PlayerController playerController)
+    public void joinSession(final IOwnershipable ctrl)
     {
-        this.playerControllers.add(playerController);
+        this.ctrls.add(ctrl);
         return;
     }
 
-    public void leaveSession(final PlayerController playerController)
+    public void leaveSession(final IOwnershipable ctrl)
     {
-        this.playerControllers.remove(playerController);
+        this.ctrls.remove(ctrl);
 
-        if (this.playerControllers.isEmpty())
+        if (this.ctrls.isEmpty())
         {
             EServerInformation.INSTANCE.removeSession(this);
             return;
         }
 
-        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s left the session.", playerController.getPlayerName()));
-
-        if (this.getGameState().hasGameStarted())
+        if (this.getCharacters().isEmpty())
         {
-            l.debug("Client {} disconnected mid-game.", playerController.getClientInstance().getAddr());
-            this.getGameState().getAuthGameMode().removePlayer(playerController.getPlayerID());
-            this.broadcastConnectionUpdate(playerController, EConnectionLoss.REMOVE, false);
-            l.info("Client {} was successfully removed from the game.", playerController.getClientInstance().getAddr());
+            EServerInformation.INSTANCE.removeSession(this);
             return;
         }
 
-        /* TODO If the await thread is already running. */
+        if (ctrl instanceof final PlayerController pc)
+        {
+            this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s left the session.", pc.getName()));
 
-        l.debug("Client {} disconnected.", playerController.getClientInstance().getAddr());
-        this.broadcastConnectionUpdate(playerController, EConnectionLoss.REMOVE, false);
-        this.readyPlayerControllerOrder.remove(playerController);
-        l.info("Client {} was successfully removed from the session.", playerController.getClientInstance().getAddr());
+            if (this.getGameState().hasGameStarted())
+            {
+                l.debug("Client {} disconnected mid-game.", pc.getClientInstance().getAddr());
+                this.getGameState().getAuthGameMode().removePlayer(pc.getPlayerID());
+                this.broadcastConnectionUpdate(pc, EConnectionLoss.REMOVE, false);
+                l.info("Client {} was successfully removed from the game.", pc.getClientInstance().getAddr());
+                return;
+            }
+
+            /* TODO If the await thread is already running. */
+
+            l.debug("Client {} disconnected.", pc.getClientInstance().getAddr());
+            this.broadcastConnectionUpdate(pc, EConnectionLoss.REMOVE, false);
+            this.readyCharacterOrder.remove(pc);
+            l.info("Client {} was successfully removed from the session.", pc.getClientInstance().getAddr());
+
+            return;
+        }
+
+        /* If a local player is removed. */
+        this.broadcastConnectionUpdate(ctrl, EConnectionLoss.REMOVE, false);
 
         return;
     }
 
-    private void broadcastConnectionUpdate(final PlayerController tPC, final EConnectionLoss eCL, final boolean bConnected)
+    private void broadcastConnectionUpdate(final IOwnershipable tCtrl, final EConnectionLoss eCL, final boolean bConnected)
     {
-        if (tPC == null)
+        if (tCtrl == null)
         {
             return;
         }
 
-        for (PlayerController PC : this.playerControllers)
+        for (PlayerController pc : this.getCharacters())
         {
-            new ConnectionUpdateModel(PC.getClientInstance(), tPC.getPlayerID(), eCL.toString(), bConnected).send();
+            new ConnectionUpdateModel(pc.getClientInstance(), tCtrl.getPlayerID(), eCL.toString(), bConnected).send();
             continue;
         }
 
         return;
     }
 
-    public void broadcastChatMessage(int caller, String message)
+    public void broadcastChatMessage(final int caller, final String msg)
     {
         // TODO Validate message.
-        if (message.isEmpty())
+        if (msg.isEmpty())
         {
             return;
         }
 
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            PC.sendChatMessage(caller, message, false);
+            pc.sendChatMessage(caller, msg, false);
             continue;
         }
 
         return;
     }
 
-    public void sendKeepAlive(ArrayList<ClientInstance> dead)
+    public void sendKeepAlive(final ArrayList<ClientInstance> dead)
     {
-
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            if (!PC.getClientInstance().isAlive())
+            if (!pc.getClientInstance().isAlive())
             {
-                dead.add(PC.getClientInstance());
+                dead.add(pc.getClientInstance());
                 continue;
             }
 
-            PC.getClientInstance().sendKeepAlive();
+            pc.getClientInstance().sendKeepAlive();
             continue;
         }
 
         return;
     }
 
-    public void defaultBehaviourAfterPostLogin(PlayerController newPC)
+    public void defaultBehaviourAfterPostLogin(final IOwnershipable newCtrl)
     {
         /* Information for the new client to understand the current state of the game. */
-        for (PlayerController PC : this.playerControllers)
+        if (newCtrl instanceof final PlayerController newPC)
         {
-            new PlayerAddedModel(newPC, PC.getPlayerID(), PC.getPlayerName(), PC.getFigure()).send();
-            new PlayerStatusModel(newPC.getClientInstance(), PC.getPlayerID(), PC.isReady()).send();
-            continue;
+            for (final PlayerController pc : this.getCharacters())
+            {
+                new PlayerAddedModel(newPC, pc.getPlayerID(), pc.getName(), pc.getFigure()).send();
+                new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
+                continue;
+            }
+
+            new MapSelectedModel(newPC, this.gameState.getCourseName()).send();
         }
-        new MapSelectedModel(newPC, this.gameState.getCourseName()).send();
 
         /* Sending information about the new client to all other clients. */
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            if (PC.getPlayerID() == newPC.getPlayerID())
+            if (pc.getPlayerID() == newCtrl.getPlayerID())
             {
                 continue;
             }
 
-            new PlayerAddedModel(PC, newPC.getPlayerID(), newPC.getPlayerName(), newPC.getFigure()).send();
+            new PlayerAddedModel(pc, newCtrl.getPlayerID(), newCtrl.getName(), newCtrl.getFigure()).send();
 
             continue;
         }
 
-        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s joined the session.", newPC.getPlayerName()));
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s joined the session.", newCtrl.getName()));
 
         return;
     }
 
-    public void sendPlayerValuesToAllClients(PlayerController changedPC)
+    /** @param cCtrl The controller that changed in any way. */
+    public void sendPlayerValuesToAllClients(final IOwnershipable cCtrl)
     {
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            new PlayerAddedModel(PC, changedPC.getPlayerID(), changedPC.getPlayerName(), changedPC.getFigure()).send();
+            new PlayerAddedModel(pc, cCtrl.getPlayerID(), cCtrl.getName(), cCtrl.getFigure()).send();
             continue;
         }
 
         return;
     }
 
-    public void handleChatMessage(PlayerController playerController, String chatMessageV2, int receiverID)
+    public void handleChatMessage(final PlayerController callingPC, final String msg, final int receiverID)
     {
         if (receiverID == ChatMsgModel.CHAT_MSG_BROADCAST)
         {
-            this.broadcastChatMessage(playerController.getPlayerID(), chatMessageV2);
+            this.broadcastChatMessage(callingPC.getPlayerID(), msg);
             return;
         }
 
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            if (PC.getPlayerID() == receiverID)
+            if (pc.getPlayerID() == receiverID)
             {
-                PC.sendChatMessage(playerController.getPlayerID(), chatMessageV2, true);
+                pc.sendChatMessage(pc.getPlayerID(), msg, true);
                 return;
             }
 
             continue;
         }
 
+        l.warn("Client {} tried to send a private message to a non-existing remote player.", callingPC.getClientInstance().getAddr());
+
         return;
     }
 
-    public void broadcastPlayerLobbyReadyStatus(PlayerController playerController)
+    public void broadcastPlayerLobbyReadyStatus(final PlayerController sourcePC)
     {
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            new PlayerStatusModel(PC.getClientInstance(), playerController.getPlayerID(), playerController.isReady()).send();
+            new PlayerStatusModel(pc.getClientInstance(), sourcePC.getPlayerID(), sourcePC.isReady()).send();
             continue;
         }
 
         return;
     }
 
-    private void broadcastCourseSelected(PlayerController playerController)
+    private void broadcastCourseSelected(final PlayerController selector)
     {
-        for (PlayerController PC : this.playerControllers)
+        for (PlayerController pc : this.getCharacters())
         {
-            new MapSelectedModel(PC, this.gameState.getCourseName()).send();
+            new MapSelectedModel(pc, this.gameState.getCourseName()).send();
             continue;
         }
 
-        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s selected the course %s.", playerController.getPlayerName(), this.gameState.getCourseName()));
+        this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s selected the course %s.", selector.getName(), this.gameState.getCourseName()));
 
         return;
     }
 
     private void updateCourseSelectorPower()
     {
-        if (this.readyPlayerControllerOrder.isEmpty())
+        if (this.readyCharacterOrder.isEmpty())
         {
             return;
         }
 
-        new SelectMapModel(this.readyPlayerControllerOrder.get(0)).send();
+        new SelectMapModel(this.readyCharacterOrder.get(0)).send();
 
         return;
     }
 
-    public void handlePlayerReadyStatus(PlayerController PC, boolean bIsReady)
+    public void handlePlayerReadyStatus(final PlayerController pc, final boolean bIsReady)
     {
-        PC.setReady(bIsReady);
+        pc.setReady(bIsReady);
 
         if (!bIsReady)
         {
-            if (!this.readyPlayerControllerOrder.contains(PC))
+            if (!this.readyCharacterOrder.contains(pc))
             {
                 return;
             }
 
-            if (this.readyPlayerControllerOrder.indexOf(PC) != 0)
+            if (this.readyCharacterOrder.indexOf(pc) != 0)
             {
-                this.readyPlayerControllerOrder.remove(PC);
+                this.readyCharacterOrder.remove(pc);
                 return;
             }
 
-            this.readyPlayerControllerOrder.remove(PC);
+            this.readyCharacterOrder.remove(pc);
             this.updateCourseSelectorPower();
 
             return;
         }
 
-        if (this.readyPlayerControllerOrder.isEmpty())
+        if (this.readyCharacterOrder.isEmpty())
         {
-            this.readyPlayerControllerOrder.add(PC);
+            this.readyCharacterOrder.add(pc);
             this.updateCourseSelectorPower();
             return;
         }
 
-        if (this.readyPlayerControllerOrder.contains(PC))
+        if (this.readyCharacterOrder.contains(pc))
         {
             return;
         }
 
-        this.readyPlayerControllerOrder.add(PC);
+        this.readyCharacterOrder.add(pc);
 
         if (this.isReadyToStartGame())
         {
@@ -300,10 +320,10 @@ public final class Session
         return;
     }
 
-    public void handleSelectCourseName(PlayerController PC, String courseName)
+    public void handleSelectCourseName(final PlayerController pc, final String courseName)
     {
         this.gameState.setCourseName(courseName);
-        this.broadcastCourseSelected(PC);
+        this.broadcastCourseSelected(pc);
 
         if (this.isReadyToStartGame())
         {
@@ -333,7 +353,10 @@ public final class Session
                 return;
             }
 
-            this.gameState.startGame(this.playerControllers.toArray(new PlayerController[0]));
+            /* TODO Here set the figures of the agents if available. */
+
+            this.gameState.startGame(this.ctrls.toArray(new IOwnershipable[0]));
+
             return;
         });
 
@@ -341,37 +364,46 @@ public final class Session
 
         return;
     }
-    public void handleSelectedStartingPoint(int playerID, int x, int y){
-        for(PlayerController pc : this.playerControllers){
-            new StartingPointTakenModel(pc.getClientInstance(), x, y, playerID).send();
+
+    public void handleSelectedStartingPoint(final int ctrlID, final int x, final int y)
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
+            new StartingPointTakenModel(pc.getClientInstance(), x, y, ctrlID).send();
+            continue;
         }
+
+        return;
     }
 
-    public void broadcastCurrentPlayer(int playerID)
+    public void broadcastCurrentPlayer(final int playerID)
     {
-        for(PlayerController pc : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
             new CurrentPlayerModel(pc.getClientInstance(), playerID).send();
+            continue;
         }
 
         return;
     }
 
-    public void broadcastNewGamePhase(EGamePhase phase)
+    public void broadcastNewGamePhase(final EGamePhase phase)
     {
-        for (PlayerController pc : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
             new ActivePhaseModel(pc.getClientInstance(), phase.i).send();
+            continue;
         }
 
         return;
     }
 
-    public void broadcastGameStart(ArrayList<ArrayList<Tile>> course)
+    public void broadcastGameStart(final ArrayList<ArrayList<Tile>> course)
     {
-        for (PlayerController pc : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
             new GameStartedModel(pc.getClientInstance(), course).send();
+            continue;
         }
 
         return;
@@ -393,9 +425,9 @@ public final class Session
             continue;
         }
 
-        for (Player p : this.getGameState().getAuthGameMode().getPlayers())
+        for (final PlayerController pc : this.getCharacters())
         {
-            new CurrentCardsModel(p.getPlayerController().getClientInstance(), activeCards).send();
+            new CurrentCardsModel(pc.getClientInstance(), activeCards).send();
             continue;
         }
 
@@ -406,15 +438,15 @@ public final class Session
 
     public String getSessionID()
     {
-        return sessionID;
+        return this.sessionID;
     }
 
     /** @deprecated Because multiple clients can have the same name. */
-    public boolean isPlayerNameInSession(String playerName)
+    public boolean isPlayerNameInSession(final String playerName)
     {
-        for (PlayerController PC : this.playerControllers)
+        for (IOwnershipable ctrl : this.ctrls)
         {
-            if (PC.getPlayerName().equals(playerName))
+            if (ctrl.getName().equals(playerName))
             {
                 return true;
             }
@@ -427,8 +459,8 @@ public final class Session
 
     private static String generateSessionID()
     {
-        String t = UUID.randomUUID().toString().substring(0, Session.DEFAULT_SESSION_ID_LENGTH);
-        for (Session s : EServerInformation.INSTANCE.getSessions())
+        final String t = UUID.randomUUID().toString().substring(0, Session.DEFAULT_SESSION_ID_LENGTH);
+        for (final Session s : EServerInformation.INSTANCE.getSessions())
         {
             if (s.getSessionID().equals(t))
             {
@@ -443,20 +475,19 @@ public final class Session
 
     public GameState getGameState()
     {
-        return gameState;
+        return this.gameState;
     }
 
     private boolean isReadyToStartGame()
     {
-        // TODO Don't check PC size but the human player size.
-        if (this.playerControllers.size() < GameState.MIN_PLAYER_START)
+        if (this.getCharacters().size() < GameState.MIN_PLAYER_START)
         {
             return false;
         }
 
-        for (PlayerController PC : this.playerControllers)
+        for (final PlayerController pc : this.getCharacters())
         {
-            if (!PC.isReady())
+            if (!pc.isReady())
             {
                 return false;
             }
@@ -467,112 +498,170 @@ public final class Session
         if (this.gameState.getCourseName().isEmpty() || this.gameState.getCourseName().isBlank())
         {
             l.info("All players are ready. The server is awaiting a course selection.");
-            this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("All players are ready. The server is awaiting %s to select a course.", this.readyPlayerControllerOrder.get(0).getPlayerName()));
+            this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("All players are ready. The server is awaiting %s to select a course.", this.readyCharacterOrder.get(0).getName()));
             return false;
         }
 
         return true;
     }
 
-    /**
-     * Sends a set of hand cards to a specified player controller and notifies all players
-     */
-    public void sendHandCardsToPlayer(PlayerController targetPlayerController, String[] hand) {
-        for (PlayerController playerController : this.playerControllers) {
-
-            NotYourCardsModel notYourCardsModel = new NotYourCardsModel(playerController.getClientInstance(), targetPlayerController.getPlayerID(), hand.length);
+    /** Sends a set of hand cards to a specified player controller and notifies all remote players. */
+    public void sendHandCardsToPlayer(final PlayerController tPC, final String[] hand)
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
+            NotYourCardsModel notYourCardsModel = new NotYourCardsModel(pc.getClientInstance(), tPC.getPlayerID(), hand.length);
             notYourCardsModel.send();
 
-            if (playerController == targetPlayerController) {
-                YourCardsModel yourCardsModel = new YourCardsModel(playerController.getClientInstance(),hand);
+            if (pc == tPC)
+            {
+                YourCardsModel yourCardsModel = new YourCardsModel(pc.getClientInstance(), hand);
                 yourCardsModel.send();
             }
+
+            continue;
         }
+
+        return;
     }
 
     /**
-     * Sends a shuffle  notification to all clients
+     * Sends a shuffle notification to all remote players.
      *
      * @param playerID The ID of the player who shuffled.
      */
-    public void sendShuffleCodingNotification(int playerID) {
-        for (PlayerController playerController : this.playerControllers) {
-            ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(playerController.getClientInstance(), playerID);
+    public void sendShuffleCodingNotification(final int playerID)
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
+            ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(pc.getClientInstance(), playerID);
             shuffleCodingModel.send();
+
+            continue;
         }
+
+        return;
     }
 
     /**
-     * @param playerID The player ID of the player who made the selection
-     * @param register The register of the selection
-     * @param filled true for placed, false for removed
+     * @param playerID The player ID of the player who made the selection.
+     * @param register The register of the selection.
+     * @param bFilled  True if the card was places in the register, false if it was removed-
      */
-    public void sendCardSelected(int playerID, int register, boolean filled) {
-        for (PlayerController playerController : this.playerControllers) {
-            CardSelectedModel cardSelectedModel = new CardSelectedModel(playerController.getClientInstance(), playerID, register, filled);
+    public void sendCardSelected(final int playerID, final int register, final boolean bFilled)
+    {
+        for (PlayerController pc : this.getCharacters())
+        {
+            CardSelectedModel cardSelectedModel = new CardSelectedModel(pc.getClientInstance(), playerID, register, bFilled);
             cardSelectedModel.send();
+
+            continue;
         }
+
+        return;
     }
 
-    public void sendCardsYouGotNow(PlayerController targetPlayerController,String[] hand ){
-        for (PlayerController playerController : this.playerControllers) {
-            if (playerController == targetPlayerController) {
-                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(playerController.getClientInstance(),hand);
+    public void sendCardsYouGotNow(final PlayerController tPC, final String[] hand)
+    {
+        for (PlayerController pc : this.getCharacters())
+        {
+            if (pc == tPC)
+            {
+                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(pc.getClientInstance(), hand);
                 cardsYouGotNowModel.send();
             }
+
+            continue;
         }
+
+        return;
     }
 
-    public void sendTimerStarted() {
-        for (PlayerController playerController : this.playerControllers) {
-            TimerStartedModel timerStartedModel = new TimerStartedModel(playerController.getClientInstance());
+    public void sendTimerStarted()
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
+            TimerStartedModel timerStartedModel = new TimerStartedModel(pc.getClientInstance());
             timerStartedModel.send();
+
+            continue;
         }
+
+        return;
     }
 
-    /**
-     * @param playerIDS An array of player IDs who  have responded too slowly
-     */
-    public void sendTimerEnded(int[] playerIDS) {
-        for (PlayerController playerController : this.playerControllers) {
-            TimerEndedModel timerEndedModel = new TimerEndedModel(playerController.getClientInstance(), playerIDS);
+    /** @param playerIDs The players that have not finished programming in time. */
+    public void sendTimerEnded(final int[] playerIDs)
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
+            TimerEndedModel timerEndedModel = new TimerEndedModel(pc.getClientInstance(), playerIDs);
             timerEndedModel.send();
+
+            continue;
         }
+
+        return;
     }
 
-    public void sendSelectionFinished(int playerID) {
-        for (PlayerController playerController : this.playerControllers) {
-            SelectionFinishedModel selectionFinishedModel = new SelectionFinishedModel(playerController.getClientInstance(), playerID);
+    public void sendSelectionFinished(final int playerID)
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
+            SelectionFinishedModel selectionFinishedModel = new SelectionFinishedModel(pc.getClientInstance(), playerID);
             selectionFinishedModel.send();
+
+            continue;
         }
+
+        return;
     }
 
-    public void handlePlayerTurning(int playerID, String startingTurn) {
-        for (PlayerController pc : this.playerControllers) {
-            l.debug("Player " + playerID + " has turned: " + startingTurn);
+    public void handlePlayerTurning(final int playerID, final String startingTurn)
+    {
+        for (PlayerController pc : this.getCharacters())
+        {
+            l.debug("Player {} has turned {}.", playerID, startingTurn);
             PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
             playerTurningModel.send();
+
+            continue;
         }
+
+        return;
     }
 
-    public void handleGameFinished(int playerID){
-        l.debug("Sent GameFinished with winningPlayer: " + playerID);
-        for (PlayerController pc : this.playerControllers) {
+    public void handleGameFinished(final int playerID)
+    {
+        l.debug("Notifying remote players that {} has won the game.", playerID);
+        for (final PlayerController pc : this.getCharacters())
+        {
             GameFinishedModel gameFinishedModel = new GameFinishedModel(pc.getClientInstance(), playerID);
             gameFinishedModel.send();
+
+            continue;
         }
+
+        return;
     }
 
-    public void handleMovement(int playerID, int x, int y){
-        for (PlayerController pc : this.playerControllers) {
+    public void handleMovement(final int playerID, final int x, final int y)
+    {
+        for (final PlayerController pc : this.getCharacters())
+        {
             MovementModel movementModel = new MovementModel(pc.getClientInstance(), playerID, x, y);
             movementModel.send();
+
+            continue;
         }
+
+        return;
     }
 
     public boolean haveAllPlayersFinishedProgramming()
     {
-        for (PlayerController pc : this.playerControllers)
+        /* Because agents will always instantly have finished their programming. */
+        for (final PlayerController pc : this.getCharacters())
         {
             if (!pc.getPlayer().hasPlayerFinishedProgramming())
             {
@@ -583,6 +672,24 @@ public final class Session
         }
 
         return true;
+    }
+
+    /** @return All remote players in this session. */
+    private ArrayList<PlayerController> getCharacters()
+    {
+        ArrayList<PlayerController> t = new ArrayList<PlayerController>();
+        for (final IOwnershipable ctrl : this.ctrls)
+        {
+            if (ctrl instanceof PlayerController)
+            {
+                t.add((PlayerController) ctrl);
+                continue;
+            }
+
+            continue;
+        }
+
+        return t;
     }
 
     // endregion Getters and Setters
