@@ -1159,11 +1159,12 @@ public class GameJFXController
                 return;
 
             case PROGRAMMING:
-                this.UIHeaderGameStateDescriptionLabel.setText("Programming Phase");
+                this.UIHeaderGameStateDescriptionLabel.setText("Programming Phase. Select your Cards by clicking on them and then clicking on an empty register. +" +
+                        "Click on filled register to remove the selected card.");
                 return;
 
             case ACTIVATION:
-                this.UIHeaderGameStateDescriptionLabel.setText("Activation Phase");
+                this.UIHeaderGameStateDescriptionLabel.setText("Activation Phase. Just wait until next Phase begins.");
                 return;
         }
 
