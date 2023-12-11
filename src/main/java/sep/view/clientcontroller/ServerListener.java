@@ -410,6 +410,7 @@ public class ServerListener implements Runnable
 
     private boolean onPlayerReboot() throws JSONException
     {
+        //TODO hier muss noch der Client mit einer RebootDirection antworten oder?
         l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
         ViewSupervisor.handleChatInfo(String.format("Player %s was rebooted.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
         return true;

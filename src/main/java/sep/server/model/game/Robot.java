@@ -206,6 +206,8 @@ public class Robot {
             for(Player player : GameState.gameMode.getPlayers()) {
                 new RebootModel(player.getPlayerController().getClientInstance(),
                         robotOwner.getPlayerController().getPlayerID()).send();
+                //TODO kommt die RebootDirection nicht vom entsprechenden Client und wird dann als PlayerTurning an +
+                // alle ausgegeben?
                 new RebootDirectionModel(player.getPlayerController().getClientInstance(),
                         rebootDirection).send();
                 new MovementModel(player.getPlayerController().getClientInstance(),
