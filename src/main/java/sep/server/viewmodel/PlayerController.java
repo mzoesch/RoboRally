@@ -26,21 +26,24 @@ public final class PlayerController implements IOwnershipable
 
     private Player player;
 
-    public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
+    public PlayerController(final ClientInstance clientInstance, final String playerName, final int playerID, final Session session)
     {
         super();
 
         this.clientInstance = clientInstance;
         this.playerName = playerName;
         this.playerID = playerID;
+
         this.session = session;
         this.figure = -1;
         this.bIsReady = false;
 
+        this.player = null;
+
         return;
     }
 
-    public void sendChatMessage(int caller, String message, boolean bIsPrivate)
+    public void sendChatMessage(final int caller, final String message, final boolean bIsPrivate)
     {
         new ChatMsgModel(this.clientInstance, caller, message, bIsPrivate).send();
         return;
@@ -59,7 +62,7 @@ public final class PlayerController implements IOwnershipable
         return this.playerName;
     }
 
-    public void setPlayerName(String playerName)
+    public void setPlayerName(final String playerName)
     {
         this.playerName = playerName;
         return;
@@ -77,13 +80,13 @@ public final class PlayerController implements IOwnershipable
         return this.figure;
     }
 
-    public void setFigure(int figure)
+    public void setFigure(final int figure)
     {
         this.figure = figure;
         return;
     }
 
-    public void setPlayer(Player player) {
+    public void setPlayer(final Player player) {
         this.player = player;
     }
 
@@ -97,20 +100,21 @@ public final class PlayerController implements IOwnershipable
         return this.bIsReady;
     }
 
-    public void setReady(boolean bIsReady)
+    public void setReady(final boolean bIsReady)
     {
         this.bIsReady = bIsReady;
         this.session.broadcastPlayerLobbyReadyStatus(this);
         return;
     }
 
-    public void setSelectedCardInRegister(String selectedCard, int selectedRegister){
-        player.setCardToRegister(selectedCard, selectedRegister);
+    public void setSelectedCardInRegister(final String selectedCard, final int selectedRegister)
+    {
+        this.player.setCardToRegister(selectedCard, selectedRegister);
     }
 
     public Player getPlayer()
     {
-        return player;
+        return this.player;
     }
 
     // endregion Getters and Setters

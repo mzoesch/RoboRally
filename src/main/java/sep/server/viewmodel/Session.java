@@ -24,6 +24,7 @@ import sep.server.model.game.Player;
 import sep.server.model.game.cards.Card;
 import sep.server.json.common.ConnectionUpdateModel;
 import sep.server.model.IOwnershipable;
+import sep.server.model.Agent;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -169,15 +170,28 @@ public final class Session
         return;
     }
 
-    public void defaultBehaviourAfterPostLogin(final IOwnershipable newCtrl)
+    /**
+     * This method must be called after a client has joined the session. Currently, there is no automatic call to
+     * this after a client has joined. So be careful.
+     *
+     * @param newCtrl The controller that just joined the session.
+     */
+    public void onPostJoin(final IOwnershipable newCtrl)
     {
         /* Information for the new client to understand the current state of the game. */
         if (newCtrl instanceof final PlayerController newPC)
         {
-            for (final PlayerController pc : this.getCharacters())
+            for (final IOwnershipable ow : this.ctrls)
             {
-                new PlayerAddedModel(newPC, pc.getPlayerID(), pc.getName(), pc.getFigure()).send();
-                new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
+                new PlayerAddedModel(newPC, ow.getPlayerID(), ow.getName(), ow.getFigure()).send();
+
+                if (ow instanceof final PlayerController pc)
+                {
+                    /* An Agent is always ready. */
+                    new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
+                    continue;
+                }
+
                 continue;
             }
 
@@ -480,7 +494,7 @@ public final class Session
 
     private boolean isReadyToStartGame()
     {
-        if (this.getCharacters().size() < GameState.MIN_PLAYER_START)
+        if (this.getCharacters().size() < GameState.MIN_REMOTE_PLAYER_COUNT_TO_START)
         {
             return false;
         }
@@ -690,6 +704,43 @@ public final class Session
         }
 
         return t;
+    }
+
+    public void addAgent()
+    {
+        if (this.ctrls.size() >= GameState.MAX_CONTROLLERS_ALLOWED)
+        {
+            l.warn("The maximum amount of controllers has been reached. No more agents can be added.");
+            return;
+        }
+
+        final Agent a = ServerInstance.createNewAgent(this);
+        this.joinSession(a);
+        this.onPostJoin(a);
+
+        l.info("Agent {} was added to session [{}].", a.getName(), this.sessionID);
+
+        return;
+    }
+
+    public Agent[] getAgents()
+    {
+        return this.ctrls.stream().filter(c -> c instanceof Agent).map(c -> (Agent) c).toArray(Agent[]::new);
+    }
+
+    public boolean isAgentNameTaken(final String agentName)
+    {
+        for (final Agent a : this.getAgents())
+        {
+            if (a.getName().equals(agentName))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
     }
 
     // endregion Getters and Setters
