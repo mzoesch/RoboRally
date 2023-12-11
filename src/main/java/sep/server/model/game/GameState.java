@@ -15,7 +15,7 @@ public class GameState
 {
     private static final Logger l = LogManager.getLogger(GameState.class);
 
-    private static final String[] AVAILABLE_COURSES = new String[] { "Dizzy Highway", "DEBUG COURSE ONE", "DEBUG COURSE TWO", "DEBUG COURSE THREE" };
+    private static final String[] AVAILABLE_COURSES = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap" };
 
     // TODO As described in Protocol v0.1, this var should be passed as a cmd program argument
     public static final int MIN_PLAYER_START = 2;
