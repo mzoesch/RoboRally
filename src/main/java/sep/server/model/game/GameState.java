@@ -34,7 +34,6 @@ public class GameState
         this.courseName = "";
         this.session = session;
         this.bGameStarted = false;
-        return;
     }
 
     public void startGame(final IOwnershipable[] ctrls)
@@ -45,8 +44,6 @@ public class GameState
         this.gameMode = new GameMode(this.courseName, ctrls, this.session);
 
         l.info("Game Mode created. The game has started with {} controllers.", ctrls.length);
-
-        return;
     }
 
     // region Getters and Setters
@@ -94,7 +91,6 @@ public class GameState
     }
 
     public void setRebootDirection(PlayerController playerController, String direction) {
-        //TODO only if reboot direction can still be changed
         playerController.getPlayer().getPlayerRobot().setDirection(direction);
     }
 
