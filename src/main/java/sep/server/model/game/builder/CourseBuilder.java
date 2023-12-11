@@ -37,7 +37,7 @@ public class CourseBuilder {
             case("Extra Crispy") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board4A = buildBoard("4A");
-                ArrayList<ArrayList<Tile>> entireCourse = appendBottom(boardStartA, board4A);
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board4A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
