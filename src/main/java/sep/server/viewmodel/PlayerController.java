@@ -13,7 +13,6 @@ import sep.server.model.IOwnershipable;
  * used to control the Pawn. A Player Controller could always be destroyed mid-game, for example, if the client
  * disconnects or a new one crated if a new client connects and posses an already existing pawn (e.g., a pawn that was
  * previously controlled by a bot).
- * (We know that we have to write some sort of AI in an upcoming milestone.)
  */
 public final class PlayerController implements IOwnershipable
 {
@@ -26,8 +25,6 @@ public final class PlayerController implements IOwnershipable
     private boolean bIsReady;
 
     private Player player;
-
-
 
     public PlayerController(ClientInstance clientInstance, String playerName, int playerID, Session session)
     {

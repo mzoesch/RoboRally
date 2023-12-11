@@ -18,6 +18,7 @@ public enum EConnectionLoss
     private EConnectionLoss(final int i)
     {
         this.i = i;
+        return;
     }
 
     @Override
