@@ -2,7 +2,7 @@ package sep.server.viewmodel;
 
 import sep.server.json.common.ChatMsgModel;
 import sep.server.json.mainmenu.InitialClientConnectionModel_v2;
-import sep.server.json.DefaultClientRequestParser;
+import sep.server.json.RDefaultClientRequestParser;
 import sep.server.model.EServerInformation;
 import sep.server.json.common.KeepAliveModel;
 
@@ -18,6 +18,8 @@ import org.json.JSONException;
 import java.net.SocketException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.function.Supplier;
+import java.util.HashMap;
 
 /**
  * High-level manager object for a client connection to the server. A Client Instance is spawned at connection
@@ -30,6 +32,20 @@ import org.apache.logging.log4j.Logger;
 public final class ClientInstance implements Runnable
 {
     private static final Logger l = LogManager.getLogger(ClientInstance.class);
+
+    private final HashMap<String, Supplier<Boolean>> clientReq =
+    new HashMap<String, Supplier<Boolean>>()
+    {{
+        put("Alive", ClientInstance.this::onAlive);
+        put("PlayerValues", ClientInstance.this::onCorePlayerAttributesChanged);
+        put("SendChat", ClientInstance.this::onChatMsg);
+        put("SetStatus", ClientInstance.this::onLobbyStatus);
+        put("MapSelected", ClientInstance.this::onCourseSelect);
+        put("PlayCard", ClientInstance.this::onCardPlay);
+        put("SelectedCard", ClientInstance.this::onRegisterSlotUpdate);
+        put("SetStartingPoint", ClientInstance.this::onStartingPointSet);
+        put("PickDamage", ClientInstance.this::onDamageCardSelect);
+    }};
 
     public Thread thread;
     private final Socket socket;
@@ -50,10 +66,13 @@ public final class ClientInstance implements Runnable
      */
     private boolean bDisconnecting;
 
-    public ClientInstance(Socket socket) throws IOException
+    private RDefaultClientRequestParser dcrp;
+
+    public ClientInstance(final Socket socket) throws IOException
     {
         super();
 
+        this.thread = null;
         this.socket = socket;
         this.inputStreamReader = new InputStreamReader(this.socket.getInputStream());
         this.outputStreamWriter = new OutputStreamWriter(this.socket.getOutputStream());
@@ -64,6 +83,8 @@ public final class ClientInstance implements Runnable
         this.bIsRegistered = false;
         this.bIsAlive = true;
         this.bDisconnecting = false;
+
+        this.dcrp = null;
 
         return;
     }
@@ -134,7 +155,8 @@ public final class ClientInstance implements Runnable
 
     /**
      * Only use this method for the initial client registration. For receiving information form the client
-     * after, use the {@link #defaultClientListener()} method.*/
+     * after, use the {@link #defaultClientListener()} method.
+     */
     public String waitForResponse()
     {
         try
@@ -163,86 +185,111 @@ public final class ClientInstance implements Runnable
         }
     }
 
-    private boolean parseRequest(DefaultClientRequestParser dcrp) throws JSONException
+    // region Client Request Handlers
+
+    private boolean onAlive()
     {
-        if (Objects.equals(dcrp.getType_v2(), "Alive"))
+        l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
+        this.setAlive(true);
+        return true;
+    }
+
+    private boolean onCorePlayerAttributesChanged()
+    {
+        final String oName = this.playerController.getPlayerName();
+
+        // TODO We have to do some validation here.
+
+        this.playerController.setPlayerName(this.dcrp.getPlayerName());
+        this.playerController.setFigure(this.dcrp.getFigureID());
+        l.debug("Client {} selected figure {}.", this.getAddr(), this.playerController.getFigure());
+
+        this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
+        if (!Objects.equals(oName, this.playerController.getPlayerName()))
         {
-//            l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
-            this.setAlive(true);
-            return true;
+            this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oName, this.playerController.getPlayerName()));
+            l.debug("Client {} changed their name from {} to {}.", this.getAddr(), oName, this.playerController.getPlayerName());
         }
 
-        /* If core player information is being changed. */
-        if (Objects.equals(dcrp.getType_v2(), "PlayerValues"))
+        return true;
+    }
+
+    private boolean onChatMsg()
+    {
+        l.debug("Client {} wants to send chat message [{}] to lobby {}.", this.getAddr(), dcrp.getChatMessage_v2(), this.getPlayerController().getSession().getSessionID());
+
+        // TODO Validate chat message.
+
+        this.playerController.getSession().handleChatMessage(this.playerController, dcrp.getChatMessage_v2(), dcrp.getReceiverID());
+
+        return true;
+    }
+
+    private boolean onLobbyStatus()
+    {
+        l.debug("Client {} set ready status to {}.", this.getAddr(), this.dcrp.getIsReadyInLobby());
+        this.playerController.getSession().handlePlayerReadyStatus(this.playerController, this.dcrp.getIsReadyInLobby());
+        return true;
+    }
+
+    private boolean onCourseSelect()
+    {
+        l.debug("Client {} selected course {}.", this.getAddr(), this.dcrp.getCourseName());
+        this.playerController.getSession().handleSelectCourseName(this.playerController, this.dcrp.getCourseName());
+        return true;
+    }
+
+    /** TODO What is the purpose of this req? */
+    private boolean onCardPlay()
+    {
+        l.debug("Received play Card from client.");
+        return true;
+    }
+
+    private boolean onRegisterSlotUpdate()
+    {
+        l.debug("Client {} selected card [{}] to register {}.", this.getAddr(), this.dcrp.getBody().isNull("card") ? null : this.dcrp.getSelectedCardAsString(), this.dcrp.getSelectedCardRegister());
+        this.playerController.setSelectedCardInRegister(this.dcrp.getBody().isNull("card") ? null : this.dcrp.getSelectedCardAsString(), this.dcrp.getSelectedCardRegister());
+        return true;
+    }
+
+    private boolean onStartingPointSet()
+    {
+        l.debug("Client {} set their starting point to ({},{})", this.getAddr(), this.dcrp.getXCoordinate(), this.dcrp.getYCoordinate());
+        this.playerController.getSession().getGameState().setStartingPoint(playerController, this.dcrp.getXCoordinate(), this.dcrp.getYCoordinate());
+        return true;
+    }
+
+    private boolean onDamageCardSelect()
+    {
+        l.debug("Received a picked damage card from client.");
+        return true;
+    }
+
+    // endregion Client Request Handlers
+
+    private void parseRequest(RDefaultClientRequestParser dcrp) throws JSONException
+    {
+        this.dcrp = dcrp;
+
+        if (this.clientReq.containsKey(this.dcrp.getType_v2()))
         {
-            final String oldName = this.playerController.getPlayerName();
-
-            // TODO We have to do some validation here.
-            this.playerController.setPlayerName(dcrp.getPlayerName());
-            this.playerController.setFigure(dcrp.getFigureID());
-            l.debug("Client {} selected figure {}.", this.getAddr(), this.playerController.getFigure());
-
-            this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
-            if (!Objects.equals(oldName, this.playerController.getPlayerName()))
+            if (this.clientReq.get(this.dcrp.getType_v2()).get())
             {
-                this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oldName, this.playerController.getPlayerName()));
-                l.debug("Client {} changed their name from {} to {}.", this.getAddr(), oldName, this.playerController.getPlayerName());
+                this.dcrp = null;
+                return;
             }
 
-            return true;
+            this.dcrp = null;
+            throw new JSONException("Hit a wall while trying to understand the server request.");
         }
 
-        /* If this client wants to send a chat message. */
-        if (Objects.equals(dcrp.getType_v2(), "SendChat"))
-        {
-            l.debug("Client {} wants to send chat message [{}] to lobby {}.", this.getAddr(), dcrp.getChatMessage_v2(), this.getPlayerController().getSession().getSessionID());
-            // TODO Validate chat message.
-            this.playerController.getSession().handleChatMessage(this.playerController, dcrp.getChatMessage_v2(), dcrp.getReceiverID());
-            return true;
-        }
+        l.warn("Received unknown request from server. Ignoring.");
+        l.warn(this.dcrp.request().toString(0));
 
-        /* If the client has set their ready status in the lobby. */
-        if (Objects.equals(dcrp.getType_v2(), "SetStatus"))
-        {
-            l.debug("Client {} set ready status to {}.", this.getAddr(), dcrp.getIsReadyInLobby());
-            this.playerController.getSession().handlePlayerReadyStatus(this.playerController, dcrp.getIsReadyInLobby());
-            return true;
-        }
+        this.dcrp = null;
 
-        if (Objects.equals(dcrp.getType_v2(), "MapSelected"))
-        {
-            l.debug("Client {} selected course {}.", this.getAddr(), dcrp.getCourseName());
-            this.playerController.getSession().handleSelectCourseName(this.playerController, dcrp.getCourseName());
-            return true;
-        }
-
-        if (Objects.equals(dcrp.getType_v2(), "PlayCard"))
-        {
-            l.debug("Received play Card from client.");
-            return true;
-        }
-
-        /* If the client has set one of their five registers. */
-        if (Objects.equals(dcrp.getType_v2(), "SelectedCard"))
-        {
-            l.debug("Client {} selected card [{}] to register {}.", this.getAddr(), dcrp.getBody().isNull("card") ? null : dcrp.getSelectedCardAsString(), dcrp.getSelectedCardRegister());
-            this.playerController.setSelectedCardInRegister(dcrp.getBody().isNull("card") ? null : dcrp.getSelectedCardAsString(), dcrp.getSelectedCardRegister());
-            return true;
-        }
-
-        if (Objects.equals(dcrp.getType_v2(), "SetStartingPoint"))
-        {
-            l.debug("Client {} set starting point to ({},{})", this.getAddr(), dcrp.getXCoordinate(), dcrp.getYCoordinate());
-            this.playerController.getSession().getGameState().setStartingPoint(playerController, dcrp.getXCoordinate(), dcrp.getYCoordinate());
-            return true;
-        }
-
-        if (Objects.equals(dcrp.getType_v2(), "PickDamage")) {
-            l.debug("Received a picked damage card from client.");
-            return true;
-        }
-
-        return false;
+        return;
     }
 
     private void defaultClientListener() throws IOException
@@ -269,30 +316,21 @@ public final class ClientInstance implements Runnable
                 return;
             }
 
-            final String s = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
-            if (!s.contains("\"messageType\":\"Alive\""))
-            {
-               l.trace("Received request from client {}. Parsing: {}", this.getAddr(), s);
-            }
-            final boolean bAccepted;
+            final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+            l.trace("Received request from client {}. Parsing: {}", this.getAddr(), r);
+
             try
             {
-                bAccepted = this.parseRequest(new DefaultClientRequestParser(new JSONObject(s)));
+                this.parseRequest(new RDefaultClientRequestParser(new JSONObject(r)));
             }
             catch (JSONException e)
             {
                 l.warn("Received invalid JSON from client {}. Ignoring.", this.getAddr());
                 l.warn(e.getMessage());
-                l.warn(s);
+                l.warn(r);
                 continue;
             }
 
-            if (bAccepted)
-            {
-                continue;
-            }
-
-            l.warn("Received unknown request from client {}. Ignoring.", this.getAddr());
             continue;
         }
     }

@@ -3,26 +3,21 @@ package sep.server.json;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-// Do not convert to record just yet, as we will add more fields to this class.
-public class DefaultClientRequestParser
+/**
+ * For easier access to the JSON object received from the client. Does not contain actual logic.
+ * We may want to split this into multiple classes later if it gets too messy.
+ */
+public record RDefaultClientRequestParser(JSONObject request)
 {
-    private final JSONObject request;
-
-    public DefaultClientRequestParser(JSONObject request)
+    public RDefaultClientRequestParser(final JSONObject request)
     {
-        super();
         this.request = request;
         return;
     }
 
-    public JSONObject getRequest()
+    public String getType_v2() throws JSONException
     {
-        return this.request;
-    }
-
-    public Object getType_v2() throws JSONException
-    {
-        return this.request.get("messageType");
+        return this.request.getString("messageType");
     }
 
     public String getChatMessage_v2() throws JSONException
@@ -40,44 +35,52 @@ public class DefaultClientRequestParser
         return this.request.getJSONObject("messageBody").getString("name");
     }
 
-    public int getFigureID()
+    public int getFigureID() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("figure");
     }
 
-    public boolean getIsReadyInLobby()
+    public boolean getIsReadyInLobby() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getBoolean("ready");
     }
 
-    public String getCourseName()
+    public String getCourseName() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getString("map");
     }
 
-    public Object getPosX()
+    public Object getPosX() throws JSONException
     {
         return this.request.getJSONObject("messageBody").get("x");
     }
 
-    public Object getPosY()
+    public Object getPosY() throws JSONException
     {
         return this.request.getJSONObject("messageBody").get("y");
     }
-    public int getXCoordinate(){ return this.request.getJSONObject("messageBody").getInt("x");}
 
-    public int getYCoordinate(){ return this.request.getJSONObject("messageBody").getInt("y");}
+    public int getXCoordinate() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("x");
+    }
+
+    public int getYCoordinate() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("y");
+    }
 
     public String getSelectedCardAsString() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getString("card");
     }
 
-    public int getSelectedCardRegister() throws JSONException {
+    public int getSelectedCardRegister() throws JSONException
+    {
         return this.request.getJSONObject("messageBody").getInt("register");
     }
 
-    public JSONObject getBody()
+    public JSONObject getBody() throws JSONException
     {
         return this.request.getJSONObject("messageBody");
     }

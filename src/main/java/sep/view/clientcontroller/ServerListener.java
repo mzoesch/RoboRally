@@ -110,17 +110,11 @@ public class ServerListener implements Runnable
                 }
 
                 final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
-
-                if (!r.contains("\"messageType\":\"Alive\""))
-                {
-                    l.trace("Received request from server: Parsing: {}", r);
-                }
+                l.trace("Received request from server: Parsing: {}", r);
 
                 try
                 {
-                    this.dsrp = new RDefaultServerRequestParser(new JSONObject(r));
-                    this.parseJSONRequestFromServer();
-                    this.dsrp = null;
+                    this.parseRequest(new RDefaultServerRequestParser(new JSONObject(r)));
                 }
                 catch (JSONException e)
                 {
@@ -152,7 +146,8 @@ public class ServerListener implements Runnable
         try
         {
             GameInstance.respondToKeepAlive();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             GameInstance.handleServerDisconnect();
             return false;
@@ -451,20 +446,26 @@ public class ServerListener implements Runnable
 
     // endregion Server request handlers
 
-    private void parseJSONRequestFromServer() throws JSONException
+    private void parseRequest(final RDefaultServerRequestParser dsrp) throws JSONException
     {
+        this.dsrp = dsrp;
+
         if (this.serverReq.containsKey(this.dsrp.getType_v2()))
         {
             if (this.serverReq.get(this.dsrp.getType_v2()).get())
             {
+                this.dsrp = null;
                 return;
             }
 
+            this.dsrp = null;
             throw new JSONException("Hit a wall while trying to understand the server request.");
         }
 
         l.warn("Received unknown request from server. Ignoring.");
         l.warn(this.dsrp.request().toString(0));
+
+        this.dsrp = null;
 
         return;
     }
