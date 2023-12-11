@@ -1650,7 +1650,7 @@ public class CourseBuilder {
         // (2,2)
         fieldtypes.add(new CheckPoint(4));
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new Laser("bottom", 2)); // TODO
+        fieldtypes.add(new Laser("bottom", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
         arrayListY.add(new Tile("4A",new Coordinate(2,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1677,7 +1677,7 @@ public class CourseBuilder {
         // (2,7)
         fieldtypes.add(new CheckPoint(2));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new Laser("top", 2)); // TODO
+        fieldtypes.add(new Laser("top", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
         fieldtypes = new ArrayList<>();
 
         // (2,8)
@@ -1924,6 +1924,7 @@ public class CourseBuilder {
         // (7,2)
         fieldtypes.add(new CheckPoint(1));
         fieldtypes.add(new Wall(new String[] {"top"}));
+        fieldtypes.add(new Laser("bottom", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
         arrayListY.add(new Tile("4A",new Coordinate(7,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1950,7 +1951,7 @@ public class CourseBuilder {
         // (7,7)
         fieldtypes.add(new CheckPoint(3));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new Laser("top", 2)); // TODO
+        fieldtypes.add(new Laser("top", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
         arrayListY.add(new Tile("4A",new Coordinate(7,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
