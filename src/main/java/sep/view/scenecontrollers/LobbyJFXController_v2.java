@@ -49,6 +49,7 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    @FXML private VBox playersInSessionLabelContainer;
     @FXML private Label serverCourseLabel;
     @FXML private VBox serverCourseSelectorArea;
     @FXML private Button readyButton;
@@ -90,6 +91,7 @@ public final class LobbyJFXController_v2
     @FXML
     private void initialize()
     {
+        HBox.setHgrow(this.playersInSessionLabelContainer, Priority.ALWAYS);
         HBox.setHgrow(this.playerNameContainer, Priority.ALWAYS);
         VBox.setVgrow(this.lobbyMsgScrollPane, Priority.ALWAYS);
         HBox.setHgrow(this.readyLabelContainer, Priority.ALWAYS);
@@ -675,6 +677,14 @@ public final class LobbyJFXController_v2
         // TODO Some input validation needed.
         l.debug("Player wants to be {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "not ready" : "ready");
         new SetStatusModel(!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady()).send();
+        return;
+    }
+
+    @FXML
+    private void onAddAgentBtn(final ActionEvent actionEvent)
+    {
+        l.debug("Client wants to add a bot to this session.");
+        EClientInformation.INSTANCE.sendAddAgentRequest();
         return;
     }
 

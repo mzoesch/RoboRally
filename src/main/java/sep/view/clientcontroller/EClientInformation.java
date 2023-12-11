@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.EPort;
 import sep.EArgs;
+import sep.view.json.common.IdentificationModel;
 
 import org.json.JSONObject;
 import java.io.InputStreamReader;
@@ -177,6 +178,12 @@ public enum EClientInformation
             return;
         }
 
+        return;
+    }
+
+    public void sendAddAgentRequest()
+    {
+        this.sendServerRequest(new IdentificationModel(this.preferredSessionID, true).toJSON());
         return;
     }
 
