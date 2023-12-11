@@ -1158,7 +1158,7 @@ public class GameJFXController
                 return;
 
             case ACTIVATION:
-                this.UIHeaderGameStateDescriptionLabel.setText(": Activation Phase. Just wait until next Phase begins.");
+                this.UIHeaderGameStateDescriptionLabel.setText(": Activation Phase. Just watch your robots move");
                 return;
         }
 
