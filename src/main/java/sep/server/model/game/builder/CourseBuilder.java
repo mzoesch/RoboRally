@@ -1529,9 +1529,6 @@ public class CourseBuilder {
         board.add(arrayListY);
         arrayListY = new ArrayList<>();
 
-        board.add(arrayListY);
-        arrayListY = new ArrayList<>();
-
         // (1,0)
         fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("4A",new Coordinate(1,0), fieldtypes));
