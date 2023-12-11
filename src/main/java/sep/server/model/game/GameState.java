@@ -94,6 +94,7 @@ public class GameState
     }
 
     public void setRebootDirection(PlayerController playerController, String direction) {
+        //TODO only if reboot direction can still be changed
         playerController.getPlayer().getPlayerRobot().setDirection(direction);
     }
 
