@@ -342,11 +342,12 @@ public class ServerListener implements Runnable
     {
         /* TODO Display current cards of each player in the UI. */
         final StringBuilder sb = new StringBuilder();
-        sb.append(String.format("In this register %d cards were played (", this.dsrp.getActiveCards().length()));
+        sb.append(String.format("In %s. register this cards were played: (", EGameState.INSTANCE.getCurrentRegister()));
         sb.append(IntStream.range(0, this.dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", this.dsrp.getPlayerIDFromActiveCardIdx(i), this.dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
         sb.append(").");
         l.debug(sb.toString());
         ViewSupervisor.handleChatInfo(sb.toString());
+        EGameState.INSTANCE.setCurrentRegister(EGameState.INSTANCE.getCurrentRegister()+1);
         return true;
     }
 

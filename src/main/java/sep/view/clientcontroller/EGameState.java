@@ -28,6 +28,8 @@ public enum EGameState
     public static final String[] PHASE_NAMES = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
     private EGamePhase currentPhase;
 
+    private int currentRegister;
+
     /**
      * Stores information that is shared for all players. The player cards for one client are unique to them and must
      * be stored here in the Game State. Information that is not unique for one player like their selected robot or
@@ -301,6 +303,9 @@ public enum EGameState
             this.clearAllRegisters();
             ViewSupervisor.updateFooter();
         }
+        if(this.currentPhase == EGamePhase.ACTIVATION){
+            this.currentRegister = 1;
+        }
         ViewSupervisor.updatePhase();
         return;
     }
@@ -472,6 +477,14 @@ public enum EGameState
 
     public void determineWinningPlayer(int playerID) {
         this.winningPlayer = getRemotePlayerByPlayerID(playerID);
+    }
+
+    public int getCurrentRegister() {
+        return currentRegister;
+    }
+
+    public void setCurrentRegister(int currentRegister) {
+        this.currentRegister = currentRegister;
     }
 
     // endregion Getters and Setters
