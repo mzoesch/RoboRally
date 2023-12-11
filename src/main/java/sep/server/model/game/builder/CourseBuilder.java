@@ -1496,8 +1496,14 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (0,4)
-        fieldtypes.add(new Wall(new String[] {"bottom"}));
+        fieldtypes.add(new Wall(new String[] {"top"}));
+        fieldtypes.add(new EnergySpace(1));
         arrayListY.add(new Tile("4A",new Coordinate(0,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,5)
+        fieldtypes.add(new Wall(new String[] {"bottom"}));
+        arrayListY.add(new Tile("4A",new Coordinate(0,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         return null;
