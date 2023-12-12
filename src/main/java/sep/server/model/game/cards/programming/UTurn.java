@@ -16,13 +16,7 @@ public class UTurn extends AProgrammingCard implements IPlayableCard {
     public void playCard(Player player, int currentRoundNumber) {
         player.getPlayerRobot().rotateRobotOnTileToTheRight();
         player.getPlayerRobot().rotateRobotOnTileToTheRight();
-        for(Player player1 : GameState.gameMode.getPlayers()) {
-            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                    player.getPlayerController().getPlayerID(),
-                    "clockwise").send();
-            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                    player.getPlayerController().getPlayerID(),
-                    "clockwise").send();
-        }
+        player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+        player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
     }
 }
