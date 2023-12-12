@@ -15,7 +15,7 @@ public class SpamDamage extends ADamageCard {
     public void playCard(Player player, int currentRoundNumber)
     {
         //Karten akutalisieren
-        player.getGameMode().getSpamDeck().add((SpamDamage) player.getCardByRegisterIndex(currentRoundNumber));
+        player.getAuthGameMode().getSpamDeck().add((SpamDamage) player.getCardByRegisterIndex(currentRoundNumber));
         player.getRegisters()[currentRoundNumber] = null;
 
         if(player.getPlayerDeck().isEmpty()){
@@ -27,8 +27,7 @@ public class SpamDamage extends ADamageCard {
         newCard.playCard(player, currentRoundNumber);
 
         String newCardString = ((Card) newCard).getCardType();
-        new ReplaceCardModel(player.getPlayerController().getClientInstance(),
-                currentRoundNumber, player.getPlayerController().getPlayerID(),
-                newCardString).send();
+        player.getAuthGameMode().getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRoundNumber, newCardString);
+
     }
 }
