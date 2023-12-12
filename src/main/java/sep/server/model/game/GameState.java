@@ -19,8 +19,9 @@ public class GameState
     private static final String[] AVAILABLE_COURSES = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap" };
 
     public static final int MAX_CONTROLLERS_ALLOWED = 6;
+    public static final int MIN_PLAYER_COUNT_TO_START = 2;
     // TODO As described in Protocol v0.1, this var should be passed as a cmd program argument
-    public static final int MIN_REMOTE_PLAYER_COUNT_TO_START = 2;
+    public static final int MIN_REMOTE_PLAYER_COUNT_TO_START = 1;
 
     private String courseName;
 

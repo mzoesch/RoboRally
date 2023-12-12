@@ -425,6 +425,10 @@ public final class Session
     {
         this.broadcastChatMessage(ChatMsgModel.SERVER_ID, "All players are ready. The game will start in 5 seconds.");
 
+        // TODO
+        //      We have to implement checks for if a client disconnects during this time
+        //      or they pick a new name figure etc. Is is currently very unsafe!
+
         this.awaitGameStartThread = new Thread(() ->
         {
             l.info("Awaiting game start . . .");
@@ -439,8 +443,6 @@ public final class Session
                 l.warn(e.getMessage());
                 return;
             }
-
-            /* TODO Here set the figures of the agents if available. */
 
             this.gameState.startGame();
 
@@ -661,7 +663,14 @@ public final class Session
 
     private boolean isReadyToStartGame()
     {
+        // WARNING Do NOT replace with .isEmpty() because this var can change as described in the protocol!
+        //         But because this is not implemented yet, we get this warning.
         if (this.getRemotePlayers().size() < GameState.MIN_REMOTE_PLAYER_COUNT_TO_START)
+        {
+            return false;
+        }
+
+        if (this.ctrls.size() < GameState.MIN_PLAYER_COUNT_TO_START)
         {
             return false;
         }
