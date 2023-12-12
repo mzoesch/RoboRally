@@ -435,20 +435,34 @@ public final class LobbyJFXController_v2
 
         for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
+            if (rp.getPlayerName().startsWith(EClientInformation.AGENT_PREFIX))
+            {
+                Label l = new Label(rp.getPlayerName());
+                l.getStyleClass().clear();
+                l.getStyleClass().add("player-in-session-label-ready-agent");
+                l.setPrefWidth(1_000);
+
+                Button b = new Button("Remove");
+                b.setStyle("-fx-min-width: 55px;");
+                b.getStyleClass().add("danger-btn-tiny");
+
+                b.setOnAction(actionEvent ->
+                {
+                    LobbyJFXController_v2.l.debug("User wants to remove the agent [{}].", rp.getPlayerID());
+                    EClientInformation.INSTANCE.sendRemoveAgentRequest(rp.getPlayerID());
+                    return;
+                });
+
+                HBox h = new HBox(l, b);
+                h.getStyleClass().add("player-in-session-hbox-agent");
+                this.playerListContainer.getChildren().add(h);
+                continue;
+            }
+
             Label l = new Label(rp.getPlayerName());
             l.getStyleClass().clear();
-            if (rp.isReady())
-            {
-                l.getStyleClass().add("player-in-session-label-ready");
-            }
-            else
-            {
-                l.getStyleClass().add("player-in-session-label-not-ready");
-            }
-            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
-            {
-                l.getStyleClass().add("player-in-session-label-client");
-            }
+            l.getStyleClass().add(rp.isReady() ? "player-in-session-label-ready" : "player-in-session-label-not-ready");
+            l.getStyleClass().add(rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID() ? "player-in-session-label-client" : "");
             l.setPrefWidth(1_000);
             this.playerListContainer.getChildren().add(l);
             continue;

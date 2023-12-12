@@ -123,6 +123,7 @@
     -fx-padding: 2px 6px 2px 6px;
 }
 
+.danger-btn-tiny,
 .danger-btn-mini,
 .danger-btn {
     -fx-background-color: -danger-btn-color;
@@ -135,6 +136,7 @@
     -fx-border-radius: 0px;
 }
 
+.danger-btn-tiny:hover,
 .danger-btn-mini:hover,
 .danger-btn:hover {
     -fx-background-color: -danger-btn-color-hover;
@@ -144,6 +146,12 @@
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+}
+
+.danger-btn-tiny {
+    -fx-font-size: 12px;
+    -fx-font-weight: 300;
+    -fx-padding: 2px 6px 2px 6px;
 }
 
 .confirm-btn-mini,

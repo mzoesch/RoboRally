@@ -170,6 +170,9 @@ public class Robot {
     /**
      * The following method handles the rebooting of a robot and sends all respective JSON messages.
      * The player draws two spam cards and the registers are emptied.
+     * Disclaimer: Default rebootDirection is "top". If the client selects a rebootDirection (normally
+     * handled in the GUI) until the end of the round, the reboot direction is updated accordingly
+     * (in the GameState).
      */
     public void reboot() {
         Player robotOwner = determineRobotOwner();

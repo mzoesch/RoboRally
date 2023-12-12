@@ -46,6 +46,7 @@ public final class ClientInstance implements Runnable
         put("SetStartingPoint", ClientInstance.this::onStartingPointSet);
         put("PickDamage", ClientInstance.this::onDamageCardSelect);
         put("HelloServer", ClientInstance.this::onAddAgentRequest);
+        put("RebootDirection", ClientInstance.this::onRebootDirection);
     }};
 
     public Thread thread;
@@ -199,7 +200,8 @@ public final class ClientInstance implements Runnable
     {
         final String oName = this.playerController.getName();
 
-        // TODO We have to do some validation here.
+        /* TODO We have to do some validation here. */
+        /* TODO Check if the client name is valid. It must not start with "[BOT]" or be empty etc. */
 
         this.playerController.setPlayerName(this.dcrp.getPlayerName());
         this.playerController.setFigure(this.dcrp.getFigureID());
@@ -273,6 +275,12 @@ public final class ClientInstance implements Runnable
         // If there is something fishy going on, the initial client connection already would have failed.
         l.debug("Client {} wants to add an agent to lobby {}.", this.getAddr(), this.getPlayerController().getSession().getSessionID());
         this.getPlayerController().getSession().addAgent();
+        return true;
+    }
+
+    private boolean onRebootDirection() {
+        l.debug("Client {} set their reboot direction to {}", this.getAddr(), this.dcrp.getDirection());
+        this.playerController.getSession().getGameState().setRebootDirection(playerController, this.dcrp.getDirection());
         return true;
     }
 

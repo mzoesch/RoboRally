@@ -104,6 +104,7 @@
     -fx-spacing: 16px;
     -fx-alignment: center;
 }
+
 .server-course-selector-hbox {
     -fx-spacing: 16px;
     -fx-alignment: center;
@@ -144,6 +145,7 @@
 .lobby-msg-wrapper {
     -fx-spacing: 8px;
 }
+
 .lobby-msg-whisper,
 .lobby-msg-server,
 .lobby-msg-client,
@@ -153,12 +155,15 @@
     -fx-text-fill: #000000ff;
     -fx-wrap-text: true;
 }
+
 .lobby-msg-whisper {
     -fx-text-fill: #000000b2;
 }
+
 .lobby-msg-server {
     -fx-text-fill: #a17800;
 }
+
 .lobby-msg-client {
     -fx-text-fill: #0078a1;
 }
@@ -175,14 +180,28 @@
     -fx-font-weight: 400;
     -fx-text-fill: -primary-text-fill;
 }
+
 .player-in-session-label-not-ready {
     -fx-background-color: rgba(255, 0, 0, 0.15);
 }
+
 .player-in-session-label-client {
     -fx-border-color: #ffffffff;
     -fx-border-radius: 3px;
     -fx-border-width: 1px;
     -fx-background-radius: 3px;
+}
+
+.player-in-session-label-ready-agent {
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+}
+
+.player-in-session-hbox-agent {
+    -fx-background-color: rgba(0, 255, 0, 0.15);
+    -fx-alignment: center;
+    -fx-padding: 4px 4px 4px 4px;
 }
 
 .virtual-v-space {

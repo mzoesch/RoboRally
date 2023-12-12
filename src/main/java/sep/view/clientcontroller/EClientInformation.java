@@ -3,6 +3,7 @@ package sep.view.clientcontroller;
 import sep.EPort;
 import sep.EArgs;
 import sep.view.json.common.IdentificationModel;
+import sep.view.json.ChatMsgModel;
 
 import org.json.JSONObject;
 import java.io.InputStreamReader;
@@ -33,6 +34,8 @@ public enum EClientInformation
     private int SERVER_PORT;
 
     public static final String PROTOCOL_VERSION = "1.0";
+
+    public static final String AGENT_PREFIX = "[BOT]";
 
     boolean bMockView;
 
@@ -184,6 +187,19 @@ public enum EClientInformation
     public void sendAddAgentRequest()
     {
         this.sendServerRequest(new IdentificationModel(this.preferredSessionID, true).toJSON());
+        return;
+    }
+
+    public void sendRemoveAgentRequest(final int playerID)
+    {
+        // TODO WARNING
+        //              Okay,
+        //              so this is super super sketchy because there is no current way to request a client
+        //              disconnection from the server, we send a chat message request directly to the server.
+        //              But we must find a better way to implement this.
+        //              We must ask how we should implement this.
+
+        new ChatMsgModel(String.format("%sDETACH{%d}", ChatMsgModel.COMMAND_PREFIX, playerID), ChatMsgModel.CHAT_MSG_BROADCAST).send();
         return;
     }
 
