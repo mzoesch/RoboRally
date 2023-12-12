@@ -23,33 +23,21 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "counterclockwise").send();
-                }
+
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
                 break;
 
             case "TurnRight":
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "clockwise").send();
-                }
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+
                 break;
 
             case "UTurn":
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "clockwise").send();
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "clockwise").send();
-                }
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
                 break;
         }
 
