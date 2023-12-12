@@ -1480,6 +1480,8 @@ public class CourseBuilder {
     }
 
 
+    // TODO Pushpanel: ein andere Bild finden, wo zahlen erkennbar sind oder Spiel ausleihen
+
     /**
      * Builds board 2A (part of Death Trap)
      * @return board 2A as ArrayList
