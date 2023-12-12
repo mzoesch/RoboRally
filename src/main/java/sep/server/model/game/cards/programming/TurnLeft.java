@@ -16,11 +16,8 @@ public class TurnLeft extends AProgrammingCard implements IPlayableCard {
         player.getPlayerRobot().rotateRobotOnTileToTheRight();
         player.getPlayerRobot().rotateRobotOnTileToTheRight();
         player.getPlayerRobot().rotateRobotOnTileToTheRight();
-        for(Player player1 : GameState.gameMode.getPlayers()) {
-            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                    player.getPlayerController().getPlayerID(),
-                    "counterclockwise").send();
-        }
+        player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+
     }
 
 }
