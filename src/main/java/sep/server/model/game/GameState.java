@@ -25,9 +25,7 @@ public class GameState
 
     private String courseName;
 
-    /** @deprecated This cannot be static nor be public! */
-    public static GameMode gameMode;
-    private GameMode authGameMode;
+    private GameMode gameMode;
     private final Session session;
 
     private boolean bGameStarted;
@@ -59,10 +57,7 @@ public class GameState
         }
 
         this.bGameStarted = true;
-        this.authGameMode = new GameMode(this.courseName, this);
-
-        /* TODO Just for legacy. Remove! */
-        GameState.gameMode = this.authGameMode;
+        this.gameMode = new GameMode(this.courseName, this);
 
         l.info("Game Mode created. The game has started with {} controllers.", this.getControllers().length);
 
@@ -73,7 +68,7 @@ public class GameState
 
     public GameMode getAuthGameMode()
     {
-        return gameMode;
+        return this.gameMode;
     }
 
     public boolean hasGameStarted()
@@ -106,7 +101,7 @@ public class GameState
     }
 
     public void setStartingPoint(PlayerController playerController, int x, int y){
-        gameMode.setStartingPoint(playerController, x,y);
+        this.gameMode.setStartingPoint(playerController, x,y);
     }
 
     public void setRebootDirection(PlayerController playerController, String direction) {
