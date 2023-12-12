@@ -69,26 +69,6 @@ public final class LobbyJFXController_v2
     @FXML private VBox playerRobotSelectorArea;
     @FXML private HBox readyLabelContainer;
 
-    /** Just for debugging purposes. Can be removed at any given time. */
-    private void testChat()
-    {
-        VBox v = new VBox();
-        v.setStyle("-fx-max-width: 380px");
-
-        this.lobbyMsgScrollPane.setContent(v);
-
-        for (int i = 0; i < 2; i++)
-        {
-            Label l = new Label("kjasdhfjhasjkdfhkljsadhfjipkahsdpuijüfhapiüjhwdtjiopüahndsjkpmgnapiejhtjipdanfpjkgnadpjkngpjiüaenrptjignadpfjignpijadnfg");
-            l.setWrapText(true);
-            v.getChildren().add(l);
-            this.lobbyMsgScrollPane.setVvalue(1.0);
-            continue;
-        }
-
-        return;
-    }
-
     @FXML
     private void initialize()
     {
