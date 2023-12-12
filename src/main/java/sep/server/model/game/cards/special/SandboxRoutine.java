@@ -22,78 +22,48 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
 
             case "Move1":
                 player.getPlayerRobot().moveRobotOneTileForwards();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new MovementModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
-                }
+                player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
                 break;
 
             case "Move2":
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getPlayerRobot().moveRobotOneTileForwards();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new MovementModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
-                }
+                player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+
                 break;
 
             case "Move3":
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getPlayerRobot().moveRobotOneTileForwards();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new MovementModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
-                }
+                player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+
                 break;
 
             case "BackUp":
                 player.getPlayerRobot().moveRobotOneTileBackwards();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new MovementModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
-                            player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
-                }
+                player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+
                 break;
 
             case "TurnLeft":
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "counterclockwise").send();
-                }
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+
                 break;
 
             case "TurnRight":
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "clockwise").send();
-                }
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
                 break;
 
             case "UTurn":
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
                 player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                for(Player player1 : GameState.gameMode.getPlayers()) {
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "clockwise").send();
-                    new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                            player.getPlayerController().getPlayerID(),
-                            "clockwise").send();
-                }
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+                player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
                 break;
             default:
                return;
