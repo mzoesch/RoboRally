@@ -25,7 +25,7 @@ public class Agent implements IOwnershipable
         this.agentID = agentID;
         this.session = session;
 
-        this.figure = -1;
+        this.figure = IOwnershipable.INVALID_FIGURE;
 
         this.possessing = null;
 
@@ -45,6 +45,13 @@ public class Agent implements IOwnershipable
     }
 
     @Override
+    public void setFigure(final int figure)
+    {
+        this.figure = figure;
+        return;
+    }
+
+    @Override
     public int getFigure()
     {
         return this.figure;
@@ -57,7 +64,7 @@ public class Agent implements IOwnershipable
     }
 
     @Override
-    public void setPlayer(Player p)
+    public void setPlayer(final Player p)
     {
         this.possessing = p;
         return;

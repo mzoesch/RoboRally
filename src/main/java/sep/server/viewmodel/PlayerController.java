@@ -36,7 +36,7 @@ public final class PlayerController implements IOwnershipable
         this.playerID = playerID;
 
         this.session = session;
-        this.figure = -1;
+        this.figure = IOwnershipable.INVALID_FIGURE;
         this.bIsReady = false;
 
         this.player = null;
@@ -81,6 +81,7 @@ public final class PlayerController implements IOwnershipable
         return this.figure;
     }
 
+    @Override
     public void setFigure(final int figure)
     {
         this.figure = figure;
