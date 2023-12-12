@@ -3,6 +3,7 @@ package sep.server.model.game;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.Session;
+import sep.server.model.Agent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +44,18 @@ public class GameState
     public void startGame()
     {
         l.info("Creating Game Mode.");
+
+        l.debug("Found {} agents.{}", this.session.getAgents().length, this.session.getAgents().length > 0 ? " Preparing them for game start." : "");
+        for (final Agent a : this.session.getAgents())
+        {
+            if (a.getFigure() == IOwnershipable.INVALID_FIGURE)
+            {
+                a.setFigure(this.getNextAvailableFigure());
+                this.session.sendPlayerValuesToAllClients(a);
+            }
+
+            continue;
+        }
 
         this.bGameStarted = true;
         this.authGameMode = new GameMode(this.courseName, this);
@@ -109,8 +122,33 @@ public class GameState
         return this.session.getControllers();
     }
 
+    private int getNextAvailableFigure()
+    {
+        int tFigure = 0;
+        while (true)
+        {
+            boolean bFound = false;
+
+            for (final IOwnershipable ctrl : this.getControllers())
+            {
+                if (ctrl.getFigure() == tFigure)
+                {
+                    bFound = true;
+                    break;
+                }
+            }
+
+            if (!bFound)
+            {
+                return tFigure;
+            }
+
+            tFigure++;
+
+            continue;
+        }
+    }
+
     // endregion Getters and Setters
-
-
 
 }
