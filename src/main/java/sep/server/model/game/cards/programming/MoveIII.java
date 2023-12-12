@@ -17,12 +17,7 @@ public class MoveIII extends AProgrammingCard implements IPlayableCard {
         player.getPlayerRobot().moveRobotOneTileForwards();
         player.getPlayerRobot().moveRobotOneTileForwards();
         player.getPlayerRobot().moveRobotOneTileForwards();
-        for(Player player1 : GameState.gameMode.getPlayers()) {
-            new MovementModel(player1.getPlayerController().getClientInstance(),
-                    player.getPlayerController().getPlayerID(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
-        }
+        player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
     }
 
 }
