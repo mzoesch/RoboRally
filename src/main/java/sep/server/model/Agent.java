@@ -1,5 +1,6 @@
 package sep.server.model;
 
+import sep.server.model.game.GameMode;
 import sep.server.viewmodel.Session;
 import sep.server.model.game.Player;
 
@@ -47,6 +48,19 @@ public class Agent implements IOwnershipable
     public int getFigure()
     {
         return this.figure;
+    }
+
+    @Override
+    public GameMode getAuthGameMode()
+    {
+        return this.session.getGameState().getAuthGameMode();
+    }
+
+    @Override
+    public void setPlayer(Player p)
+    {
+        this.possessing = p;
+        return;
     }
 
 }
