@@ -23,7 +23,9 @@ public class GameState
 
     private String courseName;
 
+    /** @deprecated This cannot be static nor be public! */
     public static GameMode gameMode;
+    private GameMode authGameMode;
     private final Session session;
 
     private boolean bGameStarted;
@@ -34,16 +36,23 @@ public class GameState
         this.courseName = "";
         this.session = session;
         this.bGameStarted = false;
+
+        return;
     }
 
-    public void startGame(final IOwnershipable[] ctrls)
+    public void startGame()
     {
         l.info("Creating Game Mode.");
 
         this.bGameStarted = true;
-        this.gameMode = new GameMode(this.courseName, ctrls, this.session);
+        this.authGameMode = new GameMode(this.courseName, this);
 
-        l.info("Game Mode created. The game has started with {} controllers.", ctrls.length);
+        /* TODO Just for legacy. Remove! */
+        GameState.gameMode = this.authGameMode;
+
+        l.info("Game Mode created. The game has started with {} controllers.", this.getControllers().length);
+
+        return;
     }
 
     // region Getters and Setters
@@ -74,10 +83,6 @@ public class GameState
         l.info("CourseName set to: " + courseName);
     }
 
-    public void sendShuffle(Player player){
-        session.sendShuffleCodingNotification(player.getPlayerController().getPlayerID());
-    }
-
     public void sendStartTimer(){
         session.sendTimerStarted();
     }
@@ -94,7 +99,15 @@ public class GameState
         playerController.getPlayer().getPlayerRobot().setDirection(direction);
     }
 
+    public Session getSession()
+    {
+        return session;
+    }
 
+    public IOwnershipable[] getControllers()
+    {
+        return this.session.getControllers();
+    }
 
     // endregion Getters and Setters
 
