@@ -1,6 +1,7 @@
 package sep.server.viewmodel;
 
 import sep.server.json.common.ChatMsgModel;
+import sep.server.model.game.GameMode;
 import sep.server.model.game.Player;
 import sep.server.model.IOwnershipable;
 
@@ -86,8 +87,9 @@ public final class PlayerController implements IOwnershipable
         return;
     }
 
-    public void setPlayer(final Player player) {
-        this.player = player;
+    @Override
+    public void setPlayer(final Player p) {
+        this.player = p;
     }
 
     public ClientInstance getClientInstance()
@@ -115,6 +117,12 @@ public final class PlayerController implements IOwnershipable
     public Player getPlayer()
     {
         return this.player;
+    }
+
+    @Override
+    public GameMode getAuthGameMode()
+    {
+        return this.session.getGameState().getAuthGameMode();
     }
 
     // endregion Getters and Setters
