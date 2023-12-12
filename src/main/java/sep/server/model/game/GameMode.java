@@ -652,19 +652,38 @@ public class GameMode {
             l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegister);
         }
 
-        // TODO Add delay between each activation phase step.
+        addDelay(1000);
         this.activateConveyorBelts(2);
+        addDelay(1000);
         this.activateConveyorBelts(1);
+        addDelay(1000);
         this.activatePushPanels();
+        addDelay(1000);
         this.activateGears();
+        addDelay(1000);
         this.findLasers();
+        addDelay(1000);
         this.shootRobotLasers();
+        addDelay(1000);
         this.checkEnergySpaces();
+        addDelay(1000);
         this.checkCheckpoints();
 
         this.currentRegister++;
 
         return this.currentRegister < GameMode.REGISTER_PHASE_COUNT;
+    }
+
+    /**
+     * The following method introduces a timeout. The length depends on the amount of milliseconds passed to the method.
+     * @param milliseconds length of timeout
+     */
+    private void addDelay(int milliseconds) {
+        try {
+            Thread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void triggerActivationPhase()
