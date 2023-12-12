@@ -121,9 +121,6 @@ public final class LobbyJFXController_v2
 
         this.updateAvailableCourses();
 
-        this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
-        this.updateSessionCourseLabel();
-
         boolean bSuccess = false;
         try
         {
@@ -147,6 +144,9 @@ public final class LobbyJFXController_v2
             ViewSupervisor.getSceneController().killCurrentScreen();
             return;
         }
+
+        this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
+        this.updateSessionCourseLabel();
 
         l.debug("Successfully connected to session [{}].", EClientInformation.INSTANCE.getPreferredSessionID());
 
