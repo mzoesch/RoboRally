@@ -646,27 +646,20 @@ public class GameMode {
             if (p.getRegisters()[this.currentRegister] != null) {
                 l.info("Player {} is playing card {}.", p.getController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
                 p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
+                addDelay(5000);
                 continue;
             }
 
             l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegister);
         }
 
-        addDelay(1000);
         this.activateConveyorBelts(2);
-        addDelay(1000);
         this.activateConveyorBelts(1);
-        addDelay(1000);
         this.activatePushPanels();
-        addDelay(1000);
         this.activateGears();
-        addDelay(1000);
         this.findLasers();
-        addDelay(1000);
         this.shootRobotLasers();
-        addDelay(1000);
         this.checkEnergySpaces();
-        addDelay(1000);
         this.checkCheckpoints();
 
         this.currentRegister++;
@@ -680,7 +673,7 @@ public class GameMode {
      */
     private void addDelay(int milliseconds) {
         try {
-            Thread.sleep(milliseconds);
+            this.activationPhaseThread.sleep(milliseconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
