@@ -1661,7 +1661,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,1)
-        fieldtypes.add(new Wall(new String[] {"botttom"}));
+        fieldtypes.add(new Wall(new String[] {"bottom"}));
         arrayListY.add(new Tile("2A",new Coordinate(3,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
