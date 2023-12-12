@@ -33,6 +33,7 @@ import javafx.beans.binding.Bindings;
 import javafx.util.Duration;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
+import org.json.JSONException;
 
 public final class LobbyJFXController_v2
 {
@@ -100,7 +101,8 @@ public final class LobbyJFXController_v2
         this.readyLabelContainerWrapper.getChildren().add(1, this.createVSpacer());
         this.readyLabelContainer.getChildren().add(1, this.createHSpacer());
 
-        this.lobbyMsgInputTextField.lengthProperty().addListener(new ChangeListener<Number>()
+        this.lobbyMsgInputTextField.lengthProperty().addListener(
+        new ChangeListener<Number>()
         {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
@@ -132,11 +134,15 @@ public final class LobbyJFXController_v2
         this.lobbyMsgContainer.setId("lobby-msg-scroll-pane-inner");
         this.lobbyMsgScrollPane.setContent(this.lobbyMsgContainer);
 
-        this.formArea.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
+        this.formArea.minWidthProperty().bind(Bindings.createDoubleBinding(
+        () ->
             this.formScrollPane.getViewportBounds().getWidth(), this.formScrollPane.viewportBoundsProperty()
         ));
 
         this.updateAvailableCourses();
+
+        this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
+        this.updateSessionCourseLabel();
 
         boolean bSuccess = false;
         try
@@ -148,14 +154,21 @@ public final class LobbyJFXController_v2
             ViewSupervisor.getSceneController().killCurrentScreen();
             return;
         }
+        catch (JSONException e)
+        {
+            l.error("Client did not understand the server's JSON.");
+            l.error(e.getMessage());
+            ViewSupervisor.getSceneController().killCurrentScreen();
+            return;
+        }
 
         if (!bSuccess)
         {
             ViewSupervisor.getSceneController().killCurrentScreen();
+            return;
         }
 
-        this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
-        this.updateSessionCourseLabel();
+        l.debug("Successfully connected to session [{}].", EClientInformation.INSTANCE.getPreferredSessionID());
 
         return;
     }
