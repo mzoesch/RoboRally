@@ -381,6 +381,13 @@ public final class Session
         {
             this.readyCharacterOrder.add(pc);
             this.updateCourseSelectorPower();
+
+            if (this.isReadyToStartGame())
+            {
+                this.prepareGameStart();
+                return;
+            }
+
             return;
         }
 
