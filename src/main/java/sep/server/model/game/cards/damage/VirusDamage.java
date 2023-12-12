@@ -5,6 +5,7 @@ import sep.server.json.game.damage.DrawDamageModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.Tile;
 import sep.server.model.game.cards.Card;
+import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
 
 public class VirusDamage extends ADamageCard {
@@ -19,14 +20,20 @@ public class VirusDamage extends ADamageCard {
         int RADIUS = 6;
         Tile centerTile = player.getPlayerRobot().getCurrentTile();
 
-        for(Player p : player.getGameMode().getPlayers()) {
+        for(Player p : player.getAuthGameMode().getPlayers()) {
             if (player != p) {
                 Tile otherTile = p.getPlayerRobot().getCurrentTile();
                 if (getDistanceBetweenTwoRobots(centerTile, otherTile) <= RADIUS) {
-                    if(!p.getGameMode().getVirusDeck().isEmpty()) {
-                        p.getDiscardPile().add(player.getGameMode().getVirusDeck().remove(0));
+                    if(!p.getAuthGameMode().getVirusDeck().isEmpty()) {
+                        p.getDiscardPile().add(player.getAuthGameMode().getVirusDeck().remove(0));
 
-                        new DrawDamageModel(p.getPlayerController().getClientInstance(), p.getPlayerController().getPlayerID(), new String[]{"Virus"}).send();
+                        if (p.getController() instanceof final PlayerController pc) {
+
+                            /* TODO Move to interface if agent needs an implementation else to pc! */
+                    new DrawDamageModel(pc.getClientInstance(), pc.getPlayerID(), new String[]{"Virus"}).send();
+                        }
+
+                        else { /* TODO There is nothing to do on the client side, right? So no need for agent logic?? */}
 
                     }
                 }
@@ -35,7 +42,7 @@ public class VirusDamage extends ADamageCard {
         }
 
         //Karten akutalisieren
-        player.getGameMode().getVirusDeck().add((VirusDamage) player.getCardByRegisterIndex(currentRoundNumber));
+        player.getAuthGameMode().getVirusDeck().add((VirusDamage) player.getCardByRegisterIndex(currentRoundNumber));
         player.getRegisters()[currentRoundNumber] = null;
 
         if(player.getPlayerDeck().isEmpty()){
@@ -47,9 +54,7 @@ public class VirusDamage extends ADamageCard {
         newCard.playCard(player, currentRoundNumber);
 
         String newCardString = ((Card) newCard).getCardType();
-        new ReplaceCardModel(player.getPlayerController().getClientInstance(),
-                currentRoundNumber, player.getPlayerController().getPlayerID(),
-                newCardString).send();
+        player.getAuthGameMode().getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRoundNumber, newCardString);
     }
 
     public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {
