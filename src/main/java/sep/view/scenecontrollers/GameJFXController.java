@@ -1570,6 +1570,10 @@ public class GameJFXController
             VBox v = new VBox(figureName, playerName, energyCubes);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
+            if(EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING)){
+                v.getStyleClass().add(String.format("player-box-%s", rp.hasSelectionFinished() ? "selected" : "inSelection"));
+            }
+            v.getStyleClass().add("player-box");
 
             this.playerContainer.getChildren().add(v);
 
