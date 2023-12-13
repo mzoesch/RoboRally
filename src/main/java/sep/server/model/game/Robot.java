@@ -308,4 +308,9 @@ public class Robot {
         return this.getAuthGameMode().getSession();
     }
 
+    public Player getPossessor()
+    {
+        return possessor;
+    }
+
 }
