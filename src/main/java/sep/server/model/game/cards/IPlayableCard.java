@@ -6,4 +6,7 @@ public interface IPlayableCard
 {
     public abstract void playCard(Player player, int currentRoundNumber);
     public abstract String getCardType();
+
+    @Override
+    public abstract String toString();
 }
