@@ -15,4 +15,10 @@ public abstract class AProgrammingCard extends Card implements IPlayableCard {
     }
 
     public abstract void playCard(Player player, int currentRoundNumber);
+
+    @Override
+    public String toString() {
+        return super.getCardType();
+    }
+
 }
