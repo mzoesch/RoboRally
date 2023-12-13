@@ -9,6 +9,7 @@ import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.game.cards.damage.*;
 import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
+import sep.server.model.Agent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,20 +96,20 @@ public class GameMode {
     /**
      * The following method is used to set a starting point (as long it is a valid one).
      * Afterward, next player for choosing a starting point is chosen or, if not possible, the phase is ended.
-     * @param pc player that wants to set a starting point
+     * @param ctrl player that wants to set a starting point
      * @param x x coordinate of the starting point
      * @param y y coordinate of the starting point
      */
-    public void setStartingPoint(PlayerController pc, int x, int y) {
-        if(ableToSetStartPoint(pc)) {
+    public void setStartingPoint(IOwnershipable ctrl, int x, int y) {
+        if (ableToSetStartPoint(ctrl)) {
 
             int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
             if(validation == 1) {
 
                 curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
-                l.info("StartingPointSelected from PlayerID: " + pc.getPlayerID() + " with Coordinates: " + x + " , " + y);
-                pc.getSession().handleSelectedStartingPoint(pc.getPlayerID(),x,y);
-                pc.getSession().handlePlayerTurning(pc.getPlayerID(), course.getStartingTurningDirection());
+                l.info("StartingPointSelected from PlayerID: " + ctrl.getPlayerID() + " with Coordinates: " + x + " , " + y);
+                ctrl.getAuthGameMode().getSession().broadcastSelectedStartingPoint(ctrl.getPlayerID(),x,y);
+                ctrl.getAuthGameMode().getSession().broadcastRotationUpdate(ctrl.getPlayerID(), course.getStartingTurningDirection());
 
                 if(startingPointSelectionFinished()) {
                     //Once all players have set their starting points, the programming phase starts
@@ -121,14 +122,22 @@ public class GameMode {
                         if (player.getPlayerRobot().getCurrentTile() == null) {
                             curPlayerInRegistration = player;
                             l.info("Now Player with ID: " + player.getController().getPlayerID() + "has to set StartingPoint");
-                            pc.getSession().broadcastCurrentPlayer(player.getController().getPlayerID());
+                            ctrl.getAuthGameMode().getSession().broadcastCurrentPlayer(player.getController().getPlayerID());
+                            if (player.getController() instanceof final Agent a)
+                            {
+                                a.evaluateStartingPoint();
+                            }
                         }
                     }
                 }
             }
             else {
                 l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
-                new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
+                if (ctrl instanceof PlayerController pc)
+                {
+                    new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
+                }
+                else {l.error("The agent {} tried to do something illegal. Starting point selection failed.", ctrl.getPlayerID());}
             }
         }
     }
@@ -136,18 +145,24 @@ public class GameMode {
     /**
      * Checks if setting a starting point is possible.
      * Prints corresponding error messages
-     * @param pc Player that wants to set a starting point
+     * @param ctrl Player that wants to set a starting point
      * @return true if possible, false if not possible
      */
-    public boolean ableToSetStartPoint(PlayerController pc) {
+    public boolean ableToSetStartPoint(IOwnershipable ctrl) {
         if (gamePhase != EGamePhase.REGISTRATION) {
             l.debug("Unable to set StartPoint due to wrong GamePhase");
-            new ErrorMsgModel(pc.getClientInstance(), "Wrong GamePhase");
+            if (ctrl instanceof PlayerController pc) {
+                new ErrorMsgModel(pc.getClientInstance(), "Wrong GamePhase");
+            }
+            else {l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());}
             return false;
 
-        } else if (pc.getPlayerID() != curPlayerInRegistration.getController().getPlayerID()) {
+        } else if (ctrl.getPlayerID() != curPlayerInRegistration.getController().getPlayerID()) {
             l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
-            new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            if (ctrl instanceof PlayerController pc) {
+                new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            }
+            else {l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());}
             return false;
 
         } else {
@@ -171,6 +186,11 @@ public class GameMode {
 
         /* The current player is the first player that joined the game. */
         this.getSession().broadcastCurrentPlayer(this.curPlayerInRegistration.getController().getPlayerID());
+
+        if (this.curPlayerInRegistration.getController() instanceof final Agent a)
+        {
+            l.error("An agent must never be the first current player in a game. Fault agent ID: {}.", a.getPlayerID());
+        }
 
         l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
     }
@@ -205,7 +225,13 @@ public class GameMode {
 
             /* TODO Here call method on agent and let them decide how they want to play this programming phase. */
 
-            l.error("Agent programming not implemented yet. Skipping to next player.");
+            if (p.getController() instanceof final Agent a)
+            {
+                a.evaluateProgrammingPhase();
+                continue;
+            }
+
+            l.error("No matching instance found for handling the programming phase for player {}.", p.getController().getPlayerID());
 
             continue;
         }
