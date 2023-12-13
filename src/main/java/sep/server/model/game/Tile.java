@@ -5,8 +5,12 @@ import sep.server.model.game.tiles.*;
 import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Tile {
+    private static final Logger l = LogManager.getLogger(Tile.class);
+
     private Coordinate coordinate;
     private Robot occupiedBy = null;
     private ArrayList<FieldType> fieldTypes;
@@ -25,6 +29,7 @@ public class Tile {
     }
 
     public void setRobot(Robot newRobot) {
+        l.trace("{} tile {}. ", newRobot == null ? "Removing current player from" : String.format("Setting player %d to", newRobot.getPossessor().getController().getPlayerID()), this.coordinate.toString());
         if(!isOccupied()) {
             occupiedBy = newRobot;
         }
