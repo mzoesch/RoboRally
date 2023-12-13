@@ -115,4 +115,19 @@ public class Course {
         return null;
     }
 
+    public Tile getNextFreeStartingPoint()
+    {
+        for (ArrayList<Tile> ts : this.course) {
+            for (Tile t : ts) {
+                if (t.getFieldTypes().stream().anyMatch(elem -> elem instanceof StartPoint)) {
+                    if (t.getRobot() == null) {
+                        return t;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
 }
