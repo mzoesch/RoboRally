@@ -290,6 +290,27 @@ public class TileModifier
             }
         }
 
+        if (Objects.equals(this.tile.getString("type"), "Gear"))
+        {
+                switch (this.tile.getString("orientations")) {
+                    case "clockwise":
+                        return TileModifier.getImage("GearClockwise");
+
+                    case "counterclockwise":
+                        return TileModifier.getImage("GearCounterclockwise");
+
+                    default:
+                        l.error("Unknown orientation for gear: {}", this.tile.getJSONArray("orientations").toString());
+                        break;
+                }
+        }
+
+        if (Objects.equals(this.tile.getString("type"), "Pit"))
+        {
+            return TileModifier.getImage("Pit");
+        }
+
+
         if (Objects.equals(this.tile.getString("type"), "RestartPoint"))
         {
             return TileModifier.getImage("RestartPoint");
