@@ -90,7 +90,7 @@ public class Player {
 
         if (this.hasPlayerFinishedProgramming())
         {
-            l.debug("Player " + this.ctrl.getName() + " has finished programming.");
+            l.debug("Player {} has finished programming. Notifying session.", this.ctrl.getPlayerID());
             this.ctrl.getAuthGameMode().getSession().broadcastProgrammingSelectionFinished(this.ctrl.getPlayerID());
 
             if (this.ctrl instanceof final PlayerController pc)
