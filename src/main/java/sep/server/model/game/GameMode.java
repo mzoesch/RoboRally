@@ -358,25 +358,31 @@ public class GameMode {
             if(newFieldType instanceof ConveyorBelt conveyorBelt) {
                 String outDirection = conveyorBelt.getOutcomingFlowDirection();
                 String[] inDirection = conveyorBelt.getIncomingFlowDirection();
-                String robotOldDirection = player.getPlayerRobot().getDirection();
+                String rotation = null;
+
                 if(inDirection != null && outDirection != null) {
                     for(String direction : inDirection) {
-                        if(!Objects.equals(direction, outDirection)) {
-                            switch(outDirection) {
-                                case("top") -> player.getPlayerRobot().setDirection("top");
-                                case("right") -> player.getPlayerRobot().setDirection("right");
-                                case("bottom") -> player.getPlayerRobot().setDirection("bottom");
-                                case("left") -> player.getPlayerRobot().setDirection("left");
+                        if((direction=="bottom" && outDirection=="right") ||
+                                (direction=="left" && outDirection=="bottom") ||
+                                (direction=="top" && outDirection=="left") ||
+                                (direction=="right" && outDirection=="top")) {
+                            rotation = "clockwise";
+                            switch(player.getPlayerRobot().getDirection()) {
+                                case("top") -> player.getPlayerRobot().setDirection("right");
+                                case("right") -> player.getPlayerRobot().setDirection("bottom");
+                                case("bottom") -> player.getPlayerRobot().setDirection("left");
+                                case("left") -> player.getPlayerRobot().setDirection("top");
+                            }
+                        } else {
+                            rotation = "counterclockwise";
+                            switch(player.getPlayerRobot().getDirection()) {
+                                case ("top") -> player.getPlayerRobot().setDirection("left");
+                                case ("right") -> player.getPlayerRobot().setDirection("top");
+                                case ("bottom") -> player.getPlayerRobot().setDirection("right");
+                                case ("left") -> player.getPlayerRobot().setDirection("bottom");
                             }
                         }
-                    }
-                    if((Objects.equals(robotOldDirection, "top") && Objects.equals(player.getPlayerRobot().getDirection(), "right")) ||
-                            (Objects.equals(robotOldDirection, "right") && Objects.equals(player.getPlayerRobot().getDirection(), "bottom")) ||
-                            (Objects.equals(robotOldDirection, "bottom") && Objects.equals(player.getPlayerRobot().getDirection(), "left")) ||
-                            (Objects.equals(robotOldDirection, "left") && Objects.equals(player.getPlayerRobot().getDirection(), "top"))) {
-                        this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
-                    } else {
-                        this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+                        this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), rotation);
                     }
                 }
             }
@@ -672,7 +678,7 @@ public class GameMode {
             if (p.getRegisters()[this.currentRegister] != null) {
                 l.info("Player {} is playing card {}.", p.getController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
                 p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
-                addDelay(5000);
+                addDelay(2000);
                 continue;
             }
 
