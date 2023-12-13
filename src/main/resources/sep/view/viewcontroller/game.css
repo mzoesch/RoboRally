@@ -75,6 +75,26 @@
     -fx-alignment: center-left;
 }
 
+#ui-footer-shop-slots {
+    -fx-spacing: 12px;
+    -fx-alignment: center-right;
+}
+
+#got-upgrade-cards {
+    -fx-spacing: 3px;
+    -fx-alignment: center-right;
+}
+
+.got-upgrade-cards-vbox {
+    -fx-spacing: 3px;
+    -fx-alignment: center-left
+}
+
+.got-upgrade-cards-hbox{
+    -fx-spacing: 3px;
+    -fx-alignment: center-left
+}
+
 #player-container {
     -fx-spacing: 6px;
 }
@@ -101,6 +121,16 @@
 .player-box-active {
     -fx-border-color: #ff0000ff;
     -fx-background-color: #ff0000ff;
+}
+
+.player-box-inSelection {
+    -fx-border-color: #2b2a33ff;
+    -fx-background-color: #2b2a33ff;
+}
+
+.player-box-selected {
+    -fx-border-color: #39FF14;
+    -fx-background-color: #39FF14;
 }
 
 .player-box:hover {

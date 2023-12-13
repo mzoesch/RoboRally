@@ -2,11 +2,12 @@ package sep.server.model.game;
 
 import sep.server.json.game.effects.MovementModel;
 import sep.server.json.game.effects.PlayerTurningModel;
-import sep.server.json.game.effects.RebootModel;
+import sep.server.model.IOwnershipable;
+import sep.server.viewmodel.Session;
+import sep.server.model.game.tiles.Coordinate;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sep.server.model.game.tiles.Coordinate;
 
 public class Robot {
     private static final Logger l = LogManager.getLogger(GameState.class);
@@ -18,10 +19,13 @@ public class Robot {
     /** @deprecated Make to gateway method */
     private Tile currentTile;
 
-    public Robot(Course course) {
+    private final Player possessor;
+
+    public Robot(Player possessor, Course course) {
         this.course = course;
         startingPoint = null;
         currentTile = null;
+        this.possessor = possessor;
     }
 
     public String getDirection()
@@ -105,29 +109,29 @@ public class Robot {
             case "south", "bottom" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
             case "east", "right" -> tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
             case "west", "left" -> tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
-            default -> l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getPlayerController().getPlayerID(), this.getDirection());
+            default -> l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
         }
 
         if (tCoordinate == null) {
-            l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getPlayerController().getPlayerID(), this.getDirection());
+            l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
             return;
         }
 
-        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getPlayerController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
+        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
 
         if (!this.getCourse().isCoordinateWithinBounds(tCoordinate)) {
-            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getPlayerController().getPlayerID(), tCoordinate.toString());
+            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), tCoordinate.toString());
             this.reboot();
             return;
         }
 
         if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(tCoordinate))) {
-            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
             return;
         }
 
         this.getCourse().updateRobotPosition(this, tCoordinate);
-        l.debug("Player {}'s robot moved [from {} to {}].", this.determineRobotOwner().getPlayerController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+        l.debug("Player {}'s robot moved [from {} to {}].", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
     }
 
     /**
@@ -160,7 +164,7 @@ public class Robot {
             case "south", "bottom" -> newDirection = "left";
             case "west", "left" -> newDirection = "top";
             default -> {
-                l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getPlayerController().getPlayerID(), this.getDirection());
+                l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
                 return;
             }
         }
@@ -179,14 +183,11 @@ public class Robot {
         Tile sourceTile = this.getCurrentTile();
         Tile restartPoint = null;
 
-        for(Player player : GameState.gameMode.getPlayers()) {
-            new RebootModel(player.getPlayerController().getClientInstance(),
-                    robotOwner.getPlayerController().getPlayerID()).send();
-        }
+        this.getAuthGameMode().getSession().broadcastReboot(robotOwner.getController().getPlayerID());
 
-        if(GameState.gameMode.getSpamDeck().size() >= 2) {
-            robotOwner.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
-            robotOwner.getDiscardPile().add(GameState.gameMode.getSpamDeck().get(0));
+        if(this.getAuthGameMode().getSpamDeck().size() >= 2) {
+            robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
+            robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
         }
 
         for (int i = 0; i < robotOwner.getRegisters().length; i++) {
@@ -201,33 +202,21 @@ public class Robot {
         this.setCurrentTile(restartPoint);
 
         if(restartPoint != null) {
-            for(Player player : GameState.gameMode.getPlayers()) {
-                switch(this.direction) {
-                    case "right" -> {
-                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
-                                robotOwner.getPlayerController().getPlayerID(),
-                                "counterclockwise").send();
-                    }
-                    case "bottom" -> {
-                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
-                                robotOwner.getPlayerController().getPlayerID(),
-                                "counterclockwise").send();
-                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
-                                robotOwner.getPlayerController().getPlayerID(),
-                                "counterclockwise").send();
-                    }
-                    case "left" -> {
-                        new PlayerTurningModel(player.getPlayerController().getClientInstance(),
-                                robotOwner.getPlayerController().getPlayerID(),
-                                "clockwise").send();
-                    }
+            switch(this.direction) {
+                case "right" -> {
+                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
                 }
+                case "bottom" -> {
+                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
+                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
+                }
+                case "left" -> {
+                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
 
-                new MovementModel(player.getPlayerController().getClientInstance(),
-                        robotOwner.getPlayerController().getPlayerID(),
-                        restartPoint.getCoordinate().getX(),
-                        restartPoint.getCoordinate().getY()).send();
+                    }
             }
+
+            this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
         }
 
         this.setDirection("top");
@@ -302,11 +291,21 @@ public class Robot {
      * @return owner
      */
     public Player determineRobotOwner() {
-        for(Player player : GameState.gameMode.getPlayers()) {
+        for(Player player : this.getAuthGameMode().getPlayers()) {
             if(player.getPlayerRobot() == this) {
                 return player;
             }
         }
         return null;
     }
+
+    public GameMode getAuthGameMode() {
+        return this.possessor.getAuthGameMode();
+    }
+
+    public Session getSession()
+    {
+        return this.getAuthGameMode().getSession();
+    }
+
 }

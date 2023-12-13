@@ -1,10 +1,7 @@
 package sep.server.model.game.cards.programming;
 
 import sep.server.json.game.effects.EnergyModel;
-import sep.server.json.game.effects.MovementModel;
-import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
-import sep.server.model.game.Robot;
 import sep.server.model.game.cards.IPlayableCard;
 
 public class PowerUp extends AProgrammingCard implements IPlayableCard {
@@ -21,6 +18,7 @@ public class PowerUp extends AProgrammingCard implements IPlayableCard {
         int newEnergy= currentEnergy +1;
         player.setEnergyCollected(newEnergy);
 
-        new EnergyModel(player.getPlayerController().getClientInstance(), player.getPlayerController().getPlayerID(), newEnergy,"PowerUpCard").send();
+        player.getAuthGameMode().getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), newEnergy, "PowerUpCard");
+
     }
 }

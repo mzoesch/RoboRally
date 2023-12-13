@@ -2,7 +2,6 @@ package sep.server.model.game.cards.special;
 
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.model.game.cards.damage.ADamageCard;
 import sep.server.model.game.cards.damage.SpamDamage;
 
 public class SpamFolder extends ASpecialProgrammingCard implements IPlayableCard {
@@ -18,7 +17,7 @@ public class SpamFolder extends ASpecialProgrammingCard implements IPlayableCard
 
             if (currentCard instanceof SpamDamage) {
                 player.getDiscardPile().remove(i);
-                player.getGameMode().getSpamDeck().add((SpamDamage) currentCard);
+                player.getAuthGameMode().getSpamDeck().add((SpamDamage) currentCard);
                 break;
             }
         }

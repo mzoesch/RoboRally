@@ -1,8 +1,6 @@
 package sep.server.model.game;
 
 import sep.server.json.common.ErrorMsgModel;
-import sep.server.json.game.activatingphase.ReplaceCardModel;
-import sep.server.json.game.effects.*;
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
@@ -34,7 +32,7 @@ public class GameMode {
 
     private final Course course;
     private final int availableCheckPoints;
-    private final Session session;
+    private final GameState gameState;
     private EGamePhase gamePhase;
 
     private final ArrayList<SpamDamage> spamCardDeck;
@@ -53,23 +51,14 @@ public class GameMode {
 
     private Thread activationPhaseThread;
 
-    public GameMode(final String courseName, final IOwnershipable[] ctrls, final Session session) {
+    public GameMode(final String courseName, final GameState gameState) {
         super();
 
         l.debug("Starting game with the following course: {}", courseName);
 
-        // TODO WARNING
-        //      This of course does not work and will throw if agents were to join the game.
-        //      Just temporary until the interfaces are up and implemented.
-        final PlayerController[] playerControllers = new PlayerController[ctrls.length];
-        for (int i = 0; i < ctrls.length; i++)
-        {
-            playerControllers[i] = (PlayerController) ctrls[i];
-        }
-
         this.course = new Course(courseName);
         this.availableCheckPoints = this.getAvailableCheckpoints(courseName);
-        this.session = session;
+        this.gameState = gameState;
         this.gamePhase = EGamePhase.INVALID;
 
         DeckBuilder deckBuilder = new DeckBuilder();
@@ -78,8 +67,8 @@ public class GameMode {
         this.virusCardDeck = deckBuilder.buildVirusDeck();
         this.wormDamageDeck = deckBuilder.buildWormDeck();
 
-        this.players = Arrays.stream(playerControllers).map(pc -> new Player(pc, this.course, this.session)).collect(Collectors.toCollection(ArrayList::new));
-        Arrays.stream(playerControllers).forEach(pc -> this.players.stream().filter(p -> p.getPlayerController() == pc).findFirst().ifPresent(pc::setPlayer));
+        this.players = Arrays.stream(this.getControllers()).map(ctrl -> new Player(ctrl, this.course)).collect(Collectors.toCollection(ArrayList::new));
+        Arrays.stream(this.getControllers()).forEach(ctrl -> this.players.stream().filter(p -> p.getController() == ctrl).findFirst().ifPresent(ctrl::setPlayer));
         this.curPlayerInRegistration = this.players.get(0);
         this.currentRegister = 0;
 
@@ -131,8 +120,8 @@ public class GameMode {
                     for(Player player : players) {
                         if (player.getPlayerRobot().getCurrentTile() == null) {
                             curPlayerInRegistration = player;
-                            l.info("Now Player with ID: " + player.getPlayerController().getPlayerID() + "has to set StartingPoint");
-                            pc.getSession().broadcastCurrentPlayer(player.getPlayerController().getPlayerID());
+                            l.info("Now Player with ID: " + player.getController().getPlayerID() + "has to set StartingPoint");
+                            pc.getSession().broadcastCurrentPlayer(player.getController().getPlayerID());
                         }
                     }
                 }
@@ -156,7 +145,7 @@ public class GameMode {
             new ErrorMsgModel(pc.getClientInstance(), "Wrong GamePhase");
             return false;
 
-        } else if (pc.getPlayerID() != curPlayerInRegistration.getPlayerController().getPlayerID()) {
+        } else if (pc.getPlayerID() != curPlayerInRegistration.getController().getPlayerID()) {
             l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
             new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
             return false;
@@ -172,16 +161,16 @@ public class GameMode {
      * The following method triggers the registration phase.
      */
     private void triggerRegistrationPhase() {
-        this.session.broadcastGameStart(this.course.getCourse());
+        this.getSession().broadcastGameStart(this.course.getCourse());
 
         // TODO WARNING: This must stand here because the {@link Session#broadcastGameStart(ArrayList<ArrayList<Tile>>)}
         //               method will instantiate the game screen of the client. Therefore, the client will not be able
         //               to understand the following request if it is sent before the game screen is loaded. We may
         //               want to fix this on the client side!
-        this.session.broadcastNewGamePhase(this.gamePhase);
+        this.getSession().broadcastNewGamePhase(this.gamePhase);
 
         /* The current player is the first player that joined the game. */
-        this.session.broadcastCurrentPlayer(this.curPlayerInRegistration.getPlayerController().getPlayerID());
+        this.getSession().broadcastCurrentPlayer(this.curPlayerInRegistration.getController().getPlayerID());
 
         l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
     }
@@ -189,7 +178,7 @@ public class GameMode {
     /**
      * The following method triggers the upgrade phase.
      */
-    private void triggerUpgradePhase(){
+    private void triggerUpgradePhase() {
         l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
         this.handleNewPhase(EGamePhase.PROGRAMMING);
     }
@@ -197,21 +186,31 @@ public class GameMode {
     /**
      * The following method triggers the programming phase and prepares the player decks.
      */
-    private void triggerProgrammingPhase(){
-        for (Player p : players){
-            p.getPlayerHand().clear(); //// Clearing the old hand
-            for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++){
-                if (p.getPlayerDeck().isEmpty()){
+    private void triggerProgrammingPhase() {
+        for (Player p : players) {
+            p.clearOldHand();
+            for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++) {
+                if (p.getPlayerDeck().isEmpty()) {
                     p.shuffleAndRefillDeck();
-                    this.session.getGameState().sendShuffle(p);
+                    this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
                 }
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-            this.session.sendHandCardsToPlayer(p.getPlayerController(), p.getPlayerHandAsStringArray());
+            if (p.getController() instanceof PlayerController pc)
+            {
+                pc.getSession().sendHandCardsToPlayer(pc, p.getPlayerHandAsStringArray());
+                continue;
+            }
+
+            /* TODO Here call method on agent and let them decide how they want to play this programming phase. */
+
+            l.error("Agent programming not implemented yet. Skipping to next player.");
+
+            continue;
         }
 
-        l.debug("Programming Phase started. All players have received their cards. Waiting for players to set their cards . . .");
+        l.debug("Programming Phase started. All remote controllers have received their cards. Waiting for them to set their cards . . .");
     }
 
     // region Activation Phase Helpers
@@ -290,11 +289,7 @@ public class GameMode {
 
                         course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
 
-                        for(Player player1 : players) {
-                            new MovementModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID(),
-                                    newCoordinate.getX(), newCoordinate.getY()).send();
-                        }
+                        this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), newCoordinate.getX(), newCoordinate.getY());
                     }
                 }
             }
@@ -353,17 +348,9 @@ public class GameMode {
                             (Objects.equals(robotOldDirection, "right") && Objects.equals(player.getPlayerRobot().getDirection(), "bottom")) ||
                             (Objects.equals(robotOldDirection, "bottom") && Objects.equals(player.getPlayerRobot().getDirection(), "left")) ||
                             (Objects.equals(robotOldDirection, "left") && Objects.equals(player.getPlayerRobot().getDirection(), "top"))) {
-                        for(Player player1 : players) {
-                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID(),
-                                    "clockwise").send();
-                        }
+                        this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
                     } else {
-                        for(Player player1 : players) {
-                            new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID(),
-                                    "counterclockwise").send();
-                        }
+                        this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
                     }
                 }
             }
@@ -399,11 +386,7 @@ public class GameMode {
 
                             course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
 
-                            for(Player player1 : players) {
-                                new MovementModel(player1.getPlayerController().getClientInstance(),
-                                        player.getPlayerController().getPlayerID(),
-                                        newCoordinate.getX(), newCoordinate.getY()).send();
-                            }
+                            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), newCoordinate.getX(), newCoordinate.getY());
                         }
                     }
                 }
@@ -443,10 +426,7 @@ public class GameMode {
 
                     player.getPlayerRobot().setDirection(newDirection);
 
-                    for(Player player1 : players) {
-                        new PlayerTurningModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(), rotationalDirection).send();
-                    }
+                    this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), rotationalDirection);
                 }
             }
         }
@@ -593,12 +573,8 @@ public class GameMode {
                         player.setEnergyCollected(currentEnergy + 1);
                     }
 
-                    for(Player player1 : players) {
-                        new EnergyModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(),
-                                player.getEnergyCollected(),
-                                "EnergySpace").send();
-                    }
+                    this.getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), player.getEnergyCollected(), "EnergySpace");
+
                 }
             }
         }
@@ -620,18 +596,11 @@ public class GameMode {
                         player.setCheckpointsCollected(player.getCheckpointsCollected()+1);
                     }
 
-                    for(Player player1 : players) {
-                        new CheckPointReachedModel(player1.getPlayerController().getClientInstance(),
-                                player.getPlayerController().getPlayerID(),
-                                player.getCheckpointsCollected()).send();
-                    }
+                    this.getSession().broadcastCheckPointReached(player.getController().getPlayerID(), player.getCheckpointsCollected());
 
                     if(player.getCheckpointsCollected() == availableCheckPoints) {
                         endGame(player);
-                        for(Player player1 : players) {
-                            new GameFinishedModel(player1.getPlayerController().getClientInstance(),
-                                    player.getPlayerController().getPlayerID()).send();
-                        }
+                        this.getSession().broadcastGameFinish(player.getController().getPlayerID());
                     }
                 }
             }
@@ -639,7 +608,7 @@ public class GameMode {
     }
 
     public void endGame(Player winner) {
-        session.handleGameFinished(winner.getPlayerController().getPlayerID());
+        getSession().handleGameFinished(winner.getController().getPlayerID());
     }
 
     /**
@@ -671,19 +640,19 @@ public class GameMode {
 
         this.determinePriorities();
         this.sortPlayersByPriorityInDesc();
-        this.session.broadcastCurrentCards(this.currentRegister);
+        this.getSession().broadcastCurrentCards(this.currentRegister);
 
         for (Player p : this.players) {
             if (p.getRegisters()[this.currentRegister] != null) {
-                l.info("Player {} is playing card {}.", p.getPlayerController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
+                l.info("Player {} is playing card {}.", p.getController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
                 p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
+                addDelay(5000);
                 continue;
             }
 
-            l.warn("Player {} does not have a card in register {}.", p.getPlayerController().getPlayerID(), this.currentRegister);
+            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegister);
         }
 
-        // TODO Add delay between each activation phase step.
         this.activateConveyorBelts(2);
         this.activateConveyorBelts(1);
         this.activatePushPanels();
@@ -696,6 +665,18 @@ public class GameMode {
         this.currentRegister++;
 
         return this.currentRegister < GameMode.REGISTER_PHASE_COUNT;
+    }
+
+    /**
+     * The following method introduces a timeout. The length depends on the amount of milliseconds passed to the method.
+     * @param milliseconds length of timeout
+     */
+    private void addDelay(int milliseconds) {
+        try {
+            this.activationPhaseThread.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void triggerActivationPhase()
@@ -752,12 +733,12 @@ public class GameMode {
      * @param phase New phase to be set
      */
     public void handleNewPhase(EGamePhase phase) {
-        l.info("Session [{}] is entering a new phase. From {} to {}.", this.session.getSessionID(), this.gamePhase, phase);
+        l.info("Session [{}] is entering a new phase. From {} to {}.", this.getSession().getSessionID(), this.gamePhase, phase);
 
         // Because the game screen in the client is not yet loaded at this point.
         // Therefore, they will not be able to understand this request.
         if (phase != EGamePhase.REGISTRATION) {
-            this.session.broadcastNewGamePhase(phase);
+            this.getSession().broadcastNewGamePhase(phase);
         }
 
         switch (phase) {
@@ -791,7 +772,7 @@ public class GameMode {
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
     public void startTimer() {
-        this.session.getGameState().sendStartTimer();
+        this.getSession().getGameState().sendStartTimer();
 
         // Sleep for 30 seconds
         Thread programmingCardThread = new Thread(() -> {
@@ -806,14 +787,14 @@ public class GameMode {
             int index = 0;
             for (Player player : players) {
                 if (!player.hasPlayerFinishedProgramming()) {
-                    playerIdWhoNotFinished[index++] = player.getPlayerController().getPlayerID();
+                    playerIdWhoNotFinished[index++] = player.getController().getPlayerID();
                     playerWhoNotFinished.add(player);
                 }
             }
             if (index < players.size()) {
                 playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
             }
-            this.session.getGameState().sendStopTimer(playerIdWhoNotFinished);
+            this.getSession().getGameState().sendStopTimer(playerIdWhoNotFinished);
 
             discardAndDrawBlind(playerWhoNotFinished);
 
@@ -855,9 +836,7 @@ public class GameMode {
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
         player.setCardInRegister(currentRegister, topCardFromDiscardPile);
 
-        new ReplaceCardModel(player.getPlayerController().getClientInstance(),
-                currentRegister, player.getPlayerController().getPlayerID(),
-                newCard).send();
+        this.getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRegister, newCard);
     }
 
     /* TODO Remove player after connection loss */
@@ -902,13 +881,19 @@ public class GameMode {
         return 0;
     }
 
-    public PlayerController[] getPlayerControllers() {
-        PlayerController[] playerControllers = new PlayerController[this.players.size()];
-        for (int i = 0; i < this.players.size(); i++)
-        {
-            playerControllers[i] = this.players.get(i).getPlayerController();
-        }
-        return playerControllers;
+    public PlayerController[] getRemotePlayers()
+    {
+       return this.gameState.getSession().getRemotePlayers().toArray(new PlayerController[0]);
+    }
+
+    public IOwnershipable[] getControllers()
+    {
+        return this.gameState.getControllers();
+    }
+
+    public Session getSession()
+    {
+        return this.gameState.getSession();
     }
 
     // endregion Getters and Setters

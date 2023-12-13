@@ -25,9 +25,13 @@ import sep.server.model.game.cards.Card;
 import sep.server.json.common.ConnectionUpdateModel;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
+import sep.server.json.game.effects.CheckPointReachedModel;
+import sep.server.json.game.effects.EnergyModel;
+import sep.server.json.game.effects.RebootModel;
+import sep.server.json.game.activatingphase.ReplaceCardModel;
+import sep.server.model.game.tiles.Coordinate;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -86,7 +90,7 @@ public final class Session
             return;
         }
 
-        if (this.getCharacters().isEmpty())
+        if (this.getRemotePlayers().isEmpty())
         {
             EServerInformation.INSTANCE.removeSession(this);
             return;
@@ -130,7 +134,7 @@ public final class Session
             return;
         }
 
-        for (PlayerController pc : this.getCharacters())
+        for (PlayerController pc : this.getRemotePlayers())
         {
             new ConnectionUpdateModel(pc.getClientInstance(), tCtrl.getPlayerID(), eCL.toString(), bConnected).send();
             continue;
@@ -147,7 +151,7 @@ public final class Session
             return;
         }
 
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             pc.sendChatMessage(caller, msg, false);
             continue;
@@ -158,7 +162,7 @@ public final class Session
 
     public void sendKeepAlive(final ArrayList<ClientInstance> dead)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             if (!pc.getClientInstance().isAlive())
             {
@@ -202,7 +206,7 @@ public final class Session
         }
 
         /* Sending information about the new client to all other clients. */
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             if (pc.getPlayerID() == newCtrl.getPlayerID())
             {
@@ -222,7 +226,7 @@ public final class Session
     /** @param cCtrl The controller that changed in any way. */
     public void sendPlayerValuesToAllClients(final IOwnershipable cCtrl)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new PlayerAddedModel(pc, cCtrl.getPlayerID(), cCtrl.getName(), cCtrl.getFigure()).send();
             continue;
@@ -246,7 +250,7 @@ public final class Session
             return;
         }
 
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             if (pc.getPlayerID() == receiverID)
             {
@@ -316,7 +320,7 @@ public final class Session
 
     public void broadcastPlayerLobbyReadyStatus(final PlayerController sourcePC)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new PlayerStatusModel(pc.getClientInstance(), sourcePC.getPlayerID(), sourcePC.isReady()).send();
             continue;
@@ -327,7 +331,7 @@ public final class Session
 
     private void broadcastCourseSelected(final PlayerController selector)
     {
-        for (PlayerController pc : this.getCharacters())
+        for (PlayerController pc : this.getRemotePlayers())
         {
             new MapSelectedModel(pc, this.gameState.getCourseName()).send();
             continue;
@@ -377,6 +381,13 @@ public final class Session
         {
             this.readyCharacterOrder.add(pc);
             this.updateCourseSelectorPower();
+
+            if (this.isReadyToStartGame())
+            {
+                this.prepareGameStart();
+                return;
+            }
+
             return;
         }
 
@@ -414,6 +425,10 @@ public final class Session
     {
         this.broadcastChatMessage(ChatMsgModel.SERVER_ID, "All players are ready. The game will start in 5 seconds.");
 
+        // TODO
+        //      We have to implement checks for if a client disconnects during this time
+        //      or they pick a new name figure etc. Is is currently very unsafe!
+
         this.awaitGameStartThread = new Thread(() ->
         {
             l.info("Awaiting game start . . .");
@@ -429,9 +444,7 @@ public final class Session
                 return;
             }
 
-            /* TODO Here set the figures of the agents if available. */
-
-            this.gameState.startGame(this.ctrls.toArray(new IOwnershipable[0]));
+            this.gameState.startGame();
 
             return;
         });
@@ -443,7 +456,7 @@ public final class Session
 
     public void handleSelectedStartingPoint(final int ctrlID, final int x, final int y)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new StartingPointTakenModel(pc.getClientInstance(), x, y, ctrlID).send();
             continue;
@@ -454,7 +467,7 @@ public final class Session
 
     public void broadcastCurrentPlayer(final int playerID)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new CurrentPlayerModel(pc.getClientInstance(), playerID).send();
             continue;
@@ -465,7 +478,7 @@ public final class Session
 
     public void broadcastNewGamePhase(final EGamePhase phase)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new ActivePhaseModel(pc.getClientInstance(), phase.i).send();
             continue;
@@ -476,7 +489,7 @@ public final class Session
 
     public void broadcastGameStart(final ArrayList<ArrayList<Tile>> course)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new GameStartedModel(pc.getClientInstance(), course).send();
             continue;
@@ -492,7 +505,7 @@ public final class Session
         {
             for (Player p : this.getGameState().getAuthGameMode().getPlayers())
             {
-                CardInfo ci = new CardInfo(p.getPlayerController().getPlayerID(), ( (Card) p.getCardByRegisterIndex(register) ).getCardType());
+                CardInfo ci = new CardInfo(p.getController().getPlayerID(), ( (Card) p.getCardByRegisterIndex(register) ).getCardType());
                 activeCards[i] = ci;
 
                 continue;
@@ -501,9 +514,103 @@ public final class Session
             continue;
         }
 
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             new CurrentCardsModel(pc.getClientInstance(), activeCards).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastCheckPointReached(final int ctrlID, final int checkpointsReached)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new CheckPointReachedModel(pc.getClientInstance(), ctrlID, checkpointsReached).send();
+            continue;
+        }
+
+        return;
+    }
+
+    /** @param ctrlID The ID of the controller that won the game. */
+    public void broadcastGameFinish(final int ctrlID)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new GameFinishedModel(pc.getClientInstance(), ctrlID).send();
+            continue;
+        }
+
+        return;
+    }
+
+    /**
+     * @param ctrlID The ID of the controller that has changed its energy.
+     * @param energy The new energy value.
+     * @param source The source of the energy change.
+     */
+    public void broadcastEnergyUpdate(final int ctrlID, final int energy, final String source)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new EnergyModel(pc.getClientInstance(), ctrlID, energy, source).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastPositionUpdate(final int ctrlID, final int x, final int y)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new MovementModel(pc.getClientInstance(), ctrlID, x, y).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastPositionUpdate(final int ctrlID, final Coordinate c)
+    {
+        this.broadcastPositionUpdate(ctrlID, c.getX(), c.getY());
+        return;
+    }
+
+    public void broadcastRotationUpdate(final int ctrlID, final String rotation)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new PlayerTurningModel(pc.getClientInstance(), ctrlID, rotation).send();
+            continue;
+        }
+
+        return;
+    }
+
+    /**
+     * @param ctrlID   The ID of the controller that replaced a card.
+     * @param register The current activation phase register.
+     * @param card     The new card that was placed in the register.
+     */
+    public void broadcastReplacedCard(final int ctrlID, final int register, final String card)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new ReplaceCardModel(pc.getClientInstance(), ctrlID, register, card).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastReboot(final int ctrlID)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new RebootModel(pc.getClientInstance(), ctrlID).send();
             continue;
         }
 
@@ -556,12 +663,19 @@ public final class Session
 
     private boolean isReadyToStartGame()
     {
-        if (this.getCharacters().size() < GameState.MIN_REMOTE_PLAYER_COUNT_TO_START)
+        // WARNING Do NOT replace with .isEmpty() because this var can change as described in the protocol!
+        //         But because this is not implemented yet, we get this warning.
+        if (this.getRemotePlayers().size() < GameState.MIN_REMOTE_PLAYER_COUNT_TO_START)
         {
             return false;
         }
 
-        for (final PlayerController pc : this.getCharacters())
+        if (this.ctrls.size() < GameState.MIN_PLAYER_COUNT_TO_START)
+        {
+            return false;
+        }
+
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             if (!pc.isReady())
             {
@@ -584,7 +698,7 @@ public final class Session
     /** Sends a set of hand cards to a specified player controller and notifies all remote players. */
     public void sendHandCardsToPlayer(final PlayerController tPC, final String[] hand)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             NotYourCardsModel notYourCardsModel = new NotYourCardsModel(pc.getClientInstance(), tPC.getPlayerID(), hand.length);
             notYourCardsModel.send();
@@ -608,7 +722,7 @@ public final class Session
      */
     public void sendShuffleCodingNotification(final int playerID)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             ShuffleCodingModel shuffleCodingModel = new ShuffleCodingModel(pc.getClientInstance(), playerID);
             shuffleCodingModel.send();
@@ -626,7 +740,7 @@ public final class Session
      */
     public void sendCardSelected(final int playerID, final int register, final boolean bFilled)
     {
-        for (PlayerController pc : this.getCharacters())
+        for (PlayerController pc : this.getRemotePlayers())
         {
             CardSelectedModel cardSelectedModel = new CardSelectedModel(pc.getClientInstance(), playerID, register, bFilled);
             cardSelectedModel.send();
@@ -639,7 +753,7 @@ public final class Session
 
     public void sendCardsYouGotNow(final PlayerController tPC, final String[] hand)
     {
-        for (PlayerController pc : this.getCharacters())
+        for (PlayerController pc : this.getRemotePlayers())
         {
             if (pc == tPC)
             {
@@ -655,7 +769,7 @@ public final class Session
 
     public void sendTimerStarted()
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             TimerStartedModel timerStartedModel = new TimerStartedModel(pc.getClientInstance());
             timerStartedModel.send();
@@ -669,7 +783,7 @@ public final class Session
     /** @param playerIDs The players that have not finished programming in time. */
     public void sendTimerEnded(final int[] playerIDs)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             TimerEndedModel timerEndedModel = new TimerEndedModel(pc.getClientInstance(), playerIDs);
             timerEndedModel.send();
@@ -682,7 +796,7 @@ public final class Session
 
     public void sendSelectionFinished(final int playerID)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             SelectionFinishedModel selectionFinishedModel = new SelectionFinishedModel(pc.getClientInstance(), playerID);
             selectionFinishedModel.send();
@@ -695,7 +809,7 @@ public final class Session
 
     public void handlePlayerTurning(final int playerID, final String startingTurn)
     {
-        for (PlayerController pc : this.getCharacters())
+        for (PlayerController pc : this.getRemotePlayers())
         {
             l.debug("Player {} has turned {}.", playerID, startingTurn);
             PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
@@ -710,7 +824,7 @@ public final class Session
     public void handleGameFinished(final int playerID)
     {
         l.debug("Notifying remote players that {} has won the game.", playerID);
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             GameFinishedModel gameFinishedModel = new GameFinishedModel(pc.getClientInstance(), playerID);
             gameFinishedModel.send();
@@ -723,7 +837,7 @@ public final class Session
 
     public void handleMovement(final int playerID, final int x, final int y)
     {
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             MovementModel movementModel = new MovementModel(pc.getClientInstance(), playerID, x, y);
             movementModel.send();
@@ -737,7 +851,7 @@ public final class Session
     public boolean haveAllPlayersFinishedProgramming()
     {
         /* Because agents will always instantly have finished their programming. */
-        for (final PlayerController pc : this.getCharacters())
+        for (final PlayerController pc : this.getRemotePlayers())
         {
             if (!pc.getPlayer().hasPlayerFinishedProgramming())
             {
@@ -750,8 +864,13 @@ public final class Session
         return true;
     }
 
+    public IOwnershipable[] getControllers()
+    {
+        return this.ctrls.toArray(new IOwnershipable[0]);
+    }
+
     /** @return All remote players in this session. */
-    private ArrayList<PlayerController> getCharacters()
+    public ArrayList<PlayerController> getRemotePlayers()
     {
         ArrayList<PlayerController> t = new ArrayList<PlayerController>();
         for (final IOwnershipable ctrl : this.ctrls)

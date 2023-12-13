@@ -3,8 +3,9 @@ package sep.server.model.game;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.builder.DeckBuilder;
+import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.PlayerController;
-import sep.server.viewmodel.Session;
+import sep.server.model.game.tiles.Coordinate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,8 +17,7 @@ public class Player {
 
     private int priority;
 
-    private final Session session;
-    private final PlayerController playerController;
+    private final IOwnershipable ctrl;
     private final Robot playerRobot;
 
     private final ArrayList<IPlayableCard> playerDeck;
@@ -28,15 +28,9 @@ public class Player {
     private int energyCollected;
     private int checkpointsCollected;
 
-    /**
-     * @deprecated Make gateway call instead
-     */
-    private GameMode gameMode;
-
-    public Player(final PlayerController playerController, final Course currentCourse, final Session session) {
-        this.session = session;
-        this.playerController = playerController;
-        this.playerRobot = new Robot(currentCourse);
+    public Player(final IOwnershipable ctrl, final Course currentCourse) {
+        this.ctrl = ctrl;
+        this.playerRobot = new Robot(this, currentCourse);
 
         this.playerDeck = new DeckBuilder().buildProgrammingDeck();
         Collections.shuffle(this.playerDeck);
@@ -47,8 +41,6 @@ public class Player {
 
         this.energyCollected = GameMode.STARTING_ENERGY;
         this.checkpointsCollected = 0;
-
-        this.gameMode = session.getGameState().getAuthGameMode();
     }
 
     /**
@@ -69,7 +61,7 @@ public class Player {
      */
     public void setCardToRegister(final String card, final int pos) {
         if (this.hasPlayerFinishedProgramming()) {
-            l.warn("Player {} has already finished programming and, therefore, cannot change their programming registers anymore.", this.playerController.getName());
+            l.warn("Player {} has already finished programming and, therefore, cannot change their programming registers anymore.", this.ctrl.getName());
             return;
         }
 
@@ -82,39 +74,62 @@ public class Player {
 
         if (playableCard == null) {
             this.registers[pos] = null;
-            this.session.sendCardSelected(this.playerController.getPlayerID(), pos, false);
+            if (this.ctrl instanceof PlayerController pc)
+            {
+                pc.getSession().sendCardSelected(this.ctrl.getPlayerID(), pos, false);
+            }
             return;
         }
 
         this.registers[pos] = playableCard;
-        this.session.sendCardSelected(getPlayerController().getPlayerID(), pos, true);
+        if (this.ctrl instanceof PlayerController pc)
+        {
+            pc.getSession().sendCardSelected(getController().getPlayerID(), pos, true);
+        }
 
-        if (this.hasPlayerFinishedProgramming()) {
-            l.debug("Player " + this.playerController.getName() + " has finished programming.");
-            this.session.sendSelectionFinished(this.playerController.getPlayerID());
+        if (this.ctrl instanceof PlayerController pc) {
+            if (this.hasPlayerFinishedProgramming())
+            {
+                l.debug("Player " + this.ctrl.getName() + " has finished programming.");
+                pc.getSession().sendSelectionFinished(this.ctrl.getPlayerID());
 
-            if (this.session.haveAllPlayersFinishedProgramming()) {
-                l.debug("All players have finished programming in time. Interrupting timer.");
-                // TODO Interrupt timer
-                this.session.getGameState().getAuthGameMode().handleNewPhase(EGamePhase.ACTIVATION);
+                if (pc.getSession().haveAllPlayersFinishedProgramming())
+                {
+                    l.debug("All players have finished programming in time. Interrupting timer.");
+                    // TODO Interrupt timer
+                    pc.getSession().getGameState().getAuthGameMode().handleNewPhase(EGamePhase.ACTIVATION);
+                }
+
+                // TODO We ignore this for now.
+                // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
+
+                return;
             }
 
-            // TODO We ignore this for now.
-            // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
+            return;
         }
+
+        l.error("A local player has finished programming. Not yet implemented.");
+
     }
 
     public void handleIncompleteProgramming() {
-        discardPile.addAll(playerHand);
-        playerHand.clear();
-        shuffleAndRefillDeck();
+        if (this.ctrl instanceof PlayerController pc)
+        {
+            discardPile.addAll(playerHand);
+            playerHand.clear();
+            shuffleAndRefillDeck();
 
-        for (int i = 0; i < registers.length; i++) {
-            if (registers[i] == null) {
-                registers[i] = playerDeck.remove(0);
+            for (int i = 0; i < registers.length; i++) {
+                if (registers[i] == null) {
+                    registers[i] = playerDeck.remove(0);
+                }
             }
+            pc.getSession().sendCardsYouGotNow(pc, getRegistersAsStringArray());
+            return;
         }
-        session.sendCardsYouGotNow(getPlayerController(), getRegistersAsStringArray());
+
+        l.error("A local player has not finished programming in time. This must never happen.");
     }
 
     /**
@@ -138,9 +153,9 @@ public class Player {
         return null;
     }
 
-    public PlayerController getPlayerController()
+    public IOwnershipable getController()
     {
-        return this.playerController;
+        return this.ctrl;
     }
 
     public Robot getPlayerRobot()
@@ -213,8 +228,8 @@ public class Player {
     public void setCheckpointsCollected(final int checkpointsCollected) {
         this.checkpointsCollected = checkpointsCollected;
     }
-    public GameMode getGameMode() {
-        return gameMode;
+    public GameMode getAuthGameMode() {
+        return this.ctrl.getAuthGameMode();
     }
 
     public int getEnergyCollected()
@@ -231,4 +246,14 @@ public class Player {
     {
         return upgradeCards;
     }
+
+    public void clearOldHand() {
+        this.playerHand.clear();
+    }
+
+    public Coordinate getPosition()
+    {
+        return this.playerRobot.getCurrentTile().getCoordinate();
+    }
+
 }

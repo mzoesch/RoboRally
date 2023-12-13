@@ -180,7 +180,7 @@ public class ServerListener implements Runnable
 
     private boolean onSelectMapRequest() throws JSONException
     {
-        l.debug("Server requested this client to choose a course. Available courses: {}.", String.join(", ", Arrays.asList(this.dsrp.getAvailableCourses())));
+        l.debug("Server requested client {} to choose a course. Available courses: {}.", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getAvailableCourses())));
         EGameState.INSTANCE.setServerCourses(this.dsrp.getAvailableCourses());
         ViewSupervisor.updateAvailableCourses(true);
         return true;
@@ -370,7 +370,7 @@ public class ServerListener implements Runnable
 
     private boolean onAnimationPlay() throws JSONException
     {
-        l.warn("Server requested this client to play an animation. But it is not implemented yet. Ignoring.");
+        l.warn("Server requested client {} to play an animation. But it is not implemented yet. Ignoring.", EClientInformation.INSTANCE.getPlayerID());
         return true;
     }
 

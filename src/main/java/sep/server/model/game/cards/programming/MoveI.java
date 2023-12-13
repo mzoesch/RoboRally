@@ -14,11 +14,7 @@ public class MoveI extends AProgrammingCard implements IPlayableCard {
     @Override
     public void playCard(Player player, int currentRoundNumber) {
         player.getPlayerRobot().moveRobotOneTileForwards();
-        for(Player player1 : GameState.gameMode.getPlayers()) {
-            new MovementModel(player1.getPlayerController().getClientInstance(),
-                    player.getPlayerController().getPlayerID(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getX(),
-                    player.getPlayerRobot().getCurrentTile().getCoordinate().getY()).send();
-        }
+
+        player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
     }
 }

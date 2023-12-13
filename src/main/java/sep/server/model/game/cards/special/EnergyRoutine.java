@@ -16,6 +16,7 @@ public class EnergyRoutine extends ASpecialProgrammingCard implements IPlayableC
         int newEnergy= currentEnergy +1;
         player.setEnergyCollected(newEnergy);
 
-        new EnergyModel(player.getPlayerController().getClientInstance(), player.getPlayerController().getPlayerID(), newEnergy,"EnergieRoutine").send();
+        player.getAuthGameMode().getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), newEnergy, "EnergyRoutine");
+
     }
 }
