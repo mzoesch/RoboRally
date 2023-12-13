@@ -454,7 +454,7 @@ public final class Session
         return;
     }
 
-    public void handleSelectedStartingPoint(final int ctrlID, final int x, final int y)
+    public void broadcastSelectedStartingPoint(final int ctrlID, final int x, final int y)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
@@ -794,7 +794,7 @@ public final class Session
         return;
     }
 
-    public void sendSelectionFinished(final int playerID)
+    public void broadcastProgrammingSelectionFinished(final int playerID)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
