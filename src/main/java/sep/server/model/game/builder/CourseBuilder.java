@@ -1073,12 +1073,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (2,4)
-        fieldtypes.add(new Gear("left"));
+        fieldtypes.add(new Gear("counterclockwise"));
         arrayListY.add(new Tile("1A",new Coordinate(2,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (2,5)
-        fieldtypes.add(new Gear("right"));
+        fieldtypes.add(new Gear("clockwise"));
         arrayListY.add(new Tile("1A",new Coordinate(2,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1185,7 +1185,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (4,5)
-        fieldtypes.add(new Gear("right"));
+        fieldtypes.add(new Gear("clockwise"));
         arrayListY.add(new Tile("1A",new Coordinate(4,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1233,7 +1233,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (5,4)
-        fieldtypes.add(new Gear("left"));
+        fieldtypes.add(new Gear("counterclockwise"));
         arrayListY.add(new Tile("1A",new Coordinate(5,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1340,12 +1340,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (7,4)
-        fieldtypes.add(new Gear("right"));
+        fieldtypes.add(new Gear("clockwise"));
         arrayListY.add(new Tile("1A",new Coordinate(7,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (7,5)
-        fieldtypes.add(new Gear("left"));
+        fieldtypes.add(new Gear("counterclockwise"));
         arrayListY.add(new Tile("1A",new Coordinate(7,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -2234,7 +2234,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (3,4)
-        fieldtypes.add(new Gear("right"));
+        fieldtypes.add(new Gear("clockwise"));
         arrayListY.add(new Tile("4A",new Coordinate(3,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -2404,7 +2404,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (6,5)
-        fieldtypes.add(new Gear("left"));
+        fieldtypes.add(new Gear("counterclockwise"));
         arrayListY.add(new Tile("4A",new Coordinate(6,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
