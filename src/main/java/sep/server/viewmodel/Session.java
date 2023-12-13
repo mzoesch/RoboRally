@@ -807,20 +807,6 @@ public final class Session
         return;
     }
 
-    public void handlePlayerTurning(final int playerID, final String startingTurn)
-    {
-        for (PlayerController pc : this.getRemotePlayers())
-        {
-            l.debug("Player {} has turned {}.", playerID, startingTurn);
-            PlayerTurningModel playerTurningModel = new PlayerTurningModel(pc.getClientInstance(), playerID, startingTurn);
-            playerTurningModel.send();
-
-            continue;
-        }
-
-        return;
-    }
-
     public void handleGameFinished(final int playerID)
     {
         l.debug("Notifying remote players that {} has won the game.", playerID);
