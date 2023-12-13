@@ -87,12 +87,14 @@ public class Player {
             pc.getSession().sendCardSelected(getController().getPlayerID(), pos, true);
         }
 
-        if (this.ctrl instanceof PlayerController pc) {
-            if (this.hasPlayerFinishedProgramming())
-            {
-                l.debug("Player " + this.ctrl.getName() + " has finished programming.");
-                pc.getSession().sendSelectionFinished(this.ctrl.getPlayerID());
 
+        if (this.hasPlayerFinishedProgramming())
+        {
+            l.debug("Player " + this.ctrl.getName() + " has finished programming.");
+            this.ctrl.getAuthGameMode().getSession().broadcastProgrammingSelectionFinished(this.ctrl.getPlayerID());
+
+            if (this.ctrl instanceof final PlayerController pc)
+            {
                 if (pc.getSession().haveAllPlayersFinishedProgramming())
                 {
                     l.debug("All players have finished programming in time. Interrupting timer.");
@@ -102,14 +104,12 @@ public class Player {
 
                 // TODO We ignore this for now.
                 // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
-
-                return;
             }
+
+            l.debug("Player {} is a local player. Therefore, the timer will not be started nor interrupted.", this.ctrl.getPlayerID());
 
             return;
         }
-
-        l.error("A local player has finished programming. Not yet implemented.");
 
     }
 
