@@ -80,9 +80,19 @@
     -fx-alignment: center-right;
 }
 
-.got-register-cards-vbox {
+#got-upgrade-cards {
     -fx-spacing: 3px;
-    -fx-alignment: center-left;
+    -fx-alignment: center-right;
+}
+
+.got-upgrade-cards-vbox {
+    -fx-spacing: 3px;
+    -fx-alignment: center-left
+}
+
+.got-upgrade-cards-hbox{
+    -fx-spacing: 3px;
+    -fx-alignment: center-left
 }
 
 #player-container {

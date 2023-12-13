@@ -134,38 +134,44 @@
                         </VBox>
                     </children>
                 </HBox>
-                    <HBox
-                            id="got-upgrade-cards-hbox" stylesheets="@game.css"
+                <HBox
+                            styleClass="got-upgrade-cards" stylesheets="@game.css"
                         >
                             <children>
                                 <VBox
-                                        styleClass="got-register-cards-vbox" stylesheets="@game.css"
-                                >
+                                      styleClass="got-upgrade-cards-vbox" stylesheets="@game.css"
+                                      >
                                     <children>
-                                        <AnchorPane
-                                                fx:id="gotTemporaryUpgradeCardSlot1"
-                                        />
-                                        <AnchorPane
-                                                fx:id="gotTemporaryUpgradeCardSlot2"
-                                        />
-                                        <AnchorPane
-                                                fx:id="gotTemporaryUpgradeCardSlot3"
-                                        />
-                                    </children>
-                                </VBox>
-                                <VBox
-                                        styleClass="got-register-cards-vbox" stylesheets="@game.css"
-                                >
-                                    <children>
-                                        <AnchorPane
-                                                fx:id="gotPermanentUpgradeCardSlot1"
-                                        />
-                                        <AnchorPane
-                                                fx:id="gotPermanentUpgradeCardSlot2"
-                                        />
-                                        <AnchorPane
-                                                fx:id="gotPermanentUpgradeCardSlot3"
-                                        />
+                                        <HBox
+                                                styleClass="got-upgrade-cards-hbox" stylesheets="@game.css"
+                                        >
+                                            <children>
+                                                <AnchorPane
+                                                        fx:id="gotTemporaryUpgradeCardSlot1"
+                                                />
+                                                <AnchorPane
+                                                        fx:id="gotTemporaryUpgradeCardSlot2"
+                                                />
+                                                <AnchorPane
+                                                        fx:id="gotTemporaryUpgradeCardSlot3"
+                                                />
+                                            </children>
+                                        </HBox>
+                                        <HBox
+                                                styleClass="got-upgrade-cards-hbox" stylesheets="@game.css"
+                                        >
+                                            <children>
+                                                <AnchorPane
+                                                        fx:id="gotPermanentUpgradeCardSlot1"
+                                                />
+                                                <AnchorPane
+                                                        fx:id="gotPermanentUpgradeCardSlot2"
+                                                />
+                                                <AnchorPane
+                                                        fx:id="gotPermanentUpgradeCardSlot3"
+                                                />
+                                            </children>
+                                        </HBox>
                                     </children>
                                 </VBox>
                             </children>

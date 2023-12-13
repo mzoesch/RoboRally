@@ -70,8 +70,8 @@ public class GameJFXController
     @FXML private AnchorPane gotTemporaryUpgradeCardSlot2;
     @FXML private AnchorPane gotTemporaryUpgradeCardSlot3;
     @FXML private AnchorPane gotPermanentUpgradeCardSlot1;
-    @FXML private AnchorPane getPermanentUpgradeCardSlot2;
-    @FXML private AnchorPane getGotPermanentUpgradeCardSlot3;
+    @FXML private AnchorPane gotPermanentUpgradeCardSlot2;
+    @FXML private AnchorPane gotPermanentUpgradeCardSlot3;
 
     private VBox chatContainer;
     private boolean showServerInfo = true;
@@ -1320,65 +1320,6 @@ public class GameJFXController
         return;
     }
 
-    private void renderShopSlot(int idx, String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName, idx);
-
-        switch (idx)
-        {
-            case 0:
-                this.shopSlot1.getChildren().clear();
-                this.shopSlot1.getChildren().add(iv);
-                this.shopSlot1.getStyleClass().clear();
-                this.shopSlot1.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 1:
-                this.shopSlot2.getChildren().clear();
-                this.shopSlot2.getChildren().add(iv);
-                this.shopSlot2.getStyleClass().clear();
-                this.shopSlot2.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 2:
-                this.shopSlot3.getChildren().clear();
-                this.shopSlot3.getChildren().add(iv);
-                this.shopSlot3.getStyleClass().clear();
-                this.shopSlot3.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 3:
-                this.shopSlot4.getChildren().clear();
-                this.shopSlot4.getChildren().add(iv);
-                this.shopSlot4.getStyleClass().clear();
-                this.shopSlot4.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 4:
-                this.shopSlot5.getChildren().clear();
-                this.shopSlot5.getChildren().add(iv);
-                this.shopSlot5.getStyleClass().clear();
-                this.shopSlot5.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-        }
-
-        return;
-    }
     /**
      * @param idx       Index of the got register slot.
      * @param cardName  Name of the card to render. Pass null to render an empty slot.
@@ -1555,6 +1496,143 @@ public class GameJFXController
         return;
     }
 
+    private void renderGotTemporaryUpgradeCardSlot(final int idx, final String cardName)
+    {
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName, idx);
+
+        switch (idx) {
+            case 0:
+                this.gotTemporaryUpgradeCardSlot1.getChildren().clear();
+                this.gotTemporaryUpgradeCardSlot1.getChildren().add(iv);
+                this.gotTemporaryUpgradeCardSlot1.getStyleClass().clear();
+                this.gotTemporaryUpgradeCardSlot1.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 1:
+                this.gotTemporaryUpgradeCardSlot2.getChildren().clear();
+                this.gotTemporaryUpgradeCardSlot2.getChildren().add(iv);
+                this.gotTemporaryUpgradeCardSlot2.getStyleClass().clear();
+                this.gotTemporaryUpgradeCardSlot2.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 2:
+                this.gotTemporaryUpgradeCardSlot3.getChildren().clear();
+                this.gotTemporaryUpgradeCardSlot3.getChildren().add(iv);
+                this.gotTemporaryUpgradeCardSlot3.getStyleClass().clear();
+                this.gotTemporaryUpgradeCardSlot3.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+        }
+        return;
+    }
+
+    private void renderGotPermanentUpgradeCardSlot(final int idx, final String cardName)
+    {
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName, idx);
+
+        switch (idx) {
+            case 0:
+                this.gotPermanentUpgradeCardSlot1.getChildren().clear();
+                this.gotPermanentUpgradeCardSlot1.getChildren().add(iv);
+                this.gotPermanentUpgradeCardSlot1.getStyleClass().clear();
+                this.gotPermanentUpgradeCardSlot1.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 1:
+                this.gotPermanentUpgradeCardSlot2.getChildren().clear();
+                this.gotPermanentUpgradeCardSlot2.getChildren().add(iv);
+                this.gotPermanentUpgradeCardSlot2.getStyleClass().clear();
+                this.gotPermanentUpgradeCardSlot2.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 2:
+                this.gotPermanentUpgradeCardSlot3.getChildren().clear();
+                this.gotPermanentUpgradeCardSlot3.getChildren().add(iv);
+                this.gotPermanentUpgradeCardSlot3.getStyleClass().clear();
+                this.gotPermanentUpgradeCardSlot3.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+        }
+        return;
+    }
+
+
+    private void renderShopSlot(int idx, String cardName)
+    {
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName, idx);
+
+        switch (idx)
+        {
+            case 0:
+                this.shopSlot1.getChildren().clear();
+                this.shopSlot1.getChildren().add(iv);
+                this.shopSlot1.getStyleClass().clear();
+                this.shopSlot1.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 1:
+                this.shopSlot2.getChildren().clear();
+                this.shopSlot2.getChildren().add(iv);
+                this.shopSlot2.getStyleClass().clear();
+                this.shopSlot2.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 2:
+                this.shopSlot3.getChildren().clear();
+                this.shopSlot3.getChildren().add(iv);
+                this.shopSlot3.getStyleClass().clear();
+                this.shopSlot3.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 3:
+                this.shopSlot4.getChildren().clear();
+                this.shopSlot4.getChildren().add(iv);
+                this.shopSlot4.getStyleClass().clear();
+                this.shopSlot4.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+
+            case 4:
+                this.shopSlot5.getChildren().clear();
+                this.shopSlot5.getChildren().add(iv);
+                this.shopSlot5.getStyleClass().clear();
+                this.shopSlot5.getStyleClass()
+                        .add(
+                                "register-slot-disabled"
+                        );
+                break;
+        }
+
+        return;
+    }
+
     /**
      * Updates the register slots.
      * No re-renders must be done after this method.
@@ -1598,6 +1676,22 @@ public class GameJFXController
 
     }
 
+    private void renderGotUpgradeCardSlots(){
+       renderGotPermanentUpgradeCardSlots();
+       renderGotTemporaryUpgradeCardSlots();
+    }
+
+    private void renderGotPermanentUpgradeCardSlots(){
+        this.renderGotPermanentUpgradeCardSlot(0, null);
+        this.renderGotPermanentUpgradeCardSlot(1, null);
+        this.renderGotPermanentUpgradeCardSlot(2, null);
+    }
+    private void renderGotTemporaryUpgradeCardSlots(){
+        this.renderGotTemporaryUpgradeCardSlot(0, null);
+        this.renderGotTemporaryUpgradeCardSlot(1, null);
+        this.renderGotTemporaryUpgradeCardSlot(2, null);
+    }
+
     // endregion HUD Footer
 
     /**
@@ -1621,7 +1715,7 @@ public class GameJFXController
         this.renderRegisterSlots();
         this.renderGotRegisterCardSlots();
         this.renderShopSlots();
-
+        this.renderGotUpgradeCardSlots();
         return;
     }
 
