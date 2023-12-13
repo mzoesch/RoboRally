@@ -16,6 +16,7 @@ public class Robot {
     private final Course course;
     private Tile startingPoint;
 
+    /* TODO WE MUST REMOVE THIS ASAP. THIS CAUSES SO MANY PROBLEMS!!!! */
     /** @deprecated Make to gateway method */
     private Tile currentTile;
 
