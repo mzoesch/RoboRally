@@ -75,6 +75,16 @@
     -fx-alignment: center-left;
 }
 
+#ui-footer-shop-slots {
+    -fx-spacing: 12px;
+    -fx-alignment: center-right;
+}
+
+.got-register-cards-vbox {
+    -fx-spacing: 3px;
+    -fx-alignment: center-left;
+}
+
 #player-container {
     -fx-spacing: 6px;
 }

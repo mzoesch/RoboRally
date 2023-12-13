@@ -61,8 +61,8 @@
             fx:id="uiFooter"
             AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
         >
-            <children>
-                <HBox
+        <children>
+            <HBox
                     id="ui-footer-register-slots" stylesheets="@game.css"
                 >
                     <children>
@@ -134,6 +134,63 @@
                         </VBox>
                     </children>
                 </HBox>
+                    <HBox
+                            id="got-upgrade-cards-hbox" stylesheets="@game.css"
+                        >
+                            <children>
+                                <VBox
+                                        styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                                >
+                                    <children>
+                                        <AnchorPane
+                                                fx:id="gotTemporaryUpgradeCardSlot1"
+                                        />
+                                        <AnchorPane
+                                                fx:id="gotTemporaryUpgradeCardSlot2"
+                                        />
+                                        <AnchorPane
+                                                fx:id="gotTemporaryUpgradeCardSlot3"
+                                        />
+                                    </children>
+                                </VBox>
+                                <VBox
+                                        styleClass="got-register-cards-vbox" stylesheets="@game.css"
+                                >
+                                    <children>
+                                        <AnchorPane
+                                                fx:id="gotPermanentUpgradeCardSlot1"
+                                        />
+                                        <AnchorPane
+                                                fx:id="gotPermanentUpgradeCardSlot2"
+                                        />
+                                        <AnchorPane
+                                                fx:id="gotPermanentUpgradeCardSlot3"
+                                        />
+                                    </children>
+                                </VBox>
+                            </children>
+                    </HBox>
+                    <HBox
+                            id="ui-footer-shop-slots" stylesheets="@game.css"
+                        >
+                            <children>
+                                <AnchorPane
+                                        fx:id="shopSlot1"
+                                />
+                                <AnchorPane
+                                        fx:id="shopSlot2"
+                                />
+                                <AnchorPane
+                                        fx:id="shopSlot3"
+                                />
+                                <AnchorPane
+                                        fx:id="shopSlot4"
+                                />
+                                <AnchorPane
+                                        fx:id="shopSlot5"
+                                />
+                            </children>
+                        </HBox>
             </children>
         </HBox>
         <VBox
