@@ -1,6 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.RDefaultServerRequestParser;
+import sep.view.lib.EShopState;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
 
@@ -45,6 +46,9 @@ public enum EGameState
 
     private final String[] registers;
     private final ArrayList<String> gotRegisters;
+
+    public static final String[] SHOP_STATES = new String[] {"Upgrade", "Damage", "Reboot"};
+    private EShopState shopState;
     private ArrayList<String> temporayUpgradeCards;
     private ArrayList<String> permanentUpgradeCards;
     private String[] shopSlots;
@@ -55,6 +59,7 @@ public enum EGameState
     private EGameState()
     {
         this.currentPhase = EGamePhase.INVALID;
+        this.shopState = EShopState.DEACTIVATED;
 
         this.remotePlayers = new ArrayList<RemotePlayer>();
         this.currentPlayer = null;
@@ -522,7 +527,7 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.temporayUpgradeCards.size())
         {
-            l.debug("Tried getting temporaryUpgradeCard from an emptySlot");
+            //l.debug("Tried getting temporaryUpgradeCard from an emptySlot");
             return null;
         }
 
@@ -533,7 +538,7 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.permanentUpgradeCards.size())
         {
-            l.debug("Tried getting permanentUpgradeCard from an emptySlot");
+            //l.debug("Tried getting permanentUpgradeCard from an emptySlot");
             return null;
         }
 
@@ -606,6 +611,9 @@ public enum EGameState
         this.shopActive = shopActive;
     }
 
+    public void setShopState(EShopState state){
+        this.shopState = state;
+    }
     // endregion Getters and Setters
 
 }
