@@ -46,8 +46,8 @@ public class GameStartedModel extends AModel
         body.put("gameMap", arrayListX);
         courseJson.put("messageType", "GameStarted");
         courseJson.put("messageBody", body);
-        l.debug("built JSON for Course");
-        l.debug(courseJson);
+        l.debug("Game mode successfully finished building the course.");
+        l.trace(courseJson);
         return courseJson;
     }
 }
