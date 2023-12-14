@@ -194,7 +194,7 @@ public final class Session
 
                 if (ow instanceof final PlayerController pc)
                 {
-                    /* An Agent is always ready. */
+                    /* An Agent is always ready. So we do not need to send any information about him. */
                     new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
                     continue;
                 }
