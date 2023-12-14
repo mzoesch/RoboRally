@@ -298,10 +298,10 @@ public class GameMode {
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                        Coordinate newCoordinate = null;
-
-                        for(int i = 0; i<speed; i++) {
-                            newCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                        Coordinate newCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                        curvedArrowCheck(player, newCoordinate);
+                        if(speed>1) {
+                            newCoordinate = calculateNewCoordinate(outDirection, newCoordinate);
                             curvedArrowCheck(player, newCoordinate);
                         }
 
