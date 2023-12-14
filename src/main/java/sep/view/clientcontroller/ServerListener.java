@@ -1,6 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.RDefaultServerRequestParser;
+import sep.view.lib.EShopState;
 import sep.view.viewcontroller.SceneController;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
@@ -408,7 +409,20 @@ public class ServerListener implements Runnable
     private boolean onPlayerReboot() throws JSONException
     {
         l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
-        ViewSupervisor.handleChatInfo(String.format("Player %s was rebooted.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        if(dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()){
+            ViewSupervisor.handleChatInfo(String.format("You were rebooted. Choose your RebootDirection in the Shop Section"));
+            //TODO hier fehlt noch Bearbeitung, wenn Shop schon aktiviert ist
+            EGameState.INSTANCE.setShopState(EShopState.REBOOT);
+            EGameState.INSTANCE.addShopSlot(0, "top");
+            EGameState.INSTANCE.addShopSlot(1, "right");
+            EGameState.INSTANCE.addShopSlot(2, "bottom");
+            EGameState.INSTANCE.addShopSlot(3, "left");
+            ViewSupervisor.updateFooter();
+            l.debug("Updated Shop for RebootDirection");
+        }else {
+            l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
+            ViewSupervisor.handleChatInfo(String.format("Player %s was rebooted.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+        }
         return true;
     }
 
