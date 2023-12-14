@@ -194,7 +194,7 @@ public final class Session
 
                 if (ow instanceof final PlayerController pc)
                 {
-                    /* An Agent is always ready. */
+                    /* An Agent is always ready. So we do not need to send any information about him. */
                     new PlayerStatusModel(newPC.getClientInstance(), pc.getPlayerID(), pc.isReady()).send();
                     continue;
                 }
@@ -219,6 +219,15 @@ public final class Session
         }
 
         this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s joined the session.", newCtrl.getName()));
+
+        /* If an agent joined all remote player's ready status will be reset. */
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            pc.setReady(false);
+            this.broadcastPlayerLobbyReadyStatus(pc);
+            continue;
+        }
+        this.readyCharacterOrder.clear();
 
         return;
     }
@@ -663,15 +672,15 @@ public final class Session
 
     private boolean isReadyToStartGame()
     {
-        // WARNING Do NOT replace with .isEmpty() because this var can change as described in the protocol!
-        //         But because this is not implemented yet, we get this warning.
-        if (this.getRemotePlayers().size() < GameState.MIN_REMOTE_PLAYER_COUNT_TO_START)
+        if (this.getRemotePlayers().size() < this.gameState.getMinRemotePlayersToStart())
         {
+            l.debug("The server is awaiting more remote controllers to join before considering starting the game.");
             return false;
         }
 
-        if (this.ctrls.size() < GameState.MIN_PLAYER_COUNT_TO_START)
+        if (this.ctrls.size() < GameState.MIN_CONTROLLERS_ALLOWED)
         {
+            l.debug("The server is awaiting more controllers to join before considering starting the game.");
             return false;
         }
 
@@ -691,6 +700,8 @@ public final class Session
             this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("All players are ready. The server is awaiting %s to select a course.", this.readyCharacterOrder.get(0).getName()));
             return false;
         }
+
+        l.debug("All controllers are ready and the session decided that the game may start now.");
 
         return true;
     }

@@ -1745,7 +1745,8 @@ public class GameJFXController
             VBox v = new VBox(figureName, playerName, energyCubes);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
-            if(EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING)){
+            if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
+            {
                 v.getStyleClass().add(String.format("player-box-%s", rp.hasSelectionFinished() ? "selected" : "inSelection"));
             }
             v.getStyleClass().add("player-box");
@@ -1812,8 +1813,8 @@ public class GameJFXController
 
     private void setStyleOfCourseViewContent()
     {
-        double viewWidth = this.files * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL;
-        double viewHeight = this.ranks * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_VERTICAL;
+        final double viewWidth = this.files * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL;
+        final double viewHeight = this.ranks * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_VERTICAL;
         this.courseScrollPaneContent.setStyle(String.format("-fx-background-color: #000000ff; -fx-min-width: %spx; -fx-min-height: %spx;", (int) viewWidth, (int) viewHeight));
 
         return;
@@ -1850,7 +1851,7 @@ public class GameJFXController
 
         if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
         {
-            l.warn("No course data available.");
+            l.error("Tried to render game scene but no course data is available.");
             return;
         }
 
