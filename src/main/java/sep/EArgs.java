@@ -16,6 +16,8 @@ public enum EArgs
     public static final EPort PREF_SERVER_PORT = EPort.DEFAULT;
     private String customServerIP;
     private int customServerPort;
+    public static final int DEFAULT_MIN_REMOTE_PLAYERS = -1;
+    private int customMinRemotePlayers;
 
     private int mode;
 
@@ -24,6 +26,7 @@ public enum EArgs
         this.mode = EArgs.DEFAULT;
         this.customServerIP = "";
         this.customServerPort = EPort.INVALID.i;
+        this.customMinRemotePlayers = EArgs.DEFAULT_MIN_REMOTE_PLAYERS;
         return;
     }
 
@@ -32,7 +35,7 @@ public enum EArgs
         return EArgs.INSTANCE.mode;
     }
 
-    public static void setMode(int mode) throws IllegalArgumentException
+    public static void setMode(final int mode) throws IllegalArgumentException
     {
         if (mode < EArgs.DEFAULT || mode > EArgs.EXIT)
         {
@@ -59,10 +62,20 @@ public enum EArgs
         return EArgs.INSTANCE.customServerPort;
     }
 
-    public static void setCustomServerPort(int customServerPort)
+    public static void setCustomServerPort(final int customServerPort)
     {
         EArgs.INSTANCE.customServerPort = customServerPort;
         return;
     }
 
+    public static int getCustomMinRemotePlayers()
+    {
+        return EArgs.INSTANCE.customMinRemotePlayers;
+    }
+
+    public static void setCustomMinRemotePlayers(final int min)
+    {
+        EArgs.INSTANCE.customMinRemotePlayers = min;
+        return;
+    }
 }
