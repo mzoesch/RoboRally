@@ -47,6 +47,21 @@
                     styleClass="text-field-port" stylesheets="@server-config.css"
                 />
             </HBox>
+            <HBox
+                styleClass="min-remote-players-container" stylesheets="@server-config.css"
+            >
+                <Label
+                    text="Min Remote Players: "
+                    styleClass="text-xl"
+                />
+                <TextField
+                    fx:id="minRemotePlayersTextField"
+                    styleClass="text-field-min-remote-players" stylesheets="@server-config.css"
+                />
+            </HBox>
+            <HBox
+                styleClass="h-spacer" stylesheets="@server-config.css"
+            />
             <Button
                     text="START SERVER"
                     styleClass="secondary-btn" style="-fx-min-width: 300px;"

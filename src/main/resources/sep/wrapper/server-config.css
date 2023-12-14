@@ -1,8 +1,25 @@
+#config-container {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-max-width: 400px;
+    -fx-max-height: 450px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #000000ff;
+    -fx-background-color: #ffffff0c;
+}
+
 .server-address-container {
     -fx-spacing: 8px;
     -fx-alignment: center;
 }
 
+.min-remote-players-container {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+.text-field-min-remote-players,
 .text-field-port,
 .text-field-host,
 .text-field {
@@ -17,8 +34,7 @@
     -fx-pref-width: 200px;
 }
 
-.text-field-port
-{
+.text-field-port  {
     -fx-min-width: 75px;
     -fx-max-width: 75px;
 }
@@ -26,6 +42,11 @@
 .text-field-host {
     -fx-min-width: 200px;
     -fx-max-width: 200px;
+}
+
+.text-field-min-remote-players {
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
 }
 
 #temp-text-field {
@@ -36,4 +57,9 @@
     -fx-border-color: -std-background-color;
     -fx-max-width: 0px;
     -fx-max-height: 0px;
+}
+
+.h-spacer {
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
 }
