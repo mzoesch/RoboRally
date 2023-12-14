@@ -84,9 +84,9 @@ public final class Launcher
                     {
                         min = Integer.parseInt(args[i + 1]);
                     }
-                    catch (NumberFormatException e)
+                    catch (final NumberFormatException e)
                     {
-                        l.fatal("Invalid port number.");
+                        l.fatal("Invalid min remote player count.");
                         l.fatal(e.getMessage());
                         l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                         System.exit(EArgs.ERR);
