@@ -297,9 +297,9 @@ public enum EGameState
         return this.currentPhase;
     }
 
-    public void setCurrentPhase(EGamePhase currentPhase)
+    public void setCurrentPhase(final EGamePhase phase)
     {
-        if (this.currentPhase == currentPhase)
+        if (this.currentPhase == phase)
         {
             l.warn("Tried to set the current phase to the same phase as before. Ignoring.");
             return;
@@ -315,7 +315,7 @@ public enum EGameState
             ViewSupervisor.updateCourseView();
         }
 
-        this.currentPhase = currentPhase;
+        this.currentPhase = phase;
         this.currentPlayer = null;
         if (this.currentPhase != EGamePhase.PROGRAMMING && this.currentPhase != EGamePhase.ACTIVATION)
         {
