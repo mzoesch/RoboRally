@@ -61,7 +61,48 @@ public class TileModifier
 
         if (Objects.equals(this.tile.getString("type"), "ConveyorBelt"))
         {
-            if (this.getOrientationsCount() == 2)
+            if (this.getOrientationsCount() == 2 && isConveyorBeltCurved()){
+                if(isConveyorBeltCurvedLeft()) {
+                    switch (this.tile.getJSONArray("orientations").getString(0)) {
+                        case "top":
+                            iv.setRotate(90);
+                            break;
+                        case "right":
+                            iv.setRotate(180);
+                            break;
+                        case "bottom":
+                            iv.setRotate(270);
+                            break;
+                        case "left":
+                            iv.setRotate(0);
+                            break;
+
+                        default:
+                            l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
+                            break;
+                    }
+                } else{
+                    switch (this.tile.getJSONArray("orientations").getString(0)) {
+                        case "top":
+                            iv.setRotate(270);
+                            break;
+                        case "right":
+                            iv.setRotate(0);
+                            break;
+                        case "bottom":
+                            iv.setRotate(90);
+                            break;
+                        case "left":
+                            iv.setRotate(180);
+                            break;
+
+                        default:
+                            l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
+                            break;
+                    }
+                }
+            }
+            else if (this.getOrientationsCount() == 2)
             {
                 switch (this.tile.getJSONArray("orientations").getString(0))
                 {
@@ -265,9 +306,16 @@ public class TileModifier
 
         if (Objects.equals(this.tile.getString("type"), "ConveyorBelt"))
         {
-            if (this.getOrientationsCount() == 2)
-            {
-                return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenStraight" : "ConveyorBeltBlueStraight");
+            if (this.getOrientationsCount() == 2) {
+                if (this.isConveyorBeltCurved()) {
+                    if (this.isConveyorBeltCurvedLeft())
+                        return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenCurvedLeft" : "ConveyorBeltBlueCurvedLeft");
+                    else{
+                        return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenCurvedRight" : "ConveyorBeltBlueCurvedRight");
+                    }
+                } else {
+                    return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenStraight" : "ConveyorBeltBlueStraight");
+                }
             }
 
             if (this.getOrientationsCount() == 3)
@@ -423,6 +471,88 @@ public class TileModifier
         {
            l.fatal(this.tile.toString(4));
             throw new RuntimeException(e);
+        }
+    }
+
+    private boolean isConveyorBeltCurved(){
+        int in = 0;
+        int out = 0;
+        switch(this.getOrientations().getString(0)){
+            case "top":
+                out = 0;
+                break;
+            case "right":
+                out = 90;
+                break;
+            case "bottom":
+                out = 180;
+                break;
+            case "left":
+                out = 270;
+                break;
+        }
+        switch(this.getOrientations().getString(1)){
+            case "top":
+                in = 0;
+                break;
+            case "right":
+                in = 90;
+                break;
+            case "bottom":
+                in = 180;
+                break;
+            case "left":
+                in = 270;
+                break;
+        }
+        int diff = (out-in);
+        l.debug(" test " + out + " , " + in + " , " + (diff % 180 != 0));
+        return diff % 180 != 0;
+    }
+
+    public boolean isConveyorBeltCurvedLeft(){
+        try {
+            int in = 0;
+            int out = 0;
+            switch (this.getOrientations().getString(0)) {
+                case "top":
+                    out = 0;
+                    break;
+                case "right":
+                    out = 90;
+                    break;
+                case "bottom":
+                    out = 180;
+                    break;
+                case "left":
+                    out = 270;
+                    break;
+            }
+            switch (this.getOrientations().getString(1)) {
+                case "top":
+                    in = 0;
+                    break;
+                case "right":
+                    in = 90;
+                    break;
+                case "bottom":
+                    in = 180;
+                    break;
+                case "left":
+                    in = 270;
+                    break;
+            }
+            int diff = (out - in);
+            if ((270 > diff) && ((diff > 0)) || diff == -270) {
+                l.debug(diff + " true");
+                return true;
+            }
+            l.debug(diff + " false");
+            return false;
+        }
+        catch(Exception e){
+            l.debug("Fehler");
+            return false;
         }
     }
 
