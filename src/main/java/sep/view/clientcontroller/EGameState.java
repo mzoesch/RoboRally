@@ -322,10 +322,22 @@ public enum EGameState
             this.clearAllRegisters();
             ViewSupervisor.updateFooter();
         }
-        if(this.currentPhase == EGamePhase.ACTIVATION){
+        if (this.currentPhase == EGamePhase.ACTIVATION)
+        {
+            this.resetPlayersForActivation();
             this.currentRegister = 1;
         }
         ViewSupervisor.updatePhase();
+        return;
+    }
+
+    private void resetPlayersForActivation()
+    {
+        for (RemotePlayer rp : this.remotePlayers)
+        {
+            rp.setSelectionFinished(false);
+        }
+
         return;
     }
 
