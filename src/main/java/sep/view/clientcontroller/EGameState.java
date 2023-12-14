@@ -540,6 +540,14 @@ public enum EGameState
         return this.permanentUpgradeCards.get(idx);
     }
 
+    public String getShopSlot(int idx){
+        if(idx < 0 || idx > shopSlots.length){
+            l.debug("Tried getting content of shopSlot outside of range of Slots");
+            return null;
+        }
+        return this.shopSlots[idx];
+    }
+
     public void addTemporaryUpgradeCards(String temporaryUpgradeCard)
     {
         if (this.temporayUpgradeCards.size() >= 3)
