@@ -4,6 +4,7 @@ import sep.view.json.RDefaultServerRequestParser;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
@@ -44,9 +45,9 @@ public enum EGameState
 
     private final String[] registers;
     private final ArrayList<String> gotRegisters;
-    private String[] temporayUpgradeCards;
-    private String[] permanentUpgradeCards;
-    private ArrayList<String> shopSlots;
+    private ArrayList<String> temporayUpgradeCards;
+    private ArrayList<String> permanentUpgradeCards;
+    private String[] shopSlots;
     private RemotePlayer winningPlayer;
 
     private EGameState()
@@ -64,9 +65,9 @@ public enum EGameState
         this.gotRegisters = new ArrayList<String>();
         this.winningPlayer = null;
 
-        this.permanentUpgradeCards = new String[3];
-        this.temporayUpgradeCards = new String[3];
-        this.shopSlots = new ArrayList<>();
+        this.permanentUpgradeCards = new ArrayList<>();
+        this.temporayUpgradeCards = new ArrayList<>();
+        this.shopSlots = new String[5];
 
         return;
     }
@@ -90,13 +91,14 @@ public enum EGameState
         EGameState.INSTANCE.gotRegisters.clear();
         EGameState.INSTANCE.winningPlayer = null;
 
-        EGameState.INSTANCE.permanentUpgradeCards[0] = null;
-        EGameState.INSTANCE.permanentUpgradeCards[1] = null;
-        EGameState.INSTANCE.permanentUpgradeCards[2] = null;
-        EGameState.INSTANCE.temporayUpgradeCards[0] = null;
-        EGameState.INSTANCE.temporayUpgradeCards[1] = null;
-        EGameState.INSTANCE.temporayUpgradeCards[2] = null;
-        EGameState.INSTANCE.shopSlots.clear();
+        EGameState.INSTANCE.permanentUpgradeCards.clear();
+        EGameState.INSTANCE.temporayUpgradeCards.clear();
+        EGameState.INSTANCE.shopSlots[0] = null;
+        EGameState.INSTANCE.shopSlots[1] = null;
+        EGameState.INSTANCE.shopSlots[2] = null;
+        EGameState.INSTANCE.shopSlots[3] = null;
+        EGameState.INSTANCE.shopSlots[4] = null;
+
         return;
     }
 
@@ -503,56 +505,74 @@ public enum EGameState
 
     public String getTemporaryUpgradeCard(int idx)
     {
-        if (idx < 0 || idx >= this.temporayUpgradeCards.length)
+        if (idx < 0 || idx >= this.temporayUpgradeCards.size())
         {
+            l.debug("Tried getting temporaryUpgradeCard from an emptySlot");
             return null;
         }
 
-        return this.temporayUpgradeCards[idx];
+        return this.temporayUpgradeCards.get(idx);
     }
 
     public String getPermanentUpgradeCard(int idx)
     {
-        if (idx < 0 || idx >= this.permanentUpgradeCards.length)
+        if (idx < 0 || idx >= this.permanentUpgradeCards.size())
         {
+            l.debug("Tried getting permanentUpgradeCard from an emptySlot");
             return null;
         }
 
-        return this.permanentUpgradeCards[idx];
+        return this.permanentUpgradeCards.get(idx);
     }
 
-    public void addTemporaryUpgradeCards(int idx, String temporaryUpgradeCard)
+    public void addTemporaryUpgradeCards(String temporaryUpgradeCard)
     {
-        if (idx < 0 || idx >= this.temporayUpgradeCards.length)
+        if (this.temporayUpgradeCards.size() >= 3)
         {
-            l.warn(String.format("Tried adding temporaryUpgradeCard in Slot %s", idx));
+            l.warn(String.format("Tried adding temporaryUpgradeCard in Slot whilst filled"));
             return;
         }
 
-        this.temporayUpgradeCards[idx] = temporaryUpgradeCard;
+        this.temporayUpgradeCards.add(temporaryUpgradeCard);
 
         return;
     }
 
-    public void addPermanentUpgradeCard(int idx, String permanentUpgradeCard)
+    public void addPermanentUpgradeCard(String permanentUpgradeCard)
     {
-        if (idx < 0 || idx >= this.permanentUpgradeCards.length)
+        if (this.permanentUpgradeCards.size() <= 3)
         {
-            l.warn(String.format("Tried adding permanentUpgradeCard in Slot %s", idx));
+            l.warn(String.format("Tried adding permanentUpgradeCard in Slot whilst filled"));
             return;
         }
 
-        this.permanentUpgradeCards[idx] = permanentUpgradeCard;
+        this.permanentUpgradeCards.add(permanentUpgradeCard);
 
         return;
     }
 
-    public void addShopSlot(String elementName){
-        if(shopSlots.size() <= 5){
-            l.warn(String.format("Tried adding %s to shop slot whilst shop slots are already filled"));
-        } else{
-            shopSlots.add(elementName);
+    public void addShopSlot(int idx, String elementName){
+        if (idx < 0 || idx >= this.shopSlots.length)
+        {
+            l.debug(String.format("Tried adding %s outside of shopSlotRange on Position %s"), elementName, idx);
+            return;
         }
+
+        if(shopSlots[idx] != null) {
+            l.debug(String.format("Tried adding %s on filled shopSlot %s"), elementName, idx);
+            return;
+        }
+        shopSlots[idx] = elementName;
+        return;
+    }
+
+    public boolean isShopFull(){
+        for(String s : shopSlots){
+            if(s == null){
+                return false;
+            }
+        }
+        return true;
     }
 
     // endregion Getters and Setters
