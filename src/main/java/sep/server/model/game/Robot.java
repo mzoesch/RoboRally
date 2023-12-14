@@ -132,7 +132,10 @@ public class Robot {
             return;
         }
 
+        this.getCurrentTile().setOccupiedBy(null);
         this.getCourse().updateRobotPosition(this, tCoordinate);
+        getCurrentTile().setOccupiedBy(this);
+
         l.debug("Player {}'s robot moved [from {} to {}].", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
     }
 

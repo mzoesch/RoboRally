@@ -51,6 +51,10 @@ public class Tile {
         return occupiedBy != null;
     }
 
+    public void setOccupiedBy(Robot occupiedBy) {
+        this.occupiedBy = occupiedBy;
+    }
+
     public boolean hasUnmovableRobot() {
         //TODO implement
         return false;
