@@ -220,6 +220,14 @@ public final class Session
 
         this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s joined the session.", newCtrl.getName()));
 
+        /* If an agent joined all remote player's ready status will be reset. */
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            pc.setReady(false);
+            this.broadcastPlayerLobbyReadyStatus(pc);
+            continue;
+        }
+
         return;
     }
 
