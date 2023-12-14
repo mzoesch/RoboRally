@@ -22,14 +22,18 @@ public final class Launcher
         throw new RuntimeException("This class cannot be instantiated.");
     }
 
+    /* TODO Help arg. */
     /**
      * This is the entry point of the server part of the application.
      * The Server Instance is created here.
      *
      * @param args Invalid arguments will be ignored. Valid program arguments are:
      *              <ul>
-     *              <li>[--port PORT] - The port number to listen on. Default is
-     *                                  {@link sep.EPort#DEFAULT EPort.DEFAULT}.
+     *              <li>[--port PORT]        - The port number to listen on. Default is
+     *                                         {@link sep.EPort#DEFAULT EPort.DEFAULT}.
+     *              <li>[--minRemotePlayers] - The minimum number of remote players required to start a game. Default is
+     *                                         {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
+     *                                         MIN_REMOTE_PLAYERS}.
      *              </ul>
      */
     public static void main(final String[] args)
@@ -43,25 +47,30 @@ public final class Launcher
                 final int i = Arrays.asList(args).indexOf("--port");
                 if (i + 1 < args.length)
                 {
+                    final int p;
                     try
                     {
-                        int p = Integer.parseInt(args[i + 1]);
-                        l.info("Detected custom port: {}.", p);
-                        EServerInformation.INSTANCE.setPort(p);
+                        p = Integer.parseInt(args[i + 1]);
                     }
-                    catch (NumberFormatException e)
+                    catch (final NumberFormatException e)
                     {
                         l.fatal("Invalid port number.");
                         l.fatal(e.getMessage());
                         l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                         System.exit(EArgs.ERR);
+                        return;
                     }
+
+                    l.info("Detected custom port: {}.", p);
+                    EServerInformation.INSTANCE.setPort(p);
                 }
                 else
                 {
                     l.fatal("Invalid port number.");
+                    l.info("Type --help for more information.");
                     l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                     System.exit(EArgs.ERR);
+                    return;
                 }
             }
 
@@ -118,11 +127,12 @@ public final class Launcher
         {
             ServerInstance.run();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.fatal("Server failed.");
             l.fatal(e.getMessage());
             System.exit(EArgs.ERR);
+            return;
         }
         finally
         {
