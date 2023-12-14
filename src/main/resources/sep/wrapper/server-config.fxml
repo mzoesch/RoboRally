@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.text.Text?>
 <BorderPane
         id="master-container" stylesheets="@globals.css"
         fx:controller="sep.wrapper.ServerConfigJFXController"
