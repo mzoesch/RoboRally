@@ -671,9 +671,7 @@ public final class Session
 
     private boolean isReadyToStartGame()
     {
-        // WARNING Do NOT replace with .isEmpty() because this var can change as described in the protocol!
-        //         But because this is not implemented yet, we get this warning.
-        if (this.getRemotePlayers().size() < GameState.MIN_REMOTE_PLAYER_COUNT_TO_START)
+        if (this.getRemotePlayers().size() < this.gameState.getMinRemotePlayersToStart())
         {
             l.debug("The server is awaiting more remote controllers to join before considering starting the game.");
             return false;
