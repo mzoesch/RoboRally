@@ -4,6 +4,7 @@ import sep.EArgs;
 import sep.EPort;
 import sep.server.model.EServerInformation;
 import sep.server.viewmodel.ServerInstance;
+import sep.server.model.game.GameState;
 
 import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
@@ -31,7 +32,7 @@ public final class Launcher
      *                                  {@link sep.EPort#DEFAULT EPort.DEFAULT}.
      *              </ul>
      */
-    public static void main(String[] args)
+    public static void main(final String[] args)
     {
         final double t0 = System.currentTimeMillis();
 
@@ -63,6 +64,48 @@ public final class Launcher
                     System.exit(EArgs.ERR);
                 }
             }
+
+            if (Arrays.asList(args).contains("--minRemotePlayers"))
+            {
+                final int i = Arrays.asList(args).indexOf("--minRemotePlayers");
+                if (i + 1 < args.length)
+                {
+                    final int min;
+                    try
+                    {
+                        min = Integer.parseInt(args[i + 1]);
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        l.fatal("Invalid port number.");
+                        l.fatal(e.getMessage());
+                        l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(EArgs.ERR);
+                        return;
+                    }
+
+                    if (min < 0 || min > GameState.MAX_CONTROLLERS_ALLOWED)
+                    {
+                        l.fatal("Invalid minimum number of remote players.");
+                        l.info("Type --help for more information.");
+                        l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(EArgs.ERR);
+                        return;
+                    }
+
+                    l.info("Detected request to change minimum required remote players: {}.", min);
+                    EServerInformation.INSTANCE.setMinRemotePlayerCountToStart(min);
+                }
+                else
+                {
+                    l.fatal("Invalid minimum number of remote players.");
+                    l.info("Type --help for more information.");
+                    l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(EArgs.ERR);
+                    return;
+                }
+            }
+
         }
 
         if (EServerInformation.INSTANCE.getPort() == EPort.INVALID.i)
