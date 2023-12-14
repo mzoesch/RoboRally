@@ -24,7 +24,7 @@
     </top>
     <center>
         <VBox
-                style="-fx-spacing: 16px; -fx-alignment: center; -fx-max-width: 400px; -fx-max-height: 300px; -fx-border-radius: 5px; -fx-background-radius: 5px;-fx-border-color: #000000ff; -fx-background-color: #ffffff0c;"
+            id="config-container" stylesheets="@server-config.css"
         >
             <Label
                 text="Server Address"
@@ -63,14 +63,14 @@
                 styleClass="h-spacer" stylesheets="@server-config.css"
             />
             <Button
-                    text="START SERVER"
-                    styleClass="secondary-btn" style="-fx-min-width: 300px;"
-                    onAction="#onStartServerBtn"
+                text="START SERVER"
+                styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                onAction="#onStartServerBtn"
             />
             <Button
-                    text="CANCEL"
-                    styleClass="danger-btn" style="-fx-min-width: 300px;"
-                        onAction="#onCancelBtn"
+                text="CANCEL"
+                styleClass="danger-btn" style="-fx-min-width: 300px;"
+                onAction="#onCancelBtn"
             />
         </VBox>
     </center>
