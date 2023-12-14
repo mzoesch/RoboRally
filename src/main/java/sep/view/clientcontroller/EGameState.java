@@ -44,6 +44,9 @@ public enum EGameState
 
     private final String[] registers;
     private final ArrayList<String> gotRegisters;
+    private String[] temporayUpgradeCards;
+    private String[] permanentUpgradeCards;
+    private ArrayList<String> shopSlots;
     private RemotePlayer winningPlayer;
 
     private EGameState()
@@ -60,6 +63,10 @@ public enum EGameState
         this.registers = new String[5];
         this.gotRegisters = new ArrayList<String>();
         this.winningPlayer = null;
+
+        this.permanentUpgradeCards = new String[3];
+        this.temporayUpgradeCards = new String[3];
+        this.shopSlots = new ArrayList<>();
 
         return;
     }
@@ -83,6 +90,13 @@ public enum EGameState
         EGameState.INSTANCE.gotRegisters.clear();
         EGameState.INSTANCE.winningPlayer = null;
 
+        EGameState.INSTANCE.permanentUpgradeCards[0] = null;
+        EGameState.INSTANCE.permanentUpgradeCards[1] = null;
+        EGameState.INSTANCE.permanentUpgradeCards[2] = null;
+        EGameState.INSTANCE.temporayUpgradeCards[0] = null;
+        EGameState.INSTANCE.temporayUpgradeCards[1] = null;
+        EGameState.INSTANCE.temporayUpgradeCards[2] = null;
+        EGameState.INSTANCE.shopSlots.clear();
         return;
     }
 
