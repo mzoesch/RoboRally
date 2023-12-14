@@ -501,6 +501,60 @@ public enum EGameState
         this.currentRegister = currentRegister;
     }
 
+    public String getTemporaryUpgradeCard(int idx)
+    {
+        if (idx < 0 || idx >= this.temporayUpgradeCards.length)
+        {
+            return null;
+        }
+
+        return this.temporayUpgradeCards[idx];
+    }
+
+    public String getPermanentUpgradeCard(int idx)
+    {
+        if (idx < 0 || idx >= this.permanentUpgradeCards.length)
+        {
+            return null;
+        }
+
+        return this.permanentUpgradeCards[idx];
+    }
+
+    public void addTemporaryUpgradeCards(int idx, String temporaryUpgradeCard)
+    {
+        if (idx < 0 || idx >= this.temporayUpgradeCards.length)
+        {
+            l.warn(String.format("Tried adding temporaryUpgradeCard in Slot %s", idx));
+            return;
+        }
+
+        this.temporayUpgradeCards[idx] = temporaryUpgradeCard;
+
+        return;
+    }
+
+    public void addPermanentUpgradeCard(int idx, String permanentUpgradeCard)
+    {
+        if (idx < 0 || idx >= this.permanentUpgradeCards.length)
+        {
+            l.warn(String.format("Tried adding permanentUpgradeCard in Slot %s", idx));
+            return;
+        }
+
+        this.permanentUpgradeCards[idx] = permanentUpgradeCard;
+
+        return;
+    }
+
+    public void addShopSlot(String elementName){
+        if(shopSlots.size() <= 5){
+            l.warn(String.format("Tried adding %s to shop slot whilst shop slots are already filled"));
+        } else{
+            shopSlots.add(elementName);
+        }
+    }
+
     // endregion Getters and Setters
 
 }
