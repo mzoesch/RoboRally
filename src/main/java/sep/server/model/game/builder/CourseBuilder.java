@@ -1552,7 +1552,7 @@ public class CourseBuilder {
 
         // (1,1)
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new PushPanel("bottom",new int[] {} ));
+        fieldtypes.add(new PushPanel("bottom",new int[] {1,3,5}));
         arrayListY.add(new Tile("2A",new Coordinate(1,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1588,7 +1588,7 @@ public class CourseBuilder {
 
         // (1,8)
         fieldtypes.add(new Wall(new String[] {"left"}));
-        fieldtypes.add(new PushPanel("right", new int[] {}));
+        fieldtypes.add(new PushPanel("right", new int[] {1,3,5}));
         arrayListY.add(new Tile("2A",new Coordinate(1,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1612,7 +1612,7 @@ public class CourseBuilder {
 
         // (2,2)
         fieldtypes.add(new Wall(new String[] {"left"}));
-        fieldtypes.add(new PushPanel("right", new int[] {}));
+        fieldtypes.add(new PushPanel("right", new int[] {2,4}));
         arrayListY.add(new Tile("2A",new Coordinate(2,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1638,7 +1638,7 @@ public class CourseBuilder {
 
         // (2,7)
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new PushPanel("top", new int[] {}));
+        fieldtypes.add(new PushPanel("top", new int[] {2,4}));
         arrayListY.add(new Tile("2A",new Coordinate(2,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1682,7 +1682,7 @@ public class CourseBuilder {
 
         // (3,5)
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new PushPanel("top", new int[] {}));
+        fieldtypes.add(new PushPanel("top", new int[] {1,3,5}));
         arrayListY.add(new Tile("2A",new Coordinate(3,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1726,7 +1726,7 @@ public class CourseBuilder {
 
         // (4,3)
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new PushPanel("top", new int[] {}));
+        fieldtypes.add(new PushPanel("top", new int[] {2,4}));
         arrayListY.add(new Tile("2A",new Coordinate(4,3), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1737,7 +1737,7 @@ public class CourseBuilder {
 
         // (4,5)
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new PushPanel("bottom", new int[] {}));
+        fieldtypes.add(new PushPanel("bottom", new int[] {2,4}));
         arrayListY.add(new Tile("2A",new Coordinate(4,5), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1839,7 +1839,7 @@ public class CourseBuilder {
 
         // (6,4)
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new PushPanel("bottom", new int[] {}));
+        fieldtypes.add(new PushPanel("bottom", new int[] {1,3,5}));
         arrayListY.add(new Tile("2A",new Coordinate(6,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1883,7 +1883,7 @@ public class CourseBuilder {
 
         // (7,2)
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new PushPanel("bottom", new int[] {}));
+        fieldtypes.add(new PushPanel("bottom", new int[] {2,4}));
         arrayListY.add(new Tile("2A",new Coordinate(7,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1909,7 +1909,7 @@ public class CourseBuilder {
 
         // (7,7)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new PushPanel("left", new int[] {}));
+        fieldtypes.add(new PushPanel("left", new int[] {2,4}));
         arrayListY.add(new Tile("2A",new Coordinate(7,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1933,7 +1933,7 @@ public class CourseBuilder {
 
         // (8,1)
         fieldtypes.add(new Wall(new String[] {"right"}));
-        fieldtypes.add(new PushPanel("left", new int[] {}));
+        fieldtypes.add(new PushPanel("left", new int[] {1,3,5}));
         arrayListY.add(new Tile("2A",new Coordinate(8,1), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1969,7 +1969,7 @@ public class CourseBuilder {
 
         // (8,8)
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new PushPanel("top", new int[] {}));
+        fieldtypes.add(new PushPanel("top", new int[] {1,3,5}));
         arrayListY.add(new Tile("2A",new Coordinate(8,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
