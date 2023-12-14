@@ -91,7 +91,7 @@ public class Launcher
             {
                 p = pb.start();
             }
-            catch (IOException e)
+            catch (final IOException e)
             {
                 l.fatal("Failed to start new process terminal. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -105,7 +105,7 @@ public class Launcher
                 /* We do not inherit IO. This may still be necessary. To be tested. */
                 RC = p.waitFor();
             }
-            catch (InterruptedException e)
+            catch (final InterruptedException e)
             {
                 l.fatal("Process terminal was interrupted. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -127,7 +127,8 @@ public class Launcher
             l.info("Command line argument [--cl] detected. Starting client.");
             EArgs.setMode(EArgs.CLIENT);
         }
-        else {
+        else
+        {
             l.info("No relevant program command line arguments detected that are necessary to start the application. Starting wrapper with default configuration.");
             Wrapper.run();
         }
@@ -159,12 +160,12 @@ public class Launcher
             final ProcessBuilder pb = new ProcessBuilder("java", "-cp", f, "sep.view.Launcher", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cl")).toArray(String[]::new)));
             pb.inheritIO();
 
-            Process p = null;
+            final Process p;
             try
             {
                 p = pb.start();
             }
-            catch (IOException e)
+            catch (final IOException e)
             {
                 l.fatal("Failed to start client. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -176,7 +177,7 @@ public class Launcher
             {
                p.waitFor();
             }
-            catch (InterruptedException e)
+            catch (final InterruptedException e)
             {
                 l.fatal("Client was interrupted. Shutting down.");
                 l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -242,12 +243,12 @@ public class Launcher
                     return;
                 }
 
-                Process p = null;
+                final Process p;
                 try
                 {
                     p = pb.start();
                 }
-                catch (IOException e)
+                catch (final IOException e)
                 {
                     l.fatal("Failed to start new server process terminal. Shutting down.");
                     l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -261,7 +262,7 @@ public class Launcher
                     /* We do not inherit IO. This may still be necessary. To be tested. */
                     RC = p.waitFor();
                 }
-                catch (InterruptedException e)
+                catch (final InterruptedException e)
                 {
                     l.fatal("Server process terminal was interrupted. Shutting down.");
                     l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -296,7 +297,7 @@ public class Launcher
         return;
     }
 
-    private static void stdoutForNoOSSupport(double t0)
+    private static void stdoutForNoOSSupport(final double t0)
     {
         l.fatal("Unsupported operating system. Shutting down.");
         l.fatal(String.format("Detected operating system: %s", System.getProperty("os.name")));
