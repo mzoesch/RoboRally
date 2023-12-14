@@ -506,7 +506,6 @@ public class TileModifier
                 break;
         }
         int diff = (out-in);
-        l.debug(" test " + out + " , " + in + " , " + (diff % 180 != 0));
         return diff % 180 != 0;
     }
 
@@ -544,14 +543,11 @@ public class TileModifier
             }
             int diff = (out - in);
             if ((270 > diff) && ((diff > 0)) || diff == -270) {
-                l.debug(diff + " true");
                 return true;
             }
-            l.debug(diff + " false");
             return false;
         }
         catch(Exception e){
-            l.debug("Fehler");
             return false;
         }
     }
