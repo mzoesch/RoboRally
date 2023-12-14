@@ -2,6 +2,8 @@ package sep.view.scenecontrollers;
 
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
+import sep.view.json.game.RebootDirectionModel;
+import sep.view.lib.EShopState;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.RCoordinate;
@@ -555,7 +557,6 @@ public class GameJFXController
     }
 
     // endregion Register Slot Action Methods
-
     // region Got Register Slot Action Methods
 
     private void onGotRegisterSlot1Clicked()
@@ -942,12 +943,62 @@ public class GameJFXController
             return;
         });
 
+
+        }
+
+        {
+            this.shopSlot1.setOnMouseClicked(e ->
+            {
+                this.onShopSlotClicked(0);
+                return;
+            });
+
+            this.shopSlot2.setOnMouseClicked(e ->
+            {
+                this.onShopSlotClicked(1);
+                return;
+            });
+            this.shopSlot3.setOnMouseClicked(e ->
+            {
+                this.onShopSlotClicked(2);
+                return;
+            });
+
+            this.shopSlot4.setOnMouseClicked(e ->
+            {
+                this.onShopSlotClicked(3);
+                return;
+            });
+
+            this.shopSlot5.setOnMouseClicked(e ->
+            {
+                this.onShopSlotClicked(4);
+                return;
+            });
+
         }
 
         return;
     }
 
     // endregion Got Register Slot Action Methods
+
+    // region Shop Slot Action Methods
+    private void onShopSlotClicked(int idx) {
+        if (EGameState.INSTANCE.getShopState() == EShopState.DEACTIVATED) {
+            l.debug("Player clicked on a empty Shop Slot");
+            return;
+        }
+        else if (EGameState.INSTANCE.getShopState() == EShopState.REBOOT){
+            new RebootDirectionModel(EGameState.INSTANCE.getShopSlot(idx));
+            l.debug("Player clicked on {} shop slot. RebootDirection {} has been sent.", idx, EGameState.INSTANCE.getShopSlot(idx));
+            EGameState.INSTANCE.clearShopSlots();
+            EGameState.INSTANCE.setShopState(EShopState.DEACTIVATED);
+            ViewSupervisor.updateFooter();
+        }
+
+    }
+    // endregion Shop Slot Action Methods
 
     // region Chat
 

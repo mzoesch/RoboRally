@@ -407,6 +407,12 @@ public enum EGameState
         return;
     }
 
+    /** Will not re-render the player head up display. */
+    public void clearShopSlots(){
+        for(int i = 0; i < shopSlots.length; i++){
+            shopSlots[i] = null;
+        }
+    }
     public void addRegister(int idx, String register)
     {
         if (idx < 0 || idx >= this.registers.length)
@@ -587,7 +593,7 @@ public enum EGameState
         }
 
         if(shopSlots[idx] != null) {
-            l.debug(String.format("Tried adding %s on filled shopSlot %s"), elementName, idx);
+            l.debug(String.format("Tried adding %s on filled shopSlot %s", elementName, idx));
             return;
         }
         shopSlots[idx] = elementName;
@@ -613,6 +619,10 @@ public enum EGameState
 
     public void setShopState(EShopState state){
         this.shopState = state;
+    }
+
+    public EShopState getShopState(){
+        return this.shopState;
     }
     // endregion Getters and Setters
 
