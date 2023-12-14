@@ -104,39 +104,39 @@ public class Robot {
     public void moveRobotOneTile(final boolean forward) {
         final int dir = forward ? 1 : -1;
         final Coordinate currentCoordinate = this.getCurrentTile().getCoordinate();
-        Coordinate tCoordinate = null;
+        Coordinate targetCoordinate = null;
 
         switch (this.getDirection().toLowerCase()) {
-            case "north", "top" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
-            case "south", "bottom" -> tCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
-            case "east", "right" -> tCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
-            case "west", "left" -> tCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
+            case "north", "top" -> targetCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
+            case "south", "bottom" -> targetCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
+            case "east", "right" -> targetCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
+            case "west", "left" -> targetCoordinate = new Coordinate(currentCoordinate.getX() - dir, currentCoordinate.getY());
             default -> l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
         }
 
-        if (tCoordinate == null) {
+        if (targetCoordinate == null) {
             l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
             return;
         }
 
-        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), tCoordinate.getX(), tCoordinate.getY());
+        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
 
-        if (!this.getCourse().isCoordinateWithinBounds(tCoordinate)) {
-            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), tCoordinate.toString());
+        if (!this.getCourse().isCoordinateWithinBounds(targetCoordinate)) {
+            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), targetCoordinate.toString());
             this.reboot();
             return;
         }
 
-        if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(tCoordinate))) {
-            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+        if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(targetCoordinate))) {
+            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), targetCoordinate.toString());
             return;
         }
 
         this.getCurrentTile().setOccupiedBy(null);
-        this.getCourse().updateRobotPosition(this, tCoordinate);
+        this.getCourse().updateRobotPosition(this, targetCoordinate);
         getCurrentTile().setOccupiedBy(this);
 
-        l.debug("Player {}'s robot moved [from {} to {}].", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), tCoordinate.toString());
+        l.debug("Player {}'s robot moved [from {} to {}].", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), targetCoordinate.toString());
     }
 
     /**
