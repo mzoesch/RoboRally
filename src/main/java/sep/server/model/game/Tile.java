@@ -55,8 +55,20 @@ public class Tile {
         this.occupiedBy = occupiedBy;
     }
 
-    public boolean hasUnmovableRobot() {
-        //TODO implement
+    public boolean hasUnmovableRobot(String pushingDirection) {
+        if(this.isOccupied()) {
+            Robot currentOccupier = this.occupiedBy;
+            currentOccupier.moveRobotOneTile(true, pushingDirection);
+
+            currentOccupier.getAuthGameMode().getSession().broadcastPositionUpdate(
+                    currentOccupier.determineRobotOwner().getController().getPlayerID(), currentOccupier.determineRobotOwner().getPosition());
+
+            if(currentOccupier.getCurrentTile() == this) {
+                return true;
+            }
+
+            return false;
+        }
         return false;
     }
 

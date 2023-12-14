@@ -101,12 +101,12 @@ public class Robot {
      * Updates the robot's position.
      * @param forward True if the robot should move forwards, false if backwards.
      */
-    public void moveRobotOneTile(final boolean forward) {
+    public void moveRobotOneTile(final boolean forward, String direction) {
         final int dir = forward ? 1 : -1;
         final Coordinate currentCoordinate = this.getCurrentTile().getCoordinate();
         Coordinate targetCoordinate = null;
 
-        switch (this.getDirection().toLowerCase()) {
+        switch (direction) {
             case "north", "top" -> targetCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() - dir);
             case "south", "bottom" -> targetCoordinate = new Coordinate(currentCoordinate.getX(), currentCoordinate.getY() + dir);
             case "east", "right" -> targetCoordinate = new Coordinate(currentCoordinate.getX() + dir, currentCoordinate.getY());
@@ -144,7 +144,7 @@ public class Robot {
      * Updates the robot's position.
      */
     public void moveRobotOneTileForwards() {
-        moveRobotOneTile(true);
+        moveRobotOneTile(true, this.getDirection().toLowerCase());
     }
 
     /**
@@ -152,7 +152,7 @@ public class Robot {
      * Updates the robot's position.
      */
     public void moveRobotOneTileBackwards() {
-        moveRobotOneTile(false);
+        moveRobotOneTile(false, this.getDirection().toLowerCase());
     }
 
     /**
@@ -285,7 +285,7 @@ public class Robot {
             }
         }
 
-        if (t1.hasUnmovableRobot()){
+        if (t1.hasUnmovableRobot(direction)){
             l.trace("Robot is unmovable because of another unmovable robot");
             return false;
         }
