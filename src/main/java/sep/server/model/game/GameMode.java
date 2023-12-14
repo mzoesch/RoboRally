@@ -358,31 +358,38 @@ public class GameMode {
             if(newFieldType instanceof ConveyorBelt conveyorBelt) {
                 String outDirection = conveyorBelt.getOutcomingFlowDirection();
                 String[] inDirection = conveyorBelt.getIncomingFlowDirection();
-                String rotation = null;
 
                 if(inDirection != null && outDirection != null) {
                     for(String direction : inDirection) {
-                        if((direction=="bottom" && outDirection=="right") ||
-                                (direction=="left" && outDirection=="bottom") ||
-                                (direction=="top" && outDirection=="left") ||
-                                (direction=="right" && outDirection=="top")) {
-                            rotation = "clockwise";
+                        if((Objects.equals(direction, "bottom") && outDirection.equals("right")) ||
+                                (Objects.equals(direction, "left") && outDirection.equals("bottom")) ||
+                                (Objects.equals(direction, "top") && outDirection.equals("left")) ||
+                                (Objects.equals(direction, "right") && outDirection.equals("top"))) {
+
                             switch(player.getPlayerRobot().getDirection()) {
                                 case("top") -> player.getPlayerRobot().setDirection("right");
                                 case("right") -> player.getPlayerRobot().setDirection("bottom");
                                 case("bottom") -> player.getPlayerRobot().setDirection("left");
                                 case("left") -> player.getPlayerRobot().setDirection("top");
                             }
-                        } else {
-                            rotation = "counterclockwise";
+
+                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+
+                        } else if((Objects.equals(direction, "bottom") && outDirection.equals("left")) ||
+                                (Objects.equals(direction, "left") && outDirection.equals("top")) ||
+                                (Objects.equals(direction, "top") && outDirection.equals("right")) ||
+                                (Objects.equals(direction, "right") && outDirection.equals("bottom"))) {
+
                             switch(player.getPlayerRobot().getDirection()) {
                                 case ("top") -> player.getPlayerRobot().setDirection("left");
                                 case ("right") -> player.getPlayerRobot().setDirection("top");
                                 case ("bottom") -> player.getPlayerRobot().setDirection("right");
                                 case ("left") -> player.getPlayerRobot().setDirection("bottom");
                             }
+
+                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+
                         }
-                        this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), rotation);
                     }
                 }
             }
