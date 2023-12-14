@@ -186,6 +186,29 @@ public class TileModifier
             }
             return;
         }
+        if (Objects.equals(this.tile.get("type"), "PushPanel"))
+        {
+            switch (this.getOrientations().getString(0))
+            {
+                case "top":
+                    iv.setRotate(270);
+                    break;
+                case "right":
+                    iv.setRotate(0);
+                    break;
+                case "bottom":
+                    iv.setRotate(90);
+                    break;
+                case "left":
+                    iv.setRotate(180);
+                    break;
+
+                default:
+                    l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
+                    break;
+            }
+            return;
+        }
 
         return;
     }
