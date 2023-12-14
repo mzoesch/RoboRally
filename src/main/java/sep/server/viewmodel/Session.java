@@ -227,6 +227,7 @@ public final class Session
             this.broadcastPlayerLobbyReadyStatus(pc);
             continue;
         }
+        this.readyCharacterOrder.clear();
 
         return;
     }
