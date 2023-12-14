@@ -48,6 +48,8 @@ public enum EGameState
     private ArrayList<String> temporayUpgradeCards;
     private ArrayList<String> permanentUpgradeCards;
     private String[] shopSlots;
+
+    private boolean shopActive;
     private RemotePlayer winningPlayer;
 
     private EGameState()
@@ -68,6 +70,7 @@ public enum EGameState
         this.permanentUpgradeCards = new ArrayList<>();
         this.temporayUpgradeCards = new ArrayList<>();
         this.shopSlots = new String[5];
+        this. shopActive = false;
 
         return;
     }
@@ -573,6 +576,14 @@ public enum EGameState
             }
         }
         return true;
+    }
+
+    public boolean isShopActive() {
+        return shopActive;
+    }
+
+    public void setShopActive(boolean shopActive) {
+        this.shopActive = shopActive;
     }
 
     // endregion Getters and Setters
