@@ -1,9 +1,7 @@
 package sep.server.model.game.cards.programming;
 
-import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.json.game.effects.MovementModel;
 
 public class BackUp extends AProgrammingCard implements IPlayableCard {
     public BackUp(String cardType) {

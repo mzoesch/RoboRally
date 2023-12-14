@@ -1,6 +1,5 @@
 package sep.server.model.game.cards.damage;
 
-import sep.server.json.game.activatingphase.ReplaceCardModel;
 import sep.server.json.game.damage.DrawDamageModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.Card;

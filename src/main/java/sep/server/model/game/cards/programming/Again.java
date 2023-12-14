@@ -1,8 +1,6 @@
 package sep.server.model.game.cards.programming;
 
 import sep.server.model.game.Player;
-import sep.server.model.game.Robot;
-import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.damage.ADamageCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;

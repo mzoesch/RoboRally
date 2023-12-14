@@ -1,8 +1,5 @@
 package sep.server.model.game;
 
-import sep.server.json.game.effects.MovementModel;
-import sep.server.json.game.effects.PlayerTurningModel;
-import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.Session;
 import sep.server.model.game.tiles.Coordinate;
 

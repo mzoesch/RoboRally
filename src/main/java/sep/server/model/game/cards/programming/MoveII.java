@@ -1,7 +1,5 @@
 package sep.server.model.game.cards.programming;
 
-import sep.server.json.game.effects.MovementModel;
-import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 
