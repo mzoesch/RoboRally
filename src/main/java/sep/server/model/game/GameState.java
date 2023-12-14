@@ -4,6 +4,7 @@ import sep.server.viewmodel.PlayerController;
 import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.Session;
 import sep.server.model.Agent;
+import sep.server.model.EServerInformation;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,24 +19,25 @@ public class GameState
 
     private static final String[] AVAILABLE_COURSES = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap" };
 
+    public static final int MIN_CONTROLLERS_ALLOWED = 2;
     public static final int MAX_CONTROLLERS_ALLOWED = 6;
-    public static final int MIN_PLAYER_COUNT_TO_START = 2;
-    // TODO As described in Protocol v0.1, this var should be passed as a cmd program argument
-    public static final int MIN_REMOTE_PLAYER_COUNT_TO_START = 1;
+    public static final int DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START = 1;
 
     private String courseName;
-
     private GameMode gameMode;
     private final Session session;
-
     private boolean bGameStarted;
+    private final int minRemotePlayerCountToStart;
 
     public GameState(final Session session)
     {
         super();
+
         this.courseName = "";
+        this.gameMode = null;
         this.session = session;
         this.bGameStarted = false;
+        this.minRemotePlayerCountToStart = EServerInformation.INSTANCE.getMinRemotePlayerCountToStart();
 
         return;
     }
@@ -143,6 +145,11 @@ public class GameState
 
             continue;
         }
+    }
+
+    public int getMinRemotePlayersToStart()
+    {
+        return this.minRemotePlayerCountToStart;
     }
 
     // endregion Getters and Setters

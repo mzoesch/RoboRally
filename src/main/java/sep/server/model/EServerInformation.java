@@ -4,6 +4,7 @@ import sep.server.viewmodel.Session;
 import sep.server.viewmodel.ClientInstance;
 import sep.EPort;
 import sep.EArgs;
+import sep.server.model.game.GameState;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -29,12 +30,15 @@ public enum EServerInformation
     private int port;
     private ServerSocket serverSocket;
     private final ArrayList<Session> sessions;
+    private int minRemotePlayerCountToStart;
 
     private EServerInformation()
     {
         this.port = EPort.INVALID.i;
         this.serverSocket = null;
         this.sessions = new ArrayList<Session>();
+        this.minRemotePlayerCountToStart = GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START;
+
         return;
     }
 
@@ -157,6 +161,17 @@ public enum EServerInformation
     {
         this.port = port;
         return;
+    }
+
+    public void setMinRemotePlayerCountToStart(final int min)
+    {
+        this.minRemotePlayerCountToStart = min;
+        return;
+    }
+
+    public int getMinRemotePlayerCountToStart()
+    {
+        return this.minRemotePlayerCountToStart;
     }
 
     // region Getters and Setters
