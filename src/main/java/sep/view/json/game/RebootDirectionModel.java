@@ -5,15 +5,14 @@ import sep.view.json.AServerRequestModel;
 import org.json.JSONObject;
 
 /**
- * Model if the client has set one of their cards in their deck to one of the register slots.
+ * Model for the selection of the RebootDirection from the Client
  */
 public final class RebootDirectionModel extends AServerRequestModel
 {
     private final String direction;
 
     /**
-     * @param register The register slot to put the card in.
-     * @param cardName The name of the card to put in the register slot (Null if the register slot is to be cleared).
+     * @param direction The direction in which the roboter shall be rebooted
      */
     public RebootDirectionModel(String direction)
     {
