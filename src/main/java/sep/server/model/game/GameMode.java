@@ -425,7 +425,9 @@ public class GameMode {
                                 return;
                             }*/
 
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
                             course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
 
                             this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), newCoordinate.getX(), newCoordinate.getY());
                         }
