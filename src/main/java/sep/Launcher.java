@@ -203,14 +203,38 @@ public class Launcher
                     l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
                 }
 
+                if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS)
+                {
+                    l.info("Detected custom minimum remote players request: {}.", EArgs.getCustomMinRemotePlayers());
+                }
+
                 final ProcessBuilder pb =
-                        System.getProperty("os.name").toLowerCase().contains("windows")
-                        ? new ProcessBuilder(System.getenv("COMSPEC"), "/c", "start", "cmd", "/k", String.format("java -cp %s sep.Launcher --sv --nocmd %s %s %s", f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
-                        :
-                        System.getProperty("os.name").toLowerCase().contains("mac")
-                        ? new ProcessBuilder("osascript", "-e", String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s\"", fp.substring(0, fp.lastIndexOf("/")), f, EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)), Arrays.asList(args).contains("--noclose") ? "" : "& exit"))
-                        : null
-                        ;
+                    System.getProperty("os.name").toLowerCase().contains("windows")
+                    ?
+                    new ProcessBuilder(
+                        System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
+                        String.format("java -cp %s sep.Launcher --sv --nocmd %s %s %s %s",
+                            f,
+                            EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinRemotePlayers()) : "",
+                            String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)),
+                            Arrays.asList(args).contains("--noclose") ? "" : "& exit")
+                        )
+                    :
+                    System.getProperty("os.name").toLowerCase().contains("mac")
+                    ?
+                    new ProcessBuilder(
+                        "osascript", "-e",
+                        String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s\"",
+                            fp.substring(0, fp.lastIndexOf("/")),
+                            f,
+                            EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinRemotePlayers()) : "",
+                            String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)),
+                            Arrays.asList(args).contains("--noclose") ? "" : "& exit")
+                        )
+                    : null
+                    ;
                 if (pb == null)
                 {
                     Launcher.stdoutForNoOSSupport(t0);
