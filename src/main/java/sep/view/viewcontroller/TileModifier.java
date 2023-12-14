@@ -340,6 +340,32 @@ public class TileModifier
             }
         }
 
+        if(Objects.equals(this.tile.getString("type"), "PushPanel")) {
+            if(this.getRegisters().length() == 1){
+                switch(this.getRegisters().getInt(0)){
+                    case 1:
+                        return TileModifier.getImage("PushPanelRegister1");
+                    case 2:
+                        return TileModifier.getImage("PushPanelRegister2");
+                    case 3:
+                        return TileModifier.getImage("PushPanelRegister3");
+                    case 4:
+                        return TileModifier.getImage("PushPanelRegister4");
+                    case 5:
+                        return TileModifier.getImage("PushPanelRegister5");
+                }
+            }
+            else if(this.getRegisters().length() == 2){
+                return TileModifier.getImage("PushPanelRegister2And4");
+            }
+            else if(this.getRegisters().length() == 3){
+                return TileModifier.getImage("PushPanelRegister1And3And5");
+            } else{
+                l.debug("Can not resolve Registers of PushPanel");
+                //TODO Entfernen, wenn PushRegister richtig in Map
+                return TileModifier.getImage("PushPanelRegister1");
+            }
+        }
 
         l.error("Unknown tile type or variation: {}. Rendering empty tile.", this.tile.getString("type"));
         return TileModifier.getImage("Empty");
@@ -348,6 +374,10 @@ public class TileModifier
     private int getCount()
     {
         return this.tile.getInt("count");
+    }
+
+    private JSONArray getRegisters(){
+        return this.tile.getJSONArray("registers");
     }
 
     private int getSpeed()
