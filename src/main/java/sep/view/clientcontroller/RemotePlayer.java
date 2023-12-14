@@ -134,7 +134,7 @@ public final class RemotePlayer
         return this.bSelectionFinished;
     }
 
-    public void setSelectionFinished(boolean b)
+    public void setSelectionFinished(final boolean b)
     {
         this.bSelectionFinished = b;
         return;
