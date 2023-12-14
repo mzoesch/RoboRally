@@ -987,12 +987,12 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (0,8)
-        fieldtypes.add(new Empty());
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[] {"left"}));
         arrayListY.add(new Tile("1A",new Coordinate(0,8), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (0,9)
-        fieldtypes.add(new ConveyorBelt(1, "right", new String[] {"left"}));
+        fieldtypes.add(new Empty());
         arrayListY.add(new Tile("1A",new Coordinate(0,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -1045,7 +1045,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (1,9)
-        fieldtypes.add(new Empty());
+        fieldtypes.add(new ConveyorBelt(1, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("1A",new Coordinate(1,9), fieldtypes));
         fieldtypes = new ArrayList<>();
 
