@@ -57,9 +57,9 @@ public enum EServerInformation
 
     public void sendKeepAlive()
     {
-        ArrayList<ClientInstance> dead = new ArrayList<ClientInstance>();
+        final ArrayList<ClientInstance> dead = new ArrayList<ClientInstance>();
 
-        for (Session s : this.sessions)
+        for (final Session s : this.sessions)
         {
             s.sendKeepAlive(dead);
             continue;
@@ -73,7 +73,7 @@ public enum EServerInformation
         if (!dead.isEmpty())
         {
             l.warn("Removing {} dead client{}.", dead.size(), dead.size() == 1 ? "" : "s");
-            for (ClientInstance ci : dead)
+            for (final ClientInstance ci : dead)
             {
                 ci.handleDisconnect();
                 continue;
@@ -97,9 +97,9 @@ public enum EServerInformation
         return this.sessions.toArray(new Session[0]);
     }
 
-    public Session getSessionByID(String sessionID)
+    public Session getSessionByID(final String sessionID)
     {
-        for (Session s : this.sessions)
+        for (final Session s : this.sessions)
         {
             if (s.getSessionID().equals(sessionID))
             {
@@ -112,9 +112,9 @@ public enum EServerInformation
         return null;
     }
 
-    public boolean isSessionIDValid(String sessionID)
+    public boolean isSessionIDValid(final String sessionID)
     {
-        for (Session s : this.sessions)
+        for (final Session s : this.sessions)
         {
             if (s.getSessionID().equals(sessionID))
             {
@@ -127,7 +127,7 @@ public enum EServerInformation
         return false;
     }
 
-    public Session getNewOrExistingSessionID(String sessionID)
+    public Session getNewOrExistingSessionID(final String sessionID)
     {
         if (this.isSessionIDValid(sessionID))
         {
@@ -138,14 +138,14 @@ public enum EServerInformation
     }
 
     /** This method will not check if the session ID is valid. */
-    public Session createNewSession(String sessionID)
+    public Session createNewSession(final String sessionID)
     {
-        Session s = new Session(sessionID);
+        final Session s = new Session(sessionID);
         this.sessions.add(s);
         return s;
     }
 
-    public void removeSession(Session session)
+    public void removeSession(final Session session)
     {
         this.sessions.remove(session);
         l.info("Session {} closed.", session.getSessionID());
@@ -157,7 +157,7 @@ public enum EServerInformation
         return this.port;
     }
 
-    public void setPort(int port)
+    public void setPort(final int port)
     {
         this.port = port;
         return;
