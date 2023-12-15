@@ -1,5 +1,7 @@
 package sep.server.model.game;
 
+import sep.server.json.game.damage.DrawDamageModel;
+import sep.server.viewmodel.PlayerController;
 import sep.server.viewmodel.Session;
 import sep.server.model.game.tiles.Coordinate;
 
@@ -190,7 +192,19 @@ public class Robot {
         if(this.getAuthGameMode().getSpamDeck().size() >= 2) {
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
+
+            if (robotOwner.getController() instanceof PlayerController pc)
+            {
+                new DrawDamageModel(pc.getClientInstance(), robotOwner.getController().getPlayerID(), new String[]{"Spam", "Spam"}).send();
+            }
+            else
+            {
+                l.error("Agent draw damage not implemented yet.");
+            }
+
         }
+
+
 
         for (int i = 0; i < robotOwner.getRegisters().length; i++) {
             robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));
