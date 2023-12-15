@@ -135,6 +135,7 @@ public class CourseBuilder {
         return leftBoard;
     }
 
+
     // TODO wird eigentlich nicht benutzt, kann es weg?
     /**
      * Appends a board to the bottom of another board. Only works for boards of the same width.
@@ -222,7 +223,7 @@ public class CourseBuilder {
     }
 
     /**
-     * Builds board StartAwithRestart (part of Extra Crispy and Death Trap)
+     * Builds board StartAR(part of Extra Crispy and Death Trap)
      * @return StartA as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildStartAR()
@@ -393,7 +394,7 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board StartA (part of DizzyHighway, Lost Bearings, Extra Crispy and Death Trap)
+     * Builds board StartA (part of DizzyHighway, Lost Bearings)
      * @return StartA as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildStartA()
