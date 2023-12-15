@@ -47,9 +47,7 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 break;
 
             case "TurnLeft":
-                player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                player.getPlayerRobot().rotateRobotOnTileToTheRight();
+                player.getPlayerRobot().rotateRobotOnTileToTheLeft();
                 player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
 
                 break;
