@@ -35,16 +35,16 @@ public class CourseBuilder {
                 return entireCourse;
             }
             case("Extra Crispy") -> {
-                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> boardStartAR = buildBoard("StartAR");
                 ArrayList<ArrayList<Tile>> board4A = buildBoard("4A");
-                ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board4A);
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartAR, board4A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
             case("Death Trap") -> {
-                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> boardStartAR = buildBoard("StartAR");
                 ArrayList<ArrayList<Tile>> board2A = buildBoard("2A");
-                ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, boardStartA);
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, boardStartAR);
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
@@ -163,6 +163,9 @@ public class CourseBuilder {
             case("StartA") -> {
                 return buildStartA();
             }
+            case("StartAR") -> {
+                return buildStartAR();
+            }
             case("5B") -> {
                 return build5B();
             }
@@ -217,6 +220,177 @@ public class CourseBuilder {
         return board;
 
     }
+
+    /**
+     * Builds board StartAwithRestart (part of Extra Crispy and Death Trap)
+     * @return StartA as ArrayList
+     */
+    public ArrayList<ArrayList<Tile>> buildStartAR()
+    {
+        ArrayList<ArrayList<Tile>> board = new ArrayList<>();
+        ArrayList<Tile> arrayListY = new ArrayList<>();
+        ArrayList<FieldType> fieldtypes = new ArrayList<>();
+
+        // (0,0)
+        fieldtypes.add(new RestartPoint("right"));
+        arrayListY.add(new Tile("StartA",new Coordinate(0,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,1)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,2)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,3)
+        fieldtypes.add(new StartPoint());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,4)
+        fieldtypes.add(new Antenna("right"));
+        arrayListY.add(new Tile("StartA",new Coordinate(0,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,5)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,6)
+        fieldtypes.add(new StartPoint());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,7)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,8)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (0,9)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(0,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
+
+        // (1,0)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,1)
+        fieldtypes.add(new StartPoint());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,2)
+        fieldtypes.add(new Wall(new String[]{"top"}));
+        arrayListY.add(new Tile("StartA",new Coordinate(1,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,3)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,4)
+        fieldtypes.add(new StartPoint());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,5)
+        fieldtypes.add(new StartPoint());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,6)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,7)
+        fieldtypes.add(new Wall(new String[]{"bottom"}));
+        arrayListY.add(new Tile("StartA",new Coordinate(1,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,8)
+        fieldtypes.add(new StartPoint());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (1,9)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(1,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
+
+        // (2,0)
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[]{"left"}));
+        arrayListY.add(new Tile("StartA",new Coordinate(2,0), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,1)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(2,1), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,2)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(2,2), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,3)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(2,3), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,4)
+        fieldtypes.add(new Wall(new String[]{"right"}));
+        arrayListY.add(new Tile("StartA",new Coordinate(2,4), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,5)
+        fieldtypes.add(new Wall(new String[]{"right"}));
+        arrayListY.add(new Tile("StartA",new Coordinate(2,5), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,6)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(2,6), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,7)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(2,7), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,8)
+        fieldtypes.add(new Empty());
+        arrayListY.add(new Tile("StartA",new Coordinate(2,8), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        // (2,9)
+        fieldtypes.add(new ConveyorBelt(1, "right", new String[]{"left"}));
+        arrayListY.add(new Tile("StartA",new Coordinate(2,9), fieldtypes));
+        fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        return board;
+    }
+
 
     /**
      * Builds board StartA (part of DizzyHighway, Lost Bearings, Extra Crispy and Death Trap)
@@ -387,6 +561,7 @@ public class CourseBuilder {
         board.add(arrayListY);
         return board;
     }
+
 
     /**
      * Builds board 5B (part of DizzyHighway)
