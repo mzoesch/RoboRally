@@ -1,4 +1,4 @@
-package sep.server.json.game.damage;
+package sep.view.json.game;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package sep.view.json.game;
+package sep.server.json.game.damage;
 
 import org.json.JSONObject;
 import sep.server.json.AModel;
