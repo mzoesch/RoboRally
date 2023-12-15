@@ -20,10 +20,7 @@ public class WeaselRoutine extends ASpecialProgrammingCard implements IPlayableC
         switch (selection) {
 
             case "TurnLeft":
-                player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                player.getPlayerRobot().rotateRobotOnTileToTheRight();
-                player.getPlayerRobot().rotateRobotOnTileToTheRight();
-
+                player.getPlayerRobot().rotateRobotOnTileToTheLeft();
                 player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
                 break;
 

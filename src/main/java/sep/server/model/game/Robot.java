@@ -155,18 +155,18 @@ public class Robot {
     }
 
     /**
-     * Rotates the robot 90 degrees to the right
+     * Rotates the robot 90 degrees to the right or to the left
      * Updates the robot's direction
      */
-    public void rotateRobotOnTileToTheRight(){
+    public void rotateRobotOnTile(boolean isRightRotation) {
         String currentDirection = this.getDirection();
         String newDirection;
 
         switch (currentDirection.toLowerCase()) {
-            case "north", "top" -> newDirection = "right";
-            case "east", "right" -> newDirection = "bottom";
-            case "south", "bottom" -> newDirection = "left";
-            case "west", "left" -> newDirection = "top";
+            case "north", "top" -> newDirection = isRightRotation ? "right" : "left";
+            case "east", "right" -> newDirection = isRightRotation ? "bottom" : "top";
+            case "south", "bottom" -> newDirection = isRightRotation ? "left" : "right";
+            case "west", "left" -> newDirection = isRightRotation ? "top" : "bottom";
             default -> {
                 l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
                 return;
@@ -175,26 +175,14 @@ public class Robot {
         this.setDirection(newDirection);
     }
 
-    /**
-     * Rotates the robot 90 degrees to the left
-     * Updates the robot's direction
-     */
+    public void rotateRobotOnTileToTheRight() {
+        rotateRobotOnTile(true);
+    }
+
     public void rotateRobotOnTileToTheLeft() {
-        String currentDirection = this.getDirection();
-        String newDirection;
-
-        switch (currentDirection.toLowerCase()) {
-            case "north", "top" -> newDirection = "left";
-            case "east", "right" -> newDirection = "top";
-            case "south", "bottom" -> newDirection = "right";
-            case "west", "left" -> newDirection = "bottom";
-            default -> {
-                l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
-                return;
-            }
-        }
-        this.setDirection(newDirection);
+        rotateRobotOnTile(false);
     }
+
 
 
 
