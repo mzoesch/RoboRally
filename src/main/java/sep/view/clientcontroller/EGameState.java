@@ -53,6 +53,9 @@ public enum EGameState
     private ArrayList<String> permanentUpgradeCards;
     private String[] shopSlots;
 
+    private int damageCardsCountToDraw;
+    private ArrayList<String> selectedDamageCards;
+
     private boolean shopActive;
     private RemotePlayer winningPlayer;
 
@@ -72,6 +75,7 @@ public enum EGameState
         this.gotRegisters = new ArrayList<String>();
         this.winningPlayer = null;
 
+        this.selectedDamageCards = new ArrayList<>();
         this.permanentUpgradeCards = new ArrayList<>();
         this.temporayUpgradeCards = new ArrayList<>();
         this.shopSlots = new String[5];
@@ -626,4 +630,29 @@ public enum EGameState
     }
     // endregion Getters and Setters
 
+
+    public int getDamageCardsCountToDraw() {
+        return damageCardsCountToDraw;
+    }
+
+    public void setDamageCardsCountToDraw(int damageCardsCountToDraw) {
+        this.damageCardsCountToDraw = damageCardsCountToDraw;
+    }
+
+    public void subtractDamageCardsCountsToDrawByOne(){
+        this.damageCardsCountToDraw = this.damageCardsCountToDraw - 1;
+    }
+
+    public ArrayList<String> getSelectedDamageCards() {
+        return selectedDamageCards;
+    }
+
+    public void addSelectedDamageCards(int idx, String damageCard) {
+        this.selectedDamageCards.add(damageCard);
+        l.debug("Added " + damageCard + "to selected damageCards");
+    }
+
+    public void clearSelectedDamageCards(){
+        this.selectedDamageCards.clear();
+    }
 }

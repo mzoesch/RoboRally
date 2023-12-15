@@ -2,24 +2,32 @@ package sep.view.json.game;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import sep.server.json.AModel;
-import sep.server.viewmodel.ClientInstance;
+import sep.view.json.AServerRequestModel;
 
-public class SelectedDamageModel extends AModel {
+import java.util.ArrayList;
 
-    private final String[] cards;
+public class SelectedDamageModel extends AServerRequestModel {
+    private final ArrayList<String> selectedDamageCards;
 
-    public SelectedDamageModel(ClientInstance ci, String[] cards) {
-        super(ci);
-        this.cards = cards;
+    public SelectedDamageModel(ArrayList<String> selectedDamageCards){
+        this.selectedDamageCards = selectedDamageCards;
     }
 
     @Override
-    public JSONObject toJSON() {
+    public JSONObject toJSON()
+    {
+        JSONArray cards = new JSONArray();
+        for(String s : selectedDamageCards){
+            cards.put(s);
+        }
+        JSONObject body = new JSONObject();
+        body.put("cards", cards);
+
         JSONObject j = new JSONObject();
         j.put("messageType", "SelectedDamage");
-        j.put("messageBody", new JSONObject().put(("cards"), this.cards)); // muss nicht eigentlich JSONArray sein?
+        j.put("messageBody", body);
 
         return j;
     }
+
 }

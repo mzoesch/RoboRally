@@ -1,6 +1,5 @@
 package sep.server.model.game.cards.programming;
 
-import sep.server.json.game.effects.EnergyModel;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 

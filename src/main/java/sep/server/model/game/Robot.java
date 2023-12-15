@@ -1,8 +1,7 @@
 package sep.server.model.game;
 
-import sep.server.json.game.effects.MovementModel;
-import sep.server.json.game.effects.PlayerTurningModel;
-import sep.server.model.IOwnershipable;
+import sep.server.json.game.damage.DrawDamageModel;
+import sep.server.viewmodel.PlayerController;
 import sep.server.viewmodel.Session;
 import sep.server.model.game.tiles.Coordinate;
 
@@ -156,18 +155,18 @@ public class Robot {
     }
 
     /**
-     * Rotates the robot 90 degrees to the right
+     * Rotates the robot 90 degrees to the right or to the left
      * Updates the robot's direction
      */
-    public void rotateRobotOnTileToTheRight(){
+    public void rotateRobotOnTile(boolean isRightRotation) {
         String currentDirection = this.getDirection();
         String newDirection;
 
         switch (currentDirection.toLowerCase()) {
-            case "north", "top" -> newDirection = "right";
-            case "east", "right" -> newDirection = "bottom";
-            case "south", "bottom" -> newDirection = "left";
-            case "west", "left" -> newDirection = "top";
+            case "north", "top" -> newDirection = isRightRotation ? "right" : "left";
+            case "east", "right" -> newDirection = isRightRotation ? "bottom" : "top";
+            case "south", "bottom" -> newDirection = isRightRotation ? "left" : "right";
+            case "west", "left" -> newDirection = isRightRotation ? "top" : "bottom";
             default -> {
                 l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
                 return;
@@ -175,6 +174,17 @@ public class Robot {
         }
         this.setDirection(newDirection);
     }
+
+    public void rotateRobotOnTileToTheRight() {
+        rotateRobotOnTile(true);
+    }
+
+    public void rotateRobotOnTileToTheLeft() {
+        rotateRobotOnTile(false);
+    }
+
+
+
 
     /**
      * The following method handles the rebooting of a robot and sends all respective JSON messages.
@@ -193,7 +203,19 @@ public class Robot {
         if(this.getAuthGameMode().getSpamDeck().size() >= 2) {
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
+
+            if (robotOwner.getController() instanceof PlayerController pc)
+            {
+                new DrawDamageModel(pc.getClientInstance(), robotOwner.getController().getPlayerID(), new String[]{"Spam", "Spam"}).send();
+            }
+            else
+            {
+                l.error("Agent draw damage not implemented yet.");
+            }
+
         }
+
+
 
         for (int i = 0; i < robotOwner.getRegisters().length; i++) {
             robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));

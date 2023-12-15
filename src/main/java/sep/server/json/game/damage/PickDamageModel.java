@@ -23,7 +23,7 @@ public class PickDamageModel extends AModel {
         body.put("availablePiles", this.availablePiles);
 
         JSONObject j = new JSONObject();
-        j.put("messageTpye", "PickDamage");
+        j.put("messageType", "PickDamage");
         j.put("messageBody", body);
 
         return j;

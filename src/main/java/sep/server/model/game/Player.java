@@ -1,6 +1,9 @@
 package sep.server.model.game;
 
 import sep.server.model.game.cards.IPlayableCard;
+import sep.server.model.game.cards.damage.SpamDamage;
+import sep.server.model.game.cards.damage.TrojanHorseDamage;
+import sep.server.model.game.cards.damage.VirusDamage;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.IOwnershipable;
@@ -143,6 +146,39 @@ public class Player {
         }
         return true;
     }
+
+    /**
+     * After a DamageCard has been played, it is removed from the register, and a new card from the deck is placed into the register.
+     */
+    public void updateRegisterAfterDamageCardWasPlayed(String cardType, int currentRoundNumber) {
+        ArrayList deckToUpdate = null;
+
+        if ("VirusDamage".equals(cardType)) {
+            deckToUpdate = getAuthGameMode().getVirusDeck();
+        } else if ("SpamDamage".equals(cardType)) {
+            deckToUpdate = getAuthGameMode().getSpamDeck();
+        } else if ("TrojanHorseDamage".equals(cardType)) {
+            deckToUpdate = getAuthGameMode().getTrojanDeck();
+        }  else if ("WormDamage".equals(cardType)) {
+            deckToUpdate = getAuthGameMode().getWormDeck();
+        }
+
+        deckToUpdate.add(getCardByRegisterIndex(currentRoundNumber));
+        registers[currentRoundNumber] = null;
+
+        if (playerDeck.isEmpty()) {
+            shuffleAndRefillDeck();
+        }
+
+        IPlayableCard newCardFromDeck = playerDeck.remove(0);
+        setCardInRegister(currentRoundNumber, newCardFromDeck);
+        newCardFromDeck.playCard(this, currentRoundNumber);
+
+        String newCardString = newCardFromDeck.getCardType();
+        getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
+
+    }
+
 
     public IPlayableCard getCardByName(final String cardName) {
         for (IPlayableCard c : this.playerHand) {
