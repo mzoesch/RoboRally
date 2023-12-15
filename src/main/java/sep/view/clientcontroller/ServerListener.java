@@ -442,9 +442,17 @@ public class ServerListener implements Runnable
     private boolean onPickDamageType() throws JSONException
     {
         /* TODO Implement this to UI. */
-        final String i = String.format("Player %s needs to decide which damage cards to pick. You have to pick %d. Available piles are: (%s).", EClientInformation.INSTANCE.getPlayerID(), this.dsrp.getDamageCardsCountToDraw(), String.join(", ", Arrays.asList(this.dsrp.getAvailableDamagePilesToDraw())));
-        l.debug(i);
-        ViewSupervisor.handleChatInfo(i);
+        final String s = String.format("You have to pick %s damage cards. Available piles are: (%s).", this.dsrp.getDamageCardsCountToDraw(), String.join(", ", Arrays.asList(this.dsrp.getAvailableDamagePilesToDraw())));
+        l.debug(s);
+        ViewSupervisor.handleChatInfo(s);
+        //TODO hier fehlt noch Bearbeitung, wenn Shop schon aktiviert ist
+        EGameState.INSTANCE.setShopState(EShopState.DAMAGE);
+        EGameState.INSTANCE.setDamageCardsCountToDraw(this.dsrp.getDamageCardsCountToDraw());
+        String [] availableCards = this.dsrp.getAvailableDamagePilesToDraw();
+        for(int i = 0; i < availableCards.length; i++) {
+            EGameState.INSTANCE.addShopSlot(i, availableCards[i]);
+        }
+        ViewSupervisor.updateFooter();
         return true;
     }
 

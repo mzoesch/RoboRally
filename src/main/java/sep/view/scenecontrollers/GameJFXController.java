@@ -2,15 +2,13 @@ package sep.view.scenecontrollers;
 
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
-import sep.view.json.game.RebootDirectionModel;
+import sep.view.json.game.*;
 import sep.view.lib.EShopState;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.RCoordinate;
-import sep.view.json.game.SetStartingPointModel;
 import sep.view.viewcontroller.TileModifier;
 import sep.view.lib.EGamePhase;
-import sep.view.json.game.SelectedCardModel;
 import sep.view.json.ChatMsgModel;
 import sep.view.clientcontroller.EClientInformation;
 
@@ -990,11 +988,31 @@ public class GameJFXController
             return;
         }
         else if (EGameState.INSTANCE.getShopState() == EShopState.REBOOT){
-            new RebootDirectionModel(EGameState.INSTANCE.getShopSlot(idx));
+            RebootDirectionModel reboot = new RebootDirectionModel(EGameState.INSTANCE.getShopSlot(idx));
+            reboot.send();
             l.debug("Player clicked on {} shop slot. RebootDirection {} has been sent.", idx, EGameState.INSTANCE.getShopSlot(idx));
             EGameState.INSTANCE.clearShopSlots();
             EGameState.INSTANCE.setShopState(EShopState.DEACTIVATED);
             ViewSupervisor.updateFooter();
+        } else if (EGameState.INSTANCE.getShopState() == EShopState.DAMAGE){
+            if(EGameState.INSTANCE.getDamageCardsCountToDraw() > 1){
+                EGameState.INSTANCE.addSelectedDamageCards(idx, EGameState.INSTANCE.getShopSlot(idx));
+                EGameState.INSTANCE.subtractDamageCardsCountsToDrawByOne();
+                l.debug("DamageCard selected. You need to select {} more", EGameState.INSTANCE.getDamageCardsCountToDraw());
+                ViewSupervisor.handleChatInfo(String.format("You selected a damageCard. You need to select %s more", EGameState.INSTANCE.getDamageCardsCountToDraw()));
+                ViewSupervisor.updateFooter();
+            } else{
+                EGameState.INSTANCE.addSelectedDamageCards(idx, EGameState.INSTANCE.getShopSlot(idx));
+                SelectedDamageModel damageModel = new SelectedDamageModel(EGameState.INSTANCE.getSelectedDamageCards());
+                damageModel.send();
+                EGameState.INSTANCE.setDamageCardsCountToDraw(0);
+                EGameState.INSTANCE.clearSelectedDamageCards();
+                EGameState.INSTANCE.setShopState(EShopState.DEACTIVATED);
+                EGameState.INSTANCE.clearShopSlots();
+                l.debug("Selection of DamageCard finished. DamageCards have been sent");
+                ViewSupervisor.handleChatInfo("Selection of DamageCard finished. DamageCards have been sent");
+                ViewSupervisor.updateFooter();
+            }
         }
 
     }
