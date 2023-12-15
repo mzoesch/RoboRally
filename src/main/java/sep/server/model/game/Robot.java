@@ -176,6 +176,29 @@ public class Robot {
     }
 
     /**
+     * Rotates the robot 90 degrees to the left
+     * Updates the robot's direction
+     */
+    public void rotateRobotOnTileToTheLeft() {
+        String currentDirection = this.getDirection();
+        String newDirection;
+
+        switch (currentDirection.toLowerCase()) {
+            case "north", "top" -> newDirection = "left";
+            case "east", "right" -> newDirection = "top";
+            case "south", "bottom" -> newDirection = "right";
+            case "west", "left" -> newDirection = "bottom";
+            default -> {
+                l.error("Player {}'s robot has an invalid direction: {}", this.determineRobotOwner().getController().getPlayerID(), this.getDirection());
+                return;
+            }
+        }
+        this.setDirection(newDirection);
+    }
+
+
+
+    /**
      * The following method handles the rebooting of a robot and sends all respective JSON messages.
      * The player draws two spam cards and the registers are emptied.
      * Disclaimer: Default rebootDirection is "top". If the client selects a rebootDirection (normally
