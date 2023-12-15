@@ -1,4 +1,4 @@
-package sep.view.json.game;
+package sep.server.json.game.damage;
 
 import org.json.JSONObject;
 import sep.server.json.AModel;
@@ -23,7 +23,7 @@ public class PickDamageModel extends AModel {
         body.put("availablePiles", this.availablePiles);
 
         JSONObject j = new JSONObject();
-        j.put("messageTpye", "PickDamage");
+        j.put("messageType", "PickDamage");
         j.put("messageBody", body);
 
         return j;
