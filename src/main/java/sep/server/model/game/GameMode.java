@@ -1,6 +1,7 @@
 package sep.server.model.game;
 
 import sep.server.json.common.ErrorMsgModel;
+import sep.server.json.game.damage.DrawDamageModel;
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
@@ -555,11 +556,20 @@ public class GameMode {
 
                 for (Player player : players) {
                     if (player.getPlayerRobot() == occupyingRobot) {
-                        for(int i = 0; i<laserCount; i++) {
-                            if(!this.spamCardDeck.isEmpty()) {
+
+                        if(this.spamCardDeck.size() >= laserCount) {
+                            for(int i=0; i<laserCount; i++) {
                                 player.getDiscardPile().add(this.spamCardDeck.remove(0));
                             }
+                            if (player.getController() instanceof PlayerController pc) {
+                                String[] spamArray = new String[laserCount];
+                                Arrays.fill(spamArray, "Spam");
+                                new DrawDamageModel(pc.getClientInstance(), player.getController().getPlayerID(), spamArray).send();
+                            } else {
+                                l.error("Agent draw damage not implemented yet.");
+                            }
                         }
+
                         laserGoing = false;
                         break;
                     }
