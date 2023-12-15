@@ -38,19 +38,6 @@ public class TrojanHorseDamage extends ADamageCard {
 
         /* TODO This will not work. All below must be in a separate callback method */
 
-        //Karten akutalisieren
-        player.getAuthGameMode().getTrojanDeck().add((TrojanHorseDamage) player.getCardByRegisterIndex(currentRoundNumber));
-        player.getRegisters()[currentRoundNumber] = null;
-
-        if(player.getPlayerDeck().isEmpty()){
-            player.shuffleAndRefillDeck();
-        }
-
-        IPlayableCard newCard = player.getPlayerDeck().remove(0);
-        player.setCardInRegister(currentRoundNumber, newCard);
-        newCard.playCard(player, currentRoundNumber);
-
-        String newCardString = ((Card) newCard).getCardType();
-        player.getAuthGameMode().getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRoundNumber, newCardString);
+        player.updateRegisterAfterDamageCardWasPlayed("TrojanHorseDamage", currentRoundNumber);
     }
 }

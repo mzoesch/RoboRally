@@ -40,20 +40,7 @@ public class VirusDamage extends ADamageCard {
 
         }
 
-        //Karten akutalisieren
-        player.getAuthGameMode().getVirusDeck().add((VirusDamage) player.getCardByRegisterIndex(currentRoundNumber));
-        player.getRegisters()[currentRoundNumber] = null;
-
-        if(player.getPlayerDeck().isEmpty()){
-            player.shuffleAndRefillDeck();
-        }
-
-        IPlayableCard newCard = player.getPlayerDeck().remove(0);
-        player.setCardInRegister(currentRoundNumber, newCard);
-        newCard.playCard(player, currentRoundNumber);
-
-        String newCardString = ((Card) newCard).getCardType();
-        player.getAuthGameMode().getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRoundNumber, newCardString);
+        player.updateRegisterAfterDamageCardWasPlayed("VirusDamage", currentRoundNumber);
     }
 
     public static int getDistanceBetweenTwoRobots (Tile t1, Tile t2) {

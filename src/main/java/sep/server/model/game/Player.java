@@ -157,27 +157,26 @@ public class Player {
             deckToUpdate = getAuthGameMode().getVirusDeck();
         } else if ("SpamDamage".equals(cardType)) {
             deckToUpdate = getAuthGameMode().getSpamDeck();
-        } else if ("TrojanDamage".equals(cardType)) {
+        } else if ("TrojanHorseDamage".equals(cardType)) {
             deckToUpdate = getAuthGameMode().getTrojanDeck();
         }  else if ("WormDamage".equals(cardType)) {
             deckToUpdate = getAuthGameMode().getWormDeck();
         }
 
-        if (deckToUpdate != null) {
-            deckToUpdate.add(getCardByRegisterIndex(currentRoundNumber));
-            registers[currentRoundNumber] = null;
+        deckToUpdate.add(getCardByRegisterIndex(currentRoundNumber));
+        registers[currentRoundNumber] = null;
 
-            if (playerDeck.isEmpty()) {
-                shuffleAndRefillDeck();
-            }
-
-            IPlayableCard newCardFromDeck = playerDeck.remove(0);
-            setCardInRegister(currentRoundNumber, newCardFromDeck);
-            newCardFromDeck.playCard(this, currentRoundNumber);
-
-            String newCardString = newCardFromDeck.getCardType();
-            getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
+        if (playerDeck.isEmpty()) {
+            shuffleAndRefillDeck();
         }
+
+        IPlayableCard newCardFromDeck = playerDeck.remove(0);
+        setCardInRegister(currentRoundNumber, newCardFromDeck);
+        newCardFromDeck.playCard(this, currentRoundNumber);
+
+        String newCardString = newCardFromDeck.getCardType();
+        getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
+
     }
 
 
