@@ -183,9 +183,6 @@ public class Robot {
         rotateRobotOnTile(false);
     }
 
-
-
-
     /**
      * The following method handles the rebooting of a robot and sends all respective JSON messages.
      * The player draws two spam cards and the registers are emptied.
@@ -204,7 +201,7 @@ public class Robot {
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
 
-            l.debug("Player has drawn two spam cards.");
+            l.debug("Player {} has drawn two spam cards.", this.determineRobotOwner().getController().getPlayerID());
 
             if (robotOwner.getController() instanceof PlayerController pc)
             {
@@ -257,7 +254,7 @@ public class Robot {
             }
 
             this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
-            l.debug("Player was assigned a restart point.");
+            l.debug("Player {} was assigned a restart point.", this.determineRobotOwner().getController().getPlayerID());
 
         } else {
             l.error("No restart point was assigned.");

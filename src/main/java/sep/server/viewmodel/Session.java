@@ -507,30 +507,33 @@ public final class Session
         return;
     }
 
-    public void broadcastCurrentCards(final int register)
-    {
-        final CardInfo[] activeCards = new CardInfo[this.getGameState().getAuthGameMode().getPlayers().size()];
-        for (int i = 0; i < activeCards.length; i++)
-        {
-            for (Player p : this.getGameState().getAuthGameMode().getPlayers())
-            {
-                CardInfo ci = new CardInfo(p.getController().getPlayerID(), ( (Card) p.getCardByRegisterIndex(register) ).getCardType());
-                activeCards[i] = ci;
+    public void broadcastCurrentCards(final int register) {
+        final ArrayList<Player> players = this.getGameState().getAuthGameMode().getPlayers();
+        if (players.isEmpty()) {
+            l.error("No players exist.");
+            return;
+        }
 
-                continue;
+        final CardInfo[] activeCards = new CardInfo[players.size()];
+        for (int i = 0; i < activeCards.length; i++) {
+            Player p = players.get(i);
+            Card card = (Card) p.getCardByRegisterIndex(register);
+            CardInfo ci;
+
+            if (card == null) {
+                l.error("Card does not exist");
+                ci = new CardInfo(p.getController().getPlayerID(), null);
+            } else {
+                ci = new CardInfo(p.getController().getPlayerID(), card.getCardType());
             }
-
-            continue;
+            activeCards[i] = ci;
         }
 
-        for (final PlayerController pc : this.getRemotePlayers())
-        {
+        for (final PlayerController pc : this.getRemotePlayers()) {
             new CurrentCardsModel(pc.getClientInstance(), activeCards).send();
-            continue;
         }
-
-        return;
     }
+
 
     public void broadcastCheckPointReached(final int ctrlID, final int checkpointsReached)
     {
