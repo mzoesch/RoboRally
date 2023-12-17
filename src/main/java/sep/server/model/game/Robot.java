@@ -217,7 +217,7 @@ public class Robot {
 
 
 
-        for (int i = 0; i < robotOwner.getRegisters().length; i++) {
+        for (int i = 0; i < 5; i++) {
             robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));
             robotOwner.setCardInRegister(i, null);
         }
