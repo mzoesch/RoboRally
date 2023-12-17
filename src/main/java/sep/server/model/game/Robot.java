@@ -204,6 +204,8 @@ public class Robot {
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
 
+            l.debug("Player has drawn two spam cards.");
+
             if (robotOwner.getController() instanceof PlayerController pc)
             {
                 new DrawDamageModel(pc.getClientInstance(), robotOwner.getController().getPlayerID(), new String[]{"Spam", "Spam"}).send();
@@ -213,13 +215,20 @@ public class Robot {
                 l.error("Agent draw damage not implemented yet.");
             }
 
+        } else {
+            l.error("Spam card deck is empty.");
         }
 
+        if(this.determineRobotOwner().getRegisters().length > 0) {
 
+            for (int i = 0; i < 5; i++) {
+                robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));
+                robotOwner.setCardInRegister(i, null);
+            }
+            l.debug("Registers were emptied.");
 
-        for (int i = 0; i < 5; i++) {
-            robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));
-            robotOwner.setCardInRegister(i, null);
+        } else {
+            l.error("Registers can't be emptied.");
         }
 
         switch (sourceTile.getBoardName()) {
@@ -237,21 +246,21 @@ public class Robot {
         this.setCurrentTile(restartPoint);
 
         if(restartPoint != null) {
+
             switch(this.direction) {
-                case "right" -> {
-                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
-                }
+                case "right" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
                 case "bottom" -> {
                     this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
                     this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
                 }
-                case "left" -> {
-                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
-
-                    }
+                case "left" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
             }
 
             this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
+            l.debug("Player was assigned a restart point.");
+
+        } else {
+            l.error("No restart point was assigned.");
         }
 
         this.setDirection("top");
