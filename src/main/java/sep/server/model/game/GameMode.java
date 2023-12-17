@@ -724,7 +724,7 @@ public class GameMode {
      * The following method introduces a timeout. The length depends on the amount of milliseconds passed to the method.
      * @param milliseconds length of timeout
      */
-    private void addDelay(int milliseconds) {
+    public void addDelay(int milliseconds) {
         try {
             this.activationPhaseThread.sleep(milliseconds);
         } catch (InterruptedException e) {

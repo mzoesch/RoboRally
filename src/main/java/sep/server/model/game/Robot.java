@@ -253,7 +253,9 @@ public class Robot {
                 case "left" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
             }
 
+            this.determineRobotOwner().getAuthGameMode().addDelay(2000);
             this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
+            this.determineRobotOwner().getAuthGameMode().addDelay(2000);
             l.debug("Player {} was assigned a restart point.", this.determineRobotOwner().getController().getPlayerID());
 
         } else {
