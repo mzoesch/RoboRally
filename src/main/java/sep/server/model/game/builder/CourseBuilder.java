@@ -123,6 +123,7 @@ public class CourseBuilder {
         return "clockwise";
     }
 
+
     /**
      * Appends a board to the right of another board. Only works for boards of the same length.
      * @param leftBoard left board
@@ -223,8 +224,8 @@ public class CourseBuilder {
     }
 
     /**
-     * Builds board StartAR(part of Extra Crispy and Death Trap)
-     * @return StartA as ArrayList
+     * Builds board StartAR (part of Extra Crispy and Death Trap)
+     * @return StartAR (StartA Reboot) as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildStartAR()
     {
