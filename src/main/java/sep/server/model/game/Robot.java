@@ -222,11 +222,18 @@ public class Robot {
             robotOwner.setCardInRegister(i, null);
         }
 
-        //TODO add other maps
-        switch(sourceTile.getBoardName()) {
-            case "StartA" -> restartPoint = startingPoint;
-            case "5B" -> restartPoint = course.getTileByNumbers(4,3);
+        switch (sourceTile.getBoardName()) {
+            case "StartA" -> {
+                restartPoint = startingPoint;
+            }
+            case "StartAR", "1A", "2A", "4A" -> {
+                restartPoint = course.getTileByNumbers(0, 0);
+            }
+            case "5B" -> {
+                restartPoint = course.getTileByNumbers(4, 3);
+            }
         }
+
         this.setCurrentTile(restartPoint);
 
         if(restartPoint != null) {
