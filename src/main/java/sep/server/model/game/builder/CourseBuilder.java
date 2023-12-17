@@ -44,7 +44,8 @@ public class CourseBuilder {
             case("Death Trap") -> {
                 ArrayList<ArrayList<Tile>> boardStartAR = buildBoard("StartAR");
                 ArrayList<ArrayList<Tile>> board2A = buildBoard("2A");
-                ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, boardStartAR);
+                ArrayList<ArrayList<Tile>> rotatedCourse = rotate180(boardStartAR);
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, rotatedCourse);
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
@@ -150,6 +151,23 @@ public class CourseBuilder {
         }
         return topBoard;
     }
+
+
+    /**
+     * Rotates a board 180 degrees.
+     *
+     * @param board board to be rotated
+     * @return rotated board
+     */
+    public ArrayList<ArrayList<Tile>> rotate180(ArrayList<ArrayList<Tile>> board) {
+        ArrayList<ArrayList<Tile>> rotatedBoard = new ArrayList<>();
+        for (int i = board.size() - 1; i >= 0; i--) {
+            ArrayList<Tile> row = new ArrayList<>(board.get(i));
+            rotatedBoard.add(row);
+        }
+        return rotatedBoard;
+    }
+
 
     /**
      * Builds a board depending on board name
