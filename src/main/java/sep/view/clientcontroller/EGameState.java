@@ -142,7 +142,7 @@ public enum EGameState
         return false;
     }
 
-    public static void addRemotePlayer(RDefaultServerRequestParser dsrp)
+    public static void addRemotePlayer(final RDefaultServerRequestParser dsrp)
     {
         // TODO This is not safe at all. More type checking needed.
 

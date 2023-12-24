@@ -2007,7 +2007,7 @@ public class GameJFXController
      */
     private void renderPlayerTransforms()
     {
-        for (RemotePlayer RP : EGameState.INSTANCE.getRemotePlayers())
+        for (final RemotePlayer RP : EGameState.INSTANCE.getRemotePlayers())
         {
             if (!RP.hasStartingPosition())
             {
@@ -2021,7 +2021,7 @@ public class GameJFXController
                 continue;
             }
 
-            RP.getRobotView().setPosition(RP.getStartingPosition(), true, false);
+            RP.getRobotView().setPosition(RP.getStartingPosition(), false, false);
             RP.getRobotView().renderPosition();
 
             continue;

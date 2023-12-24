@@ -41,7 +41,7 @@ public class RobotView
         this.iv = null;
         this.ap = null;
 
-        this.bIsNextRotationLerp = true;
+        this.bIsNextRotationLerp = false;
 
         return;
     }
@@ -113,14 +113,8 @@ public class RobotView
         return;
     }
 
-    public void addRotationWithLerp(String r)
+    public void addRotationWithLerp(final String r)
     {
-        // TODO
-        //      Okay, this does not work with many different rotations hailing inbound at nearly the same time. For
-        //      example, if many agents setting their starting points at the same time. We may need to implement some
-        //      sort of delay here if previous rotations are still being updated regardless if being lerped or not.
-        //      This is my guess, why this does not work. But it is not tested yet.
-
         if (!this.bIsNextRotationLerp)
         {
             this.addRotation(r);
