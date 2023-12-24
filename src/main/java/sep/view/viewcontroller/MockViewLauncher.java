@@ -4,6 +4,7 @@ import sep.view.json.RDefaultServerRequestParser;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.lib.EGamePhase;
+import sep.Types;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +32,18 @@ public final class MockViewLauncher
             l.info("Mock view started. Waiting for JavaFX thread to start.");
             try
             {
-                Thread.sleep(1000);
+                // TODO
+                //      We only need this for OSX, as the JavaFX thread is not started immediately.
+                //      This is a current issue with JavaFX on Sonoma (14.x.x upwards)
+                //      and only fixed in newer JFX Versions.
+                if (Types.OS.isOSX())
+                {
+                    Thread.sleep(7_000);
+                }
+                else
+                {
+                    Thread.sleep(500);
+                }
             }
             catch (InterruptedException e)
             {
