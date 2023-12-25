@@ -1605,7 +1605,8 @@ public class GameJFXController
         return;
     }
 
-    private void renderShopSlots(){
+    private void renderShopSlots()
+    {
         this.renderShopSlot(0, EGameState.INSTANCE.getShopSlot(0));
         this.renderShopSlot(1, EGameState.INSTANCE.getShopSlot(1));
         this.renderShopSlot(2, EGameState.INSTANCE.getShopSlot(2));
@@ -1614,17 +1615,25 @@ public class GameJFXController
 
     }
 
-    private void renderGotUpgradeCardSlots(){
-       renderGotPermanentUpgradeCardSlots();
-       renderGotTemporaryUpgradeCardSlots();
+    private void renderGotUpgradeCardSlots()
+    {
+        this.renderGotPermanentUpgradeCardSlots();
+        this.renderGotTemporaryUpgradeCardSlots();
+
+        return;
     }
 
-    private void renderGotPermanentUpgradeCardSlots(){
+    private void renderGotPermanentUpgradeCardSlots()
+    {
         this.renderGotPermanentUpgradeCardSlot(0, EGameState.INSTANCE.getPermanentUpgradeCard(0));
         this.renderGotPermanentUpgradeCardSlot(1, EGameState.INSTANCE.getPermanentUpgradeCard(1));
         this.renderGotPermanentUpgradeCardSlot(2, EGameState.INSTANCE.getPermanentUpgradeCard(2));
+
+        return;
     }
-    private void renderGotTemporaryUpgradeCardSlots(){
+
+    private void renderGotTemporaryUpgradeCardSlots()
+    {
         this.renderGotTemporaryUpgradeCardSlot(0, EGameState.INSTANCE.getPermanentUpgradeCard(0));
         this.renderGotTemporaryUpgradeCardSlot(1, EGameState.INSTANCE.getPermanentUpgradeCard(1));
         this.renderGotTemporaryUpgradeCardSlot(2, EGameState.INSTANCE.getPermanentUpgradeCard(2));
