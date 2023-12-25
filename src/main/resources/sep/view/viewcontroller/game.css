@@ -1,23 +1,35 @@
 /* We have to do this because the Game Course should not be padded. */
-#master-container {
+#master-game-container {
     -fx-background-color: #2b2a33ff;
+}
+
+#information-container {
+    -fx-min-width: 350px;
+    -fx-padding: 12px 12px 12px 12px;
+    -fx-background-color: #0c0a5cff;
 }
 
 #ui-header {
     -fx-min-height: 50px;
-    -fx-background-color: rgb(66, 31, 31);
+    -fx-background-color: #421f1fff;
 }
 
 #ui-header-phase {
     -fx-font-size: 20px;
-    -fx-text-fill: white;
-    -fx-alignment: center;
+    -fx-text-fill: #ffffffff;
+    -fx-alignment: top-right;
 }
 
 #ui-header-game-state {
     -fx-font-size: 20px;
-    -fx-text-fill: white;
+    -fx-text-fill: #ffffffff;
     -fx-alignment: center;
+}
+
+#footer-container {
+    -fx-min-height: 200px;
+    -fx-background-color: #490000;
+    -fx-padding: 12px 12px 12px 12px;
 }
 
 #ui-footer {
@@ -30,6 +42,14 @@
 
 #ui-footer-register-slots {
     -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+#register-container {
+}
+
+#register-hbox {
+    -fx-spacing: 8px;
     -fx-alignment: center-left;
 }
 
@@ -50,7 +70,7 @@
 }
 
 .register-slot-disabled {
-    -fx-background-color: rgba(0, 0, 0, 0.8);
+    -fx-background-color: rgba(96, 96, 96, 0.8);
     -fx-border-color: #3f0909;
     -fx-border-width: 1px;
 }
@@ -183,7 +203,6 @@
     -fx-min-width: 320px;
     -fx-max-width: 320px;
     -fx-padding: 3px 3px 3px 3px;
-
     -fx-background: #c2c0c9;
 }
 
@@ -220,4 +239,3 @@
 .lobby-msg-client {
     -fx-text-fill: #0078a1;
 }
-
