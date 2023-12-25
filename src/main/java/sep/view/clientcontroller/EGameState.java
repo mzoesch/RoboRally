@@ -366,6 +366,7 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.registers.length)
         {
+            l.error("Tried getting a register card that is out of bounds [{}].", idx);
             return null;
         }
 
