@@ -32,6 +32,9 @@ import javafx.util.Duration;
 import javafx.animation.PauseTransition;
 import javafx.scene.layout.Priority;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
 
 public class GameJFXController
 {
@@ -1092,15 +1095,28 @@ public class GameJFXController
      */
     private void renderGameStateDescription()
     {
-        switch (EGameState.INSTANCE.getCurrentPhase())
-        {
-            case REGISTRATION:
-                this.UIHeaderGameStateDescriptionLabel.setText(String.format(": Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
-                return;
-
-            case UPGRADE:
-                this.UIHeaderGameStateDescriptionLabel.setText(": Select your upgradeCards");
-                return;
+//
+//        switch (EGameState.INSTANCE.getCurrentPhase())
+//        {
+//            case REGISTRATION:
+//                this.UIHeaderGameStateDescriptionLabel.setText(String.format(": Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+//                return;
+//
+//            case UPGRADE:
+//                this.UIHeaderGameStateDescriptionLabel.setText(": Select your upgradeCards");
+//                return;
+//
+//            case PROGRAMMING:
+//                this.UIHeaderGameStateDescriptionLabel.setText(": Select your cards by clicking on them and then on an empty register. " +
+//                        "To empty a register, click on it without having selected a card.");
+//                return;
+//
+//            case ACTIVATION:
+//                this.UIHeaderGameStateDescriptionLabel.setText(": Activation Phase. Just watch your robots move");
+//                return;
+//        }
+//
+//        this.UIHeaderGameStateDescriptionLabel.setText("Unknown game state.");
 
             case PROGRAMMING:
                 this.UIHeaderGameStateDescriptionLabel.setText(": Select your cards by clicking on them and then on an empty register. " +
