@@ -6,9 +6,8 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Button?>
 
-<?import javafx.scene.image.ImageView?>
 <AnchorPane
-    id="master-container" stylesheets="@game.css"
+    id="master-game-container" stylesheets="@globals.css, @game.css"
     fx:id="masterContainer"
     fx:controller="sep.view.scenecontrollers.GameJFXController"
     xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
@@ -19,8 +18,7 @@
         <!--Game Course-->
         <AnchorPane
             id="course-container" stylesheets="@game.css"
-            fx:id="courseContainer"
-            AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+            AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="350.0"
         >
             <ScrollPane
                 id="course-scroll-pane" stylesheets="@game.css"
@@ -34,186 +32,206 @@
             </ScrollPane>
         </AnchorPane>
         <!--Game UI-->
-        <HBox
-            id="ui-header" stylesheets="@game.css"
-            fx:id="uiHeader"
-            AnchorPane.topAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        <AnchorPane
+            id="information-container" stylesheets="@game.css"
+            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
         >
             <children>
+                <Label
+                    text="30s"
+                    styleClass="text-xl"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"
+                />
                 <Label
                     text="Current Phase ???"
                     id="ui-header-phase" stylesheets="@game.css"
                     fx:id="UIHeaderPhaseLabel"
-                />
-                <Label
-                    id="ui-header-game-state" stylesheets="@game.css"
-                    fx:id="UIHeaderGameStateDescriptionLabel"
+                    AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 />
             </children>
-        </HBox>
+        </AnchorPane>
+        <AnchorPane
+            id="footer-container" stylesheets="@game.css"
+            fx:id="footerContainer"
+            AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+        >
+            <children>
+                <Button
+                    styleClass="secondary-btn-tiny"
+                    onAction="#onFooterBtn"
+                    fx:id="footerBtn"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"
+                />
+                <AnchorPane
+                    id="register-container" stylesheets="@game.css"
+                    fx:id="registerContainer"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="0.0"
+                />
+                <VBox
+                    id="chat-container" stylesheets="@game.css"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                >
+                    <children>
+                        <ScrollPane
+                            id="chat-scroll-pane" stylesheets="@game.css"
+                            fx:id="chatScrollPane"
+                        />
+                        <TextField
+                            promptText="Write chat message"
+                            id="chat-input-text-field" stylesheets="@game.css"
+                            fx:id="chatInputTextField"
+                        />
+                    </children>
+                </VBox>
+            </children>
+        </AnchorPane>
         <HBox
             id="player-container" stylesheets="@game.css"
             fx:id="playerContainer"
             AnchorPane.topAnchor="20.0" AnchorPane.rightAnchor="20.0"
         />
-        <HBox
-            id="ui-footer" stylesheets="@game.css"
-            fx:id="uiFooter"
-            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-        >
-        <children>
-            <HBox
-                    id="ui-footer-register-slots" stylesheets="@game.css"
-                >
-                    <children>
-                        <AnchorPane
-                            fx:id="registerSlot1"
-                        />
-                        <AnchorPane
-                            fx:id="registerSlot2"
-                        />
-                        <AnchorPane
-                            fx:id="registerSlot3"
-                        />
-                        <AnchorPane
-                            fx:id="registerSlot4"
-                        />
-                        <AnchorPane
-                            fx:id="registerSlot5"
-                        />
-                    </children>
-                </HBox>
-                <HBox
-                    id="got-register-cards-hbox" stylesheets="@game.css"
-                >
-                    <children>
-                        <VBox
-                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
-                        >
-                            <children>
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot1"
-                                />
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot2"
-                                />
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot3"
-                                />
-                            </children>
-                        </VBox>
-                        <VBox
-                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
-                        >
-                            <children>
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot4"
-                                />
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot5"
-                                />
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot6"
-                                />
-                            </children>
-                        </VBox>
-                        <VBox
-                            styleClass="got-register-cards-vbox" stylesheets="@game.css"
-                        >
-                            <children>
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot7"
-                                />
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot8"
-                                />
-                                <AnchorPane
-                                    fx:id="gotRegisterCardSlot9"
-                                />
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-                <HBox
-                            styleClass="got-upgrade-cards" stylesheets="@game.css"
-                        >
-                            <children>
-                                <VBox
-                                      styleClass="got-upgrade-cards-vbox" stylesheets="@game.css"
-                                      >
-                                    <children>
-                                        <HBox
-                                                styleClass="got-upgrade-cards-hbox" stylesheets="@game.css"
-                                        >
-                                            <children>
-                                                <AnchorPane
-                                                        fx:id="gotTemporaryUpgradeCardSlot1"
-                                                />
-                                                <AnchorPane
-                                                        fx:id="gotTemporaryUpgradeCardSlot2"
-                                                />
-                                                <AnchorPane
-                                                        fx:id="gotTemporaryUpgradeCardSlot3"
-                                                />
-                                            </children>
-                                        </HBox>
-                                        <HBox
-                                                styleClass="got-upgrade-cards-hbox" stylesheets="@game.css"
-                                        >
-                                            <children>
-                                                <AnchorPane
-                                                        fx:id="gotPermanentUpgradeCardSlot1"
-                                                />
-                                                <AnchorPane
-                                                        fx:id="gotPermanentUpgradeCardSlot2"
-                                                />
-                                                <AnchorPane
-                                                        fx:id="gotPermanentUpgradeCardSlot3"
-                                                />
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </VBox>
-                            </children>
-                    </HBox>
-                    <HBox
-                            id="ui-footer-shop-slots" stylesheets="@game.css"
-                        >
-                            <children>
-                                <AnchorPane
-                                        fx:id="shopSlot1"
-                                />
-                                <AnchorPane
-                                        fx:id="shopSlot2"
-                                />
-                                <AnchorPane
-                                        fx:id="shopSlot3"
-                                />
-                                <AnchorPane
-                                        fx:id="shopSlot4"
-                                />
-                                <AnchorPane
-                                        fx:id="shopSlot5"
-                                />
-                            </children>
-                        </HBox>
-            </children>
-        </HBox>
-        <VBox
-            id="chat-container" stylesheets="@game.css"
-            AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="300.0"
-        >
-            <children>
-                <ScrollPane
-                    id="chat-scroll-pane" stylesheets="@game.css"
-                    fx:id="chatScrollPane"
-                />
-                <TextField
-                    promptText="Write global chat message"
-                    id="chat-input-text-field" stylesheets="@game.css"
-                    fx:id="chatInputTextField"
-                />
-            </children>
-        </VBox>
+<!--        <HBox-->
+<!--            id="ui-footer" stylesheets="@game.css"-->
+<!--            fx:id="uiFooter"-->
+<!--            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"-->
+<!--        >-->
+<!--        <children>-->
+<!--            <HBox-->
+<!--                    id="ui-footer-register-slots" stylesheets="@game.css"-->
+<!--                >-->
+<!--                    <children>-->
+<!--                        <AnchorPane-->
+<!--                            fx:id="registerSlot1"-->
+<!--                        />-->
+<!--                        <AnchorPane-->
+<!--                            fx:id="registerSlot2"-->
+<!--                        />-->
+<!--                        <AnchorPane-->
+<!--                            fx:id="registerSlot3"-->
+<!--                        />-->
+<!--                        <AnchorPane-->
+<!--                            fx:id="registerSlot4"-->
+<!--                        />-->
+<!--                        <AnchorPane-->
+<!--                            fx:id="registerSlot5"-->
+<!--                        />-->
+<!--                    </children>-->
+<!--                </HBox>-->
+<!--                <HBox-->
+<!--                    id="got-register-cards-hbox" stylesheets="@game.css"-->
+<!--                >-->
+<!--                    <children>-->
+<!--                        <VBox-->
+<!--                            styleClass="got-register-cards-vbox" stylesheets="@game.css"-->
+<!--                        >-->
+<!--                            <children>-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot1"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot2"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot3"-->
+<!--                                />-->
+<!--                            </children>-->
+<!--                        </VBox>-->
+<!--                        <VBox-->
+<!--                            styleClass="got-register-cards-vbox" stylesheets="@game.css"-->
+<!--                        >-->
+<!--                            <children>-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot4"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot5"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot6"-->
+<!--                                />-->
+<!--                            </children>-->
+<!--                        </VBox>-->
+<!--                        <VBox-->
+<!--                            styleClass="got-register-cards-vbox" stylesheets="@game.css"-->
+<!--                        >-->
+<!--                            <children>-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot7"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot8"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                    fx:id="gotRegisterCardSlot9"-->
+<!--                                />-->
+<!--                            </children>-->
+<!--                        </VBox>-->
+<!--                    </children>-->
+<!--                </HBox>-->
+<!--                <HBox-->
+<!--                            styleClass="got-upgrade-cards" stylesheets="@game.css"-->
+<!--                        >-->
+<!--                            <children>-->
+<!--                                <VBox-->
+<!--                                      styleClass="got-upgrade-cards-vbox" stylesheets="@game.css"-->
+<!--                                      >-->
+<!--                                    <children>-->
+<!--                                        <HBox-->
+<!--                                                styleClass="got-upgrade-cards-hbox" stylesheets="@game.css"-->
+<!--                                        >-->
+<!--                                            <children>-->
+<!--                                                <AnchorPane-->
+<!--                                                        fx:id="gotTemporaryUpgradeCardSlot1"-->
+<!--                                                />-->
+<!--                                                <AnchorPane-->
+<!--                                                        fx:id="gotTemporaryUpgradeCardSlot2"-->
+<!--                                                />-->
+<!--                                                <AnchorPane-->
+<!--                                                        fx:id="gotTemporaryUpgradeCardSlot3"-->
+<!--                                                />-->
+<!--                                            </children>-->
+<!--                                        </HBox>-->
+<!--                                        <HBox-->
+<!--                                                styleClass="got-upgrade-cards-hbox" stylesheets="@game.css"-->
+<!--                                        >-->
+<!--                                            <children>-->
+<!--                                                <AnchorPane-->
+<!--                                                        fx:id="gotPermanentUpgradeCardSlot1"-->
+<!--                                                />-->
+<!--                                                <AnchorPane-->
+<!--                                                        fx:id="gotPermanentUpgradeCardSlot2"-->
+<!--                                                />-->
+<!--                                                <AnchorPane-->
+<!--                                                        fx:id="gotPermanentUpgradeCardSlot3"-->
+<!--                                                />-->
+<!--                                            </children>-->
+<!--                                        </HBox>-->
+<!--                                    </children>-->
+<!--                                </VBox>-->
+<!--                            </children>-->
+<!--                    </HBox>-->
+<!--                    <HBox-->
+<!--                            id="ui-footer-shop-slots" stylesheets="@game.css"-->
+<!--                        >-->
+<!--                            <children>-->
+<!--                                <AnchorPane-->
+<!--                                        fx:id="shopSlot1"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                        fx:id="shopSlot2"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                        fx:id="shopSlot3"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                        fx:id="shopSlot4"-->
+<!--                                />-->
+<!--                                <AnchorPane-->
+<!--                                        fx:id="shopSlot5"-->
+<!--                                />-->
+<!--                            </children>-->
+<!--                        </HBox>-->
+<!--            </children>-->
+<!--        </HBox>-->
     </children>
 </AnchorPane>
