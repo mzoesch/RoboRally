@@ -1584,6 +1584,94 @@ public class GameJFXController
                 break;
         }
 
+            return;
+        }
+        )
+        ;
+
+        ap.getChildren().clear();
+        ap.getChildren().add(iv);
+
+        p.getChildren().add(ap);
+
+        return;
+    }
+
+    private void renderGotTemporaryUpgradeCardSlot(final int idx, final String cardName)
+    {
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName);
+//
+//        switch (idx) {
+//            case 0:
+//                this.gotTemporaryUpgradeCardSlot1.getChildren().clear();
+//                this.gotTemporaryUpgradeCardSlot1.getChildren().add(iv);
+//                this.gotTemporaryUpgradeCardSlot1.getStyleClass().clear();
+//                this.gotTemporaryUpgradeCardSlot1.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 1:
+//                this.gotTemporaryUpgradeCardSlot2.getChildren().clear();
+//                this.gotTemporaryUpgradeCardSlot2.getChildren().add(iv);
+//                this.gotTemporaryUpgradeCardSlot2.getStyleClass().clear();
+//                this.gotTemporaryUpgradeCardSlot2.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 2:
+//                this.gotTemporaryUpgradeCardSlot3.getChildren().clear();
+//                this.gotTemporaryUpgradeCardSlot3.getChildren().add(iv);
+//                this.gotTemporaryUpgradeCardSlot3.getStyleClass().clear();
+//                this.gotTemporaryUpgradeCardSlot3.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//        }
+
+        return;
+    }
+
+    private void renderGotPermanentUpgradeCardSlot(final int idx, final String cardName)
+    {
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName);
+
+//        switch (idx) {
+//            case 0:
+//                this.gotPermanentUpgradeCardSlot1.getChildren().clear();
+//                this.gotPermanentUpgradeCardSlot1.getChildren().add(iv);
+//                this.gotPermanentUpgradeCardSlot1.getStyleClass().clear();
+//                this.gotPermanentUpgradeCardSlot1.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 1:
+//                this.gotPermanentUpgradeCardSlot2.getChildren().clear();
+//                this.gotPermanentUpgradeCardSlot2.getChildren().add(iv);
+//                this.gotPermanentUpgradeCardSlot2.getStyleClass().clear();
+//                this.gotPermanentUpgradeCardSlot2.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 2:
+//                this.gotPermanentUpgradeCardSlot3.getChildren().clear();
+//                this.gotPermanentUpgradeCardSlot3.getChildren().add(iv);
+//                this.gotPermanentUpgradeCardSlot3.getStyleClass().clear();
+//                this.gotPermanentUpgradeCardSlot3.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//        }
+
         return;
     }
 
