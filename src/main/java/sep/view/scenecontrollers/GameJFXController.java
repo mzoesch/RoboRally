@@ -41,26 +41,11 @@ public class GameJFXController
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
     @FXML private Label UIHeaderPhaseLabel;
-    @FXML private Label UIHeaderGameStateDescriptionLabel;
     @FXML private AnchorPane masterContainer;
     @FXML private HBox playerContainer;
-    @FXML private AnchorPane courseContainer;
     @FXML private ScrollPane courseScrollPane;
     @FXML private AnchorPane courseScrollPaneContent;
-    @FXML private AnchorPane registerSlot1;
-    @FXML private AnchorPane registerSlot2;
-    @FXML private AnchorPane registerSlot3;
-    @FXML private AnchorPane registerSlot4;
-    @FXML private AnchorPane registerSlot5;
-    @FXML private AnchorPane gotRegisterCardSlot1;
-    @FXML private AnchorPane gotRegisterCardSlot2;
-    @FXML private AnchorPane gotRegisterCardSlot3;
-    @FXML private AnchorPane gotRegisterCardSlot4;
-    @FXML private AnchorPane gotRegisterCardSlot5;
-    @FXML private AnchorPane gotRegisterCardSlot6;
-    @FXML private AnchorPane gotRegisterCardSlot7;
-    @FXML private AnchorPane gotRegisterCardSlot8;
-    @FXML private AnchorPane gotRegisterCardSlot9;
+    @FXML private AnchorPane registerContainer;
     @FXML private ScrollPane chatScrollPane;
     @FXML private TextField chatInputTextField;
 
@@ -86,6 +71,10 @@ public class GameJFXController
     private int gotRegisterSlotClicked;
     private static final int INVALID_GOT_REGISTER_SLOT = -1;
 
+    private boolean bFooterCollapsed;
+    private HBox registerHBox;
+    private static final int footerPeekHeight = 50;
+
     private int files;
     private int ranks;
     private Tile[][] tiles;
@@ -100,6 +89,8 @@ public class GameJFXController
         this.tileDimensions = ViewSupervisor.TILE_DIMENSIONS;
         this.bClickedOnTile = false;
         this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+
+        this.bFooterCollapsed = true;
 
         this.files = 0;
         this.ranks = 0;
@@ -156,8 +147,6 @@ public class GameJFXController
             return;
         });
         p.play();
-
-        this.initializeButtonActions();
 
         this.chatContainer = new VBox();
         this.chatContainer.setId("chat-scroll-pane-inner");
@@ -304,6 +293,14 @@ public class GameJFXController
         );
 
 
+        return;
+    }
+
+    @FXML
+    private void onFooterBtn(final ActionEvent actionEvent)
+    {
+        this.bFooterCollapsed = !this.bFooterCollapsed;
+        this.renderHUDFooter();
         return;
     }
 
@@ -854,6 +851,7 @@ public class GameJFXController
     // endregion Got Register Slot Action Methods
 
     // region Shop Slot Action Methods
+
     private void onShopSlotClicked(int idx) {
         if (EGameState.INSTANCE.getShopState() == EShopState.DEACTIVATED) {
             l.debug("Player clicked on a empty Shop Slot");
@@ -888,6 +886,7 @@ public class GameJFXController
         }
 
     }
+
     // endregion Shop Slot Action Methods
 
     // region Chat
@@ -1118,17 +1117,6 @@ public class GameJFXController
 //
 //        this.UIHeaderGameStateDescriptionLabel.setText("Unknown game state.");
 
-            case PROGRAMMING:
-                this.UIHeaderGameStateDescriptionLabel.setText(": Select your cards by clicking on them and then on an empty register. " +
-                        "To empty a register, click on it without having selected a card.");
-                return;
-
-            case ACTIVATION:
-                this.UIHeaderGameStateDescriptionLabel.setText(": Activation Phase. Just watch your robots move");
-                return;
-        }
-
-        this.UIHeaderGameStateDescriptionLabel.setText("Unknown game state.");
         return;
     }
 
@@ -1146,7 +1134,7 @@ public class GameJFXController
         return iv;
     }
 
-    private ImageView getCardRegisterSlot(final int width, final int height, final String cardName, final int idx)
+    private ImageView getCardRegisterSlot(final int width, final int height, final String cardName)
     {
         if (cardName == null)
         {
@@ -1157,432 +1145,111 @@ public class GameJFXController
         iv.setFitWidth(width);
         iv.setFitHeight(height);
         iv.setImage(TileModifier.getImage(cardName));
+
         return iv;
     }
 
-    /**
-     * @param idx       Index of the register slot.
-     * @param cardName  Name of the card to render. Pass null to render an empty slot.
-     */
-    private void renderRegisterSlot(int idx, String cardName)
+    /** @param idx Index of the register slot. */
+    private void addRegisterSlot(final int idx, final boolean bIsGotRegister, final Pane p, final int w, final int h)
     {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName, idx);
-
-        switch (idx)
+        final ImageView iv = this.getCardRegisterSlot(w, h, bIsGotRegister ? EGameState.INSTANCE.getGotRegister(idx) : EGameState.INSTANCE.getRegister(idx));
+        final AnchorPane ap = new AnchorPane();
+        if (bIsGotRegister)
         {
-            case 0:
-                this.registerSlot1.getChildren().clear();
-                this.registerSlot1.getChildren().add(iv);
-                this.registerSlot1.getStyleClass().clear();
-                this.registerSlot1.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                            ? EGameState.INSTANCE.getRegister(0) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : EGameState.INSTANCE.getRegister(0) == null
-                                ? "register-slot-available"
-                                : "register-slot-disabled"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 1:
-                this.registerSlot2.getChildren().clear();
-                this.registerSlot2.getChildren().add(iv);
-                this.registerSlot2.getStyleClass().clear();
-                this.registerSlot2.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                            ? EGameState.INSTANCE.getRegister(1) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : EGameState.INSTANCE.getRegister(1) == null
-                                ? "register-slot-available"
-                                : "register-slot-disabled"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 2:
-                this.registerSlot3.getChildren().clear();
-                this.registerSlot3.getChildren().add(iv);
-                this.registerSlot3.getStyleClass().clear();
-                this.registerSlot3.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                            ? EGameState.INSTANCE.getRegister(2) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : EGameState.INSTANCE.getRegister(2) == null
-                                ? "register-slot-available"
-                                : "register-slot-disabled"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 3:
-                this.registerSlot4.getChildren().clear();
-                this.registerSlot4.getChildren().add(iv);
-                this.registerSlot4.getStyleClass().clear();
-                this.registerSlot4.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                            ? EGameState.INSTANCE.getRegister(3) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : EGameState.INSTANCE.getRegister(3) == null
-                                ? "register-slot-available"
-                                : "register-slot-disabled"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 4:
-                this.registerSlot5.getChildren().clear();
-                this.registerSlot5.getChildren().add(iv);
-                this.registerSlot5.getStyleClass().clear();
-                this.registerSlot5.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
-                            ? EGameState.INSTANCE.getRegister(4) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : EGameState.INSTANCE.getRegister(4) == null
-                                ? "register-slot-available"
-                                : "register-slot-disabled"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
+            ap.getStyleClass().add(
+               EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
+            ?! EGameState.INSTANCE.areRegistersFull()
+            ?  this.gotRegisterSlotClicked != idx
+            ?  EGameState.INSTANCE.getGotRegister(idx) == null
+            ?  "register-slot-disabled"
+            :  "register-slot"
+            :  "register-slot-active"
+            :  "register-slot-disabled"
+            :  "register-slot-disabled"
+            )
+            ;
         }
-
-        return;
-    }
-
-    /**
-     * @param idx       Index of the got register slot.
-     * @param cardName  Name of the card to render. Pass null to render an empty slot.
-     */
-    private void renderGotRegisterSlot(final int idx, final String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName, idx);
-
-        switch (idx)
+        else
         {
-            case 0:
-                this.gotRegisterCardSlot1.getChildren().clear();
-                this.gotRegisterCardSlot1.getChildren().add(iv);
-                this.gotRegisterCardSlot1.getStyleClass().clear();
-                this.gotRegisterCardSlot1.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(0) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 1:
-                this.gotRegisterCardSlot2.getChildren().clear();
-                this.gotRegisterCardSlot2.getChildren().add(iv);
-                this.gotRegisterCardSlot2.getStyleClass().clear();
-                this.gotRegisterCardSlot2.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(1) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 2:
-                this.gotRegisterCardSlot3.getChildren().clear();
-                this.gotRegisterCardSlot3.getChildren().add(iv);
-                this.gotRegisterCardSlot3.getStyleClass().clear();
-                this.gotRegisterCardSlot3.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(2) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 3:
-                this.gotRegisterCardSlot4.getChildren().clear();
-                this.gotRegisterCardSlot4.getChildren().add(iv);
-                this.gotRegisterCardSlot4.getStyleClass().clear();
-                this.gotRegisterCardSlot4.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(3) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 4:
-                this.gotRegisterCardSlot5.getChildren().clear();
-                this.gotRegisterCardSlot5.getChildren().add(iv);
-                this.gotRegisterCardSlot5.getStyleClass().clear();
-                this.gotRegisterCardSlot5.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(4) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 5:
-                this.gotRegisterCardSlot6.getChildren().clear();
-                this.gotRegisterCardSlot6.getChildren().add(iv);
-                this.gotRegisterCardSlot6.getStyleClass().clear();
-                this.gotRegisterCardSlot6.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(5) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 6:
-                this.gotRegisterCardSlot7.getChildren().clear();
-                this.gotRegisterCardSlot7.getChildren().add(iv);
-                this.gotRegisterCardSlot7.getStyleClass().clear();
-                this.gotRegisterCardSlot7.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(6) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 7:
-                this.gotRegisterCardSlot8.getChildren().clear();
-                this.gotRegisterCardSlot8.getChildren().add(iv);
-                this.gotRegisterCardSlot8.getStyleClass().clear();
-                this.gotRegisterCardSlot8.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(7) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
-
-            case 8:
-                this.gotRegisterCardSlot9.getChildren().clear();
-                this.gotRegisterCardSlot9.getChildren().add(iv);
-                this.gotRegisterCardSlot9.getStyleClass().clear();
-                this.gotRegisterCardSlot9.getStyleClass()
-                .add(
-                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
-                    ? !EGameState.INSTANCE.areRegistersFull()
-                        ? this.gotRegisterSlotClicked != idx
-                            ? EGameState.INSTANCE.getGotRegister(8) == null
-                                ? "register-slot-disabled"
-                                : "register-slot"
-                            : "register-slot-active"
-                        : "register-slot-disabled"
-                    : "register-slot-disabled"
-                );
-                break;
+            ap.getStyleClass().add(
+               EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
+            ?! EGameState.INSTANCE.areRegistersFull()
+            ?  this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT
+            ?  EGameState.INSTANCE.getRegister(idx) == null
+            ?  "register-slot-disabled"
+            :  "register-slot"
+            :  EGameState.INSTANCE.getRegister(idx) == null
+            ?  "register-slot-available"
+            :  "register-slot-disabled"
+            :  "register-slot-disabled"
+            :  "register-slot-disabled"
+            )
+            ;
         }
 
-        return;
-    }
-
-    private void renderGotTemporaryUpgradeCardSlot(final int idx, final String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName, idx);
-
-        switch (idx) {
-            case 0:
-                this.gotTemporaryUpgradeCardSlot1.getChildren().clear();
-                this.gotTemporaryUpgradeCardSlot1.getChildren().add(iv);
-                this.gotTemporaryUpgradeCardSlot1.getStyleClass().clear();
-                this.gotTemporaryUpgradeCardSlot1.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 1:
-                this.gotTemporaryUpgradeCardSlot2.getChildren().clear();
-                this.gotTemporaryUpgradeCardSlot2.getChildren().add(iv);
-                this.gotTemporaryUpgradeCardSlot2.getStyleClass().clear();
-                this.gotTemporaryUpgradeCardSlot2.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 2:
-                this.gotTemporaryUpgradeCardSlot3.getChildren().clear();
-                this.gotTemporaryUpgradeCardSlot3.getChildren().add(iv);
-                this.gotTemporaryUpgradeCardSlot3.getStyleClass().clear();
-                this.gotTemporaryUpgradeCardSlot3.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-        }
-        return;
-    }
-
-    private void renderGotPermanentUpgradeCardSlot(final int idx, final String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName, idx);
-
-        switch (idx) {
-            case 0:
-                this.gotPermanentUpgradeCardSlot1.getChildren().clear();
-                this.gotPermanentUpgradeCardSlot1.getChildren().add(iv);
-                this.gotPermanentUpgradeCardSlot1.getStyleClass().clear();
-                this.gotPermanentUpgradeCardSlot1.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 1:
-                this.gotPermanentUpgradeCardSlot2.getChildren().clear();
-                this.gotPermanentUpgradeCardSlot2.getChildren().add(iv);
-                this.gotPermanentUpgradeCardSlot2.getStyleClass().clear();
-                this.gotPermanentUpgradeCardSlot2.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
-            case 2:
-                this.gotPermanentUpgradeCardSlot3.getChildren().clear();
-                this.gotPermanentUpgradeCardSlot3.getChildren().add(iv);
-                this.gotPermanentUpgradeCardSlot3.getStyleClass().clear();
-                this.gotPermanentUpgradeCardSlot3.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-        }
-        return;
-    }
-
-
-    private void renderShopSlot(int idx, String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName, idx);
-
-        switch (idx)
+        ap.setOnMouseClicked(e
+        ->
         {
+            if (bIsGotRegister)
+            {
+                switch (idx)
+                {
+                case 0:
+                    this.onGotRegisterSlot1Clicked();
+                    return;
+                case 1:
+                    this.onGotRegisterSlot2Clicked();
+                    return;
+                case 2:
+                    this.onGotRegisterSlot3Clicked();
+                    return;
+                case 3:
+                    this.onGotRegisterSlot4Clicked();
+                    return;
+                case 4:
+                    this.onGotRegisterSlot5Clicked();
+                    return;
+                case 5:
+                    this.onGotRegisterSlot6Clicked();
+                    return;
+                case 6:
+                    this.onGotRegisterSlot7Clicked();
+                    return;
+                case 7:
+                    this.onGotRegisterSlot8Clicked();
+                    return;
+                case 8:
+                    this.onGotRegisterSlot9Clicked();
+                    return;
+                default:
+                    l.error("Invalid got register slot index: {}", idx);
+                    break;
+                }
+
+                return;
+            }
+
+            switch (idx)
+            {
             case 0:
-                this.shopSlot1.getChildren().clear();
-                this.shopSlot1.getChildren().add(iv);
-                this.shopSlot1.getStyleClass().clear();
-                this.shopSlot1.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
+                this.onRegisterSlot1Clicked();
+                return;
             case 1:
-                this.shopSlot2.getChildren().clear();
-                this.shopSlot2.getChildren().add(iv);
-                this.shopSlot2.getStyleClass().clear();
-                this.shopSlot2.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
+                this.onRegisterSlot2Clicked();
+                return;
             case 2:
-                this.shopSlot3.getChildren().clear();
-                this.shopSlot3.getChildren().add(iv);
-                this.shopSlot3.getStyleClass().clear();
-                this.shopSlot3.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
+                this.onRegisterSlot3Clicked();
+                return;
             case 3:
-                this.shopSlot4.getChildren().clear();
-                this.shopSlot4.getChildren().add(iv);
-                this.shopSlot4.getStyleClass().clear();
-                this.shopSlot4.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
-                break;
-
+                this.onRegisterSlot4Clicked();
+                return;
             case 4:
-                this.shopSlot5.getChildren().clear();
-                this.shopSlot5.getChildren().add(iv);
-                this.shopSlot5.getStyleClass().clear();
-                this.shopSlot5.getStyleClass()
-                        .add(
-                                "register-slot-disabled"
-                        );
+                this.onRegisterSlot5Clicked();
+                return;
+            default:
+                l.error("Invalid register slot index: {}", idx);
                 break;
-        }
+            }
 
             return;
         }
@@ -1675,36 +1342,106 @@ public class GameJFXController
         return;
     }
 
-    /**
-     * Updates the register slots.
-     * No re-renders must be done after this method.
-     */
-    private void renderRegisterSlots()
+    private void renderShopSlot(int idx, String cardName)
     {
-        this.renderRegisterSlot(0, EGameState.INSTANCE.getRegister(0));
-        this.renderRegisterSlot(1, EGameState.INSTANCE.getRegister(1));
-        this.renderRegisterSlot(2, EGameState.INSTANCE.getRegister(2));
-        this.renderRegisterSlot(3, EGameState.INSTANCE.getRegister(3));
-        this.renderRegisterSlot(4, EGameState.INSTANCE.getRegister(4));
+        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName);
+//
+//        switch (idx)
+//        {
+//            case 0:
+//                this.shopSlot1.getChildren().clear();
+//                this.shopSlot1.getChildren().add(iv);
+//                this.shopSlot1.getStyleClass().clear();
+//                this.shopSlot1.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 1:
+//                this.shopSlot2.getChildren().clear();
+//                this.shopSlot2.getChildren().add(iv);
+//                this.shopSlot2.getStyleClass().clear();
+//                this.shopSlot2.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 2:
+//                this.shopSlot3.getChildren().clear();
+//                this.shopSlot3.getChildren().add(iv);
+//                this.shopSlot3.getStyleClass().clear();
+//                this.shopSlot3.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 3:
+//                this.shopSlot4.getChildren().clear();
+//                this.shopSlot4.getChildren().add(iv);
+//                this.shopSlot4.getStyleClass().clear();
+//                this.shopSlot4.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//
+//            case 4:
+//                this.shopSlot5.getChildren().clear();
+//                this.shopSlot5.getChildren().add(iv);
+//                this.shopSlot5.getStyleClass().clear();
+//                this.shopSlot5.getStyleClass()
+//                        .add(
+//                                "register-slot-disabled"
+//                        );
+//                break;
+//        }
 
         return;
     }
 
-    /**
-     * Updates the got register card slots.
-     * No re-renders must be done after this method.
-     */
-    private void renderGotRegisterCardSlots()
+    private void renderRegisterSlots()
     {
-        this.renderGotRegisterSlot(0, EGameState.INSTANCE.getGotRegister(0));
-        this.renderGotRegisterSlot(1, EGameState.INSTANCE.getGotRegister(1));
-        this.renderGotRegisterSlot(2, EGameState.INSTANCE.getGotRegister(2));
-        this.renderGotRegisterSlot(3, EGameState.INSTANCE.getGotRegister(3));
-        this.renderGotRegisterSlot(4, EGameState.INSTANCE.getGotRegister(4));
-        this.renderGotRegisterSlot(5, EGameState.INSTANCE.getGotRegister(5));
-        this.renderGotRegisterSlot(6, EGameState.INSTANCE.getGotRegister(6));
-        this.renderGotRegisterSlot(7, EGameState.INSTANCE.getGotRegister(7));
-        this.renderGotRegisterSlot(8, EGameState.INSTANCE.getGotRegister(8));
+        if (this.registerHBox == null)
+        {
+            this.registerHBox = new HBox();
+            this.registerHBox.setId("register-hbox");
+        }
+        else
+        {
+            this.registerHBox.getChildren().clear();
+        }
+
+        this.registerContainer.getChildren().clear();
+        this.registerContainer.getChildren().add(this.registerHBox);
+        for (int i = 0; i < 5; i++)
+        {
+            this.addRegisterSlot(i, false, this.registerHBox, ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT);
+            continue;
+        }
+
+        this.registerHBox.getChildren().add(new VBox());
+        for (int i = 0; i < 9; i++)
+        {
+            if (i % 3 == 0)
+            {
+                ( (Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1) ).getChildren().add(new HBox());
+            }
+
+            this.addRegisterSlot
+            (
+              i
+            , true
+            , (Pane) ((Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1)).getChildren().get(((Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1)).getChildren().size() - 1)
+            , ViewSupervisor.GOT_REGISTER_SLOT_WIDTH
+            , ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT
+            )
+            ;
+
+            continue;
+        }
 
         return;
     }
@@ -1717,6 +1454,7 @@ public class GameJFXController
         this.renderShopSlot(3, EGameState.INSTANCE.getShopSlot(3));
         this.renderShopSlot(4, EGameState.INSTANCE.getShopSlot(4));
 
+        return;
     }
 
     private void renderGotUpgradeCardSlots()
@@ -1741,6 +1479,36 @@ public class GameJFXController
         this.renderGotTemporaryUpgradeCardSlot(0, EGameState.INSTANCE.getPermanentUpgradeCard(0));
         this.renderGotTemporaryUpgradeCardSlot(1, EGameState.INSTANCE.getPermanentUpgradeCard(1));
         this.renderGotTemporaryUpgradeCardSlot(2, EGameState.INSTANCE.getPermanentUpgradeCard(2));
+
+        return;
+    }
+
+    private void setFooterBtnText()
+    {
+        if (this.bFooterCollapsed)
+        {
+            this.footerBtn.setText("Show");
+            return;
+        }
+
+        this.footerBtn.setText("Collapse");
+
+        return;
+    }
+
+    private void translateFooter()
+    {
+        /* TODO Maybe with a timeline? */
+
+        if (this.bFooterCollapsed)
+        {
+            this.footerContainer.setTranslateY(this.footerContainer.getHeight() - GameJFXController.footerPeekHeight);
+            return;
+        }
+
+        this.footerContainer.setTranslateY(0);
+
+        return;
     }
 
     // endregion HUD Footer
@@ -1764,9 +1532,11 @@ public class GameJFXController
     private void renderHUDFooter()
     {
         this.renderRegisterSlots();
-        this.renderGotRegisterCardSlots();
         this.renderShopSlots();
         this.renderGotUpgradeCardSlots();
+        this.setFooterBtnText();
+        this.translateFooter();
+
         return;
     }
 
