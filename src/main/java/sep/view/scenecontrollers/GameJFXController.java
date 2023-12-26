@@ -42,7 +42,7 @@ public class GameJFXController
 
     @FXML private Label UIHeaderPhaseLabel;
     @FXML private AnchorPane masterContainer;
-    @FXML private HBox playerContainer;
+    @FXML private VBox playerContainer;
     @FXML private ScrollPane courseScrollPane;
     @FXML private AnchorPane courseScrollPaneContent;
     @FXML private AnchorPane registerContainer;
