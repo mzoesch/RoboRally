@@ -137,7 +137,7 @@ public enum EClientInformation
      * Will create a new thread that will listen for server responses to not block the main thread.
      *
      * @see sep.view.clientcontroller.ServerListener
-     * */
+     */
     public void listen()
     {
         if (this.serverListener != null)
