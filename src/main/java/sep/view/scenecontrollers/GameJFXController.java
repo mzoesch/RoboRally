@@ -143,10 +143,10 @@ public class GameJFXController
         this.renderView();
 
         // TODO Highly sketchy. Needs some testing.
-        PauseTransition p = new PauseTransition(new Duration(2_000));
+        final PauseTransition p = new PauseTransition(new Duration(2_000));
         p.setOnFinished(e ->
         {
-            l.info("Scrolling view to center.");
+            l.debug("Scrolling view to center.");
             this.courseScrollPane.setHvalue(0.5);
             this.courseScrollPane.setVvalue(0.5);
             return;
@@ -179,20 +179,20 @@ public class GameJFXController
             // TODO Add min max
             switch (e.getCode())
             {
-                /* Zoom in. */
-                case W:
-                    this.tileDimensions += GameJFXController.resizeAmount;
-                    this.renderCourse();
-                    break;
+            /* Zoom in. */
+            case W:
+                this.tileDimensions += GameJFXController.resizeAmount;
+                this.renderCourse();
+                break;
 
-                /* Zoom out. */
-                case S:
-                    this.tileDimensions -= GameJFXController.resizeAmount;
-                    this.renderCourse();
-                    break;
+            /* Zoom out. */
+            case S:
+                this.tileDimensions -= GameJFXController.resizeAmount;
+                this.renderCourse();
+                break;
             }
-            return;
 
+            return;
         });
 
         /* TODO We of course have to del these event listeners when we switch scenes. */
@@ -560,6 +560,7 @@ public class GameJFXController
     }
 
     // endregion Register Slot Action Methods
+
     // region Got Register Slot Action Methods
 
     private void onGotRegisterSlot1Clicked()
@@ -898,7 +899,7 @@ public class GameJFXController
 
     private void onSubmitChatMsg()
     {
-        String token = this.getChatMsg();
+        final String token = this.getChatMsg();
         this.chatInputTextField.clear();
 
         if (this.isChatMsgACommand(token))
@@ -916,28 +917,28 @@ public class GameJFXController
                     this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
                     return;
                 }
-                int idxBSBegin = token.indexOf("\"");
-                String sub = token.substring(idxBSBegin + 1);
+                final int idxBSBegin = token.indexOf("\"");
+                final String sub = token.substring(idxBSBegin + 1);
                 if (!sub.contains("\""))
                 {
                     this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
                     return;
                 }
-                int idxBSEnd = sub.indexOf("\"");
+                final int idxBSEnd = sub.indexOf("\"");
 
-                String targetPlayer = token.substring(idxBSBegin + 1, idxBSBegin + idxBSEnd + 1);
+                final String targetPlayer = token.substring(idxBSBegin + 1, idxBSBegin + idxBSEnd + 1);
                 if (targetPlayer.isEmpty() || targetPlayer.isBlank())
                 {
                     this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
                     return;
                 }
 
-                String msgToWhisper;
+                final String msgToWhisper;
                 try
                 {
                     msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
                 }
-                catch (IndexOutOfBoundsException e)
+                catch (final IndexOutOfBoundsException e)
                 {
                     this.addChatMsgToView(ChatMsgModel.CLIENT_ID, "Invalid message.", false);
                     return;
@@ -947,7 +948,7 @@ public class GameJFXController
                     return;
                 }
 
-                RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
+                final RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
                 if (target == null)
                 {
                     this.addChatMsgToView(ChatMsgModel.CLIENT_ID, String.format("Player %s not found.", targetPlayer), false);
@@ -978,29 +979,42 @@ public class GameJFXController
 
             if (this.getChatCommand(token).equals("hide"))
             {
-                ArrayList<Node> serverInfo = new ArrayList<>();
-                for(Node node : chatContainer.getChildren()){
-                    if(node instanceof Label label){
-                        if(label.getStyleClass().contains("lobby-msg-server")){
+                final ArrayList<Node> serverInfo = new ArrayList<>();
+                for (final Node node : chatContainer.getChildren())
+                {
+                    if (node instanceof final Label label)
+                    {
+                        if (label.getStyleClass().contains("lobby-msg-server"))
+                        {
                             node.setVisible(false);
                             serverInfo.add(node);
-                            l.debug("Line added to serverInfo");
+                            l.debug("Line added to serverInfo.");
+                            continue;
                         }
                     }
+
+                    continue;
                 }
-                chatContainer.getChildren().removeAll(serverInfo);
-                showServerInfo = false;
+
+                this.chatContainer.getChildren().removeAll(serverInfo);
+                this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is now hidden.", false);
+                this.showServerInfo = false;
+
                 return;
             }
 
             if (this.getChatCommand(token).equals("show"))
             {
-                if(showServerInfo){
-                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is already shown", false);
-                } else{
-                    showServerInfo = true;
-                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is shown again", false);
+                if (this.showServerInfo)
+                {
+                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is already shown.", false);
                 }
+                else
+                {
+                    this.showServerInfo = true;
+                    this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is now shown.", false);
+                }
+
                 return;
             }
 
@@ -1013,59 +1027,54 @@ public class GameJFXController
         {
             return;
         }
+
         new ChatMsgModel(token, ChatMsgModel.CHAT_MSG_BROADCAST).send();
 
         return;
     }
 
-    private void addChatMsgToView(int caller, String msg, boolean bIsPrivate)
+    private void addChatMsgToView(final int caller, final String msg, final boolean bIsPrivate)
     {
         if (caller == ChatMsgModel.SERVER_ID)
         {
-            if(showServerInfo) {
-                Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
+            if (this.showServerInfo)
+            {
+                final Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
                 l.getStyleClass().add("lobby-msg-server");
                 l.setWrapText(true);
                 this.chatContainer.getChildren().add(l);
 
                 /* Kinda sketchy. But is there a better way? */
-                PauseTransition p = new PauseTransition(Duration.millis(15));
+                final PauseTransition p = new PauseTransition(Duration.millis(15));
                 p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
                 p.play();
             }
-            return;
 
+            return;
         }
 
         if (caller == ChatMsgModel.CLIENT_ID)
         {
-            Label l = new Label(String.format("[%s] %s", ChatMsgModel.CLIENT_NAME, msg));
+            final Label l = new Label(String.format("[%s] %s", ChatMsgModel.CLIENT_NAME, msg));
             l.getStyleClass().add("lobby-msg-client");
             l.setWrapText(true);
             this.chatContainer.getChildren().add(l);
 
             /* Kinda sketchy. But is there a better way? */
-            PauseTransition p = new PauseTransition(Duration.millis(15));
+            /* final */ PauseTransition p = new PauseTransition(Duration.millis(15));
             p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
             p.play();
 
             return;
         }
 
-        Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
-        if (bIsPrivate)
-        {
-            l.getStyleClass().add("lobby-msg-whisper");
-        }
-        else
-        {
-            l.getStyleClass().add("lobby-msg");
-        }
+        final Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
+        l.getStyleClass().add(bIsPrivate ? "lobby-msg-whisper" : "lobby-msg");
         l.setWrapText(true);
         this.chatContainer.getChildren().add(l);
 
         /* Kinda sketchy. But is there a better way? */
-        PauseTransition p = new PauseTransition(Duration.millis(15));
+        final PauseTransition p = new PauseTransition(Duration.millis(15));
         p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
         p.play();
 
@@ -1159,6 +1168,7 @@ public class GameJFXController
     {
         final ImageView iv = this.getCardRegisterSlot(w, h, bIsGotRegister ? EGameState.INSTANCE.getGotRegister(idx) : EGameState.INSTANCE.getRegister(idx));
         final AnchorPane ap = new AnchorPane();
+
         if (bIsGotRegister)
         {
             ap.getStyleClass().add(
@@ -1199,31 +1209,31 @@ public class GameJFXController
             {
                 switch (idx)
                 {
-                case 0:
+                case 0x0:
                     this.onGotRegisterSlot1Clicked();
                     return;
-                case 1:
+                case 0x1:
                     this.onGotRegisterSlot2Clicked();
                     return;
-                case 2:
+                case 0x2:
                     this.onGotRegisterSlot3Clicked();
                     return;
-                case 3:
+                case 0x3:
                     this.onGotRegisterSlot4Clicked();
                     return;
-                case 4:
+                case 0x4:
                     this.onGotRegisterSlot5Clicked();
                     return;
-                case 5:
+                case 0x5:
                     this.onGotRegisterSlot6Clicked();
                     return;
-                case 6:
+                case 0x6:
                     this.onGotRegisterSlot7Clicked();
                     return;
-                case 7:
+                case 0x7:
                     this.onGotRegisterSlot8Clicked();
                     return;
-                case 8:
+                case 0x8:
                     this.onGotRegisterSlot9Clicked();
                     return;
                 default:
@@ -1236,19 +1246,19 @@ public class GameJFXController
 
             switch (idx)
             {
-            case 0:
+            case 0b0:
                 this.onRegisterSlot1Clicked();
                 return;
-            case 1:
+            case 0b1:
                 this.onRegisterSlot2Clicked();
                 return;
-            case 2:
+            case 0b10:
                 this.onRegisterSlot3Clicked();
                 return;
-            case 3:
+            case 0b11:
                 this.onRegisterSlot4Clicked();
                 return;
-            case 4:
+            case 0b100:
                 this.onRegisterSlot5Clicked();
                 return;
             default:
@@ -1347,7 +1357,7 @@ public class GameJFXController
         return;
     }
 
-    private void renderShopSlot(int idx, String cardName)
+    private void renderShopSlot(final int idx, final String cardName)
     {
         final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName);
 //
@@ -1439,7 +1449,7 @@ public class GameJFXController
             (
               i
             , true
-            , (Pane) ((Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1)).getChildren().get(((Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1)).getChildren().size() - 1)
+            , (Pane) ( (Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1) ).getChildren().get( ( (Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1) ).getChildren().size() - 1)
             , ViewSupervisor.GOT_REGISTER_SLOT_WIDTH
             , ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT
             )
@@ -1490,29 +1500,14 @@ public class GameJFXController
 
     private void setFooterBtnText()
     {
-        if (this.bFooterCollapsed)
-        {
-            this.footerBtn.setText("Show");
-            return;
-        }
-
-        this.footerBtn.setText("Collapse");
-
+        this.footerBtn.setText(this.bFooterCollapsed ? "Show" : "Collapse");
         return;
     }
 
     private void translateFooter()
     {
         /* TODO Maybe with a timeline? */
-
-        if (this.bFooterCollapsed)
-        {
-            this.footerContainer.setTranslateY(this.footerContainer.getHeight() - GameJFXController.footerPeekHeight);
-            return;
-        }
-
-        this.footerContainer.setTranslateY(0);
-
+        this.footerContainer.setTranslateY(this.bFooterCollapsed ? this.footerContainer.getHeight() - GameJFXController.footerPeekHeight : 0);
         return;
     }
 
@@ -1521,7 +1516,7 @@ public class GameJFXController
     /**
      * Updates every dependency of the header.
      * No re-renders must be done after this method.
-     * */
+     */
     private void renderHUDHeader()
     {
         this.renderPhaseTitle();
@@ -1533,7 +1528,7 @@ public class GameJFXController
     /**
      * Updates every dependency of the footer.
      * No re-renders must be done after this method.
-     * */
+     */
     private void renderHUDFooter()
     {
         this.renderRegisterSlots();
@@ -1548,7 +1543,7 @@ public class GameJFXController
     /**
      * Displays every player in the lobby with some stats.
      * No re-renders must be done after this method.
-     * */
+     */
     private void renderPlayerInformationArea()
     {
         this.playerContainer.getChildren().clear();
@@ -1567,20 +1562,20 @@ public class GameJFXController
                 ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(GameJFXController.createHSpacer());
             }
 
-            Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
+            final Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
             figureName.getStyleClass().add("player-box-text");
 
-            Label playerName = new Label(rp.getPlayerName());
+            final Label playerName = new Label(rp.getPlayerName());
             if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
             {
                 playerName.setText(String.format("%s (You)", rp.getPlayerName()));
             }
             playerName.getStyleClass().add("player-box-text");
 
-            Label energyCubes = new Label("Energy: " + rp.getEnergyCubes());
+            final Label energyCubes = new Label("Energy: " + rp.getEnergyCubes());
             energyCubes.getStyleClass().add("player-box-text");
 
-            VBox v = new VBox(figureName, playerName, energyCubes);
+            final VBox v = new VBox(figureName, playerName, energyCubes);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
             if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
@@ -1600,7 +1595,7 @@ public class GameJFXController
     /**
      * Super method for all HUD updates. Will rerender everything on the HUD.
      * No re-renders must be done after this method.
-     * */
+     */
     public void renderHUD()
     {
         this.renderHUDHeader();
@@ -1616,13 +1611,9 @@ public class GameJFXController
 
     // region Helper Methods
 
-    /**
-     * Updates global variable used to render the course. They may change based on
-     * the current board and size of the client's window.
-     * */
     private void updateGlobalVariables()
     {
-        /* We can do this because even if there is no tile, it must always be annotated with a null json object. */
+        /* We can do this because even if there is no tile, it must always be annotated with a null JSON Object. */
         this.files = EGameState.INSTANCE.getCurrentServerCourseJSON().toList().size();
         this.ranks = EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(0).toList().size();
 
@@ -1631,7 +1622,7 @@ public class GameJFXController
         {
             for (int j = 0; j < this.ranks; j++)
             {
-                Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(i).getJSONArray(j));
+                final Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(i).getJSONArray(j));
                 t.setTranslateX(i);
                 t.setTranslateY(j);
                 tiles[i][j] = t;
@@ -1641,7 +1632,6 @@ public class GameJFXController
             continue;
         }
 
-        // TODO Only works with rectangle courses
         this.minXTranslation = this.tiles[0][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
         this.maxXTranslation = this.tiles[this.files - 1][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
         this.centralXTranslation = ((this.courseScrollPane.getWidth() - this.maxXTranslation) - this.minXTranslation) / 2 - (double) this.tileDimensions / 2;
@@ -1651,10 +1641,7 @@ public class GameJFXController
 
     private void setStyleOfCourseViewContent()
     {
-        final double viewWidth = this.files * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL;
-        final double viewHeight = this.ranks * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_VERTICAL;
-        this.courseScrollPaneContent.setStyle(String.format("-fx-background-color: #000000ff; -fx-min-width: %spx; -fx-min-height: %spx;", (int) viewWidth, (int) viewHeight));
-
+        this.courseScrollPaneContent.setStyle(String.format("-fx-background-color: #000000ff; -fx-min-width: %spx; -fx-min-height: %spx;", this.files * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL, this.ranks * this.tileDimensions + ViewSupervisor.VIRTUAL_SPACE_VERTICAL));
         return;
     }
 
@@ -1693,9 +1680,9 @@ public class GameJFXController
      * Renders the actual course board. This method will take some time to execute. Do not call this method if you only
      * want to update a small part of the view. Use the specific update methods instead.
      *
-     * <p>It Will render everything that is static on the course board.
+     * <p>It will render everything that is static on the course board.
      *
-     * <p>You will have to rerender the whole course view after this method (like player positions).
+     * <p>You will have to re-render movable parts of the course view after this method (like player positions).
      */
     private void renderCourseBoard()
     {
@@ -1714,8 +1701,8 @@ public class GameJFXController
         {
             for (int j = 0; j < this.ranks; j++)
             {
-                Tile t = this.tiles[i][j];
-                AnchorPane AP = new AnchorPane();
+                final Tile t = this.tiles[i][j];
+                final AnchorPane AP = new AnchorPane();
                 for (int k = t.getImageViews().length - 1; k >= 0; k--)
                 {
                     ImageView iv = t.getImageViews()[k];
@@ -1732,40 +1719,42 @@ public class GameJFXController
                     {
                         l.info("User clicked on tile. Checking if valid move.");
 
-                        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
+                        if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.REGISTRATION)
                         {
-                            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasStartingPosition())
-                            {
-                                l.warn("User already has a starting position.");
-                                return;
-                            }
-
-                            if (EGameState.INSTANCE.getClientRemotePlayer() != EGameState.INSTANCE.getCurrentPlayer())
-                            {
-                                l.warn("Player can not set starting position because it is not their turn.");
-                                return;
-                            }
-
-                            /* To prevent spamming the server with requests. */
-                            if (this.bClickedOnTile)
-                            {
-                                return;
-                            }
-
-                            l.info("User wants to set starting position.");
-                            // TODO Some kind of validation.
-                            new SetStartingPointModel(t.getTranslateX(), t.getTranslateY()).send();
-                            this.bClickedOnTile = true;
-
+                            l.warn("User clicked on tile but it is not the registration phase.");
                             return;
                         }
+
+                        if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasStartingPosition())
+                        {
+                            l.warn("User already has a starting position.");
+                            return;
+                        }
+
+                        if (EGameState.INSTANCE.getClientRemotePlayer() != EGameState.INSTANCE.getCurrentPlayer())
+                        {
+                            l.warn("Player can not set starting position because it is not their turn.");
+                            return;
+                        }
+
+                        /* To prevent spamming the server with requests. */
+                        if (this.bClickedOnTile)
+                        {
+                            l.warn("Already waiting for server response.");
+                            return;
+                        }
+
+                        l.info("User wants to set starting position.");
+                        /* TODO Some kind of validation. */
+                        new SetStartingPointModel(t.getTranslateX(), t.getTranslateY()).send();
+                        this.bClickedOnTile = true;
 
                         return;
                     });
 
                     // Since there is AFAIK no "::before" or "::after" css
                     // support for JavaFX. We add a pseudo elem here.
-                    AnchorPane after = new AnchorPane();
+                    final AnchorPane after = new AnchorPane();
 
                     after.getStyleClass().add("tile-after");
 
@@ -1817,7 +1806,7 @@ public class GameJFXController
      * Updates the whole course view. This is very costly. Do not call this method if you only want to update a small
      * part of the view. Use the specific update methods instead.
      * No re-renders must be done after this method.
-     * */
+     */
     private void renderCourse()
     {
         this.renderCourseBoard();
@@ -1909,7 +1898,7 @@ public class GameJFXController
         return;
     }
 
-    public void onChatMsgReceived(int sourceID, String msg, boolean bIsPrivate)
+    public void onChatMsgReceived(final int sourceID, final String msg, final boolean bIsPrivate)
     {
         Platform.runLater(() ->
         {
@@ -1945,24 +1934,19 @@ public class GameJFXController
         return this.chatInputTextField.getText();
     }
 
-    private boolean isChatMsgValid(String token)
+    private boolean isChatMsgValid(final String token)
     {
         return !token.isEmpty() && token.length() <= EGameState.MAX_CHAT_MESSAGE_LENGTH;
     }
 
-    private boolean isChatMsgACommand(String token)
+    private boolean isChatMsgACommand(final String token)
     {
         return token.startsWith(ChatMsgModel.COMMAND_PREFIX);
     }
 
-    private String getChatCommand(String token)
+    private String getChatCommand(final String token)
     {
-        if (!token.contains(" "))
-        {
-            return token.substring(1);
-        }
-
-        return token.substring(1, token.indexOf(" "));
+        return !token.contains(" ") ? token.substring(1) : token.substring(1, token.indexOf(" "));
     }
 
     public double calcXTranslation(final int file)
