@@ -53,13 +53,13 @@ public final class MockViewLauncher
             l.info("Give mock information to JavaFX thread.");
 
             /* Players */
-//            for (int i = 0; i < MockViewLauncher.MOCK_PLAYER_COUNT; i++)
-//            {
-//                RDefaultServerRequestParser dsrp = new RDefaultServerRequestParser(new JSONObject(String.format(
-//                        "{\"messageType\":\"PlayerAdded\",\"messageBody\":{\"clientID\": %d,\"name\":\"Player %d\", \"figure\": %d}}", i, i, i
-//                )));
-//                EGameState.addRemotePlayer(dsrp);
-//            }
+            for (int i = 0; i < MockViewLauncher.MOCK_PLAYER_COUNT; i++)
+            {
+                RDefaultServerRequestParser dsrp = new RDefaultServerRequestParser(new JSONObject(String.format(
+                        "{\"messageType\":\"PlayerAdded\",\"messageBody\":{\"clientID\": %d,\"name\":\"Player %d\", \"figure\": %d}}", i, i, i
+                )));
+                EGameState.addRemotePlayer(dsrp);
+            }
 
             // region Course creation
 
