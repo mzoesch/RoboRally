@@ -1076,24 +1076,6 @@ public class GameJFXController
 
     // region Rendering
 
-    // region Utils
-
-    private static Node createHSpacer()
-    {
-        final Region s = new Region();
-        HBox.setHgrow(s, Priority.ALWAYS);
-        return s;
-    }
-
-    private static Node createVSpacer()
-    {
-        final Region s = new Region();
-        VBox.setVgrow(s, Priority.ALWAYS);
-        return s;
-    }
-
-    // endregion Utils
-
     // region Head Up Display
 
     // region HUD Header
@@ -1689,6 +1671,20 @@ public class GameJFXController
         }
 
         return;
+    }
+
+    private static Node createHSpacer()
+    {
+        final Region s = new Region();
+        HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private static Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
+        return s;
     }
 
     // endregion Helper Methods
