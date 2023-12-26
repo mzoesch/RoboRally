@@ -2,7 +2,10 @@ package sep.view.scenecontrollers;
 
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.RemotePlayer;
-import sep.view.json.game.*;
+import sep.view.json.game.SelectedCardModel;
+import sep.view.json.game.SelectedDamageModel;
+import sep.view.json.game.RebootDirectionModel;
+import sep.view.json.game.SetStartingPointModel;
 import sep.view.lib.EShopState;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
@@ -35,6 +38,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
+import javafx.scene.layout.Region;
 
 public class GameJFXController
 {
@@ -1072,6 +1076,24 @@ public class GameJFXController
 
     // region Rendering
 
+    // region Utils
+
+    private static Node createHSpacer()
+    {
+        final Region s = new Region();
+        HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private static Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    // endregion Utils
+
     // region Head Up Display
 
     // region HUD Header
@@ -1549,8 +1571,20 @@ public class GameJFXController
     {
         this.playerContainer.getChildren().clear();
 
-        for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; i++)
         {
+            final RemotePlayer rp = EGameState.INSTANCE.getRemotePlayers()[i];
+
+            if (i % 2 == 0)
+            {
+                this.playerContainer.getChildren().add(new HBox());
+            }
+
+            if (i % 2 == 1)
+            {
+                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(GameJFXController.createHSpacer());
+            }
+
             Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
             figureName.getStyleClass().add("player-box-text");
 
@@ -1573,7 +1607,7 @@ public class GameJFXController
             }
             v.getStyleClass().add("player-box");
 
-            this.playerContainer.getChildren().add(v);
+            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(v);
 
             continue;
         }
