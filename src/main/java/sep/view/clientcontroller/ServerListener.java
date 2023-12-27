@@ -336,7 +336,6 @@ public class ServerListener implements Runnable
 
     private boolean onCurrentRegisterCards() throws JSONException
     {
-        /* TODO Display current cards of each player in the UI. */
         final StringBuilder sb = new StringBuilder();
         sb.append(String.format("In register %s these cards were played: (", EGameState.INSTANCE.getCurrentRegister()));
         sb.append(IntStream.range(0, this.dsrp.getActiveCards().length()).mapToObj(i -> String.format("%s[Player %d played card %s]", i == 0 ? "" : ", ", this.dsrp.getPlayerIDFromActiveCardIdx(i), this.dsrp.getActiveCardFromIdx(i))).collect(Collectors.joining()));
