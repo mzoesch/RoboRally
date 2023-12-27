@@ -70,7 +70,7 @@ public class GameJFXController
     private boolean showServerInfo = true;
 
     private int tileDimensions;
-    private static final int resizeAmount = 10;
+    private static final int RESIZE_AMOUNT = 10;
 
     private boolean bClickedOnTile;
     private int gotRegisterSlotClicked;
@@ -181,13 +181,13 @@ public class GameJFXController
             {
             /* Zoom in. */
             case W:
-                this.tileDimensions += GameJFXController.resizeAmount;
+                this.tileDimensions += GameJFXController.RESIZE_AMOUNT;
                 this.renderCourse();
                 break;
 
             /* Zoom out. */
             case S:
-                this.tileDimensions -= GameJFXController.resizeAmount;
+                this.tileDimensions -= GameJFXController.RESIZE_AMOUNT;
                 this.renderCourse();
                 break;
             }
