@@ -23,10 +23,12 @@ public enum EArgs
 
     private EArgs()
     {
-        this.mode = EArgs.DEFAULT;
         this.customServerIP = "";
         this.customServerPort = EPort.INVALID.i;
         this.customMinRemotePlayers = EArgs.DEFAULT_MIN_REMOTE_PLAYERS;
+
+        this.mode = EArgs.DEFAULT;
+
         return;
     }
 
@@ -43,15 +45,11 @@ public enum EArgs
         }
 
         EArgs.INSTANCE.mode = mode;
+
         return;
     }
 
-    public static String getCustomServerIP()
-    {
-        return EArgs.INSTANCE.customServerIP;
-    }
-
-    public static void setCustomServerIP(String customServerIP)
+    public static void setCustomServerIP(final String customServerIP)
     {
         EArgs.INSTANCE.customServerIP = customServerIP;
         return;
@@ -78,4 +76,5 @@ public enum EArgs
         EArgs.INSTANCE.customMinRemotePlayers = min;
         return;
     }
+
 }
