@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.json.RDefaultServerRequestParser;
 import sep.view.lib.EShopState;
+import sep.view.lib.RRegisterCard;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
 
@@ -656,4 +657,27 @@ public enum EGameState
     public void clearSelectedDamageCards(){
         this.selectedDamageCards.clear();
     }
+
+    private void clearRCardsFromRemotes()
+    {
+        for (final RemotePlayer rp : this.remotePlayers)
+        {
+            rp.clearPlayedRCards();
+            continue;
+        }
+
+        return;
+    }
+
+    public void addRCardsToRemotes(final RRegisterCard[] currentRegisterCards)
+    {
+        for (final RRegisterCard rrc : currentRegisterCards)
+        {
+            Objects.requireNonNull(this.getRemotePlayer(rrc.ctrlID())).addPlayedRCards(rrc.card());
+            continue;
+        }
+
+        return;
+    }
+
 }

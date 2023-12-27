@@ -3,6 +3,8 @@ package sep.view.clientcontroller;
 import sep.view.viewcontroller.RobotView;
 import sep.view.lib.RCoordinate;
 
+import java.util.ArrayList;
+
 /**
  * Represents a player in the lobby. Not just remote players but also the client player.
  * We may store information on the remote player state here that is unique to a player and not to the game. This
@@ -25,6 +27,7 @@ public final class RemotePlayer
 
     private boolean bSelectionFinished;
     private int checkPointsReached = 0;
+    private final ArrayList<String> playedRCards;
 
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
     {
@@ -39,6 +42,7 @@ public final class RemotePlayer
         this.registerSlots = new String[REGISTER_SLOTS];
 
         this.bSelectionFinished = false;
+        this.playedRCards = new ArrayList<String>();
 
         return;
     }
@@ -149,4 +153,22 @@ public final class RemotePlayer
     }
 
     public void setCheckPointsReached(int number){ checkPointsReached = number;}
+
+    public void clearPlayedRCards()
+    {
+        this.playedRCards.clear();
+        return;
+    }
+
+    public void addPlayedRCards(final String card)
+    {
+        this.playedRCards.add(card);
+        return;
+    }
+
+    public String[] getPlayedRCards()
+    {
+        return this.playedRCards.toArray(new String[0]);
+    }
+
 }
