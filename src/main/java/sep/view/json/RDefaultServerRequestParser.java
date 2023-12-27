@@ -2,6 +2,7 @@ package sep.view.json;
 
 import sep.view.lib.RCoordinate;
 import sep.view.clientcontroller.EConnectionLoss;
+import sep.view.lib.RRegisterCard;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -186,6 +187,11 @@ public record RDefaultServerRequestParser(JSONObject request)
     public EConnectionLoss getNetAction() throws JSONException
     {
         return EConnectionLoss.fromString(this.request.getJSONObject("messageBody").getString("action"));
+    }
+
+    public RRegisterCard[] getCurrentRegisterCards() throws JSONException
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()).mapToObj(i -> new RRegisterCard(this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"), this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card"))).toArray(RRegisterCard[]::new);
     }
 
 }
