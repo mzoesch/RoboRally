@@ -344,6 +344,8 @@ public class ServerListener implements Runnable
         l.debug(sb.toString());
         ViewSupervisor.handleChatInfo(sb.toString());
         EGameState.INSTANCE.setCurrentRegister(EGameState.INSTANCE.getCurrentRegister() + 1);
+        EGameState.INSTANCE.addRCardsToRemotes(this.dsrp.getCurrentRegisterCards());
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 

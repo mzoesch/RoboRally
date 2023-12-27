@@ -26,7 +26,8 @@ public final class RemotePlayer
     private int energyCubes = 5;
 
     private boolean bSelectionFinished;
-    private int checkPointsReached = 0;
+    private int checkPointsReached;
+
     private final ArrayList<String> playedRCards;
 
     public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
@@ -42,6 +43,8 @@ public final class RemotePlayer
         this.registerSlots = new String[REGISTER_SLOTS];
 
         this.bSelectionFinished = false;
+        this.checkPointsReached = 0;
+
         this.playedRCards = new ArrayList<String>();
 
         return;

@@ -1865,6 +1865,17 @@ public class GameJFXController
         return;
     }
 
+    public void onRPhase()
+    {
+        Platform.runLater(() ->
+        {
+            this.renderPlayerInformationArea();
+            return;
+        });
+
+        return;
+    }
+
     public void onCourseUpdate()
     {
         Platform.runLater(() ->

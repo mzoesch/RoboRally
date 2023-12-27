@@ -251,6 +251,22 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void updatePlayerInformationArea()
+    {
+        try
+        {
+            final GameJFXController ctrl = (GameJFXController) ViewSupervisor.getSceneController().getCurrentController();
+            ctrl.onRPhase();
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     public static void updateFooter()
     {
         try
