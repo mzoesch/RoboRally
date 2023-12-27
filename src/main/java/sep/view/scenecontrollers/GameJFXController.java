@@ -1580,7 +1580,41 @@ public class GameJFXController
             }
             v.getStyleClass().add("player-box");
 
-            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(v);
+            final AnchorPane ap = new AnchorPane();
+            HBox.setHgrow(ap, Priority.ALWAYS);
+            for (int j = 0; j < rp.getPlayedRCards().length; j++)
+            {
+                final ImageView iv = new ImageView();
+                iv.setFitWidth(GameJFXController.RCARD_WIDTH);
+                iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
+                iv.setImage(TileModifier.getImage(rp.getPlayedRCards()[j]));
+                iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (i % 2 == 0 ? 1 : -1));
+                if (i % 2 == 0)
+                {
+                    AnchorPane.setLeftAnchor(iv, 10.0);
+                }
+                else
+                {
+                    AnchorPane.setRightAnchor(iv, 10.0);
+                }
+                ap.getChildren().add(iv);
+                continue;
+            }
+
+            final HBox h = new HBox();
+            h.getStyleClass().add("player-information-container");
+            h.setStyle(EGameState.INSTANCE.getClientRemotePlayer() == null ? String.format("-%sx-border-color: #282828ff", "f") : EGameState.INSTANCE.getClientRemotePlayer().getPlayerID() == rp.getPlayerID() ? String.format("-%sx-border-color: #ffffffff", "f") : String.format("-%sx-border-color: #282828ff", "f"));
+            if (i % 2 != 0)
+            {
+                h.getChildren().add(ap);
+            }
+            h.getChildren().add(v);
+            if (i % 2 == 0)
+            {
+                h.getChildren().add(ap);
+            }
+
+            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(h);
 
             continue;
         }
