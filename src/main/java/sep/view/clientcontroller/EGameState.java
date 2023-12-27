@@ -315,6 +315,8 @@ public enum EGameState
             return;
         }
 
+        this.clearRCardsFromRemotes();
+
         // TODO
         //      We exited the registration phase, and there will be no more clickable actions on the course view,
         //      therefore, we re-render the course view to remove the hover effect. Note, this is not efficient, we
