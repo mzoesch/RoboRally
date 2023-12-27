@@ -140,7 +140,6 @@
 
 .player-box-active {
     -fx-border-color: #ff0000ff;
-    -fx-background-color: #ff0000ff;
 }
 
 .player-box-inSelection {
@@ -150,7 +149,6 @@
 
 .player-box-selected {
     -fx-border-color: #39FF14;
-    -fx-background-color: #39FF14;
 }
 
 .player-box:hover {
