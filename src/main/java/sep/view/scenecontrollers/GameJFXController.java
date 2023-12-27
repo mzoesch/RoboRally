@@ -1578,7 +1578,16 @@ public class GameJFXController
             {
                 v.getStyleClass().add(String.format("player-box-%s", rp.hasSelectionFinished() ? "selected" : "inSelection"));
             }
-            v.getStyleClass().add("player-box");
+            v.setStyle(String.format("-fx-background-color: %s;",
+                  rp.getFigureID() == 0 ? GameJFXController.COLOR_HAMMER
+                : rp.getFigureID() == 1 ? GameJFXController.COLOR_TRUNDLE
+                : rp.getFigureID() == 2 ? GameJFXController.COLOR_SQUASH
+                : rp.getFigureID() == 3 ? GameJFXController.COLOR_X90
+                : rp.getFigureID() == 4 ? GameJFXController.COLOR_SPIN
+                : rp.getFigureID() == 5 ? GameJFXController.COLOR_TWONKY
+                : rp.getFigureID() == 6 ? GameJFXController.COLOR_TWITCH
+                : ""
+            ));
 
             final AnchorPane ap = new AnchorPane();
             HBox.setHgrow(ap, Priority.ALWAYS);

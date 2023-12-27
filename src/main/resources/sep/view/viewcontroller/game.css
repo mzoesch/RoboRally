@@ -160,6 +160,13 @@
     -fx-text-fill: white;
 }
 
+.player-information-container {
+    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-padding: 5px;
+    -fx-min-width: 200px;
+    -fx-max-width: 200px;
+}
+
 #course-container {
 }
 
