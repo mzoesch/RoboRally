@@ -32,6 +32,17 @@
     -fx-text-fill: -text-fill-error;
 }
 
+.text-sm-error,
+.text-sm {
+    -fx-font-size: 12px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+}
+
+.text-sm-error {
+    -fx-text-fill: -text-fill-error;
+}
+
 .text-base-error,
 .text-base {
     -fx-font-size: 16px;
