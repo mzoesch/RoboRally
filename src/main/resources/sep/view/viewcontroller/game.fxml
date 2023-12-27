@@ -18,7 +18,7 @@
         <!--Game Course-->
         <AnchorPane
             id="course-container" stylesheets="@game.css"
-            AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="350.0"
+            AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="450.0"
         >
             <ScrollPane
                 id="course-scroll-pane" stylesheets="@game.css"

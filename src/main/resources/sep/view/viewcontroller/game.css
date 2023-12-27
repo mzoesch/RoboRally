@@ -4,7 +4,7 @@
 }
 
 #information-container {
-    -fx-min-width: 350px;
+    -fx-min-width: 450px;
     -fx-padding: 12px 12px 12px 12px;
     -fx-background-color: #0c0a5cff;
 }
