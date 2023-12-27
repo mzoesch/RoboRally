@@ -1563,19 +1563,15 @@ public class GameJFXController
             }
 
             final Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
-            figureName.getStyleClass().add("player-box-text");
+            figureName.getStyleClass().add("text-sm");
 
-            final Label playerName = new Label(rp.getPlayerName());
-            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
-            {
-                playerName.setText(String.format("%s (You)", rp.getPlayerName()));
-            }
-            playerName.getStyleClass().add("player-box-text");
+            final Label ctrlName = new Label(rp.getPlayerName());
+            ctrlName.getStyleClass().add("text-sm");
 
-            final Label energyCubes = new Label("Energy: " + rp.getEnergyCubes());
-            energyCubes.getStyleClass().add("player-box-text");
+            final Label energyCubes = new Label(String.format("Energy: %d", rp.getEnergyCubes()));
+            energyCubes.getStyleClass().add("text-sm");
 
-            final VBox v = new VBox(figureName, playerName, energyCubes);
+            final VBox v = new VBox(figureName, ctrlName, energyCubes);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
             if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
