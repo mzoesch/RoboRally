@@ -44,6 +44,14 @@ public class GameJFXController
 {
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
+    private static final String COLOR_HAMMER = "#ff000033";
+    private static final String COLOR_TRUNDLE = "#0000ff33";
+    private static final String COLOR_SQUASH = "#ffc0cb33";
+    private static final String COLOR_X90 = "#00ff0033";
+    private static final String COLOR_SPIN = "#00ffff33";
+    private static final String COLOR_TWONKY = "#ffff0033";
+    private static final String COLOR_TWITCH = "#aaaaaa33";
+
     @FXML private Label UIHeaderPhaseLabel;
     @FXML private AnchorPane masterContainer;
     @FXML private VBox playerContainer;
@@ -65,6 +73,10 @@ public class GameJFXController
 //    @FXML private AnchorPane gotPermanentUpgradeCardSlot3;
     @FXML private Button footerBtn;
     @FXML private AnchorPane footerContainer;
+
+    private static final int RCARD_WIDTH = 50;
+    private static final int RCARD_HEIGHT = 88;
+    private static final int RCARD_TRANSLATION_DIFF_X = 10;
 
     private VBox chatContainer;
     private boolean showServerInfo = true;
