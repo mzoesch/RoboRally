@@ -5,6 +5,7 @@ import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.lib.EGamePhase;
 import sep.Types;
+import sep.view.lib.RRegisterCard;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -980,6 +981,19 @@ public final class MockViewLauncher
                 EGameState.INSTANCE.addGotRegister(s);
             }
             EGameState.INSTANCE.setCurrentPlayer(0);
+
+            for (int i = 0; i < 5; i++)
+            {
+                EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{
+                    new RRegisterCard(0, "MoveI"),
+                    new RRegisterCard(1, "MoveI"),
+                    new RRegisterCard(2, "MoveI"),
+                    new RRegisterCard(3, "MoveII"),
+                    new RRegisterCard(4, "MoveII"),
+                    new RRegisterCard(5, "MoveII"),
+                });
+            }
+            ViewSupervisor.updatePlayerInformationArea();
 
             return;
         });
