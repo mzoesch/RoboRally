@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
+import javafx.application.Platform;
 
 /**
  * This class is responsible for launching the JavaFX application and is
@@ -133,10 +134,21 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    public static void startGame(JSONArray course)
+    public static void startGame(final JSONArray course)
     {
         EGameState.INSTANCE.setCurrentServerCourseJSON(course);
         ViewSupervisor.INSTANCE.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
+        return;
+    }
+
+    public static void startGameLater(final JSONArray course)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.startGame(course);
+            return;
+        });
+
         return;
     }
     

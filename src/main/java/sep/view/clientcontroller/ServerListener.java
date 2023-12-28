@@ -198,7 +198,7 @@ public class ServerListener implements Runnable
     private boolean onGameStart() throws JSONException
     {
         l.debug("Game has started. Loading game scene . . .");
-        ViewSupervisor.startGame(this.dsrp.getGameCourse());
+        ViewSupervisor.startGameLater(this.dsrp.getGameCourse());
         return true;
     }
 
