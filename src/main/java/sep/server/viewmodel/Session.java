@@ -32,6 +32,7 @@ import sep.server.json.game.activatingphase.ReplaceCardModel;
 import sep.server.model.game.tiles.Coordinate;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -259,15 +260,10 @@ public final class Session
             return;
         }
 
-        for (final PlayerController pc : this.getRemotePlayers())
+        if (this.getPlayerControllerByID(receiverID) != null)
         {
-            if (pc.getPlayerID() == receiverID)
-            {
-                pc.sendChatMessage(pc.getPlayerID(), msg, true);
-                return;
-            }
-
-            continue;
+            Objects.requireNonNull(this.getPlayerControllerByID(receiverID)).sendChatMessage(callingPC.getPlayerID(), msg, true);
+            return;
         }
 
         l.warn("Client {} tried to send a private message to a non-existing remote player.", callingPC.getClientInstance().getAddr());
