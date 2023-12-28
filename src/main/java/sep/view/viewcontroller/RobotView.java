@@ -192,7 +192,7 @@ public class RobotView
 
     public Image getRobotImage()
     {
-        return Tile.getRobotImage(this.possessor.getFigureID());
+        return Tile.getRobotImage(this.possessor.getFigure().i);
     }
 
     // endregion Getters and Setters

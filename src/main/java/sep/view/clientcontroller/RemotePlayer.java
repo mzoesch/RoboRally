@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.viewcontroller.RobotView;
 import sep.view.lib.RCoordinate;
+import sep.view.lib.Types.EFigure;
 
 import java.util.ArrayList;
 
@@ -14,7 +15,7 @@ public final class RemotePlayer
 {
     private final int playerID;
     private String playerName;
-    private int figureID;
+    private EFigure figure;
     private boolean bReady;
 
     private RCoordinate startPos;
@@ -30,11 +31,11 @@ public final class RemotePlayer
 
     private final ArrayList<String> playedRCards;
 
-    public RemotePlayer(int playerID, String playerName, int figureID, boolean bReady)
+    public RemotePlayer(final int playerID, final String playerName, final EFigure figure, final boolean bReady)
     {
         this.playerID = playerID;
         this.playerName = playerName;
-        this.figureID = figureID;
+        this.figure = figure;
         this.bReady = bReady;
 
         this.startPos = null;
@@ -60,9 +61,9 @@ public final class RemotePlayer
         return this.playerName;
     }
 
-    public int getFigureID()
+    public EFigure getFigure()
     {
-        return this.figureID;
+        return this.figure;
     }
 
     public void setPlayerName(String playerName)
@@ -71,9 +72,9 @@ public final class RemotePlayer
         return;
     }
 
-    public void setFigureID(int figureID)
+    public void setFigure(final EFigure figure)
     {
-        this.figureID = figureID;
+        this.figure = figure;
         return;
     }
 

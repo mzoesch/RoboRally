@@ -1,18 +1,19 @@
 package sep.view.json.lobby;
 
 import sep.view.json.AServerRequestModel;
+import sep.view.lib.Types.EFigure;
 
 import org.json.JSONObject;
 
 public final class PlayerValuesModel extends AServerRequestModel
 {
     private final String playerName;
-    private final int figureID;
+    private final EFigure f;
 
-    public PlayerValuesModel(final String playerName, final int figureID)
+    public PlayerValuesModel(final String playerName, final EFigure f)
     {
         this.playerName = playerName;
-        this.figureID = figureID;
+        this.f = f;
 
         return;
     }
@@ -22,7 +23,7 @@ public final class PlayerValuesModel extends AServerRequestModel
     {
         JSONObject body = new JSONObject();
         body.put("name", this.playerName);
-        body.put("figure", this.figureID);
+        body.put("figure", this.f.i);
 
         JSONObject j = new JSONObject();
         j.put("messageType", "PlayerValues");

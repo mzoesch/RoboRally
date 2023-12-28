@@ -5,8 +5,8 @@ import sep.view.lib.EShopState;
 import sep.view.lib.RRegisterCard;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
+import sep.view.lib.Types.EFigure;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
@@ -24,8 +24,6 @@ public enum EGameState
 
     private static final Logger l = LogManager.getLogger(EGameState.class);
 
-    public static final int INVALID_FIGURE_ID = -1;
-    public static final String[] FIGURE_NAMES = new String[] {"Hammer Bot", "Trundle Bot", "Squash Bot", "Hulk x90", "Spin Bot", "Twonky", "Twitch"};
     public static final int MAX_CHAT_MESSAGE_LENGTH = 64;
 
     public static final String[] PHASE_NAMES = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
@@ -150,14 +148,14 @@ public enum EGameState
         if (EGameState.INSTANCE.isRemotePlayerAlreadyAdded(dsrp.getPlayerID()))
         {
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setPlayerName(dsrp.getPlayerName());
-            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setFigureID(dsrp.getFigureID());
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setFigure(dsrp.getFigure());
             ViewSupervisor.updatePlayerSelection();
 
             l.debug("Remote player {} already added. Updating his name and figures.", dsrp.getPlayerID());
             return;
         }
 
-        RemotePlayer rp = new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigureID(), false);
+        RemotePlayer rp = new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigure(), false);
         EGameState.INSTANCE.remotePlayers.add(rp);
         ViewSupervisor.updatePlayerSelection();
 
@@ -172,11 +170,11 @@ public enum EGameState
     }
 
     /** If the robot at a specific index is already selected by a player. */
-    public boolean isPlayerRobotUnavailable(int idx)
+    public boolean isPlayerRobotUnavailable(final EFigure f)
     {
         for (RemotePlayer rp : this.remotePlayers)
         {
-            if (rp.getFigureID() == idx)
+            if (rp.getFigure() == f)
             {
                 return true;
             }
@@ -190,7 +188,7 @@ public enum EGameState
     {
         for (RemotePlayer rp : this.remotePlayers)
         {
-            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID() && rp.getFigureID() != EGameState.INVALID_FIGURE_ID)
+            if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID() && rp.getFigure() != EFigure.INVALID)
             {
                 return true;
             }
@@ -199,11 +197,11 @@ public enum EGameState
         return false;
     }
 
-    public RemotePlayer getRemotePlayerByFigureID(int idx)
+    public RemotePlayer getRemotePlayerByFigureID(final EFigure f)
     {
         for (RemotePlayer rp : this.remotePlayers)
         {
-            if (rp.getFigureID() == idx)
+            if (rp.getFigure() == f)
             {
                 return rp;
             }
@@ -238,17 +236,17 @@ public enum EGameState
         return null;
     }
 
-    public int getClientSelectedRobotID()
+    public EFigure getClientSelectedFigure()
     {
         for (RemotePlayer rp : this.remotePlayers)
         {
             if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
             {
-                return rp.getFigureID();
+                return rp.getFigure();
             }
         }
 
-        return EGameState.INVALID_FIGURE_ID;
+        return EFigure.INVALID;
     }
 
     public RemotePlayer[] getRemotePlayers()

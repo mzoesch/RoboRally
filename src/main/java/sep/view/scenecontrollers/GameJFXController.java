@@ -7,6 +7,7 @@ import sep.view.json.game.SelectedDamageModel;
 import sep.view.json.game.RebootDirectionModel;
 import sep.view.json.game.SetStartingPointModel;
 import sep.view.lib.EShopState;
+import sep.view.lib.Types;
 import sep.view.viewcontroller.Tile;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.RCoordinate;
@@ -1574,7 +1575,7 @@ public class GameJFXController
                 ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(GameJFXController.createHSpacer());
             }
 
-            final Label figureName = new Label(EGameState.FIGURE_NAMES[rp.getFigureID()]);
+            final Label figureName = new Label(rp.getFigure().toString());
             figureName.getStyleClass().add("text-sm");
 
             final Label ctrlName = new Label(rp.getPlayerName());
@@ -1591,13 +1592,13 @@ public class GameJFXController
                 v.getStyleClass().add(String.format("player-box-%s", rp.hasSelectionFinished() ? "selected" : "inSelection"));
             }
             v.setStyle(String.format("-fx-background-color: %s;",
-                  rp.getFigureID() == 0 ? GameJFXController.COLOR_HAMMER
-                : rp.getFigureID() == 1 ? GameJFXController.COLOR_TRUNDLE
-                : rp.getFigureID() == 2 ? GameJFXController.COLOR_SQUASH
-                : rp.getFigureID() == 3 ? GameJFXController.COLOR_X90
-                : rp.getFigureID() == 4 ? GameJFXController.COLOR_SPIN
-                : rp.getFigureID() == 5 ? GameJFXController.COLOR_TWONKY
-                : rp.getFigureID() == 6 ? GameJFXController.COLOR_TWITCH
+                  rp.getFigure() == Types.EFigure.  HAMMER  ? GameJFXController.    COLOR_HAMMER
+                : rp.getFigure() == Types.EFigure.  TRUNDLE ? GameJFXController.    COLOR_TRUNDLE
+                : rp.getFigure() == Types.EFigure.  SQUASH  ? GameJFXController.    COLOR_SQUASH
+                : rp.getFigure() == Types.EFigure.  X90     ? GameJFXController.    COLOR_X90
+                : rp.getFigure() == Types.EFigure.  SPIN    ? GameJFXController.    COLOR_SPIN
+                : rp.getFigure() == Types.EFigure.  TWONKY  ? GameJFXController.    COLOR_TWONKY
+                : rp.getFigure() == Types.EFigure.  TWITCH  ? GameJFXController.    COLOR_TWITCH
                 : ""
             ));
 

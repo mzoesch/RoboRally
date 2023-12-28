@@ -3,6 +3,7 @@ package sep.view.json;
 import sep.view.lib.RCoordinate;
 import sep.view.clientcontroller.EConnectionLoss;
 import sep.view.lib.RRegisterCard;
+import sep.view.lib.Types.EFigure;
 
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -36,9 +37,9 @@ public record RDefaultServerRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getString("name");
     }
 
-    public int getFigureID() throws JSONException
+    public EFigure getFigure() throws JSONException
     {
-        return this.request.getJSONObject("messageBody").getInt("figure");
+        return EFigure.fromInt(this.request.getJSONObject("messageBody").getInt("figure"));
     }
 
     public boolean isChatMsgPrivate() throws JSONException

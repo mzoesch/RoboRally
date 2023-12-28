@@ -1,6 +1,7 @@
 package sep.view.scenecontrollers;
 
 import sep.view.json.lobby.PlayerValuesModel;
+import sep.view.lib.Types.EFigure;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.clientcontroller.EGameState;
@@ -338,15 +339,15 @@ public final class LobbyJFXController_v2
         return s;
     }
 
-    private Node createRobotSelectorBox(int idx)
+    private Node createRobotSelectorBox(final EFigure f)
     {
-        Label l = new Label(EGameState.INSTANCE.isPlayerRobotUnavailable(idx) ? EGameState.INSTANCE.getRemotePlayerByFigureID(idx) == null ? "Available" : Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByFigureID(idx)).getPlayerName() : "Available");
+        Label l = new Label(EGameState.INSTANCE.isPlayerRobotUnavailable(f) ? EGameState.INSTANCE.getRemotePlayerByFigureID(f) == null ? "Available" : Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByFigureID(f)).getPlayerName() : "Available");
         l.getStyleClass().add("text-base");
 
-        Button b = new Button(String.format(EGameState.FIGURE_NAMES[idx]));
+        Button b = new Button(f.toString());
         if (EGameState.INSTANCE.hasClientSelectedARobot())
         {
-            if (EGameState.INSTANCE.getClientSelectedRobotID() == idx)
+            if (EGameState.INSTANCE.getClientSelectedFigure() == f)
             {
                 b.getStyleClass().add("primary-btn-mini");
             }
@@ -357,7 +358,7 @@ public final class LobbyJFXController_v2
         }
         else
         {
-            if (EGameState.INSTANCE.isPlayerRobotUnavailable(idx))
+            if (EGameState.INSTANCE.isPlayerRobotUnavailable(f))
             {
                 b.getStyleClass().add("secondary-btn-mini");
             }
@@ -366,9 +367,9 @@ public final class LobbyJFXController_v2
                 b.getStyleClass().add("primary-btn-mini");
             }
         }
-        if (EGameState.INSTANCE.getRemotePlayerByFigureID(idx) != null)
+        if (EGameState.INSTANCE.getRemotePlayerByFigureID(f) != null)
         {
-            b.setDisable(EGameState.INSTANCE.getClientSelectedRobotID() != idx);
+            b.setDisable(EGameState.INSTANCE.getClientSelectedFigure() != f);
         }
         b.setOnAction(actionEvent ->
         {
@@ -376,32 +377,32 @@ public final class LobbyJFXController_v2
 
             if (this.isPlayerNameValid())
             {
-                if (EGameState.INSTANCE.getClientSelectedRobotID() == idx)
+                if (EGameState.INSTANCE.getClientSelectedFigure() == f)
                 {
                     if (!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerName().equals(this.getPlayerName()))
                     {
-                        LobbyJFXController_v2.l.debug("Player selected robot ({}) {}.", idx, EGameState.FIGURE_NAMES[idx]);
-                        new PlayerValuesModel(this.getPlayerName(), idx).send();
+                        LobbyJFXController_v2.l.debug("Player selected robot ({}) {}.", f.i, f.toString());
+                        new PlayerValuesModel(this.getPlayerName(), f).send();
                         return;
                     }
 
-                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but he already selected this robot and the name did not change. Ignoring.", idx, EGameState.FIGURE_NAMES[idx]);
+                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but he already selected this robot and the name did not change. Ignoring.", f, f.toString());
                     return;
                 }
 
-                if (EGameState.INSTANCE.isPlayerRobotUnavailable(idx))
+                if (EGameState.INSTANCE.isPlayerRobotUnavailable(f))
                 {
-                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but this robot is already taken. Ignoring.", idx, EGameState.FIGURE_NAMES[idx]);
+                    LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but this robot is already taken. Ignoring.", f, f.toString());
                     return;
                 }
 
-                LobbyJFXController_v2.l.debug("Player selected robot ({}) {}.", idx, EGameState.FIGURE_NAMES[idx]);
-                new PlayerValuesModel(this.getPlayerName(), idx).send();
+                LobbyJFXController_v2.l.debug("Player selected robot ({}) {}.", f, f.toString());
+                new PlayerValuesModel(this.getPlayerName(), f).send();
                 return;
             }
 
             this.formErrorLabel.setText("Invalid player name.");
-            LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but player name is invalid.", idx, EGameState.FIGURE_NAMES[idx]);
+            LobbyJFXController_v2.l.debug("Player selected robot ({}) {}, but player name is invalid.", f, f.toString());
 
             return;
         });
@@ -611,12 +612,12 @@ public final class LobbyJFXController_v2
 
         this.playerRobotSelectorArea.getChildren().clear();
 
-        int half = EGameState.FIGURE_NAMES.length / 2;
+        int half = EFigure.NUM.i / 2;
         HBox hTop = new HBox();
         hTop.getStyleClass().add("player-robot-selector-hbox");
         for (int i = 0; i < half; i++)
         {
-            hTop.getChildren().add(this.createRobotSelectorBox(i));
+            hTop.getChildren().add(this.createRobotSelectorBox(EFigure.fromInt(i)));
             if (i + 1 < half)
             {
                 hTop.getChildren().add(this.createHSpacer());
@@ -627,10 +628,10 @@ public final class LobbyJFXController_v2
 
         HBox hBot = new HBox();
         hBot.getStyleClass().add("player-robot-selector-hbox");
-        for (int i = half; i < EGameState.FIGURE_NAMES.length; i++)
+        for (int i = half; i < EFigure.NUM.i; i++)
         {
-            hBot.getChildren().add(this.createRobotSelectorBox(i));
-            if (i + 1 < EGameState.FIGURE_NAMES.length)
+            hBot.getChildren().add(this.createRobotSelectorBox(EFigure.fromInt(i)));
+            if (i + 1 < EFigure.NUM.i)
             {
                 hBot.getChildren().add(this.createHSpacer());
             }
