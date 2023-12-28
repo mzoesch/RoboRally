@@ -943,6 +943,21 @@ public final class Session
                 && !    msg.substring(msg.indexOf(ChatMsgModel.ARG_BEGIN) + 1, msg.lastIndexOf(ChatMsgModel.ARG_END) - 1).isEmpty();
     }
 
+    private PlayerController getPlayerControllerByID(final int ID)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            if (pc.getPlayerID() == ID)
+            {
+                return pc;
+            }
+
+            continue;
+        }
+
+        return null;
+    }
+
     // endregion Getters and Setters
 
 }
