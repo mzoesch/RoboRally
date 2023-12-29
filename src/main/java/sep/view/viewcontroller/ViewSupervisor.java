@@ -7,6 +7,7 @@ import sep.view.scenecontrollers.LobbyJFXController_v2;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.clientcontroller.EGameState;
 import sep.view.scenecontrollers.GameJFXController;
+import sep.view.lib.Types;
 
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -334,6 +335,24 @@ public final class ViewSupervisor extends Application
     }
 
     // endregion Game Events
+
+
+    public static void createPopUp(final Types.RPopUpMask mask)
+    {
+        ViewSupervisor.INSTANCE.sceneController.renderPopUp(mask);
+        return;
+    }
+
+    public static void createPopUpLater(final Types.RPopUpMask mask)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createPopUp(mask);
+            return;
+        });
+
+        return;
+    }
 
     // endregion Updating methods
 
