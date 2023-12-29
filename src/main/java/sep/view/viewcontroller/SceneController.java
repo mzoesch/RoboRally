@@ -18,8 +18,11 @@ import org.apache.logging.log4j.    LogManager      ;
 import org.apache.logging.log4j.    Logger          ;
 
 /**
- * Object that handles the overall flow in the Graphical User Interface. It manages the loading of FXML files and
- * the corresponding controllers, the activation of them and destruction.
+ * Singleton object that implements high-level methods relevant for the Graphical User Interface and handles the
+ * overall flow it. It is spawned by the {@link ViewSupervisor} at JFX startup and not destroyed until the Platform
+ * has been exited.
+ *
+ * <p> It manages the loading of FXML files and the corresponding controllers, the activation of them and destruction.
  */
 public final class SceneController
 {
