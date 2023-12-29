@@ -94,7 +94,68 @@ public final class SceneController
         return;
     }
 
-    public <T> void renderNewScreen(String ID, String path, boolean bAutoKillAfterUse)
+    private void createPopUp(final Pane target, final Types.RPopUpMask mask)
+    {
+        final AnchorPane container = new AnchorPane();
+        container.setId("pop-up-container");
+        container.setMouseTransparent(false);
+
+        final Label headerLabel = new Label(mask.header());
+        headerLabel.getStyleClass().add("text-2xl-error");
+        final HBox header = new HBox(headerLabel);
+        header.setId("pop-up-header");
+
+        final Label msgLabel = new Label(mask.msg());
+        msgLabel.getStyleClass().add("text-xl");
+        final HBox body = new HBox(msgLabel);
+        body.setId("pop-up-body");
+        body.setMouseTransparent(true);
+
+        final HBox form = new HBox();
+        form.setId("pop-up-form");
+        if (Objects.requireNonNull(mask.type()) == Types.EPopUp.ERROR)
+        {
+            final Button b = new Button("OK");
+            b.getStyleClass().add("secondary-btn");
+            b.setOnAction(e ->
+            {
+                target.getChildren().remove(container);
+                return;
+            });
+
+            form.getChildren().add(b);
+        }
+
+        container.getChildren().add(    body    );
+        container.getChildren().add(    header  );
+        container.getChildren().add(    form    );
+
+        AnchorPane.setLeftAnchor(   header, 0.0 );
+        AnchorPane.setRightAnchor(  header, 0.0 );
+        AnchorPane.setTopAnchor(    header, 0.0 );
+
+        AnchorPane.setLeftAnchor(   body,   0.0 );
+        AnchorPane.setRightAnchor(  body,   0.0 );
+        AnchorPane.setTopAnchor(    body,   0.0 );
+        AnchorPane.setBottomAnchor( body,   0.0 );
+
+        AnchorPane.setLeftAnchor(   form,  0.0 );
+        AnchorPane.setRightAnchor(  form,  0.0 );
+        AnchorPane.setBottomAnchor( form,  0.0 );
+
+        AnchorPane.setLeftAnchor(   container,  0.0 );
+        AnchorPane.setRightAnchor(  container,  0.0 );
+        AnchorPane.setTopAnchor(    container,  0.0 );
+        AnchorPane.setBottomAnchor( container,  0.0 );
+
+        target.getChildren().add(container);
+
+        l.debug("Successfully created pop up of type {}.", mask.type().toString());
+
+        return;
+    }
+
+    public <T> void renderNewScreen(final String ID, final String path, final boolean bAutoKillAfterUse)
     {
         final FXMLLoader ldr = new FXMLLoader(SceneController.class.getResource(path));
         final Pane p;
@@ -116,6 +177,36 @@ public final class SceneController
 
         this.addScreen(rgs);
         this.activateScreen(ID);
+
+        return;
+    }
+
+    public void renderPopUp(final Types.RPopUpMask mask)
+    {
+        final Pane target;
+
+        if (this.masterScene.getRoot() instanceof final BorderPane bp)
+        {
+            if (bp.getCenter() instanceof final AnchorPane ap)
+            {
+                this.createPopUp(ap, mask);
+                return;
+            }
+
+            l.fatal("Failed to create pop up. Center of BorderPane is not an AnchorPane.");
+            GameInstance.kill();
+
+            return;
+        }
+
+        if (this.masterScene.getRoot() instanceof final AnchorPane ap)
+        {
+            this.createPopUp(ap, mask);
+            return;
+        }
+
+        l.fatal("Failed to create pop up. Root of master scene is not valid.");
+        GameInstance.kill();
 
         return;
     }
