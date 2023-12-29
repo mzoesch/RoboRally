@@ -59,4 +59,22 @@ public final class Types
         ERROR,
     }
 
+    public record RPopUpMask(EPopUp type, String header, String msg)
+    {
+        public RPopUpMask
+        {
+        }
+
+        public RPopUpMask(final EPopUp type)
+        {
+            this(type, type.toString(), null);
+        }
+
+        public RPopUpMask(final EPopUp type, final String msg)
+        {
+            this(type, type.toString() , msg);
+        }
+
+    }
+
 }
