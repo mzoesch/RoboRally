@@ -54,4 +54,9 @@ public final class Types
 
     }
 
+    public enum EPopUp
+    {
+        ERROR,
+    }
+
 }
