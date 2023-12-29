@@ -39,29 +39,38 @@
         </AnchorPane>
     </top>
     <center>
-        <VBox
-            id="btn-container" stylesheets="@main-menu.css"
-        >
-            <Button
-                text="HOST SESSION"
-                styleClass="secondary-btn" style="-fx-min-width: 300px;"
-                onAction="#onHostBtn"
-            />
-            <Button
-                text="JOIN SESSION"
-                styleClass="secondary-btn" style="-fx-min-width: 300px;"
-                onAction="#onJoinBtn"
-            />
-            <Button
-                text="CREDITS"
-                styleClass="secondary-btn" style="-fx-min-width: 300px;"
-            />
-            <Button
-                text="EXIT GAME"
-                styleClass="danger-btn" style="-fx-min-width: 300px;"
-                onAction="#onExitBtn"
-            />
-        </VBox>
+        <AnchorPane>
+            <HBox
+                style="-fx-alignment: center;"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+            >
+                <VBox
+                    id="btn-container" stylesheets="@main-menu.css"
+
+                >
+                    <Button
+                        text="HOST SESSION"
+                        styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                        onAction="#onHostBtn"
+                    />
+                    <Button
+                        text="JOIN SESSION"
+                        styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                        onAction="#onJoinBtn"
+                    />
+                    <Button
+                        text="CREDITS"
+                        styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                        onAction="#onPopUpTestBtn"
+                    />
+                    <Button
+                        text="EXIT GAME"
+                        styleClass="danger-btn" style="-fx-min-width: 300px;"
+                        onAction="#onExitBtn"
+                    />
+                </VBox>
+            </HBox>
+        </AnchorPane>
     </center>
     <bottom>
         <Label
