@@ -7,6 +7,7 @@ import sep.view.viewcontroller.SceneController;
 import sep.EPort;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
+import sep.view.lib.Types;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,8 +26,6 @@ public class MainMenuJFXController
     @FXML
     protected void onHostBtn(ActionEvent actionEvent) throws IOException
     {
-        this.sessionJoinErrorField.setText("");
-
         if (this.isServerAddressInvalid())
         {
             return;
@@ -43,7 +42,7 @@ public class MainMenuJFXController
             return;
         }
 
-        this.sessionJoinErrorField.setText(EClientInformation.INSTANCE.getStdServerErrPipeline().toString());
+        ViewSupervisor.createPopUp(new Types.RPopUpMask(Types.EPopUp.ERROR, "Server Connection Failed", EClientInformation.INSTANCE.getStdServerErrPipeline().toString()));
 
         return;
     }
@@ -51,8 +50,6 @@ public class MainMenuJFXController
     @FXML
     protected void onJoinBtn(ActionEvent actionEvent) throws IOException
     {
-        this.sessionJoinErrorField.setText("");
-
         if (this.isServerAddressInvalid())
         {
             return;
@@ -76,8 +73,15 @@ public class MainMenuJFXController
             return;
         }
 
-        this.sessionJoinErrorField.setText(EClientInformation.INSTANCE.getStdServerErrPipeline().toString());
+        ViewSupervisor.createPopUp(new Types.RPopUpMask(Types.EPopUp.ERROR, "Server Connection Failed", EClientInformation.INSTANCE.getStdServerErrPipeline().toString()));
 
+        return;
+    }
+
+    @FXML
+    public void onPopUpTestBtn(final ActionEvent actionEvent)
+    {
+        ViewSupervisor.createPopUp(new Types.RPopUpMask(Types.EPopUp.ERROR, "Test", "This is a test pop up."));
         return;
     }
 
