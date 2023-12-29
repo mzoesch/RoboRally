@@ -70,20 +70,22 @@ public final class SceneController
     {
         for (final RGameScene<?> s : this.screens)
         {
-            if (s.ID().equals(ID))
+            if (!s.ID().equals(ID))
             {
-                RGameScene<?> oldScreen = this.screens.size() > 1 ? this.getCurrentScreen() : null;
-
-                this.currentScreen = ID;
-                this.masterScene.setRoot(s.screen());
-
-                if (oldScreen != null && oldScreen.hasFallback())
-                {
-                    this.screens.remove(oldScreen);
-                }
-
-                return;
+                continue;
             }
+
+            final RGameScene<?> oldScreen = this.screens.size() > 1 ? this.getCurrentScreen() : null;
+
+            this.currentScreen = ID;
+            this.masterScene.setRoot(s.screen());
+
+            if (oldScreen != null && oldScreen.hasFallback())
+            {
+                this.screens.remove(oldScreen);
+            }
+
+            return;
         }
 
         l.fatal("Failed to activate screen with ID {}.", ID);
