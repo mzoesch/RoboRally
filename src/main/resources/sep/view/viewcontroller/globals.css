@@ -200,3 +200,32 @@
 }
 
 /*#endregion Buttons*/
+
+/*#region Pop Ups*/
+
+#pop-up-container {
+    -fx-background-color: rgba(23, 23, 23, 0.9);
+    -fx-padding: 24px 24px 24px 24px;
+    -fx-max-width: 500px;
+    -fx-max-height: 500px;
+    -fx-border-color: white;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-width: 1px;
+}
+
+#pop-up-header {
+    -fx-alignment: center;
+}
+
+#pop-up-body {
+    -fx-alignment: center;
+}
+
+#pop-up-form {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+}
+
+/*#endregion Pop Ups*/
+
