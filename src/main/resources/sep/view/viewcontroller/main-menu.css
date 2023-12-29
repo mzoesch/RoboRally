@@ -29,6 +29,8 @@
     -fx-spacing: 16px;
     -fx-alignment: center;
 
+    -fx-min-width: 400px;
+    -fx-min-height: 400px;
     -fx-max-width: 400px;
     -fx-max-height: 400px;
 
