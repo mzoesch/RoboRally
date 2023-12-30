@@ -483,7 +483,7 @@ public class GameMode {
      */
     private void findLasers() {
 
-        this.getSession().broadcastAnimation(Types.Animation.PlayerShooting);
+        this.getSession().broadcastAnimation(Types.Animation.WALL_SHOOTING);
 
         for (ArrayList<Tile> row : course.getCourse()) {
             for (Tile tile : row) {
