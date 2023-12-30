@@ -1895,6 +1895,80 @@ public final class GameJFXController
         return;
     }
 
+    // region Animation Rendering
+
+    private void renderWallShooting()
+    {
+        for (final Tile t : this.getWallLasers())
+        {
+            for (final RLaserMask mask : t.getLaserAffectedTiles(this.tiles, 1))
+            {
+                final ImageView iv = Tile.getFormattedImageView(mask);
+                iv.setFitHeight(    this.tileDimensions );
+                iv.setFitWidth(     this.tileDimensions );
+
+                final AnchorPane ap = new AnchorPane(iv);
+
+                this.renderOnPosition(ap, mask.t().getTileLocation());
+
+                final PauseTransition p = new PauseTransition(Duration.millis(GameJFXController.SHOOTING_LASER_DURATION));
+                p.setOnFinished(e -> this.courseScrollPaneContent.getChildren().remove(ap));
+                p.play();
+
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
+    // endregion Animation Rendering
+
+    private void renderAnimation(final sep.Types.Animation anim)
+    {
+        l.debug("Rendering animation: {}", anim);
+        switch (anim)
+        {
+        case BLUE_CONVEYOR_BELT ->
+        {
+            break;
+        }
+        case GREEN_CONVEYOR_BELT ->
+        {
+            break;
+        }
+        case PUSH_PANEL ->
+        {
+            break;
+        }
+        case GEAR ->
+        {
+            break;
+        }
+        case CHECK_POINT ->
+        {
+            break;
+        }
+        case PLAYER_SHOOTING ->
+        {
+            break;
+        }
+        case WALL_SHOOTING ->
+        {
+            this.renderWallShooting();
+            break;
+        }
+        case ENERGY_SPACE ->
+        {
+            break;
+        }
+        }
+
+        return;
+    }
+
     // endregion Rendering
 
     // region Update View Methods from outside
@@ -1998,6 +2072,15 @@ public final class GameJFXController
         return;
     }
 
+    public void playAnimation(final sep.Types.Animation anim)
+    {
+        Platform.runLater(() ->
+        {
+            this.renderAnimation(anim);
+            return;
+        });
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters
@@ -2035,6 +2118,29 @@ public final class GameJFXController
     public double calcYTranslation(final int rank)
     {
         return rank * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_VERTICAL / 2;
+    }
+
+    public Tile[] getWallLasers()
+    {
+        final ArrayList<Tile> wallLasers = new ArrayList<>();
+
+        for (int file = 0; file < this.files; file++)
+        {
+            for (int rank = 0; rank < this.ranks; rank++)
+            {
+                if (this.tiles[file][rank].hasModifier(Types.EModifier.LASER))
+                {
+                    wallLasers.add(this.tiles[file][rank]);
+                    continue;
+                }
+
+                continue;
+            }
+
+            continue;
+        }
+
+        return wallLasers.toArray(new Tile[0]);
     }
 
     // endregion Getters and Setters
