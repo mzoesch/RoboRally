@@ -10,15 +10,16 @@ public class Tile
 {
     private final JSONArray tile;
 
-    private int translateX;
-    private int translateY;
+    private int xTranslation;
+    private int yTranslation;
 
     public Tile(JSONArray tile)
     {
         super();
         this.tile = tile;
-        this.translateX = 0;
-        this.translateY = 0;
+        this.xTranslation = 0;
+        this.yTranslation = 0;
+
         return;
     }
 
@@ -68,25 +69,25 @@ public class Tile
         return imageViews.toArray(new ImageView[0]);
     }
 
-    public int getTranslateX()
+    public int getXTranslation()
     {
-        return this.translateX;
+        return this.xTranslation;
     }
 
-    public int getTranslateY()
+    public int getYTranslation()
     {
-        return this.translateY;
+        return this.yTranslation;
     }
 
-    public void setTranslateX(int translateX)
+    public void setXTranslation(final int xTranslation)
     {
-        this.translateX = translateX;
+        this.xTranslation = xTranslation;
         return;
     }
 
-    public void setTranslateY(int translateY)
+    public void setYTranslation(final int yTranslation)
     {
-        this.translateY = translateY;
+        this.yTranslation = yTranslation;
         return;
     }
 
