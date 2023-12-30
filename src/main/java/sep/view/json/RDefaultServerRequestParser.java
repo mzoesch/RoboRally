@@ -10,10 +10,7 @@ import org.json.JSONException;
 import java.util.stream.IntStream;
 import org.json.JSONArray;
 
-/**
- * For easier access to the JSON object received from the server. Does not contain actual logic.
- * We may want to split this into multiple classes later if it gets too messy.
- */
+/** For easier access to the JSON object received from the server. Does not contain actual logic. */
 public record RDefaultServerRequestParser(JSONObject request)
 {
     public RDefaultServerRequestParser(final JSONObject request)
