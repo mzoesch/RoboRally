@@ -42,4 +42,32 @@ public final class Types
         }
     }
 
+    public enum Animation
+    {
+        BlueConveyorBelt    (   "BlueConveyorBelt"     ),
+        GreenConveyorBelt   (   "GreenConveyorBelt"    ),
+        PushPanel           (   "PushPanel"            ),
+        Gear                (   "Gear"                 ),
+        CheckPoint          (   "CheckPoint"           ), /* TODO What anim should we play here?? */
+        PlayerShooting      (   "PlayerShooting"       ),
+        WallShooting        (   "WallShooting"         ),
+        EnergySpace         (   "EnergySpace"          ),
+        ;
+
+        private final String s;
+
+        private Animation(final String s)
+        {
+            this.s = s;
+            return;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.s;
+        }
+
+    }
+
 }
