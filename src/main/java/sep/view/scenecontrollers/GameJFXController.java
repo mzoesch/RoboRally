@@ -54,27 +54,8 @@ public final class GameJFXController
     private static final String COLOR_TWONKY    = "#ffff0033";
     private static final String COLOR_TWITCH    = "#aaaaaa33";
 
-    @FXML private Label UIHeaderPhaseLabel;
-    @FXML private AnchorPane masterContainer;
-    @FXML private VBox playerContainer;
-    @FXML private ScrollPane courseScrollPane;
-    @FXML private AnchorPane courseScrollPaneContent;
-    @FXML private AnchorPane registerContainer;
-    @FXML private ScrollPane chatScrollPane;
-    @FXML private TextField chatInputTextField;
-//    @FXML private AnchorPane shopSlot1;
-//    @FXML private AnchorPane shopSlot2;
-//    @FXML private AnchorPane shopSlot3;
-//    @FXML private AnchorPane shopSlot4;
-//    @FXML private AnchorPane shopSlot5;
-//    @FXML private AnchorPane gotTemporaryUpgradeCardSlot1;
-//    @FXML private AnchorPane gotTemporaryUpgradeCardSlot2;
-//    @FXML private AnchorPane gotTemporaryUpgradeCardSlot3;
-//    @FXML private AnchorPane gotPermanentUpgradeCardSlot1;
-//    @FXML private AnchorPane gotPermanentUpgradeCardSlot2;
-//    @FXML private AnchorPane gotPermanentUpgradeCardSlot3;
-    @FXML private Button footerBtn;
-    @FXML private AnchorPane footerContainer;
+    private static final int SHOOTING_LASER_DURATION = 1_000;
+
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
     @FXML private VBox          playerContainer;
