@@ -1,33 +1,33 @@
 package sep.view.viewcontroller;
 
-import javafx.scene.image.Image;
-import org.json.JSONObject;
-import java.util.Objects;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import javafx.scene.image.ImageView;
-import org.json.JSONArray;
-import javafx.scene.transform.Translate;
-import javafx.scene.transform.Rotate;
-import org.json.JSONException;
+import sep.view.lib.Types.          ERotation;
 
-public class TileModifier
+import java.util.                   Objects;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import javafx.scene.image.          Image;
+import javafx.scene.image.          ImageView;
+import org.json.                    JSONObject;
+import org.json.                    JSONArray;
+import org.json.                    JSONException;
+
+public final class TileModifier
 {
     private static final Logger l = LogManager.getLogger(TileModifier.class);
 
     private final JSONObject tile;
 
-    private static final String path = "file:src/main/resources/public/";
-    private static final String extension = ".png";
+    private static final String path        = "file:src/main/resources/public/";
+    private static final String extension   = ".png";
 
-    public TileModifier(JSONObject tile)
+    public TileModifier(final JSONObject tile)
     {
         super();
         this.tile = tile;
         return;
     }
 
-    public void rotateImage(ImageView iv)
+    public void rotateImage(final ImageView iv)
     {
         if (Objects.equals(this.tile.getString("type"), "Wall"))
         {
@@ -447,7 +447,8 @@ public class TileModifier
         return this.tile.getInt("count");
     }
 
-    private JSONArray getRegisters(){
+    private JSONArray getRegisters()
+    {
         return this.tile.getJSONArray("registers");
     }
 
@@ -467,9 +468,9 @@ public class TileModifier
         {
             return this.tile.getJSONArray("orientations").length();
         }
-        catch (JSONException e)
+        catch (final JSONException e)
         {
-           l.fatal(this.tile.toString(4));
+            l.error(this.tile.toString(4));
             throw new RuntimeException(e);
         }
     }
@@ -550,6 +551,18 @@ public class TileModifier
         catch(Exception e){
             return false;
         }
+    }
+
+    public ERotation[] getRotations()
+    {
+        final ERotation[] rotations = new ERotation[this.getOrientationsCount()];
+
+        for (int i = 0; i < this.getOrientationsCount(); i++)
+        {
+            rotations[i] = ERotation.fromString(this.getOrientations().getString(i));
+        }
+
+        return rotations;
     }
 
     // endregion Getters and Setters
