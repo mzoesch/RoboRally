@@ -44,14 +44,14 @@ public final class Types
 
     public enum Animation
     {
-        BlueConveyorBelt    (   "BlueConveyorBelt"     ),
-        GreenConveyorBelt   (   "GreenConveyorBelt"    ),
-        PushPanel           (   "PushPanel"            ),
-        Gear                (   "Gear"                 ),
-        CheckPoint          (   "CheckPoint"           ), /* TODO What anim should we play here?? */
-        PlayerShooting      (   "PlayerShooting"       ),
-        WallShooting        (   "WallShooting"         ),
-        EnergySpace         (   "EnergySpace"          ),
+        BLUE_CONVEYOR_BELT  (   "BlueConveyorBelt"     ),
+        GREEN_CONVEYOR_BELT (   "GreenConveyorBelt"    ),
+        PUSH_PANEL          (   "PushPanel"            ),
+        GEAR                (   "Gear"                 ),
+        CHECK_POINT         (   "CheckPoint"           ), /* TODO What anim should we play here?? */
+        PLAYER_SHOOTING     (   "PlayerShooting"       ),
+        WALL_SHOOTING       (   "WallShooting"         ),
+        ENERGY_SPACE        (   "EnergySpace"          ),
         ;
 
         private final String s;
