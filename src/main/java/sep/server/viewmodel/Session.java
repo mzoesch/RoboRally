@@ -1,41 +1,49 @@
 package sep.server.viewmodel;
 
-import sep.server.json.common.CurrentPlayerModel;
-import sep.server.json.game.activatingphase.ActivePhaseModel;
-import sep.server.json.game.StartingPointTakenModel;
-import sep.server.json.game.effects.GameFinishedModel;
-import sep.server.json.game.effects.MovementModel;
-import sep.server.json.game.effects.PlayerTurningModel;
-import sep.server.model.game.GameState;
-import sep.server.model.EServerInformation;
-import sep.server.json.lobby.PlayerAddedModel;
-import sep.server.json.common.ChatMsgModel;
-import sep.server.json.lobby.PlayerStatusModel;
-import sep.server.json.lobby.SelectMapModel;
-import sep.server.json.lobby.MapSelectedModel;
-import sep.server.json.game.programmingphase.*;
-import sep.server.json.game.programmingphase.SelectionFinishedModel;
-import sep.server.model.game.EGamePhase;
-import sep.server.model.game.Tile;
-import sep.server.json.game.GameStartedModel;
-import sep.server.json.game.activatingphase.CardInfo;
-import sep.server.json.game.activatingphase.CurrentCardsModel;
-import sep.server.model.game.Player;
-import sep.server.model.game.cards.Card;
-import sep.server.json.common.ConnectionUpdateModel;
-import sep.server.model.IOwnershipable;
-import sep.server.model.Agent;
-import sep.server.json.game.effects.CheckPointReachedModel;
-import sep.server.json.game.effects.EnergyModel;
-import sep.server.json.game.effects.RebootModel;
-import sep.server.json.game.activatingphase.ReplaceCardModel;
-import sep.server.model.game.tiles.Coordinate;
+import sep.server.json.game.activatingphase.    ActivePhaseModel;
+import sep.server.json.game.activatingphase.    ReplaceCardModel;
+import sep.server.json.game.activatingphase.    CardInfo;
+import sep.server.json.game.activatingphase.    CurrentCardsModel;
+import sep.server.json.lobby.                   PlayerAddedModel;
+import sep.server.json.lobby.                   PlayerStatusModel;
+import sep.server.json.lobby.                   SelectMapModel;
+import sep.server.json.lobby.                   MapSelectedModel;
+import sep.server.json.game.effects.            GameFinishedModel;
+import sep.server.json.game.effects.            MovementModel;
+import sep.server.json.game.effects.            PlayerTurningModel;
+import sep.server.json.game.effects.            CheckPointReachedModel;
+import sep.server.json.game.effects.            EnergyModel;
+import sep.server.json.game.effects.            RebootModel;
+import sep.server.json.game.effects.            AnimationModel;
+import sep.server.model.game.                   GameState;
+import sep.server.model.game.                   EGamePhase;
+import sep.server.model.game.                   Tile;
+import sep.server.model.game.                   Player;
+import sep.server.model.                        EServerInformation;
+import sep.server.model.                        IOwnershipable;
+import sep.server.model.                        Agent;
+import sep.                                     Types;
+import sep.server.json.common.                  ChatMsgModel;
+import sep.server.json.common.                  CurrentPlayerModel;
+import sep.server.json.common.                  ConnectionUpdateModel;
+import sep.server.json.game.programmingphase.   NotYourCardsModel;
+import sep.server.json.game.programmingphase.   YourCardsModel;
+import sep.server.json.game.programmingphase.   ShuffleCodingModel;
+import sep.server.json.game.programmingphase.   CardSelectedModel;
+import sep.server.json.game.programmingphase.   CardsYouGotNowModel;
+import sep.server.json.game.programmingphase.   TimerStartedModel;
+import sep.server.json.game.programmingphase.   TimerEndedModel;
+import sep.server.json.game.programmingphase.   SelectionFinishedModel;
+import sep.server.model.game.tiles.             Coordinate;
+import sep.server.json.game.                    GameStartedModel;
+import sep.server.json.game.                    StartingPointTakenModel;
+import sep.server.model.game.cards.             Card;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.                   ArrayList;
+import java.util.                   Objects;
+import java.util.                   UUID;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
 
 /**
  * Handles how clients can join and leave a session and also how to communicate with each other. For example,
@@ -825,6 +833,17 @@ public final class Session
             GameFinishedModel gameFinishedModel = new GameFinishedModel(pc.getClientInstance(), playerID);
             gameFinishedModel.send();
 
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastAnimation(final Types.Animation anim)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new AnimationModel(pc.getClientInstance(), anim).send();
             continue;
         }
 
