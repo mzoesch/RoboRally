@@ -1,16 +1,18 @@
 package sep;
 
-public class Types
+public final class Types
 {
     public enum OS
     {
         WINDOWS,
         OSX,
-        OTHER;
+        OTHER,
+        ;
 
         public static OS getOS()
         {
-            String os = System.getProperty("os.name").toLowerCase();
+            final String os = System.getProperty("os.name").toLowerCase();
+
             if (os.contains("windows"))
             {
                 return OS.WINDOWS;
