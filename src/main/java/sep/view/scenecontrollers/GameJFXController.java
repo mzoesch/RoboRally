@@ -1,57 +1,58 @@
 package sep.view.scenecontrollers;
 
-import sep.view.clientcontroller.EGameState;
-import sep.view.clientcontroller.RemotePlayer;
-import sep.view.json.game.SelectedCardModel;
-import sep.view.json.game.SelectedDamageModel;
-import sep.view.json.game.RebootDirectionModel;
-import sep.view.json.game.SetStartingPointModel;
-import sep.view.lib.EShopState;
-import sep.view.lib.Types;
-import sep.view.viewcontroller.Tile;
-import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.lib.RCoordinate;
-import sep.view.viewcontroller.TileModifier;
-import sep.view.lib.EGamePhase;
-import sep.view.json.ChatMsgModel;
-import sep.view.clientcontroller.EClientInformation;
+import sep.view.clientcontroller.   EGameState;
+import sep.view.clientcontroller.   RemotePlayer;
+import sep.view.clientcontroller.   EClientInformation;
+import sep.view.json.game.          SelectedCardModel;
+import sep.view.json.game.          SelectedDamageModel;
+import sep.view.json.game.          RebootDirectionModel;
+import sep.view.json.game.          SetStartingPointModel;
+import sep.view.json.               ChatMsgModel;
+import sep.view.viewcontroller.     Tile;
+import sep.view.viewcontroller.     ViewSupervisor;
+import sep.view.viewcontroller.     TileModifier;
+import sep.view.lib.                EShopState;
+import sep.view.lib.                Types;
+import sep.view.lib.                RCoordinate;
+import sep.view.lib.                EGamePhase;
+import sep.view.lib.Types.          RLaserMask;
 
-import javafx.fxml.FXML;
-import javafx.scene.layout.HBox;
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.AnchorPane;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.Node;
-import javafx.scene.control.TextField;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import javafx.scene.image.ImageView;
-import java.util.ArrayList;
-import java.util.Objects;
-import javafx.scene.control.ScrollPane;
-import javafx.util.Duration;
-import javafx.animation.PauseTransition;
-import javafx.scene.layout.Priority;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.layout.Region;
+import javafx.application.          Platform;
+import java.util.                   ArrayList;
+import java.util.                   Objects;
+import javafx.scene.layout.         HBox;
+import javafx.scene.layout.         VBox;
+import javafx.scene.layout.         AnchorPane;
+import javafx.scene.layout.         Priority;
+import javafx.scene.layout.         Region;
+import javafx.scene.layout.         Pane;
+import javafx.animation.            PauseTransition;
+import javafx.fxml.                 FXML;
+import javafx.beans.value.          ChangeListener;
+import javafx.beans.value.          ObservableValue;
+import javafx.scene.                Node;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import javafx.event.                ActionEvent;
+import javafx.scene.input.          KeyCode;
+import javafx.util.                 Duration;
+import javafx.scene.control.        Label;
+import javafx.scene.control.        TextField;
+import javafx.scene.control.        ScrollPane;
+import javafx.scene.control.        Button;
+import javafx.scene.image.          ImageView;
 
-public class GameJFXController
+public final class GameJFXController
 {
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
-    private static final String COLOR_HAMMER = "#ff000033";
-    private static final String COLOR_TRUNDLE = "#0000ff33";
-    private static final String COLOR_SQUASH = "#ffc0cb33";
-    private static final String COLOR_X90 = "#00ff0033";
-    private static final String COLOR_SPIN = "#00ffff33";
-    private static final String COLOR_TWONKY = "#ffff0033";
-    private static final String COLOR_TWITCH = "#aaaaaa33";
+    private static final String COLOR_HAMMER    = "#ff000033";
+    private static final String COLOR_TRUNDLE   = "#0000ff33";
+    private static final String COLOR_SQUASH    = "#ffc0cb33";
+    private static final String COLOR_X90       = "#00ff0033";
+    private static final String COLOR_SPIN      = "#00ffff33";
+    private static final String COLOR_TWONKY    = "#ffff0033";
+    private static final String COLOR_TWITCH    = "#aaaaaa33";
 
     @FXML private Label UIHeaderPhaseLabel;
     @FXML private AnchorPane masterContainer;
@@ -74,48 +75,62 @@ public class GameJFXController
 //    @FXML private AnchorPane gotPermanentUpgradeCardSlot3;
     @FXML private Button footerBtn;
     @FXML private AnchorPane footerContainer;
+    @FXML private Label         UIHeaderPhaseLabel;
+    @FXML private AnchorPane    masterContainer;
+    @FXML private VBox          playerContainer;
+    @FXML private ScrollPane    courseScrollPane;
+    @FXML private AnchorPane    courseScrollPaneContent;
+    @FXML private AnchorPane    registerContainer;
+    @FXML private ScrollPane    chatScrollPane;
+    @FXML private TextField     chatInputTextField;
+    @FXML private Button        footerBtn;
+    @FXML private AnchorPane    footerContainer;
 
-    private static final int RCARD_WIDTH = 50;
-    private static final int RCARD_HEIGHT = 88;
-    private static final int RCARD_TRANSLATION_DIFF_X = 10;
+    private static final int RCARD_WIDTH                = 50;
+    private static final int RCARD_HEIGHT               = 88;
+    private static final int RCARD_TRANSLATION_DIFF_X   = 10;
 
-    private VBox chatContainer;
-    private boolean showServerInfo = true;
+    private VBox        chatContainer;
+    private boolean     showServerInfo;
 
-    private int tileDimensions;
-    private static final int RESIZE_AMOUNT = 10;
+    private int                 tileDimensions;
+    private static final int    RESIZE_AMOUNT = 10;
 
-    private boolean bClickedOnTile;
-    private int gotRegisterSlotClicked;
-    private static final int INVALID_GOT_REGISTER_SLOT = -1;
+    private boolean             bClickedOnTile;
+    private int                 gotRegisterSlotClicked;
+    private static final int    INVALID_GOT_REGISTER_SLOT = -1;
 
-    private boolean bFooterCollapsed;
-    private HBox registerHBox;
-    private static final int footerPeekHeight = 50;
+    private boolean             bFooterCollapsed;
+    private HBox                registerHBox;
+    private static final int    footerPeekHeight = 50;
 
-    private int files;
-    private int ranks;
-    private Tile[][] tiles;
-    private double minXTranslation;
-    private double maxXTranslation;
-    private double centralXTranslation;
+    private int         files;
+    private int         ranks;
+    private Tile[][]    tiles;
+    private double      minXTranslation;
+    private double      maxXTranslation;
+    private double      centralXTranslation;
 
     public GameJFXController()
     {
         super();
 
+        this.showServerInfo = false;
+
         this.tileDimensions = ViewSupervisor.TILE_DIMENSIONS;
-        this.bClickedOnTile = false;
+
+        this.bClickedOnTile         = false;
         this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
 
-        this.bFooterCollapsed = true;
+        this.bFooterCollapsed   = true;
+        this.registerHBox       = null;
 
-        this.files = 0;
-        this.ranks = 0;
-        this.tiles = null;
-        this.minXTranslation = 0.0;
-        this.maxXTranslation = 0.0;
-        this.centralXTranslation = 0.0;
+        this.files                  = 0;
+        this.ranks                  = 0;
+        this.tiles                  = null;
+        this.minXTranslation        = 0.0;
+        this.maxXTranslation        = 0.0;
+        this.centralXTranslation    = 0.0;
 
         return;
     }
@@ -125,14 +140,14 @@ public class GameJFXController
     {
         VBox.setVgrow(this.chatScrollPane, Priority.ALWAYS);
 
-        this.courseScrollPane.setFitToWidth(true);
-        this.courseScrollPane.setFitToHeight(true);
-        this.courseScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        this.courseScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        this.courseScrollPane.setFitToWidth(    true    );
+        this.courseScrollPane.setFitToHeight(   true    );
+        this.courseScrollPane.setHbarPolicy(    ScrollPane.ScrollBarPolicy.NEVER    );
+        this.courseScrollPane.setVbarPolicy(    ScrollPane.ScrollBarPolicy.NEVER    );
 
         this.courseScrollPane.widthProperty().addListener((obs, val, t1) ->
         {
-            // TODO Only update translations not the whole course.
+            /* TODO Only update translations not the whole course. */
             this.renderCourse();
             return;
         });
@@ -140,7 +155,7 @@ public class GameJFXController
         this.chatInputTextField.lengthProperty().addListener(new ChangeListener<Number>()
         {
             @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            public void changed(final ObservableValue<? extends Number> observableValue, final Number number, final Number t1)
             {
                 if (t1.intValue() > EGameState.MAX_CHAT_MESSAGE_LENGTH)
                 {
