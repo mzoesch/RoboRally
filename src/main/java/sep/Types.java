@@ -1,5 +1,7 @@
 package sep;
 
+import java.util.Objects;
+
 public final class Types
 {
     public enum OS
@@ -60,6 +62,19 @@ public final class Types
         {
             this.s = s;
             return;
+        }
+
+        public static Animation fromString(final String s)
+        {
+            for (final Animation a : Animation.values())
+            {
+                if (Objects.equals(a.s, s))
+                {
+                    return a;
+                }
+            }
+
+            return null;
         }
 
         @Override
