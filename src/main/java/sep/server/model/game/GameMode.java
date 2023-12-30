@@ -11,6 +11,7 @@ import sep.server.model.game.cards.damage.*;
 import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
+import sep.Types;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -481,6 +482,9 @@ public class GameMode {
      * the handleLaserByDirection method.
      */
     private void findLasers() {
+
+        this.getSession().broadcastAnimation(Types.Animation.PlayerShooting);
+
         for (ArrayList<Tile> row : course.getCourse()) {
             for (Tile tile : row) {
                 for (FieldType fieldType : tile.getFieldTypes()) {
