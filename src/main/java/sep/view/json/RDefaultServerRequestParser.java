@@ -90,9 +90,7 @@ public record RDefaultServerRequestParser(JSONObject request)
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cardsInHand").getString(i)).toArray(String[]::new);
     }
 
-    /**
-     * Only valid for Not Your Cards request. Not the same as getCardsInHand().
-     */
+    /** Only valid for NotYourCards request. Not the same as {@link #getCardsInHand()}. */
     public int getCardsInHandCountNYC() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("cardsInHand");
