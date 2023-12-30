@@ -1671,8 +1671,8 @@ public final class GameJFXController
             for (int j = 0; j < this.ranks; j++)
             {
                 final Tile t = new Tile(EGameState.INSTANCE.getCurrentServerCourseJSON().getJSONArray(i).getJSONArray(j));
-                t.setTranslateX(i);
-                t.setTranslateY(j);
+                t.setXTranslation(i);
+                t.setYTranslation(j);
                 tiles[i][j] = t;
                 continue;
             }
@@ -1680,9 +1680,9 @@ public final class GameJFXController
             continue;
         }
 
-        this.minXTranslation = this.tiles[0][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
-        this.maxXTranslation = this.tiles[this.files - 1][0].getTranslateX() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
-        this.centralXTranslation = ((this.courseScrollPane.getWidth() - this.maxXTranslation) - this.minXTranslation) / 2 - (double) this.tileDimensions / 2;
+        this.minXTranslation        = this.tiles[0][0].getXTranslation() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        this.maxXTranslation        = this.tiles[this.files - 1][0].getXTranslation() * this.tileDimensions + (double) ViewSupervisor.VIRTUAL_SPACE_HORIZONTAL / 2;
+        this.centralXTranslation    = ((this.courseScrollPane.getWidth() - this.maxXTranslation) - this.minXTranslation) / 2 - (double) this.tileDimensions / 2;
 
         return;
     }
@@ -1754,8 +1754,8 @@ public final class GameJFXController
                 for (int k = t.getImageViews().length - 1; k >= 0; k--)
                 {
                     ImageView iv = t.getImageViews()[k];
-                    iv.setFitHeight(this.tileDimensions);
-                    iv.setFitWidth(this.tileDimensions);
+                    iv.setFitHeight(    this.tileDimensions );
+                    iv.setFitWidth(     this.tileDimensions );
                     AP.getChildren().add(iv);
                     continue;
                 }
@@ -1794,7 +1794,7 @@ public final class GameJFXController
 
                         l.info("User wants to set starting position.");
                         /* TODO Some kind of validation. */
-                        new SetStartingPointModel(t.getTranslateX(), t.getTranslateY()).send();
+                        new SetStartingPointModel(t.getXTranslation(), t.getYTranslation()).send();
                         this.bClickedOnTile = true;
 
                         return;
