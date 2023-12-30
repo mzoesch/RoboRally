@@ -1,5 +1,9 @@
 package sep.view.lib;
 
+import sep.view.viewcontroller.Tile;
+
+import java.util.Objects;
+
 public final class Types
 {
     private Types() throws IllegalStateException
@@ -75,6 +79,110 @@ public final class Types
             this(type, type.toString() , msg);
         }
 
+    }
+
+    public enum EModifier
+    {
+        INVALID         (   "Invalid"       ),
+        EMPTY           (   "Empty"         ),
+        START_POINT     (   "StartPoint"    ),
+        CONVEYOR_BELT   (   "ConveyorBelt"  ),
+        PUSH_PANEL      (   "PushPanel"     ),
+        GEAR            (   "Gear"          ),
+        PIT             (   "Pit"           ),
+        ENERGY_SPACE    (   "EnergySpace"   ),
+        WALL            (   "Wall"          ),
+        LASER           (   "Laser"         ),
+        ANTENNA         (   "Antenna"       ),
+        CHECK_POINT     (   "CheckPoint"    ),
+        RESTART_POINT   (   "RestartPoint"  ),
+        ;
+
+        private final String s;
+
+        private EModifier(final String s)
+        {
+            this.s = s;
+            return;
+        }
+
+        public static EModifier fromString(final String s)
+        {
+            for (final EModifier e : EModifier.values())
+            {
+                if (e.s.equals(s))
+                {
+                    return e;
+                }
+
+                continue;
+            }
+
+            return null;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.s;
+        }
+
+    }
+
+    public enum ERotation
+    {
+        INVALID (   "Invalid"   ),
+        NORTH   (   "top"       ),
+        EAST    (   "right"     ),
+        SOUTH   (   "bottom"    ),
+        WEST    (   "left"      ),
+        ;
+
+        private final String s;
+
+        private ERotation(final String s)
+        {
+            this.s = s;
+            return;
+        }
+
+        public static ERotation fromString(final String s)
+        {
+            for (final ERotation e : ERotation.values())
+            {
+                if (Objects.equals(e.s, s))
+                {
+                    return e;
+                }
+
+                continue;
+            }
+
+            return null;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.s;
+        }
+
+        public ERotation getOpposite()
+        {
+            return switch (this)
+            {
+            case NORTH  -> ERotation.SOUTH;
+            case EAST   -> ERotation.WEST;
+            case SOUTH  -> ERotation.NORTH;
+            case WEST   -> ERotation.EAST;
+            default     -> null;
+            };
+        }
+
+    }
+
+    public record RLaserMask(Tile t, ERotation rot, int count)
+    {
     }
 
 }
