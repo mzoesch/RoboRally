@@ -1,14 +1,15 @@
 package sep.view.json;
 
-import sep.view.lib.RCoordinate;
-import sep.view.clientcontroller.EConnectionLoss;
-import sep.view.lib.RRegisterCard;
-import sep.view.lib.Types.EFigure;
+import sep.                         Types;
+import sep.view.lib.Types.          EFigure;
+import sep.view.lib.                RCoordinate;
+import sep.view.lib.                RRegisterCard;
+import sep.view.clientcontroller.   EConnectionLoss;
 
-import org.json.JSONObject;
-import org.json.JSONException;
-import java.util.stream.IntStream;
-import org.json.JSONArray;
+import java.util.stream.    IntStream;
+import org.json.            JSONObject;
+import org.json.            JSONException;
+import org.json.            JSONArray;
 
 /** For easier access to the JSON object received from the server. Does not contain actual logic. */
 public record RDefaultServerRequestParser(JSONObject request)
@@ -190,6 +191,11 @@ public record RDefaultServerRequestParser(JSONObject request)
     public RRegisterCard[] getCurrentRegisterCards() throws JSONException
     {
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()).mapToObj(i -> new RRegisterCard(this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"), this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card"))).toArray(RRegisterCard[]::new);
+    }
+
+    public Types.Animation getAnimation() throws JSONException
+    {
+        return Types.Animation.fromString(this.request.getJSONObject("messageBody").getString("type"));
     }
 
 }

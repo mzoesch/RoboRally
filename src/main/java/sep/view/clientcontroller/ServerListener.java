@@ -372,7 +372,8 @@ public class ServerListener implements Runnable
 
     private boolean onAnimationPlay() throws JSONException
     {
-        l.warn("Server requested client {} to play an animation. But it is not implemented yet. Ignoring.", EClientInformation.INSTANCE.getPlayerID());
+        l.debug("Server requested client {} to play an animation: {}.", EClientInformation.INSTANCE.getPlayerID(), this.dsrp.getAnimation().toString());
+        ViewSupervisor.playAnimation(this.dsrp.getAnimation());
         return true;
     }
 
