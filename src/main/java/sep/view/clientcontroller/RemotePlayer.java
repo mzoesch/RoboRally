@@ -175,4 +175,9 @@ public final class RemotePlayer
         return this.playedRCards.toArray(new String[0]);
     }
 
+    public RCoordinate getFigureLocation()
+    {
+        return this.possessing.getPosition();
+    }
+
 }
