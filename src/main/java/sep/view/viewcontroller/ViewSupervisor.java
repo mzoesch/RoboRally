@@ -354,6 +354,22 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    public static void playAnimation(final sep.Types.Animation anim)
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).playAnimation(anim);
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during Anim event. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+
+        return;
+    }
+
     // endregion Updating methods
 
     /** Only valid on the JFX thread. */
