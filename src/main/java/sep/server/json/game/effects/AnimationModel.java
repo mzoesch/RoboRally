@@ -1,24 +1,31 @@
 package sep.server.json.game.effects;
 
-import org.json.JSONObject;
-import sep.server.json.AModel;
-import sep.server.viewmodel.ClientInstance;
+import sep.server.json.         AModel;
+import sep.server.viewmodel.    ClientInstance;
+import sep.                     Types;
 
-public class AnimationModel extends AModel {
+import org.json.                JSONObject;
 
-    private final String type;
+public class AnimationModel extends AModel
+{
+    private final Types.Animation anim;
 
-    public AnimationModel(ClientInstance ci, String type) {
+    public AnimationModel(final ClientInstance ci, final Types.Animation anim)
+    {
         super(ci);
-        this.type = type;
+        this.anim = anim;
+
+        return;
     }
 
     @Override
-    public JSONObject toJSON() {
-        JSONObject j = new JSONObject();
-        j.put("messageType", "Animation");
-        j.put("messageBody", new JSONObject().put("type", this.type));
+    public JSONObject toJSON()
+    {
+        final JSONObject j = new JSONObject();
+        j.put(  "messageType",  "Animation"                                         );
+        j.put(  "messageBody",  new JSONObject().put("type", this.anim.toString())  );
 
         return j;
     }
+
 }
