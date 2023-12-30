@@ -195,6 +195,11 @@ public class RobotView
         return Tile.getRobotImage(this.possessor.getFigure().i);
     }
 
+    public RCoordinate getPosition()
+    {
+        return this.position;
+    }
+
     // endregion Getters and Setters
 
 }
