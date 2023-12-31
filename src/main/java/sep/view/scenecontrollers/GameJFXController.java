@@ -27,6 +27,9 @@ import javafx.scene.layout.         Priority;
 import javafx.scene.layout.         Region;
 import javafx.scene.layout.         Pane;
 import javafx.animation.            PauseTransition;
+import javafx.animation.            Timeline;
+import javafx.animation.            KeyFrame;
+import javafx.animation.            KeyValue;
 import javafx.fxml.                 FXML;
 import javafx.beans.value.          ChangeListener;
 import javafx.beans.value.          ObservableValue;
@@ -1910,7 +1913,27 @@ public final class GameJFXController
 
     // region Animation Rendering
 
-    private void renderRobotShooting()
+    private void renderGearAnim()
+    {
+        for (int i = 0; i < this.gears.size(); i++)
+        {
+            /* TODO Depending on the length of the game the rotation will increase drastically. We may want to reset it. */
+            final int newRot    = this.gears.get(i).rotation() + (this.gears.get(i).clockwise() ? 90 : -90);
+            final Timeline t    = new Timeline();
+            final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.GEAR_ANIMATION_DURATION), new KeyValue(this.gears.get(i).iv().rotateProperty(), newRot));
+            t.getKeyFrames().add(kf);
+
+            t.play();
+
+            this.gears.set(i, new Types.RGearMask(this.gears.get(i).iv(), this.gears.get(i).clockwise(), newRot));
+
+            continue;
+        }
+
+        return;
+    }
+
+    private void renderRobotShootingAnim()
     {
         for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
@@ -1993,7 +2016,7 @@ public final class GameJFXController
         }
         case GEAR ->
         {
-            l.warn("Server requested to render gear animation. Not implemented yet.");
+            this.renderGearAnim();
             break;
         }
         case CHECK_POINT ->
