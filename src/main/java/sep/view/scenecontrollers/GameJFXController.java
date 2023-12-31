@@ -120,27 +120,6 @@ public final class GameJFXController
         return;
     }
 
-    private void centerCourse()
-    {
-        this.courseScrollPane.setHvalue(0.5);
-        this.courseScrollPane.setVvalue(0.5);
-        return;
-    }
-
-    /** TODO Highly sketchy. Needs some testing. */
-    private void centerCourseLater()
-    {
-        final PauseTransition p = new PauseTransition(new Duration(GameJFXController.CENTERING_SCROLL_TIMEOUT));
-        p.setOnFinished(e ->
-        {
-            this.centerCourse();
-            return;
-        });
-        p.play();
-
-        return;
-    }
-
     @FXML
     private void initialize()
     {
@@ -1688,6 +1667,27 @@ public final class GameJFXController
     // region Course View
 
     // region Helper Methods
+
+    private void centerCourse()
+    {
+        this.courseScrollPane.setHvalue(0.5);
+        this.courseScrollPane.setVvalue(0.5);
+        return;
+    }
+
+    /** TODO Highly sketchy. Needs some testing. */
+    private void centerCourseLater()
+    {
+        final PauseTransition p = new PauseTransition(new Duration(GameJFXController.CENTERING_SCROLL_TIMEOUT));
+        p.setOnFinished(e ->
+        {
+            this.centerCourse();
+            return;
+        });
+        p.play();
+
+        return;
+    }
 
     private void updateGlobalVariables()
     {
