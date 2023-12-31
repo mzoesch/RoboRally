@@ -2,7 +2,8 @@ package sep.view.lib;
 
 import sep.view.viewcontroller.Tile;
 
-import java.util.Objects;
+import java.util.           Objects;
+import javafx.scene.image.  ImageView;
 
 public final class Types
 {
@@ -182,6 +183,10 @@ public final class Types
     }
 
     public record RLaserMask(Tile t, ERotation rot, int count)
+    {
+    }
+
+    public record RGearMask(ImageView iv, boolean clockwise, int rotation)
     {
     }
 
