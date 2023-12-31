@@ -119,6 +119,7 @@ public final class GameJFXController
         this.files                  = 0;
         this.ranks                  = 0;
         this.tiles                  = null;
+        this.gears                  = new ArrayList<>();
         this.minXTranslation        = 0.0;
         this.maxXTranslation        = 0.0;
         this.centralXTranslation    = 0.0;
