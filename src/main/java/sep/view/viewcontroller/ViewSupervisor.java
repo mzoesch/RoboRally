@@ -20,8 +20,9 @@ import javafx.stage.                WindowEvent;
 import javafx.stage.                Stage;
 
 /**
- * This class is responsible for launching the JavaFX application and is
- * the gate-way from outside the JavaFX thread to the JavaFX thread.
+ * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
+ * communication to it. This Singleton class is valid during the entire lifetime of the JavaFX Application
+ * and not destroyed until the Platform has been exited.
  */
 public final class ViewSupervisor extends Application
 {
