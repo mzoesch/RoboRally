@@ -444,6 +444,8 @@ public class GameMode {
      * The robot is rotated 90 degrees into the gear's rotational direction.
      */
     private void activateGears() {
+        this.getSession().broadcastAnimation(Types.Animation.GEAR);
+
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
