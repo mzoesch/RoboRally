@@ -1978,26 +1978,32 @@ public final class GameJFXController
         {
         case BLUE_CONVEYOR_BELT ->
         {
+            l.warn("Server requested to render blue conveyor belt animation. Not implemented yet.");
             break;
         }
         case GREEN_CONVEYOR_BELT ->
         {
+            l.warn("Server requested to render green conveyor belt animation. Not implemented yet.");
             break;
         }
         case PUSH_PANEL ->
         {
+            l.warn("Server requested to render push panel animation. Not implemented yet.");
             break;
         }
         case GEAR ->
         {
+            l.warn("Server requested to render gear animation. Not implemented yet.");
             break;
         }
         case CHECK_POINT ->
         {
+            l.warn("Server requested to render check point animation. Not implemented yet.");
             break;
         }
         case PLAYER_SHOOTING ->
         {
+            this.renderRobotShooting();
             break;
         }
         case WALL_SHOOTING ->
@@ -2007,6 +2013,7 @@ public final class GameJFXController
         }
         case ENERGY_SPACE ->
         {
+            l.warn("Server requested to render energy space animation. Not implemented yet.");
             break;
         }
         }
