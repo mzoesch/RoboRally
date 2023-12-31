@@ -1966,7 +1966,7 @@ public final class GameJFXController
         return;
     }
 
-    private void renderWallShooting()
+    private void renderWallShootingAnim()
     {
         for (final Tile t : this.getWallLasers())
         {
@@ -2027,12 +2027,12 @@ public final class GameJFXController
         }
         case PLAYER_SHOOTING ->
         {
-            this.renderRobotShooting();
+            this.renderRobotShootingAnim();
             break;
         }
         case WALL_SHOOTING ->
         {
-            this.renderWallShooting();
+            this.renderWallShootingAnim();
             break;
         }
         case ENERGY_SPACE ->
