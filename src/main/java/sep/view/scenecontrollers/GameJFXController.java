@@ -1781,15 +1781,16 @@ public final class GameJFXController
             {
                 final Tile t = this.tiles[i][j];
                 final AnchorPane AP = new AnchorPane();
+                /* Warning: This is not commutative. Do not change the order here. */
                 for (int k = t.getImageViews().length - 1; k >= 0; k--)
                 {
-                    ImageView iv = t.getImageViews()[k];
+                    final ImageView iv = t.getImageViews()[k];
                     iv.setFitHeight(    this.tileDimensions );
                     iv.setFitWidth(     this.tileDimensions );
                     AP.getChildren().add(iv);
                     continue;
                 }
-                this.renderOnPosition(AP, new RCoordinate(i, j));
+                this.renderOnPosition(AP, t.getTileLocation());
 
                 if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
                 {
