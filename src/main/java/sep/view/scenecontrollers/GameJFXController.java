@@ -57,6 +57,9 @@ public final class GameJFXController
     private static final int    SHOOTING_LASER_DURATION     = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT         = 15    ;
     private static final int    CENTERING_SCROLL_TIMEOUT    = 2_000 ;
+    private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
+    private static final int    CHAT_SCROLL_TIMEOUT             = 15    ;
+    private static final int    CENTERING_SCROLL_TIMEOUT        = 2_000 ;
 
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -1908,6 +1911,38 @@ public final class GameJFXController
     }
 
     // region Animation Rendering
+
+    private void renderRobotShooting()
+    {
+        for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        {
+            if (!rp.getRobotView().hasPosition())
+            {
+                continue;
+            }
+
+            for (final RLaserMask mask : rp.getRobotView().getLaserAffectedTiles(this.tiles, 1))
+            {
+                final ImageView iv = Tile.getFormattedImageView(mask);
+                iv.setFitHeight(    this.tileDimensions );
+                iv.setFitWidth(     this.tileDimensions );
+
+                final AnchorPane ap = new AnchorPane(iv);
+
+                this.renderOnPosition(ap, mask.t().getTileLocation());
+
+                final PauseTransition p = new PauseTransition(Duration.millis(GameJFXController.SHOOTING_ROBOT_LASER_DURATION));
+                p.setOnFinished(e -> this.courseScrollPaneContent.getChildren().remove(ap));
+                p.play();
+
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
 
     private void renderWallShooting()
     {
