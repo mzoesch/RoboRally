@@ -61,6 +61,7 @@ public final class GameJFXController
     private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT             = 15    ;
     private static final int    CENTERING_SCROLL_TIMEOUT        = 2_000 ;
+    private static final int    GEAR_ANIMATION_DURATION         = 1_000 ;
 
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -1770,6 +1771,7 @@ public final class GameJFXController
     private void renderCourseBoard()
     {
         this.courseScrollPaneContent.getChildren().clear();
+        this.gears.clear();
 
         if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
         {
@@ -1793,6 +1795,12 @@ public final class GameJFXController
                     iv.setFitHeight(    this.tileDimensions );
                     iv.setFitWidth(     this.tileDimensions );
                     AP.getChildren().add(iv);
+
+                    if (TileModifier.isGear(iv.getImage()))
+                    {
+                        this.gears.add(TileModifier.generateGearMask(iv));
+                    }
+
                     continue;
                 }
                 this.renderOnPosition(AP, t.getTileLocation());
