@@ -83,8 +83,9 @@ public final class GameJFXController
 
     private boolean             bFooterCollapsed;
     private HBox                registerHBox;
-    private static final int    footerPeekHeight = 50;
     private static final int    FOOTER_PEEK_HEIGHT = 50;
+    /** During initialization. */
+    private static final int    NULL_FOOTER_HEIGHT = 200;
 
     private int         files;
     private int         ranks;
@@ -152,7 +153,7 @@ public final class GameJFXController
 
         this.renderView();
 
-        // TODO Highly sketchy. Needs some testing.
+        /* TODO Highly sketchy. Needs some testing. */
         final PauseTransition p = new PauseTransition(new Duration(2_000));
         p.setOnFinished(e ->
         {
@@ -1517,7 +1518,14 @@ public final class GameJFXController
     private void translateFooter()
     {
         /* TODO Maybe with a timeline? */
-        this.footerContainer.setTranslateY(this.bFooterCollapsed ? this.footerContainer.getHeight() - GameJFXController.footerPeekHeight : 0);
+        this.footerContainer.setTranslateY(
+              this.bFooterCollapsed
+            ? this.footerContainer.getHeight() < 10
+            ? GameJFXController.NULL_FOOTER_HEIGHT - GameJFXController.FOOTER_PEEK_HEIGHT
+            : this.footerContainer.getHeight() - GameJFXController.FOOTER_PEEK_HEIGHT
+            : 0
+        );
+
         return;
     }
 
