@@ -147,7 +147,7 @@ public final class Tile
         return false;
     }
 
-    public boolean isTraversable(final ERotation rot, boolean bCheckOpposite)
+    public boolean isNotTraversable(final ERotation rot, boolean bCheckOpposite)
     {
         for (int i = 0; i < this.getModifierSize(); i++)
         {
@@ -160,12 +160,12 @@ public final class Tile
             {
                 if (Objects.equals(r, rot))
                 {
-                    return false;
+                    return true;
                 }
 
                 if (bCheckOpposite && Objects.equals(r.getOpposite(), rot))
                 {
-                    return false;
+                    return true;
                 }
 
                 continue;
@@ -173,7 +173,7 @@ public final class Tile
 
         }
 
-        return true;
+        return false;
     }
 
     private TileModifier getLaserModifier()
@@ -196,7 +196,7 @@ public final class Tile
 
         masks.add(new RLaserMask(this, rot, count));
 
-        if (!this.isTraversable(rot, false))
+        if (this.isNotTraversable(rot, false))
         {
             return masks.toArray(new RLaserMask[0]);
         }
@@ -227,7 +227,7 @@ public final class Tile
                 break;
             }
 
-            if (!tiles[masks.get(masks.size() - 1).t().getTileLocation().x()][masks.get(masks.size() - 1).t().getTileLocation().y()].isTraversable(rot, true))
+            if (tiles[masks.get(masks.size() - 1).t().getTileLocation().x()][masks.get(masks.size() - 1).t().getTileLocation().y()].isNotTraversable(rot, true))
             {
                 break;
             }
