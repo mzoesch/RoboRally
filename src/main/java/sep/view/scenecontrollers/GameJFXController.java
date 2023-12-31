@@ -54,10 +54,8 @@ public final class GameJFXController
     private static final String COLOR_TWONKY    = "#ffff0033";
     private static final String COLOR_TWITCH    = "#aaaaaa33";
 
-    private static final int    SHOOTING_LASER_DURATION     = 1_000 ;
-    private static final int    CHAT_SCROLL_TIMEOUT         = 15    ;
-    private static final int    CENTERING_SCROLL_TIMEOUT    = 2_000 ;
     private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
+    private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT             = 15    ;
     private static final int    CENTERING_SCROLL_TIMEOUT        = 2_000 ;
 
@@ -1958,7 +1956,7 @@ public final class GameJFXController
 
                 this.renderOnPosition(ap, mask.t().getTileLocation());
 
-                final PauseTransition p = new PauseTransition(Duration.millis(GameJFXController.SHOOTING_LASER_DURATION));
+                final PauseTransition p = new PauseTransition(Duration.millis(GameJFXController.SHOOTING_WALL_LASER_DURATION));
                 p.setOnFinished(e -> this.courseScrollPaneContent.getChildren().remove(ap));
                 p.play();
 
