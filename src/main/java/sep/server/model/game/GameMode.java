@@ -501,6 +501,8 @@ public class GameMode {
      * and calls the handleLaserShooting method depending on the direction the robot is facing to.
      */
     private void shootRobotLasers() {
+        this.getSession().broadcastAnimation(Types.Animation.PLAYER_SHOOTING);
+
         for(Player player : players) {
             Robot playerRobot = player.getPlayerRobot();
             Tile robotTile = playerRobot.getCurrentTile();
