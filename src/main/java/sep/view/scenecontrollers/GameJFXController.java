@@ -56,6 +56,7 @@ public final class GameJFXController
 
     private static final int    SHOOTING_LASER_DURATION     = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT         = 15    ;
+    private static final int    CENTERING_SCROLL_TIMEOUT    = 2_000 ;
 
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -119,6 +120,27 @@ public final class GameJFXController
         return;
     }
 
+    private void centerCourse()
+    {
+        this.courseScrollPane.setHvalue(0.5);
+        this.courseScrollPane.setVvalue(0.5);
+        return;
+    }
+
+    /** TODO Highly sketchy. Needs some testing. */
+    private void centerCourseLater()
+    {
+        final PauseTransition p = new PauseTransition(new Duration(GameJFXController.CENTERING_SCROLL_TIMEOUT));
+        p.setOnFinished(e ->
+        {
+            this.centerCourse();
+            return;
+        });
+        p.play();
+
+        return;
+    }
+
     @FXML
     private void initialize()
     {
@@ -154,16 +176,7 @@ public final class GameJFXController
 
         this.renderView();
 
-        /* TODO Highly sketchy. Needs some testing. */
-        final PauseTransition p = new PauseTransition(new Duration(2_000));
-        p.setOnFinished(e ->
-        {
-            l.debug("Scrolling view to center.");
-            this.courseScrollPane.setHvalue(0.5);
-            this.courseScrollPane.setVvalue(0.5);
-            return;
-        });
-        p.play();
+        this.centerCourseLater();
 
         this.chatContainer = new VBox();
         this.chatContainer.setId("chat-scroll-pane-inner");
