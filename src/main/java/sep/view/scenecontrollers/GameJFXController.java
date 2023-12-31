@@ -84,6 +84,7 @@ public final class GameJFXController
     private boolean             bFooterCollapsed;
     private HBox                registerHBox;
     private static final int    footerPeekHeight = 50;
+    private static final int    FOOTER_PEEK_HEIGHT = 50;
 
     private int         files;
     private int         ranks;
