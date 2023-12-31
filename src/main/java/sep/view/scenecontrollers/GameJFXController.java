@@ -93,12 +93,13 @@ public final class GameJFXController
     /** During initialization. */
     private static final int    NULL_FOOTER_HEIGHT = 200;
 
-    private int         files;
-    private int         ranks;
-    private Tile[][]    tiles;
-    private double      minXTranslation;
-    private double      maxXTranslation;
-    private double      centralXTranslation;
+    private int                                 files;
+    private int                                 ranks;
+    private Tile[][]                            tiles;
+    private final ArrayList<Types.RGearMask>    gears;
+    private double                              minXTranslation;
+    private double                              maxXTranslation;
+    private double                              centralXTranslation;
 
     public GameJFXController()
     {
