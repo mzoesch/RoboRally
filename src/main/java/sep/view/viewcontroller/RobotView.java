@@ -2,6 +2,7 @@ package sep.view.viewcontroller;
 
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.lib.RCoordinate;
+import sep.view.lib.Types;
 import sep.view.scenecontrollers.GameJFXController;
 import sep.view.lib.RRotation;
 
@@ -14,6 +15,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.util.Duration;
+import java.util.ArrayList;
 
 public class RobotView
 {
@@ -198,6 +200,73 @@ public class RobotView
     public RCoordinate getPosition()
     {
         return this.position;
+    }
+
+    public Types.RLaserMask[] getLaserAffectedTiles(final Tile[][] tiles, final int count)
+    {
+        final Tile t                                = tiles[this.position.x()][this.position.y()];
+        final Types.ERotation rot                   = this.rotation.toEnum();
+        final ArrayList<Types.RLaserMask> masks     = new ArrayList<Types.RLaserMask>();
+
+        System.out.printf("Player rotation: %s\n", rot);
+
+        if (rot == null)
+        {
+            l.warn("Tried to animate a robot shooting with an invalid rotation.");
+            return masks.toArray(new Types.RLaserMask[0]);
+        }
+
+        masks.add(new Types.RLaserMask(t, rot, count));
+
+        if (t.isNotTraversable(rot, false))
+        {
+            return masks.toArray(new Types.RLaserMask[0]);
+        }
+
+        while (true)
+        {
+            final RCoordinate toCheck = masks.get(masks.size() - 1).t().getTileLocation().getNeighbour(rot);
+
+            if (toCheck == null)
+            {
+                break;
+            }
+
+            if (!RCoordinate.exists(toCheck, tiles))
+            {
+                break;
+            }
+
+            masks.add(new Types.RLaserMask(tiles[toCheck.x()][toCheck.y()], rot, count));
+
+            if (tiles[masks.get(masks.size() - 1).t().getTileLocation().x()][masks.get(masks.size() - 1).t().getTileLocation().y()].isNotTraversable(rot, false))
+            {
+                /* We may not shoot inside the Antenna. */
+                if (tiles[masks.get(masks.size() - 1).t().getTileLocation().x()][masks.get(masks.size() - 1).t().getTileLocation().y()].hasModifier(Types.EModifier.ANTENNA))
+                {
+                    masks.remove(masks.size() - 1);
+                    break;
+                }
+
+                break;
+            }
+
+            /* If the laser is at the entry point where we shoot. We cannot reach players on this tile. */
+            if (tiles[masks.get(masks.size() - 1).t().getTileLocation().x()][masks.get(masks.size() - 1).t().getTileLocation().y()].isNotTraversable(rot.getOpposite(), false))
+            {
+                masks.remove(masks.size() - 1);
+                break;
+            }
+
+            if (RCoordinate.isOccupied(masks.get(masks.size() - 1).t().getTileLocation()))
+            {
+                break;
+            }
+
+            continue;
+        }
+
+        return masks.toArray(new Types.RLaserMask[0]);
     }
 
     // endregion Getters and Setters
