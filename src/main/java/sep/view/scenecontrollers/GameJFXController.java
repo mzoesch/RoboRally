@@ -54,7 +54,8 @@ public final class GameJFXController
     private static final String COLOR_TWONKY    = "#ffff0033";
     private static final String COLOR_TWITCH    = "#aaaaaa33";
 
-    private static final int SHOOTING_LASER_DURATION = 1_000;
+    private static final int    SHOOTING_LASER_DURATION     = 1_000 ;
+    private static final int    CHAT_SCROLL_TIMEOUT         = 15    ;
 
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -908,6 +909,22 @@ public final class GameJFXController
 
     // region Chat
 
+    private void scrollChatToEnd()
+    {
+        this.chatScrollPane.setVvalue(1.0);
+        return;
+    }
+
+    /** Kinda sketchy. But is there a better way? */
+    private void scrollChatToEndLater()
+    {
+        final PauseTransition p = new PauseTransition(Duration.millis(GameJFXController.CHAT_SCROLL_TIMEOUT));
+        p.setOnFinished(e -> this.scrollChatToEnd());
+        p.play();
+
+        return;
+    }
+
     private void onSubmitChatMsg()
     {
         final String token = this.getChatMsg();
@@ -1055,10 +1072,7 @@ public final class GameJFXController
                 l.setWrapText(true);
                 this.chatContainer.getChildren().add(l);
 
-                /* Kinda sketchy. But is there a better way? */
-                final PauseTransition p = new PauseTransition(Duration.millis(15));
-                p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
-                p.play();
+                this.scrollChatToEndLater();
             }
 
             return;
@@ -1071,10 +1085,7 @@ public final class GameJFXController
             l.setWrapText(true);
             this.chatContainer.getChildren().add(l);
 
-            /* Kinda sketchy. But is there a better way? */
-            /* final */ PauseTransition p = new PauseTransition(Duration.millis(15));
-            p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
-            p.play();
+            this.scrollChatToEndLater();
 
             return;
         }
@@ -1084,10 +1095,7 @@ public final class GameJFXController
         l.setWrapText(true);
         this.chatContainer.getChildren().add(l);
 
-        /* Kinda sketchy. But is there a better way? */
-        final PauseTransition p = new PauseTransition(Duration.millis(15));
-        p.setOnFinished(f -> this.chatScrollPane.setVvalue(1.0));
-        p.play();
+        this.scrollChatToEndLater();
 
         return;
     }
