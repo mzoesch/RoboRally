@@ -87,4 +87,30 @@ public record RRotation(int rotation)
         return String.format("%d", this.rotation);
     }
 
+    public Types.ERotation toEnum()
+    {
+        if (this.rotation == 0)
+        {
+            return Types.ERotation.NORTH;
+        }
+
+        if (this.rotation == 90)
+        {
+            return Types.ERotation.EAST;
+        }
+
+        if (this.rotation == 180)
+        {
+            return Types.ERotation.SOUTH;
+        }
+
+        if (this.rotation == 270)
+        {
+            return Types.ERotation.WEST;
+        }
+
+        l.error("Invalid rotation: {}", this.rotation);
+        return null;
+    }
+
 }
