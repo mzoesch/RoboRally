@@ -151,6 +151,11 @@ public final class Tile
     {
         for (int i = 0; i < this.getModifierSize(); i++)
         {
+            if (Objects.equals(this.getModifier(i).getType(), EModifier.ANTENNA.toString()))
+            {
+                return true;
+            }
+
             if (!Objects.equals(this.getModifier(i).getType(), EModifier.WALL.toString()))
             {
                 continue;
