@@ -1,6 +1,7 @@
 package sep.view.viewcontroller;
 
 import sep.view.lib.Types.          ERotation;
+import sep.view.lib.Types.          RGearMask;
 
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
@@ -563,6 +564,16 @@ public final class TileModifier
         }
 
         return rotations;
+    }
+
+    public static boolean isGear(final Image i)
+    {
+        return Objects.equals(i.getUrl(), TileModifier.getImage("GearClockwise").getUrl()) || Objects.equals(i.getUrl(), TileModifier.getImage("GearCounterclockwise").getUrl());
+    }
+
+    public static RGearMask generateGearMask(final ImageView iv)
+    {
+        return new RGearMask(iv, Objects.equals(iv.getImage().getUrl(), TileModifier.getImage("GearClockwise").getUrl()), 0);
     }
 
     // endregion Getters and Setters
