@@ -1,17 +1,15 @@
 package sep;
 
-import sep.wrapper.Wrapper;
+import sep.wrapper. Wrapper;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.                     IOException;
+import java.util.                   Arrays;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
 
-// TODO Save screen size and position of the wrapper Graphical User Interface and inherit it to the follow-up process.
-// TODO Osascript will always open a new window (Meaning two if Terminal is not running).
-// TODO Open Terminal in pref App not default.
-public class Launcher
+/* TODO Save screen size and position of the wrapper Graphical User Interface and inherit it to the follow-up process. */
+/* TODO Osascript will always open a new window (Meaning two if Terminal is not running). */
+public final class Launcher
 {
     private static final Logger l = LogManager.getLogger(Launcher.class);
 
@@ -44,8 +42,8 @@ public class Launcher
         l.debug("Detected operating system: " + System.getProperty("os.name"));
 
         /* This only works with jar files because else the getPath() will return a dir. */
-        final String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        final String f = fp.substring(fp.lastIndexOf("/") + 1);
+        final String fp     = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        final String f      = fp.substring(fp.lastIndexOf("/") + 1);
 
         if (args.length == 0)
         {
@@ -55,29 +53,35 @@ public class Launcher
         else if (Arrays.asList(args).contains("--cmd"))
         {
             l.info("Command line argument [--cmd] detected. Starting new process terminal.");
+
             final ProcessBuilder pb =
-                System.getProperty("os.name").toLowerCase().contains("windows")
+                Types.OS.isWindows()
                 ?
                 new ProcessBuilder(
                     System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
-                    String.format("java -cp %s sep.Launcher %s --nocmd%s",
+                    String.format(
+                        "java -cp %s sep.Launcher %s --nocmd%s",
                         f,
                         String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)),
-                        Arrays.asList(args).contains("--noclose") ? "" : " & exit")
+                        Arrays.asList(args).contains("--noclose") ? "" : " & exit"
+                        )
                     )
                 :
-                System.getProperty("os.name").toLowerCase().contains("mac")
+                Types.OS.isOSX()
                 ?
                 new ProcessBuilder(
                     "osascript", "-e",
-                    String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher %s --nocmd%s\"",
+                    String.format(
+                        "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher %s --nocmd%s\"",
                         fp.substring(0, fp.lastIndexOf("/")),
                         f,
                         String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)),
-                        Arrays.asList(args).contains("--noclose") ? "" : " & exit")
+                        Arrays.asList(args).contains("--noclose") ? "" : " & exit"
+                        )
                     )
                 : null
                 ;
+
             /* I do not have a linux machine, therefore, I cannot test this. */
             if (pb == null)
             {
@@ -199,43 +203,48 @@ public class Launcher
             }
             else
             {
-                if (EArgs.getCustomServerPort() != EPort.INVALID.i) /* Set through GUI. */
+                if (EArgs.getCustomServerPort() != EPort.INVALID.i) /* Set through Graphical User Interface. */
                 {
                     l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
                 }
 
-                if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS)
+                if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS) /* Set through Graphical User Interface. */
                 {
                     l.info("Detected custom minimum remote players request: {}.", EArgs.getCustomMinRemotePlayers());
                 }
 
                 final ProcessBuilder pb =
-                    System.getProperty("os.name").toLowerCase().contains("windows")
+                    Types.OS.isWindows()
                     ?
                     new ProcessBuilder(
                         System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
-                        String.format("java -cp %s sep.Launcher --sv --nocmd %s %s %s %s",
+                        String.format(
+                            "java -cp %s sep.Launcher --sv --nocmd %s %s %s %s",
                             f,
                             EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
                             EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinRemotePlayers()) : "",
                             String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)),
-                            Arrays.asList(args).contains("--noclose") ? "" : "& exit")
+                            Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                            )
                         )
                     :
-                    System.getProperty("os.name").toLowerCase().contains("mac")
+                    Types.OS.isOSX()
                     ?
                     new ProcessBuilder(
                         "osascript", "-e",
-                        String.format("tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s\"",
+                        String.format(
+                            "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s\"",
                             fp.substring(0, fp.lastIndexOf("/")),
                             f,
                             EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
                             EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinRemotePlayers()) : "",
                             String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)),
-                            Arrays.asList(args).contains("--noclose") ? "" : "& exit")
+                            Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                            )
                         )
                     : null
                     ;
+
                 if (pb == null)
                 {
                     Launcher.stdoutForNoOSSupport(t0);
