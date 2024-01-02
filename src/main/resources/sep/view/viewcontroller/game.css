@@ -244,3 +244,26 @@
 .lobby-msg-client {
     -fx-text-fill: #0078a1;
 }
+
+#reboot-dialog-container {
+    -fx-background-color: rgba(43, 42, 51, 0.95);
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 800px;
+    -fx-min-height: 300px;
+    -fx-max-width: 800px;
+    -fx-max-height: 300px;
+}
+
+#reboot-dialog-body {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+.reboot-btn {
+    -fx-min-width: 170px;
+    -fx-max-width: 170px;
+    -fx-wrap-text: false;
+}
