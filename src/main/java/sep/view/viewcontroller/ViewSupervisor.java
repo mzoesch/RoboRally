@@ -29,6 +29,7 @@ import javafx.scene.layout.         AnchorPane;
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
  * communication to it. This Singleton class is valid during the entire lifetime of the JavaFX Application
  * and not destroyed until the Platform has been exited.
+ * {@inheritDoc}
  */
 public final class ViewSupervisor extends Application
 {
