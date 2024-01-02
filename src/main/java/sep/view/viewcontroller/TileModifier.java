@@ -1,16 +1,24 @@
 package sep.view.viewcontroller;
 
+import sep.Types;
 import sep.view.lib.Types.          ERotation;
 import sep.view.lib.Types.          RGearMask;
+import sep.view.clientcontroller.   GameInstance;
 
+import java.io.IOException;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import java.net.                    URL;
 import javafx.scene.image.          Image;
 import javafx.scene.image.          ImageView;
 import org.json.                    JSONObject;
 import org.json.                    JSONArray;
 import org.json.                    JSONException;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import javafx.embed.swing.SwingFXUtils;
 
 public final class TileModifier
 {
@@ -18,9 +26,9 @@ public final class TileModifier
 
     private final JSONObject tile;
 
-    private static final String path        = "file:src/main/resources/public/";
-    private static final String extension   = ".png";
     private static final String PATH_DEV    = "file:src/main/resources/public/";
+    private static final String PATH_PROD   = "/public/";
+    private static final String EXTENSION   = ".png";
 
     public TileModifier(final JSONObject tile)
     {
@@ -263,19 +271,59 @@ public final class TileModifier
         return this.tile.getString("type");
     }
 
-    public static Image getImage(String modName)
+    public static Image getImage(final String modName)
     {
-//        final Image i = new Image(String.format("/public/%s%s", modName, TileModifier.extension));
-        final Image i = new Image(String.format("%s%s%s", TileModifier.path, modName, TileModifier.extension));
-        if (i.isError())
+        // Why are we doing this?
+        // Loading directly in JavaFX is way faster than loading via URL and is basically instant.
+        // But when the Application is packaged with MVN into a JAR, the JavaFX fails to load the images, and we must
+        // use the SWING Framework to do the loading for us. If it is figured out how to directly load files, we can
+        // safety remove this code.
+
+        if (Types.Configurations.isDev())
         {
-            l.error("Could not load image: {}", modName);
-            l.error(i.getException().getMessage());
-            return i;
             final Image i = new Image(String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION));
+            if (i.isError())
+            {
+                l.error("Could not load image: {}", modName);
+                l.error(i.getException().getMessage());
+                return i;
+            }
+
+            return i;
         }
 
-        return i;
+        if (Types.Configurations.isProd())
+        {
+            final URL               url     = TileModifier.class.getResource(String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION));
+            final BufferedImage     awtImg;
+
+            if (url == null)
+            {
+                l.error("Could not load image because the calculated url does not exist: {}", modName);
+                return null;
+            }
+
+            try
+            {
+                awtImg = ImageIO.read(url);
+            }
+            catch (final IOException e)
+            {
+                l.fatal("Could not load image: {}", modName);
+                l.fatal(e.getMessage());
+                GameInstance.kill();
+                return null;
+            }
+
+            /* TODO Test if this method is faster then the above. */
+            /* final Image fxImgDirect = new Image(url.openStream() */
+
+            return SwingFXUtils.toFXImage(awtImg, null);
+        }
+
+        l.fatal("Failed to detect application configuration.");
+        GameInstance.kill();
+        return null;
     }
 
     public Image getImage()
