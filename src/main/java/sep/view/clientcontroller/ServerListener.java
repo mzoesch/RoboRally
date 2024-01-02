@@ -29,6 +29,8 @@ public final class ServerListener implements Runnable
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
 
+    private static final int ORDERLY_CLOSE = -1;
+
     private final HashMap<String, Supplier<Boolean>> serverReq =
     new HashMap<String, Supplier<Boolean>>()
     {{
@@ -103,9 +105,8 @@ public final class ServerListener implements Runnable
         {
             while (true)
             {
-                // If the server closed the connection in an orderly way, we will receive -1;
                 final int escapeCharacter = this.bufferedReader.read();
-                if (escapeCharacter == -1)
+                if (escapeCharacter == ServerListener.ORDERLY_CLOSE)
                 {
                     GameInstance.handleServerDisconnect();
                     return;
