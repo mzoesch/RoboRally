@@ -332,7 +332,6 @@ public final class ViewSupervisor extends Application
 
     // endregion Game Events
 
-
     public static void createPopUp(final Types.RPopUpMask mask)
     {
         ViewSupervisor.getSceneController().renderPopUp(mask);
@@ -371,31 +370,34 @@ public final class ViewSupervisor extends Application
     {
         ViewSupervisor.createPopUp(p);
 
-        if (autoDestroyDelay > 0)
+        if (autoDestroyDelay <= 0)
         {
-            new Thread(() ->
-            {
-                try
-                {
-                    l.debug("Waiting {}ms before destroying pop up.", autoDestroyDelay);
-                    Thread.sleep(autoDestroyDelay);
-                }
-                catch (final InterruptedException e)
-                {
-                    l.error("Failed to sleep thread for {}ms.", autoDestroyDelay);
-                    l.error(e.getMessage());
-                    return;
-                }
-
-                Platform.runLater(() ->
-                {
-                    ViewSupervisor.getSceneController().destroyPopUp(p);
-                    return;
-                });
-
-                return;
-            }).start();
+            return;
         }
+
+        new Thread(() ->
+        {
+            l.debug("Waiting {}ms before destroying pop up.", autoDestroyDelay);
+            try
+            {
+                Thread.sleep(autoDestroyDelay);
+            }
+            catch (final InterruptedException e)
+            {
+                l.error("Failed to sleep thread for {}ms.", autoDestroyDelay);
+                l.error(e.getMessage());
+                return;
+            }
+
+            Platform.runLater(() ->
+            {
+                ViewSupervisor.getSceneController().destroyPopUp(p);
+                return;
+            });
+
+            return;
+        })
+        .start();
 
         return;
     }
