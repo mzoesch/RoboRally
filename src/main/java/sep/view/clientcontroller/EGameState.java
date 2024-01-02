@@ -339,6 +339,7 @@ public enum EGameState
         }
 
         ViewSupervisor.updatePhase();
+        ViewSupervisor.updateFooterState(this.currentPhase != EGamePhase.PROGRAMMING);
 
         return;
     }

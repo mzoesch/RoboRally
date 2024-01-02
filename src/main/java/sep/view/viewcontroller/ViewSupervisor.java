@@ -520,6 +520,21 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    public static void updateFooterState(final boolean bCollapsed)
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onFooterStateUpdate(bCollapsed);
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during footer state update. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // endregion Updating methods
 
     /** Only valid on the JFX thread. */
