@@ -1,24 +1,24 @@
 package sep.view.viewcontroller;
 
-import sep.Types;
+import sep.                         Types;
 import sep.view.lib.Types.          ERotation;
 import sep.view.lib.Types.          RGearMask;
 import sep.view.clientcontroller.   GameInstance;
 
-import java.io.IOException;
+import java.io.                     IOException;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import javax.imageio.               ImageIO;
 import java.net.                    URL;
 import javafx.scene.image.          Image;
 import javafx.scene.image.          ImageView;
 import org.json.                    JSONObject;
 import org.json.                    JSONArray;
 import org.json.                    JSONException;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import javafx.embed.swing.SwingFXUtils;
+import javafx.embed.swing.          SwingFXUtils;
+import java.awt.image.              BufferedImage;
+import java.util.                   HashMap;
 
 public final class TileModifier
 {
@@ -26,9 +26,11 @@ public final class TileModifier
 
     private final JSONObject tile;
 
-    private static final String PATH_DEV    = "file:src/main/resources/public/";
-    private static final String PATH_PROD   = "/public/";
-    private static final String EXTENSION   = ".png";
+    /** TODO This is currently fine but if we have to many images this will get really big and significantly increases memory */
+    private static final HashMap<String, Image>     IMG_CACHE   = new HashMap<String, Image>();
+    private static final String                     PATH_DEV    = "file:src/main/resources/public/";
+    private static final String                     PATH_PROD   = "/public/";
+    private static final String                     EXTENSION   = ".png";
 
     public TileModifier(final JSONObject tile)
     {
@@ -271,7 +273,7 @@ public final class TileModifier
         return this.tile.getString("type");
     }
 
-    public static Image getImage(final String modName)
+    private static Image loadImage(final String modName)
     {
         // Why are we doing this?
         // Loading directly in JavaFX is way faster than loading via URL and is basically instant.
@@ -326,33 +328,47 @@ public final class TileModifier
         return null;
     }
 
-    public Image getImage()
+    public static Image loadCachedImage(final String modName)
+    {
+        if (TileModifier.IMG_CACHE.containsKey(modName))
+        {
+            return TileModifier.IMG_CACHE.get(modName);
+        }
+
+        l.debug("Loading and caching image: {}.", modName);
+        final Image i = TileModifier.loadImage(modName);
+        TileModifier.IMG_CACHE.put(modName, i);
+
+        return i;
+    }
+
+    public Image loadCachedImage()
     {
         if (Objects.equals(this.tile.getString("type"), "Empty"))
         {
             // TODO Variations
-            return TileModifier.getImage("EmptyTile_00");
+            return TileModifier.loadCachedImage("EmptyTile_00");
         }
 
         if (Objects.equals(this.tile.getString("type"), "StartPoint"))
         {
-            return TileModifier.getImage("StartPoint");
+            return TileModifier.loadCachedImage("StartPoint");
         }
 
         if (Objects.equals(this.tile.getString("type"), "Antenna"))
         {
-            return TileModifier.getImage("PriorityAntenna");
+            return TileModifier.loadCachedImage("PriorityAntenna");
         }
 
         if (Objects.equals(this.tile.getString("type"), "EnergySpace"))
         {
             if (this.getCount() == 0)
             {
-                return TileModifier.getImage("EnergySpaceInactive");
+                return TileModifier.loadCachedImage("EnergySpaceInactive");
             }
             if (this.getCount() == 1)
             {
-                return TileModifier.getImage("EnergySpaceActive");
+                return TileModifier.loadCachedImage("EnergySpaceActive");
             }
         }
 
@@ -360,7 +376,7 @@ public final class TileModifier
         {
             if (this.getOrientationsCount() == 1)
             {
-                return TileModifier.getImage("WallSingle");
+                return TileModifier.loadCachedImage("WallSingle");
             }
         }
 
@@ -369,12 +385,12 @@ public final class TileModifier
             if (this.getOrientationsCount() == 2) {
                 if (this.isConveyorBeltCurved()) {
                     if (this.isConveyorBeltCurvedLeft())
-                        return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenCurvedLeft" : "ConveyorBeltBlueCurvedLeft");
+                        return TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenCurvedLeft" : "ConveyorBeltBlueCurvedLeft");
                     else{
-                        return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenCurvedRight" : "ConveyorBeltBlueCurvedRight");
+                        return TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenCurvedRight" : "ConveyorBeltBlueCurvedRight");
                     }
                 } else {
-                    return TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenStraight" : "ConveyorBeltBlueStraight");
+                    return TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenStraight" : "ConveyorBeltBlueStraight");
                 }
             }
 
@@ -385,33 +401,33 @@ public final class TileModifier
                     case "top":
                         return Objects.equals(this.getOrientations().getString(1), "bottom") || Objects.equals(this.getOrientations().getString(2), "bottom")
                             ?
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
                             :
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
                             ;
 
                     case "right":
                         return Objects.equals(this.getOrientations().getString(1), "left") || Objects.equals(this.getOrientations().getString(2), "left")
                             ?
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
                             :
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
                             ;
 
                     case "bottom":
                         return Objects.equals(this.getOrientations().getString(1), "top") || Objects.equals(this.getOrientations().getString(2), "top")
                             ?
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
                             :
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
                             ;
 
                     case "left":
                         return Objects.equals(this.getOrientations().getString(1), "right") || Objects.equals(this.getOrientations().getString(2), "right")
                             ?
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTIn" : "ConveyorBeltBlueTIn")
                             :
-                            TileModifier.getImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
+                            TileModifier.loadCachedImage(this.getSpeed() == 1 ? "ConveyorBeltGreenTOut" : "ConveyorBeltBlueTOut")
                             ;
 
                     default:
@@ -425,10 +441,10 @@ public final class TileModifier
         {
                 switch (this.tile.getString("orientations")) {
                     case "clockwise":
-                        return TileModifier.getImage("GearClockwise");
+                        return TileModifier.loadCachedImage("GearClockwise");
 
                     case "counterclockwise":
-                        return TileModifier.getImage("GearCounterclockwise");
+                        return TileModifier.loadCachedImage("GearCounterclockwise");
 
                     default:
                         l.error("Unknown orientation for gear: {}", this.tile.getJSONArray("orientations").toString());
@@ -438,18 +454,18 @@ public final class TileModifier
 
         if (Objects.equals(this.tile.getString("type"), "Pit"))
         {
-            return TileModifier.getImage("Pit");
+            return TileModifier.loadCachedImage("Pit");
         }
 
 
         if (Objects.equals(this.tile.getString("type"), "RestartPoint"))
         {
-            return TileModifier.getImage("RestartPoint");
+            return TileModifier.loadCachedImage("RestartPoint");
         }
 
         if (Objects.equals(this.tile.getString("type"), "CheckPoint"))
         {
-            return TileModifier.getImage("CheckPoint");
+            return TileModifier.loadCachedImage("CheckPoint");
         }
 
         if (Objects.equals(this.tile.getString("type"), "Laser"))
@@ -459,11 +475,11 @@ public final class TileModifier
             switch (this.getCount())
             {
                 case 1:
-                    return TileModifier.getImage("LaserSingleInsetInactive");
+                    return TileModifier.loadCachedImage("LaserSingleInsetInactive");
                 case 2:
-                    return TileModifier.getImage("LaserDoubleInsetInactive");
+                    return TileModifier.loadCachedImage("LaserDoubleInsetInactive");
                 case 3:
-                    return TileModifier.getImage("LaserTripleInsetInactive");
+                    return TileModifier.loadCachedImage("LaserTripleInsetInactive");
 
                 default:
                     l.error("Unknown laser count: {}", this.getCount());
@@ -475,31 +491,31 @@ public final class TileModifier
             if(this.getRegisters().length() == 1){
                 switch(this.getRegisters().getInt(0)){
                     case 1:
-                        return TileModifier.getImage("PushPanelRegister1");
+                        return TileModifier.loadCachedImage("PushPanelRegister1");
                     case 2:
-                        return TileModifier.getImage("PushPanelRegister2");
+                        return TileModifier.loadCachedImage("PushPanelRegister2");
                     case 3:
-                        return TileModifier.getImage("PushPanelRegister3");
+                        return TileModifier.loadCachedImage("PushPanelRegister3");
                     case 4:
-                        return TileModifier.getImage("PushPanelRegister4");
+                        return TileModifier.loadCachedImage("PushPanelRegister4");
                     case 5:
-                        return TileModifier.getImage("PushPanelRegister5");
+                        return TileModifier.loadCachedImage("PushPanelRegister5");
                 }
             }
             else if(this.getRegisters().length() == 2){
-                return TileModifier.getImage("PushPanelRegister2And4");
+                return TileModifier.loadCachedImage("PushPanelRegister2And4");
             }
             else if(this.getRegisters().length() == 3){
-                return TileModifier.getImage("PushPanelRegister1And3And5");
+                return TileModifier.loadCachedImage("PushPanelRegister1And3And5");
             } else{
                 l.debug("Can not resolve Registers of PushPanel");
                 //TODO Entfernen, wenn PushRegister richtig in Map
-                return TileModifier.getImage("PushPanelRegister1");
+                return TileModifier.loadCachedImage("PushPanelRegister1");
             }
         }
 
         l.error("Unknown tile type or variation: {}. Rendering empty tile.", this.tile.getString("type"));
-        return TileModifier.getImage("Empty");
+        return TileModifier.loadCachedImage("Empty");
     }
 
     private int getCount()
@@ -627,12 +643,12 @@ public final class TileModifier
 
     public static boolean isGear(final Image i)
     {
-        return Objects.equals(i.getUrl(), TileModifier.getImage("GearClockwise").getUrl()) || Objects.equals(i.getUrl(), TileModifier.getImage("GearCounterclockwise").getUrl());
+        return Objects.equals(i.getUrl(), TileModifier.loadCachedImage("GearClockwise").getUrl()) || Objects.equals(i.getUrl(), TileModifier.loadCachedImage("GearCounterclockwise").getUrl());
     }
 
     public static RGearMask generateGearMask(final ImageView iv)
     {
-        return new RGearMask(iv, Objects.equals(iv.getImage().getUrl(), TileModifier.getImage("GearClockwise").getUrl()), 0);
+        return new RGearMask(iv, Objects.equals(iv.getImage().getUrl(), TileModifier.loadCachedImage("GearClockwise").getUrl()), 0);
     }
 
     // endregion Getters and Setters

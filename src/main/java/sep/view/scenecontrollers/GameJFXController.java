@@ -1162,7 +1162,7 @@ public final class GameJFXController
         iv.setFitWidth(width);
         iv.setFitHeight(height);
         iv.getStyleClass().add("register-slot");
-        iv.setImage(TileModifier.getImage("EmptyRegisterSlot"));
+        iv.setImage(TileModifier.loadCachedImage("EmptyRegisterSlot"));
         return iv;
     }
 
@@ -1176,7 +1176,7 @@ public final class GameJFXController
         final ImageView iv = new ImageView();
         iv.setFitWidth(width);
         iv.setFitHeight(height);
-        iv.setImage(TileModifier.getImage(cardName));
+        iv.setImage(TileModifier.loadCachedImage(cardName));
 
         return iv;
     }
@@ -1621,7 +1621,7 @@ public final class GameJFXController
                 final ImageView iv = new ImageView();
                 iv.setFitWidth(GameJFXController.RCARD_WIDTH);
                 iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
-                iv.setImage(TileModifier.getImage(rp.getPlayedRCards()[j]));
+                iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
                 iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (i % 2 == 0 ? 1 : -1));
                 if (i % 2 == 0)
                 {

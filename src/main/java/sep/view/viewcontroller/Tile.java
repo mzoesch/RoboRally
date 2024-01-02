@@ -48,7 +48,7 @@ public final class Tile
         iv.setPreserveRatio(true);
         iv.setSmooth(true);
         iv.setCache(true);
-        iv.setImage(TileModifier.getImage(String.format(("LaserBeamSingleFull"))));
+        iv.setImage(TileModifier.loadCachedImage(String.format(("LaserBeamSingleFull"))));
 
         if (mask.rot().equals(ERotation.NORTH) || mask.rot().equals(ERotation.SOUTH))
         {
@@ -65,7 +65,7 @@ public final class Tile
 
         for (int i = 0; i < this.tile.length(); i++)
         {
-            images.add(this.getModifier(i).getImage());
+            images.add(this.getModifier(i).loadCachedImage());
             continue;
         }
 
@@ -88,7 +88,7 @@ public final class Tile
         /* Background */
         if (!Objects.equals(this.getModifier(0).getType(), EModifier.EMPTY.toString()))
         {
-            imageViews.add(new ImageView(TileModifier.getImage("EmptyTile_00")));
+            imageViews.add(new ImageView(TileModifier.loadCachedImage("EmptyTile_00")));
         }
 
         return imageViews.toArray(new ImageView[0]);
@@ -131,7 +131,7 @@ public final class Tile
 
     public static Image getRobotImage(final int figureID)
     {
-        return TileModifier.getImage(String.format("Robot_%d", figureID));
+        return TileModifier.loadCachedImage(String.format("Robot_%d", figureID));
     }
 
     public boolean hasModifier(final EModifier m)
