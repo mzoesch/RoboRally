@@ -2166,6 +2166,18 @@ public final class GameJFXController
         });
     }
 
+    public void onFooterStateUpdate(final boolean bCollapsed)
+    {
+        Platform.runLater(() ->
+        {
+            this.bFooterCollapsed = bCollapsed;
+            this.renderHUDFooter();
+            return;
+        });
+
+        return;
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters
