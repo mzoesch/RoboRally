@@ -8,6 +8,51 @@ import java.io.                     IOException;
 
 public final class Types
 {
+    private static final Logger l = LogManager.getLogger(Types.class);
+
+    public enum Props
+    {
+        GROUP_ID        (   "groupId"       ),
+        ARTIFACT_ID     (   "artifactId"    ),
+        VERSION         (   "version"       ),
+        NAME            (   "name"          ),
+        ;
+
+        private final String prop;
+
+        private Props(final String prop)
+        {
+            final Properties props = new Properties();
+            try
+            {
+                props.load(Types.class.getClassLoader().getResourceAsStream(".properties"));
+            }
+            catch (final IOException e)
+            {
+                l.fatal("Could not load properties file.");
+                l.fatal(e.getMessage());
+                throw new RuntimeException(e);
+            }
+
+            this.prop = props.getProperty(prop);
+
+            if (this.prop == null || this.prop.isEmpty() || this.prop.isBlank() || Objects.equals(this.prop, "null"))
+            {
+                l.fatal("Could not load property: {}.", prop);
+                throw new RuntimeException(String.format("Could not load property: %s.", prop));
+            }
+
+            return;
+        }
+
+        @Override
+        public String toString()
+        {
+            return this.prop;
+        }
+
+    }
+
     public enum OS
     {
         WINDOWS,
