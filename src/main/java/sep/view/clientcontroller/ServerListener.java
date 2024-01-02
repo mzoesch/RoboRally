@@ -1,86 +1,87 @@
 package sep.view.clientcontroller;
 
-import sep.view.json.RDefaultServerRequestParser;
-import sep.view.lib.EShopState;
-import sep.view.viewcontroller.SceneController;
-import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.lib.EGamePhase;
+import sep.view.json.           RDefaultServerRequestParser;
+import sep.view.lib.            EShopState;
+import sep.view.lib.            EGamePhase;
+import sep.view.viewcontroller. SceneController;
+import sep.view.viewcontroller. ViewSupervisor;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.util.Objects;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.function.Supplier;
-import java.util.HashMap;
+import java.io.                     IOException;
+import java.io.                     InputStreamReader;
+import java.io.                     BufferedReader;
+import java.util.                   Objects;
+import java.util.                   Arrays;
+import java.util.                   HashMap;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.util.stream.            Collectors;
+import java.util.stream.            IntStream;
+import java.net.                    Socket;
+import java.util.function.          Supplier;
+import org.json.                    JSONException;
+import org.json.                    JSONObject;
 
 /**
  * We create a special object for listening to the server socket on a separate
  * thread to avoid blocking the main thread of the application.
  */
-public class ServerListener implements Runnable
+public final class ServerListener implements Runnable
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
 
     private final HashMap<String, Supplier<Boolean>> serverReq =
     new HashMap<String, Supplier<Boolean>>()
     {{
-        put("Alive", ServerListener.this::onAlive);
-        put("PlayerAdded", ServerListener.this::onCorePlayerAttributesChanged);
-        put("ReceivedChat", ServerListener.this::onChatMsg);
-        put("PlayerStatus", ServerListener.this::onLobbyPlayerStatus);
-        put("SelectMap", ServerListener.this::onSelectMapRequest);
-        put("MapSelected", ServerListener.this::onMapSelected);
-        put("GameStarted", ServerListener.this::onGameStart);
-        put("ActivePhase", ServerListener.this::onPhaseChange);
-        put("CurrentPlayer", ServerListener.this::onPlayerTurnChange);
-        put("Error", ServerListener.this::onErrorMsg);
-        put("CardPlayed", ServerListener.this::onCardPlayed);
-        put("StartingPointTaken", ServerListener.this::onStartingPointTaken);
-        put("PlayerTurning", ServerListener.this::onRobotRotationUpdate);
-        put("CardSelected", ServerListener.this::onRegisterSlotUpdate);
-        put("SelectionFinished", ServerListener.this::onPlayerFinishedProgramming);
-        put("CardsYouGotNow", ServerListener.this::onForcedFinishProgramming);
-        put("NotYourCards", ServerListener.this::onPlayerProgrammingCardsReceived);
-        put("ShuffleCoding", ServerListener.this::onProgrammingDeckShuffled);
-        put("TimerStarted", ServerListener.this::onProgrammingTimerStart);
-        put("TimerEnded", ServerListener.this::onProgrammingTimerEnd);
-        put("YourCards", ServerListener.this::onProgrammingCardsReceived);
-        put("CurrentCards", ServerListener.this::onCurrentRegisterCards);
-        put("ReplaceCard", ServerListener.this::onCurrentRegisterCardReplacement);
-        put("Animation", ServerListener.this::onAnimationPlay);
-        put("CheckPointReached", ServerListener.this::onCheckpointReached);
-        put("Energy", ServerListener.this::onEnergyTokenChanged);
-        put("GameFinished", ServerListener.this::onGameEnd);
-        put("Movement", ServerListener.this::onPlayerPositionUpdate);
-        put("Reboot", ServerListener.this::onPlayerReboot);
-        put("ConnectionUpdate", ServerListener.this::onClientConnectionUpdate);
-        put("PickDamage", ServerListener.this::onPickDamageType);
-        put("DrawDamage", ServerListener.this::onDrawDamage);
-    }};
+        put(    "Alive",                ServerListener.this::onAlive                            );
+        put(    "PlayerAdded",          ServerListener.this::onCorePlayerAttributesChanged      );
+        put(    "ReceivedChat",         ServerListener.this::onChatMsg                          );
+        put(    "PlayerStatus",         ServerListener.this::onLobbyPlayerStatus                );
+        put(    "SelectMap",            ServerListener.this::onSelectMapRequest                 );
+        put(    "MapSelected",          ServerListener.this::onMapSelected                      );
+        put(    "GameStarted",          ServerListener.this::onGameStart                        );
+        put(    "ActivePhase",          ServerListener.this::onPhaseChange                      );
+        put(    "CurrentPlayer",        ServerListener.this::onPlayerTurnChange                 );
+        put(    "Error",                ServerListener.this::onErrorMsg                         );
+        put(    "CardPlayed",           ServerListener.this::onCardPlayed                       );
+        put(    "StartingPointTaken",   ServerListener.this::onStartingPointTaken               );
+        put(    "PlayerTurning",        ServerListener.this::onRobotRotationUpdate              );
+        put(    "CardSelected",         ServerListener.this::onRegisterSlotUpdate               );
+        put(    "SelectionFinished",    ServerListener.this::onPlayerFinishedProgramming        );
+        put(    "CardsYouGotNow",       ServerListener.this::onForcedFinishProgramming          );
+        put(    "NotYourCards",         ServerListener.this::onPlayerProgrammingCardsReceived   );
+        put(    "ShuffleCoding",        ServerListener.this::onProgrammingDeckShuffled          );
+        put(    "TimerStarted",         ServerListener.this::onProgrammingTimerStart            );
+        put(    "TimerEnded",           ServerListener.this::onProgrammingTimerEnd              );
+        put(    "YourCards",            ServerListener.this::onProgrammingCardsReceived         );
+        put(    "CurrentCards",         ServerListener.this::onCurrentRegisterCards             );
+        put(    "ReplaceCard",          ServerListener.this::onCurrentRegisterCardReplacement   );
+        put(    "Animation",            ServerListener.this::onAnimationPlay                    );
+        put(    "CheckPointReached",    ServerListener.this::onCheckpointReached                );
+        put(    "Energy",               ServerListener.this::onEnergyTokenChanged               );
+        put(    "GameFinished",         ServerListener.this::onGameEnd                          );
+        put(    "Movement",             ServerListener.this::onPlayerPositionUpdate             );
+        put(    "Reboot",               ServerListener.this::onPlayerReboot                     );
+        put(    "ConnectionUpdate",     ServerListener.this::onClientConnectionUpdate           );
+        put(    "PickDamage",           ServerListener.this::onPickDamageType                   );
+        put(    "DrawDamage",           ServerListener.this::onDrawDamage                       );
+    }}
+    ;
 
-    private final Socket socket;
-    private final InputStreamReader inputStreamReader;
-    private final BufferedReader bufferedReader;
+    private final Socket                socket;
+    private final InputStreamReader     inputStreamReader;
+    private final BufferedReader        bufferedReader;
 
     private RDefaultServerRequestParser dsrp;
 
-    public ServerListener(Socket socket, InputStreamReader inputStreamReader, BufferedReader bufferedReader)
+    public ServerListener(final Socket socket, final InputStreamReader inputStreamReader, final BufferedReader bufferedReader)
     {
         super();
 
-        this.socket = socket;
-        this.inputStreamReader = inputStreamReader;
-        this.bufferedReader = bufferedReader;
+        this.socket             = socket;
+        this.inputStreamReader  = inputStreamReader;
+        this.bufferedReader     = bufferedReader;
 
-        this.dsrp = null;
+        this.dsrp               = null;
 
         return;
     }
@@ -117,18 +118,19 @@ public class ServerListener implements Runnable
                 {
                     this.parseRequest(new RDefaultServerRequestParser(new JSONObject(r)));
                 }
-                catch (JSONException e)
+                catch (final JSONException e)
                 {
                     l.warn("Failed to parse JSON request from server. Ignoring.");
                     l.warn(e.getMessage());
                     l.warn(r);
+
                     continue;
                 }
 
                 continue;
             }
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.fatal("Failed to read from server.");
             l.fatal(e.getMessage());
@@ -425,6 +427,7 @@ public class ServerListener implements Runnable
             l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
             ViewSupervisor.handleChatInfo(String.format("Player %s was rebooted.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
         }
+
         return true;
     }
 
