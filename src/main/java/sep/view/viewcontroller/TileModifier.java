@@ -264,7 +264,16 @@ public final class TileModifier
 
     public static Image getImage(String modName)
     {
-        return new Image(String.format("%s%s%s", TileModifier.path, modName, TileModifier.extension));
+//        final Image i = new Image(String.format("/public/%s%s", modName, TileModifier.extension));
+        final Image i = new Image(String.format("%s%s%s", TileModifier.path, modName, TileModifier.extension));
+        if (i.isError())
+        {
+            l.error("Could not load image: {}", modName);
+            l.error(i.getException().getMessage());
+            return i;
+        }
+
+        return i;
     }
 
     public Image getImage()
