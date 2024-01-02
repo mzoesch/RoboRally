@@ -1,12 +1,12 @@
 package sep.view;
 
-import sep.view.clientcontroller.GameInstance;
+import sep.view.clientcontroller.   GameInstance;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.util.Arrays;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.util.                   Arrays;
 
-public class Launcher
+public final class Launcher
 {
     private static final Logger l = LogManager.getLogger(Launcher.class);
 
