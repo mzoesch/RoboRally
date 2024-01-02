@@ -38,8 +38,14 @@ public final class Launcher
     {
         final double t0 = System.currentTimeMillis();
 
-        l.info("Starting application.");
-        l.debug("Detected operating system: " + System.getProperty("os.name"));
+        l.info(     "Starting application."                                             );
+        l.debug(    "Detected operating system: {}.",   Types.OS.getOS().toString()     );
+        l.debug(    "Protocol version: {}.",            Types.Props.VERSION.toString()  );
+
+        if (Types.Configurations.isDev())
+        {
+            l.error("Wrapper code is not meant to run outside of MVN packaged JAR files. Shutting down.");
+        }
 
         /* This only works with jar files because else the getPath() will return a dir. */
         final String fp     = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
