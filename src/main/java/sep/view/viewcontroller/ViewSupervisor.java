@@ -346,7 +346,10 @@ public final class ViewSupervisor extends Application
     }
 
     public static void createPopUp(final Pane p)
-    {}
+    {
+        ViewSupervisor.getSceneController().renderPopUp(p);
+        return;
+    }
 
     public static void createPopupLater(final Pane p)
     {
@@ -361,7 +364,7 @@ public final class ViewSupervisor extends Application
 
     public static void createPopUp(final Pane p, final int autoDestroyDelay)
     {
-        ViewSupervisor.getSceneController().renderPopUp(p);
+        ViewSupervisor.createPopUp(p);
 
         if (autoDestroyDelay > 0)
         {
