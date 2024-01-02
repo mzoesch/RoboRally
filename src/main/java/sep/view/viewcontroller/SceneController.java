@@ -226,6 +226,20 @@ public final class SceneController
 
     public void destroyPopUp(final Pane target)
     {
+        if (target == null)
+        {
+            l.fatal("Failed to destroy pop up. Target is null.");
+            GameInstance.kill();
+            return;
+        }
+
+        if (!Objects.requireNonNull(this.getPopUpTarget()).getChildren().contains(target))
+        {
+            l.fatal("Failed to destroy pop up. Target is not a child of the pop up master container.");
+            GameInstance.kill();
+            return;
+        }
+
         Objects.requireNonNull(this.getPopUpTarget()).getChildren().remove(target);
 
         l.debug("Successfully destroyed pop up.");
