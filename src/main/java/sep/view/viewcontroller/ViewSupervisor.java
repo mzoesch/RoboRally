@@ -4,11 +4,14 @@ import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
 import sep.view.json.               ChatMsgModel;
 import sep.view.json.               RDefaultServerRequestParser;
+import sep.view.json.game.          RebootDirectionModel;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.lib.                Types;
 
+import javafx.scene.control.        Label;
+import javafx.scene.control.        Button;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
@@ -19,6 +22,8 @@ import javafx.scene.                Scene;
 import javafx.stage.                WindowEvent;
 import javafx.stage.                Stage;
 import javafx.scene.layout.         Pane;
+import javafx.scene.layout.         HBox;
+import javafx.scene.layout.         AnchorPane;
 
 /**
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
@@ -419,6 +424,100 @@ public final class ViewSupervisor extends Application
             l.error(e.getMessage());
             return;
         }
+    }
+
+    public static void createRebootDialog()
+    {
+        final HBox h = new HBox();
+        h.setAlignment(javafx.geometry.Pos.CENTER);
+
+        final Label header = new Label("You robot has been rebooted. Select a direction to continue.");
+        header.getStyleClass().add("text-xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 50.0     );
+
+        final HBox form = new HBox();
+        form.setId("reboot-dialog-body");
+
+        AnchorPane.setLeftAnchor(       form, 0.0      );
+        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setBottomAnchor(     form, 50.0      );
+
+        final Button bW = new Button("West");
+        bW.getStyleClass().add("secondary-btn");
+        bW.getStyleClass().add("reboot-btn");
+        form.getChildren().add(bW);
+        bW.setOnAction(e ->
+        {
+            new RebootDirectionModel("right").send();
+            ViewSupervisor.getSceneController().destroyPopUp(h);
+            return;
+        }
+        );
+
+        final Button bN = new Button("North");
+        bN.getStyleClass().add("secondary-btn");
+        bN.getStyleClass().add("reboot-btn");
+        form.getChildren().add(bN);
+        bN.setOnAction(e ->
+        {
+            new RebootDirectionModel("top").send();
+            ViewSupervisor.getSceneController().destroyPopUp(h);
+            return;
+        }
+        );
+
+        final Button bS = new Button("South");
+        bS.getStyleClass().add("secondary-btn");
+        bS.getStyleClass().add("reboot-btn");
+        form.getChildren().add(bS);
+        bS.setOnAction(e ->
+        {
+            new RebootDirectionModel("bottom").send();
+            ViewSupervisor.getSceneController().destroyPopUp(h);
+            return;
+        }
+        );
+
+        final Button bE = new Button("East");
+        bE.getStyleClass().add("secondary-btn");
+        bE.getStyleClass().add("reboot-btn");
+        form.getChildren().add(bE);
+        bE.setOnAction(e ->
+        {
+            new RebootDirectionModel("left").send();
+            ViewSupervisor.getSceneController().destroyPopUp(h);
+            return;
+        }
+        );
+
+        final AnchorPane p = new AnchorPane(header, form);
+        p.setId("reboot-dialog-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h);
+
+        return;
+    }
+
+    public static void createRebootDialogLater()
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createRebootDialog();
+            return;
+        });
+
+        return;
     }
 
     // endregion Updating methods
