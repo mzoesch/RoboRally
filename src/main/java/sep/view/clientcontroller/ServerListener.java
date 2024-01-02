@@ -413,19 +413,16 @@ public final class ServerListener implements Runnable
 
     private boolean onPlayerReboot() throws JSONException
     {
-        l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
-        if(dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID()){
-            ViewSupervisor.handleChatInfo(String.format("You were rebooted. Choose your RebootDirection in the Shop Section"));
-            //TODO hier fehlt noch Bearbeitung, wenn Shop schon aktiviert ist
-            EGameState.INSTANCE.setShopState(EShopState.REBOOT);
-            EGameState.INSTANCE.addShopSlot(0, "top");
-            EGameState.INSTANCE.addShopSlot(1, "right");
-            EGameState.INSTANCE.addShopSlot(2, "bottom");
-            EGameState.INSTANCE.addShopSlot(3, "left");
-            ViewSupervisor.updateFooter();
-            l.debug("Updated Shop for RebootDirection");
-        }else {
-            l.debug("Player {} was rebooted.", this.dsrp.getPlayerID());
+        l.debug("Player {} has been rebooted.", this.dsrp.getPlayerID());
+
+        if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+        {
+            l.debug("Local player has been rebooted. Showing reboot dialog.");
+            ViewSupervisor.handleChatInfo("You were rebooted. Choose your reboot direction.");
+            ViewSupervisor.createRebootDialogLater();
+        }
+        else
+        {
             ViewSupervisor.handleChatInfo(String.format("Player %s was rebooted.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
         }
 
