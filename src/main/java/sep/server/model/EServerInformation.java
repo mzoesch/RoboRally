@@ -24,7 +24,6 @@ public enum EServerInformation
 
     private static final Logger l = LogManager.getLogger(EServerInformation.class);
 
-    public static final String PROTOCOL_VERSION = "1.0";
     public static final int KEEP_ALIVE_INTERVAL = 5_000;
 
     private int port;

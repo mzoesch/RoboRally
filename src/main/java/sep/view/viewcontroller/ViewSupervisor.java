@@ -65,7 +65,7 @@ public final class ViewSupervisor extends Application
 
         if (EClientInformation.INSTANCE.isMockView())
         {
-            s.setTitle(String.format("%s v%s (Mock View)", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
+            s.setTitle(String.format("%s v%s (Mock View)", SceneController.WIN_TITLE, sep.Types.Props.VERSION.toString()));
             this.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
             s.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> GameInstance.kill());
             s.show();
@@ -73,7 +73,7 @@ public final class ViewSupervisor extends Application
             return;
         }
 
-        s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, EClientInformation.PROTOCOL_VERSION));
+        s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, sep.Types.Props.VERSION.toString()));
         this.sceneController.renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
         s.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> GameInstance.kill());
         s.show();

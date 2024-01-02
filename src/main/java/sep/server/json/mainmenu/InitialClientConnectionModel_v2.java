@@ -28,7 +28,7 @@ public class InitialClientConnectionModel_v2
     {
         JSONObject j = new JSONObject();
         j.put("messageType", "HelloClient");
-        j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", EServerInformation.PROTOCOL_VERSION)));
+        j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", sep.Types.Props.VERSION.toString())));
 
         if (this.ci.sendRemoteRequest(j))
         {
@@ -90,7 +90,7 @@ public class InitialClientConnectionModel_v2
             JSONObject messageBody = this.response.getJSONObject("messageBody");
 
             // Maybe we should check for legacy protocol versions in the future?
-            if (!messageBody.getString("protocol").equals(String.format("Version %s", EServerInformation.PROTOCOL_VERSION)))
+            if (!messageBody.getString("protocol").equals(String.format("Version %s", sep.Types.Props.VERSION.toString())))
             {
                 l.fatal("Client protocol version is not compatible with server protocol version.");
                 return false;

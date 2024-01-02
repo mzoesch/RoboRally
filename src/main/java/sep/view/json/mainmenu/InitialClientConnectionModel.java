@@ -28,8 +28,8 @@ public final class InitialClientConnectionModel
         }
 
         l.debug("Server Protocol Version: {}", jsonObject.getJSONObject("messageBody").getString("protocol"));
-        l.debug("Client Protocol Version: {}", String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
-        return jsonObject.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
+        l.debug("Client Protocol Version: {}", String.format("Version %s", sep.Types.Props.VERSION.toString()));
+        return jsonObject.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", sep.Types.Props.VERSION.toString()));
     }
 
     public static void sendProtocolVersionConfirmation() throws IOException
@@ -43,7 +43,7 @@ public final class InitialClientConnectionModel
         JSONObject messageBody = new JSONObject();
         messageBody.put("group", EClientInformation.INSTANCE.getPreferredSessionID());
         messageBody.put("isAI", false);
-        messageBody.put("protocol", String.format("Version %s", EClientInformation.PROTOCOL_VERSION));
+        messageBody.put("protocol", String.format("Version %s", sep.Types.Props.VERSION.toString()));
 
         JSONObject j = new JSONObject();
         j.put("messageType", "HelloServer");
