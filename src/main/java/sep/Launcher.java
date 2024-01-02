@@ -96,6 +96,12 @@ public final class Launcher
                 return;
             }
 
+            /* The process cannot start if not packaged in a jar file. We inherit to get the stderr. */
+            if (Types.Configurations.isDev())
+            {
+                pb.inheritIO();
+            }
+
             final Process p;
             try
             {
@@ -112,7 +118,6 @@ public final class Launcher
             int RC = EArgs.OK;
             try
             {
-                /* We do not inherit IO. This may still be necessary. To be tested. */
                 RC = p.waitFor();
             }
             catch (final InterruptedException e)
@@ -258,6 +263,12 @@ public final class Launcher
                     return;
                 }
 
+                /* The process cannot start if not packaged in a jar file. We inherit to get the stderr. */
+                if (Types.Configurations.isDev())
+                {
+                    pb.inheritIO();
+                }
+
                 final Process p;
                 try
                 {
@@ -274,7 +285,6 @@ public final class Launcher
                 int RC = EArgs.OK;
                 try
                 {
-                    /* We do not inherit IO. This may still be necessary. To be tested. */
                     RC = p.waitFor();
                 }
                 catch (final InterruptedException e)
