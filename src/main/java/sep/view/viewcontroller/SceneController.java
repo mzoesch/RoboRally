@@ -94,7 +94,7 @@ public final class SceneController
         return;
     }
 
-    private void createPopUp(final Pane target, final Types.RPopUpMask mask)
+    private Pane createPopUp(final Pane target, final Types.RPopUpMask mask)
     {
         final AnchorPane container = new AnchorPane();
         container.setId("pop-up-container");
@@ -148,11 +148,7 @@ public final class SceneController
         AnchorPane.setTopAnchor(    container,  0.0 );
         AnchorPane.setBottomAnchor( container,  0.0 );
 
-        target.getChildren().add(container);
-
-        l.debug("Successfully created pop up of type {}.", mask.type().toString());
-
-        return;
+        return container;
     }
 
     public <T> void renderNewScreen(final String ID, final String path, final boolean bAutoKillAfterUse)
@@ -181,32 +177,58 @@ public final class SceneController
         return;
     }
 
-    public void renderPopUp(final Types.RPopUpMask mask)
+    private Pane getPopUpTarget()
     {
-        final Pane target;
-
         if (this.masterScene.getRoot() instanceof final BorderPane bp)
         {
             if (bp.getCenter() instanceof final AnchorPane ap)
             {
-                this.createPopUp(ap, mask);
-                return;
+                return ap;
             }
 
-            l.fatal("Failed to create pop up. Center of BorderPane is not an AnchorPane.");
-            GameInstance.kill();
-
-            return;
+            return null;
         }
 
         if (this.masterScene.getRoot() instanceof final AnchorPane ap)
         {
-            this.createPopUp(ap, mask);
+            return ap;
+        }
+
+        return null;
+    }
+
+    public void renderPopUp(final Types.RPopUpMask mask)
+    {
+        this.renderPopUp(this.createPopUp(this.getPopUpTarget(), mask));
+
+        l.debug("Successfully created pop up of type {}.", mask.type().toString());
+
+        return;
+    }
+
+    public void renderPopUp(final Pane p)
+    {
+        final Pane target = this.getPopUpTarget();
+
+        if (target == null)
+        {
+            l.fatal("Failed to create pop up. Root of master scene is not valid for holding pop ups.");
+            GameInstance.kill();
             return;
         }
 
-        l.fatal("Failed to create pop up. Root of master scene is not valid.");
-        GameInstance.kill();
+        target.getChildren().add(p);
+
+        l.debug("Successfully rendered pop up.");
+
+        return;
+    }
+
+    public void destroyPopUp(final Pane target)
+    {
+        Objects.requireNonNull(this.getPopUpTarget()).getChildren().remove(target);
+
+        l.debug("Successfully destroyed pop up.");
 
         return;
     }
