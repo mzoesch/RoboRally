@@ -337,7 +337,9 @@ public enum EGameState
             this.resetPlayersForActivation();
             this.currentRegister = 1;
         }
+
         ViewSupervisor.updatePhase();
+
         return;
     }
 
