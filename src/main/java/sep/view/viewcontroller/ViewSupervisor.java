@@ -18,6 +18,7 @@ import javafx.scene.                Parent;
 import javafx.scene.                Scene;
 import javafx.stage.                WindowEvent;
 import javafx.stage.                Stage;
+import javafx.scene.layout.         Pane;
 
 /**
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
@@ -338,6 +339,64 @@ public final class ViewSupervisor extends Application
         Platform.runLater(() ->
         {
             ViewSupervisor.createPopUp(mask);
+            return;
+        });
+
+        return;
+    }
+
+    public static void createPopUp(final Pane p)
+    {}
+
+    public static void createPopupLater(final Pane p)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createPopUp(p);
+            return;
+        });
+
+        return;
+    }
+
+    public static void createPopUp(final Pane p, final int autoDestroyDelay)
+    {
+        ViewSupervisor.getSceneController().renderPopUp(p);
+
+        if (autoDestroyDelay > 0)
+        {
+            new Thread(() ->
+            {
+                try
+                {
+                    l.debug("Waiting {}ms before destroying pop up.", autoDestroyDelay);
+                    Thread.sleep(autoDestroyDelay);
+                }
+                catch (final InterruptedException e)
+                {
+                    l.error("Failed to sleep thread for {}ms.", autoDestroyDelay);
+                    l.error(e.getMessage());
+                    return;
+                }
+
+                Platform.runLater(() ->
+                {
+                    ViewSupervisor.getSceneController().destroyPopUp(p);
+                    return;
+                });
+
+                return;
+            }).start();
+        }
+
+        return;
+    }
+
+    public static void createPopUpLater(final Pane p, final int autoDestroyDelay)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createPopUp(p, autoDestroyDelay);
             return;
         });
 
