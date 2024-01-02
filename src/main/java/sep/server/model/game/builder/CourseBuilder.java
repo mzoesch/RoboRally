@@ -155,7 +155,6 @@ public class CourseBuilder {
 
     /**
      * Rotates a board 180 degrees.
-     *
      * @param board board to be rotated
      * @return rotated board
      */
