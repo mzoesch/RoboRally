@@ -44,6 +44,37 @@ public final class Types
         }
     }
 
+    public enum Configurations
+    {
+        DEV,
+        PROD,
+        ;
+
+        /** Kinda sketchy but works for now. This is only a temporary sln. And should be removed later on.  */
+        public static Configurations getConfiguration()
+        {
+            final String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+
+            if (fp.lastIndexOf("/") == -1)
+            {
+                return null;
+            }
+
+            return fp.lastIndexOf("/") == fp.length() - 1 ? Configurations.DEV : Configurations.PROD;
+        }
+
+        public static boolean isDev()
+        {
+            return Configurations.getConfiguration() == Configurations.DEV;
+        }
+
+        public static boolean isProd()
+        {
+            return Configurations.getConfiguration() == Configurations.PROD;
+        }
+
+    }
+
     public enum Animation
     {
         BLUE_CONVEYOR_BELT  (   "BlueConveyorBelt"     ),
