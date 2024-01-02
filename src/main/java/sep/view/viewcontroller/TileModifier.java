@@ -20,6 +20,7 @@ public final class TileModifier
 
     private static final String path        = "file:src/main/resources/public/";
     private static final String extension   = ".png";
+    private static final String PATH_DEV    = "file:src/main/resources/public/";
 
     public TileModifier(final JSONObject tile)
     {
@@ -271,6 +272,7 @@ public final class TileModifier
             l.error("Could not load image: {}", modName);
             l.error(i.getException().getMessage());
             return i;
+            final Image i = new Image(String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION));
         }
 
         return i;
