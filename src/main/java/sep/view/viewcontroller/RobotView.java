@@ -1,25 +1,25 @@
 package sep.view.viewcontroller;
 
-import sep.view.clientcontroller.RemotePlayer;
-import sep.view.lib.RCoordinate;
-import sep.view.lib.Types;
-import sep.view.lib.ERotation;
-import sep.view.scenecontrollers.GameJFXController;
-import sep.view.lib.RRotation;
-import sep.view.lib.EModifier;
+import sep.view.clientcontroller.   RemotePlayer;
+import sep.view.lib.                RRotation;
+import sep.view.lib.                RCoordinate;
+import sep.view.lib.                RLaserMask;
+import sep.view.lib.                ERotation;
+import sep.view.lib.                EModifier;
+import sep.view.scenecontrollers.   GameJFXController;
 
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.util.Duration;
-import java.util.ArrayList;
+import javafx.scene.image.          Image;
+import javafx.scene.image.          ImageView;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.util.                   ArrayList;
+import javafx.animation.            KeyFrame;
+import javafx.animation.            KeyValue;
+import javafx.animation.            Timeline;
+import javafx.util.                 Duration;
+import javafx.scene.layout.         AnchorPane;
 
-public class RobotView
+public final class RobotView
 {
     private static final Logger l = LogManager.getLogger(RobotView.class);
 
