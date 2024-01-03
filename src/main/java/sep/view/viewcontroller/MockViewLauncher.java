@@ -37,7 +37,7 @@ public final class MockViewLauncher
                 //      We only need this for OSX, as the JavaFX thread is not started immediately.
                 //      This is a current issue with JavaFX on Sonoma (14.x.x upwards)
                 //      and only fixed in newer JFX Versions.
-                if (Types.OS.isOSX())
+                if (Types.EOS.isOSX())
                 {
                     Thread.sleep(7_000);
                 }
