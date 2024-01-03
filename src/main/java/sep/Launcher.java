@@ -41,6 +41,7 @@ public final class Launcher
         l.info(     "Starting application."                                             );
         l.debug(    "Detected operating system: {}.",   Types.OS.getOS().toString()     );
         l.debug(    "Protocol version: {}.",            Types.Props.VERSION.toString()  );
+        l.debug(    "Protocol version: {}.",            Types.EProps.VERSION.toString()  );
 
         if (Types.Configurations.isDev())
         {

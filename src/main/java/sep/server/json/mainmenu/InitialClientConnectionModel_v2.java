@@ -1,9 +1,8 @@
 package sep.server.json.mainmenu;
 
+import sep.Types;
 import sep.server.viewmodel.ClientInstance;
-import sep.server.model.EServerInformation;
 
-import java.io.IOException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +27,7 @@ public class InitialClientConnectionModel_v2
     {
         JSONObject j = new JSONObject();
         j.put("messageType", "HelloClient");
-        j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", sep.Types.Props.VERSION.toString())));
+        j.put("messageBody", new JSONObject().put("protocol", String.format("Version %s", Types.EProps.VERSION.toString())));
 
         if (this.ci.sendRemoteRequest(j))
         {
@@ -90,7 +89,7 @@ public class InitialClientConnectionModel_v2
             JSONObject messageBody = this.response.getJSONObject("messageBody");
 
             // Maybe we should check for legacy protocol versions in the future?
-            if (!messageBody.getString("protocol").equals(String.format("Version %s", sep.Types.Props.VERSION.toString())))
+            if (!messageBody.getString("protocol").equals(String.format("Version %s", Types.EProps.VERSION.toString())))
             {
                 l.fatal("Client protocol version is not compatible with server protocol version.");
                 return false;

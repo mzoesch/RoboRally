@@ -10,7 +10,7 @@ public final class Types
 {
     private static final Logger l = LogManager.getLogger(Types.class);
 
-    public enum Props
+    public enum EProps
     {
         GROUP_ID        (   "groupId"       ),
         ARTIFACT_ID     (   "artifactId"    ),
@@ -20,7 +20,7 @@ public final class Types
 
         private final String prop;
 
-        private Props(final String prop)
+        private EProps(final String prop)
         {
             final Properties props = new Properties();
             try
