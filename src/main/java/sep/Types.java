@@ -93,6 +93,24 @@ public final class Types
         }
     }
 
+    public enum EPort
+    {
+        INVALID (   -1      ),
+        MIN     (   1024    ),
+        DEFAULT (   8080    ),
+        MAX     (   65535   ),
+        ;
+
+        public final int i;
+
+        private EPort(final int i)
+        {
+            this.i = i;
+            return;
+        }
+
+    }
+
     public enum Configurations
     {
         DEV,

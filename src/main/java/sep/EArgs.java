@@ -13,7 +13,7 @@ public enum EArgs
     public final static int EXIT = 3;
 
     public static final String PREF_SERVER_IP = "localhost";
-    public static final EPort PREF_SERVER_PORT = EPort.DEFAULT;
+    public static final Types.EPort PREF_SERVER_PORT = Types.EPort.DEFAULT;
     private String customServerIP;
     private int customServerPort;
     public static final int DEFAULT_MIN_REMOTE_PLAYERS = -1;
@@ -24,7 +24,7 @@ public enum EArgs
     private EArgs()
     {
         this.customServerIP = "";
-        this.customServerPort = EPort.INVALID.i;
+        this.customServerPort = Types.EPort.INVALID.i;
         this.customMinRemotePlayers = EArgs.DEFAULT_MIN_REMOTE_PLAYERS;
 
         this.mode = EArgs.DEFAULT;

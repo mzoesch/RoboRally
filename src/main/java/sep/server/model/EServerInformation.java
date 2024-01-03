@@ -2,7 +2,6 @@ package sep.server.model;
 
 import sep.server.viewmodel.Session;
 import sep.server.viewmodel.ClientInstance;
-import sep.EPort;
 import sep.EArgs;
 import sep.server.model.game.GameState;
 
@@ -33,7 +32,7 @@ public enum EServerInformation
 
     private EServerInformation()
     {
-        this.port = EPort.INVALID.i;
+        this.port = sep.Types.EPort.INVALID.i;
         this.serverSocket = null;
         this.sessions = new ArrayList<Session>();
         this.minRemotePlayerCountToStart = GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START;

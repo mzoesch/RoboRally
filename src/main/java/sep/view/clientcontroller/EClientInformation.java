@@ -1,6 +1,5 @@
 package sep.view.clientcontroller;
 
-import sep.EPort;
 import sep.EArgs;
 import sep.view.json.common.IdentificationModel;
 import sep.view.json.ChatMsgModel;
@@ -58,7 +57,7 @@ public enum EClientInformation
         this.JFX_INSTANCE = null;
 
         this.SERVER_IP = EArgs.PREF_SERVER_IP;
-        this.SERVER_PORT = EPort.DEFAULT.i;
+        this.SERVER_PORT = sep.Types.EPort.DEFAULT.i;
 
         this.bMockView = false;
 

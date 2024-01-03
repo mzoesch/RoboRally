@@ -4,7 +4,6 @@ import sep.EArgs;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.viewcontroller.SceneController;
-import sep.EPort;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
 import sep.view.lib.Types;
@@ -125,7 +124,7 @@ public class MainMenuJFXController
             EClientInformation.INSTANCE.setServerIP(tokens[0]);
             try
             {
-                if (Integer.parseInt(tokens[1]) < EPort.MIN.i || Integer.parseInt(tokens[1]) > EPort.MAX.i)
+                if (Integer.parseInt(tokens[1]) < sep.Types.EPort.MIN.i || Integer.parseInt(tokens[1]) > sep.Types.EPort.MAX.i)
                 {
                     this.sessionJoinErrorField.setText("Server port is invalid.");
                     return true;

@@ -1,6 +1,5 @@
 package sep.wrapper;
 
-import sep.EPort;
 import sep.EArgs;
 import sep.server.model.game.GameState;
 
@@ -27,7 +26,7 @@ public final class ServerConfigJFXController
 
         if (!(port.isEmpty() || port.isBlank()))
         {
-            if (Integer.parseInt(port) < EPort.MIN.i || Integer.parseInt(port) > EPort.MAX.i)
+            if (Integer.parseInt(port) < sep.Types.EPort.MIN.i || Integer.parseInt(port) > sep.Types.EPort.MAX.i)
             {
                 this.showAlert("Invalid port number.");
                 return;

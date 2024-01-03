@@ -1,7 +1,6 @@
 package sep.server;
 
 import sep.EArgs;
-import sep.EPort;
 import sep.server.model.EServerInformation;
 import sep.server.viewmodel.ServerInstance;
 import sep.server.model.game.GameState;
@@ -30,7 +29,7 @@ public final class Launcher
      * @param args Invalid arguments will be ignored. Valid program arguments are:
      *              <ul>
      *              <li>[--port PORT]        - The port number to listen on. Default is
-     *                                         {@link sep.EPort#DEFAULT EPort.DEFAULT}.
+     *                                         {@link sep.Types.EPort#DEFAULT EPort.DEFAULT}.
      *              <li>[--minRemotePlayers] - The minimum number of remote players required to start a game. Default is
      *                                         {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
      *                                         MIN_REMOTE_PLAYERS}.
@@ -117,10 +116,10 @@ public final class Launcher
 
         }
 
-        if (EServerInformation.INSTANCE.getPort() == EPort.INVALID.i)
+        if (EServerInformation.INSTANCE.getPort() == sep.Types.EPort.INVALID.i)
         {
-            l.info("No port change request detected. Using default port: {}.", EPort.DEFAULT.i);
-            EServerInformation.INSTANCE.setPort(EPort.DEFAULT.i);
+            l.info("No port change request detected. Using default port: {}.", sep.Types.EPort.DEFAULT.i);
+            EServerInformation.INSTANCE.setPort(sep.Types.EPort.DEFAULT.i);
         }
 
         try

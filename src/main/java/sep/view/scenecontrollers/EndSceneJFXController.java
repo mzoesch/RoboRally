@@ -5,7 +5,6 @@ import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.viewcontroller.SceneController;
-import sep.EPort;
 import sep.view.clientcontroller.EClientInformation;
 
 import javafx.event.ActionEvent;

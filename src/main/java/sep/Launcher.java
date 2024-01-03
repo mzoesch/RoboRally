@@ -214,7 +214,7 @@ public final class Launcher
             }
             else
             {
-                if (EArgs.getCustomServerPort() != EPort.INVALID.i) /* Set through Graphical User Interface. */
+                if (EArgs.getCustomServerPort() != sep.Types.EPort.INVALID.i) /* Set through Graphical User Interface. */
                 {
                     l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
                 }
@@ -232,7 +232,7 @@ public final class Launcher
                         String.format(
                             "java -cp %s sep.Launcher --sv --nocmd %s %s %s %s",
                             f,
-                            EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            EArgs.getCustomServerPort() != sep.Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
                             EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinRemotePlayers()) : "",
                             String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)),
                             Arrays.asList(args).contains("--noclose") ? "" : "& exit"
@@ -247,7 +247,7 @@ public final class Launcher
                             "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s\"",
                             fp.substring(0, fp.lastIndexOf("/")),
                             f,
-                            EArgs.getCustomServerPort() != EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            EArgs.getCustomServerPort() != sep.Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
                             EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinRemotePlayers()) : "",
                             String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)),
                             Arrays.asList(args).contains("--noclose") ? "" : "& exit"
