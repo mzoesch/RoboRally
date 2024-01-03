@@ -1,7 +1,6 @@
 package sep.view.json;
 
-import sep.                         Types;
-import sep.view.lib.Types.          EFigure;
+import sep.view.lib.                EFigure;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                RRegisterCard;
 import sep.view.clientcontroller.   EConnectionLoss;

@@ -17,6 +17,7 @@ import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.Types.          RLaserMask;
 import sep.view.lib.                EAnimation;
+import sep.view.lib.                EFigure;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
@@ -1605,13 +1606,13 @@ public final class GameJFXController
                 v.getStyleClass().add(String.format("player-box-%s", rp.hasSelectionFinished() ? "selected" : "inSelection"));
             }
             v.setStyle(String.format("-fx-background-color: %s;",
-                  rp.getFigure() == Types.EFigure.  HAMMER  ? GameJFXController.    COLOR_HAMMER
-                : rp.getFigure() == Types.EFigure.  TRUNDLE ? GameJFXController.    COLOR_TRUNDLE
-                : rp.getFigure() == Types.EFigure.  SQUASH  ? GameJFXController.    COLOR_SQUASH
-                : rp.getFigure() == Types.EFigure.  X90     ? GameJFXController.    COLOR_X90
-                : rp.getFigure() == Types.EFigure.  SPIN    ? GameJFXController.    COLOR_SPIN
-                : rp.getFigure() == Types.EFigure.  TWONKY  ? GameJFXController.    COLOR_TWONKY
-                : rp.getFigure() == Types.EFigure.  TWITCH  ? GameJFXController.    COLOR_TWITCH
+                  rp.getFigure() == EFigure.  HAMMER  ? GameJFXController.    COLOR_HAMMER
+                : rp.getFigure() == EFigure.  TRUNDLE ? GameJFXController.    COLOR_TRUNDLE
+                : rp.getFigure() == EFigure.  SQUASH  ? GameJFXController.    COLOR_SQUASH
+                : rp.getFigure() == EFigure.  X90     ? GameJFXController.    COLOR_X90
+                : rp.getFigure() == EFigure.  SPIN    ? GameJFXController.    COLOR_SPIN
+                : rp.getFigure() == EFigure.  TWONKY  ? GameJFXController.    COLOR_TWONKY
+                : rp.getFigure() == EFigure.  TWITCH  ? GameJFXController.    COLOR_TWITCH
                 : ""
             ));
 

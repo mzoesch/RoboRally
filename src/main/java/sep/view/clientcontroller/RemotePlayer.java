@@ -2,7 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.viewcontroller.RobotView;
 import sep.view.lib.RCoordinate;
-import sep.view.lib.Types.EFigure;
+import sep.view.lib.EFigure;
 
 import java.util.ArrayList;
 

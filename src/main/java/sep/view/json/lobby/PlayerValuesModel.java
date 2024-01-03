@@ -1,7 +1,7 @@
 package sep.view.json.lobby;
 
 import sep.view.json.AServerRequestModel;
-import sep.view.lib.Types.EFigure;
+import sep.view.lib.EFigure;
 
 import org.json.JSONObject;
 

@@ -1,7 +1,7 @@
 package sep.view.scenecontrollers;
 
 import sep.view.json.lobby.PlayerValuesModel;
-import sep.view.lib.Types.EFigure;
+import sep.view.lib.EFigure;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.clientcontroller.GameInstance;
 import sep.view.clientcontroller.EGameState;

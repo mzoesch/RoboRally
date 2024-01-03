@@ -5,7 +5,7 @@ import sep.view.lib.EShopState;
 import sep.view.lib.RRegisterCard;
 import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.lib.EGamePhase;
-import sep.view.lib.Types.EFigure;
+import sep.view.lib.EFigure;
 
 import java.util.ArrayList;
 import java.util.Objects;
