@@ -1,5 +1,6 @@
 package sep.view.json.common;
 
+import sep.Types;
 import sep.view.json.AServerRequestModel;
 
 import org.json.JSONObject;
@@ -25,7 +26,7 @@ public class IdentificationModel extends AServerRequestModel
         final JSONObject b = new JSONObject();
         b.put("group", this.sessionID);
         b.put("isAI", this.bIsAgent);
-        b.put("protocol", String.format("Version %s", sep.Types.Props.VERSION.toString()));
+        b.put("protocol", String.format("Version %s", Types.EProps.VERSION.toString()));
 
         final JSONObject j = new JSONObject();
         j.put("messageType", "HelloServer");
