@@ -6,6 +6,7 @@ import sep.view.lib.Types;
 import sep.view.lib.ERotation;
 import sep.view.scenecontrollers.GameJFXController;
 import sep.view.lib.RRotation;
+import sep.view.lib.EModifier;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

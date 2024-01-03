@@ -18,6 +18,7 @@ import sep.view.lib.                RLaserMask;
 import sep.view.lib.                EAnimation;
 import sep.view.lib.                RGearMask;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                EModifier;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
@@ -2227,7 +2228,7 @@ public final class GameJFXController
         {
             for (int rank = 0; rank < this.ranks; rank++)
             {
-                if (this.tiles[file][rank].hasModifier(Types.EModifier.LASER))
+                if (this.tiles[file][rank].hasModifier(EModifier.LASER))
                 {
                     wallLasers.add(this.tiles[file][rank]);
                     continue;

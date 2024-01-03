@@ -1,9 +1,6 @@
 package sep.view.viewcontroller;
 
-import sep.view.lib.Types.  EModifier;
-import sep.view.lib.Types.  ERotation;
-import sep.view.lib.Types.  RLaserMask;
-import sep.view.lib.        RCoordinate;
+import sep.view.lib.    EModifier;
 import sep.view.lib.    ERotation;
 import sep.view.lib.    RLaserMask;
 import sep.view.lib.    RCoordinate;

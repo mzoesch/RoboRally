@@ -1,8 +1,6 @@
 package sep.view.viewcontroller;
 
 import sep.                         Types;
-import sep.view.lib.Types.          ERotation;
-import sep.view.lib.Types.          RGearMask;
 import sep.view.lib.                ERotation;
 import sep.view.lib.                RGearMask;
 import sep.view.clientcontroller.   GameInstance;
