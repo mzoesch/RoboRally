@@ -12,11 +12,11 @@ import sep.view.viewcontroller.     Tile;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     TileModifier;
 import sep.view.lib.                EShopState;
-import sep.view.lib.                Types;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.Types.          RLaserMask;
 import sep.view.lib.                EAnimation;
+import sep.view.lib.                RGearMask;
 import sep.view.lib.                EFigure;
 
 import javafx.application.          Platform;
@@ -96,13 +96,13 @@ public final class GameJFXController
     /** During initialization. */
     private static final int    NULL_FOOTER_HEIGHT = 200;
 
-    private int                                 files;
-    private int                                 ranks;
-    private Tile[][]                            tiles;
-    private final ArrayList<Types.RGearMask>    gears;
-    private double                              minXTranslation;
-    private double                              maxXTranslation;
-    private double                              centralXTranslation;
+    private int                         files;
+    private int                         ranks;
+    private Tile[][]                    tiles;
+    private final ArrayList<RGearMask>  gears;
+    private double                      minXTranslation;
+    private double                      maxXTranslation;
+    private double                      centralXTranslation;
 
     public GameJFXController()
     {
@@ -1937,7 +1937,7 @@ public final class GameJFXController
 
             t.play();
 
-            this.gears.set(i, new Types.RGearMask(this.gears.get(i).iv(), this.gears.get(i).clockwise(), newRot));
+            this.gears.set(i, new RGearMask(this.gears.get(i).iv(), this.gears.get(i).clockwise(), newRot));
 
             continue;
         }
