@@ -111,14 +111,14 @@ public final class Types
 
     }
 
-    public enum Configurations
+    public enum EConfigurations
     {
         DEV,
         PROD,
         ;
 
         /** Kinda sketchy but works for now. This is only a temporary sln. And should be removed later on.  */
-        public static Configurations getConfiguration()
+        public static EConfigurations getConfiguration()
         {
             final String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
@@ -127,58 +127,17 @@ public final class Types
                 return null;
             }
 
-            return fp.lastIndexOf("/") == fp.length() - 1 ? Configurations.DEV : Configurations.PROD;
+            return fp.lastIndexOf("/") == fp.length() - 1 ? EConfigurations.DEV : EConfigurations.PROD;
         }
 
         public static boolean isDev()
         {
-            return Configurations.getConfiguration() == Configurations.DEV;
+            return EConfigurations.getConfiguration() == EConfigurations.DEV;
         }
 
         public static boolean isProd()
         {
-            return Configurations.getConfiguration() == Configurations.PROD;
-        }
-
-    }
-
-    public enum Animation
-    {
-        BLUE_CONVEYOR_BELT  (   "BlueConveyorBelt"     ),
-        GREEN_CONVEYOR_BELT (   "GreenConveyorBelt"    ),
-        PUSH_PANEL          (   "PushPanel"            ),
-        GEAR                (   "Gear"                 ),
-        CHECK_POINT         (   "CheckPoint"           ), /* TODO What anim should we play here?? */
-        PLAYER_SHOOTING     (   "PlayerShooting"       ),
-        WALL_SHOOTING       (   "WallShooting"         ),
-        ENERGY_SPACE        (   "EnergySpace"          ),
-        ;
-
-        private final String s;
-
-        private Animation(final String s)
-        {
-            this.s = s;
-            return;
-        }
-
-        public static Animation fromString(final String s)
-        {
-            for (final Animation a : Animation.values())
-            {
-                if (Objects.equals(a.s, s))
-                {
-                    return a;
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        public String toString()
-        {
-            return this.s;
+            return EConfigurations.getConfiguration() == EConfigurations.PROD;
         }
 
     }

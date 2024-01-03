@@ -281,7 +281,7 @@ public final class TileModifier
         // use the SWING Framework to do the loading for us. If it is figured out how to directly load files, we can
         // safety remove this code.
 
-        if (Types.Configurations.isDev())
+        if (Types.EConfigurations.isDev())
         {
             final Image i = new Image(String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION));
             if (i.isError())
@@ -294,7 +294,7 @@ public final class TileModifier
             return i;
         }
 
-        if (Types.Configurations.isProd())
+        if (Types.EConfigurations.isProd())
         {
             final URL               url     = TileModifier.class.getResource(String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION));
             final BufferedImage     awtImg;

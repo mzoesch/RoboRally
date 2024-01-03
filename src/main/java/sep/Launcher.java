@@ -42,7 +42,7 @@ public final class Launcher
         l.debug(    "Detected operating system: {}.",   Types.EOS.getOS().toString()     );
         l.debug(    "Protocol version: {}.",            Types.EProps.VERSION.toString()  );
 
-        if (Types.Configurations.isDev())
+        if (Types.EConfigurations.isDev())
         {
             l.error("Wrapper code is not meant to run outside of MVN packaged JAR files.");
         }
@@ -264,7 +264,7 @@ public final class Launcher
                 }
 
                 /* The process cannot start if not packaged in a jar file. We inherit to get the stderr. */
-                if (Types.Configurations.isDev())
+                if (Types.EConfigurations.isDev())
                 {
                     pb.inheritIO();
                 }
