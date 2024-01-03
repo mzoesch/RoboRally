@@ -1,5 +1,6 @@
 package sep.view.viewcontroller;
 
+import sep.Types;
 import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
 import sep.view.json.               ChatMsgModel;
@@ -66,7 +67,7 @@ public final class ViewSupervisor extends Application
 
         if (EClientInformation.INSTANCE.isMockView())
         {
-            s.setTitle(String.format("%s v%s (Mock View)", SceneController.WIN_TITLE, sep.Types.Props.VERSION.toString()));
+            s.setTitle(String.format("%s v%s (Mock View)", SceneController.WIN_TITLE, Types.EProps.VERSION.toString()));
             this.sceneController.renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
             s.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> GameInstance.kill());
             s.show();
@@ -74,7 +75,7 @@ public final class ViewSupervisor extends Application
             return;
         }
 
-        s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, sep.Types.Props.VERSION.toString()));
+        s.setTitle(String.format("%s v%s", SceneController.WIN_TITLE, Types.EProps.VERSION.toString()));
         this.sceneController.renderNewScreen(SceneController.MAIN_MENU_ID, SceneController.PATH_TO_MAIN_MENU, false);
         s.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> GameInstance.kill());
         s.show();
