@@ -465,7 +465,23 @@ public final class TileModifier
 
         if (Objects.equals(this.tile.getString("type"), "CheckPoint"))
         {
-            return TileModifier.loadCachedImage("CheckPoint");
+            switch (this.getCount())
+            {
+                case 1:
+                    return TileModifier.loadCachedImage("CheckPoint1");
+                case 2:
+                    return TileModifier.loadCachedImage("Checkpoint2");
+                case 3:
+                    return TileModifier.loadCachedImage("CheckPoint3");
+                case 4:
+                    return TileModifier.loadCachedImage("CheckPoint4");
+                case 5:
+                    return TileModifier.loadCachedImage("CheckPoint5");
+
+                default:
+                    l.error("Unknown laser count: {}", this.getCount());
+                    break;
+            }
         }
 
         if (Objects.equals(this.tile.getString("type"), "Laser"))
