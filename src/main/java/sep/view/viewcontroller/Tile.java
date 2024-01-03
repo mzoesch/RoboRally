@@ -6,6 +6,7 @@ import sep.view.lib.Types.  RLaserMask;
 import sep.view.lib.        RCoordinate;
 import sep.view.lib.    ERotation;
 import sep.view.lib.    RLaserMask;
+import sep.view.lib.    RCoordinate;
 
 import org.json.            JSONArray;
 import javafx.scene.image.  Image;
