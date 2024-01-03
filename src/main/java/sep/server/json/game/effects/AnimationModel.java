@@ -1,16 +1,16 @@
 package sep.server.json.game.effects;
 
+import sep.server.model.game.   EAnimation;
 import sep.server.json.         AModel;
 import sep.server.viewmodel.    ClientInstance;
-import sep.                     Types;
 
 import org.json.                JSONObject;
 
-public class AnimationModel extends AModel
+public final class AnimationModel extends AModel
 {
-    private final Types.Animation anim;
+    private final EAnimation anim;
 
-    public AnimationModel(final ClientInstance ci, final Types.Animation anim)
+    public AnimationModel(final ClientInstance ci, final EAnimation anim)
     {
         super(ci);
         this.anim = anim;

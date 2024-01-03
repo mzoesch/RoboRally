@@ -11,7 +11,6 @@ import sep.server.model.game.cards.damage.*;
 import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
-import sep.Types;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -444,7 +443,7 @@ public class GameMode {
      * The robot is rotated 90 degrees into the gear's rotational direction.
      */
     private void activateGears() {
-        this.getSession().broadcastAnimation(Types.Animation.GEAR);
+        this.getSession().broadcastAnimation(EAnimation.GEAR);
 
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
@@ -485,7 +484,7 @@ public class GameMode {
      */
     private void findLasers() {
 
-        this.getSession().broadcastAnimation(Types.Animation.WALL_SHOOTING);
+        this.getSession().broadcastAnimation(EAnimation.WALL_SHOOTING);
 
         for (ArrayList<Tile> row : course.getCourse()) {
             for (Tile tile : row) {
@@ -503,7 +502,7 @@ public class GameMode {
      * and calls the handleLaserShooting method depending on the direction the robot is facing to.
      */
     private void shootRobotLasers() {
-        this.getSession().broadcastAnimation(Types.Animation.PLAYER_SHOOTING);
+        this.getSession().broadcastAnimation(EAnimation.PLAYER_SHOOTING);
 
         for(Player player : players) {
             Robot playerRobot = player.getPlayerRobot();

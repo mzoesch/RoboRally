@@ -5,6 +5,7 @@ import sep.view.lib.Types.          EFigure;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                RRegisterCard;
 import sep.view.clientcontroller.   EConnectionLoss;
+import sep.view.lib.                EAnimation;
 
 import java.util.stream.    IntStream;
 import org.json.            JSONObject;
@@ -191,9 +192,9 @@ public record RDefaultServerRequestParser(JSONObject request)
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()).mapToObj(i -> new RRegisterCard(this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"), this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card"))).toArray(RRegisterCard[]::new);
     }
 
-    public Types.Animation getAnimation() throws JSONException
+    public EAnimation getAnimation() throws JSONException
     {
-        return Types.Animation.fromString(this.request.getJSONObject("messageBody").getString("type"));
+        return EAnimation.fromString(this.request.getJSONObject("messageBody").getString("type"));
     }
 
 }

@@ -19,10 +19,10 @@ import sep.server.model.game.                   GameState;
 import sep.server.model.game.                   EGamePhase;
 import sep.server.model.game.                   Tile;
 import sep.server.model.game.                   Player;
+import sep.server.model.game.                   EAnimation;
 import sep.server.model.                        EServerInformation;
 import sep.server.model.                        IOwnershipable;
 import sep.server.model.                        Agent;
-import sep.                                     Types;
 import sep.server.json.common.                  ChatMsgModel;
 import sep.server.json.common.                  CurrentPlayerModel;
 import sep.server.json.common.                  ConnectionUpdateModel;
@@ -839,7 +839,7 @@ public final class Session
         return;
     }
 
-    public void broadcastAnimation(final Types.Animation anim)
+    public void broadcastAnimation(final EAnimation anim)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {

@@ -9,6 +9,7 @@ import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.lib.                Types;
+import sep.view.lib.                EAnimation;
 
 import javafx.scene.control.        Label;
 import javafx.scene.control.        Button;
@@ -414,7 +415,7 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    public static void playAnimation(final sep.Types.Animation anim)
+    public static void playAnimation(final EAnimation anim)
     {
         try
         {

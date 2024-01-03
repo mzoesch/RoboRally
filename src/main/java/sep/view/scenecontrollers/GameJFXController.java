@@ -16,6 +16,7 @@ import sep.view.lib.                Types;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.Types.          RLaserMask;
+import sep.view.lib.                EAnimation;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
@@ -2004,7 +2005,7 @@ public final class GameJFXController
 
     // endregion Animation Rendering
 
-    private void renderAnimation(final sep.Types.Animation anim)
+    private void renderAnimation(final EAnimation anim)
     {
         l.debug("Rendering animation: {}", anim);
         switch (anim)
@@ -2157,7 +2158,7 @@ public final class GameJFXController
         return;
     }
 
-    public void playAnimation(final sep.Types.Animation anim)
+    public void playAnimation(final EAnimation anim)
     {
         Platform.runLater(() ->
         {
