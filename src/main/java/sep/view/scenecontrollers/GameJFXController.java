@@ -14,7 +14,7 @@ import sep.view.viewcontroller.     TileModifier;
 import sep.view.lib.                EShopState;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EGamePhase;
-import sep.view.lib.Types.          RLaserMask;
+import sep.view.lib.                RLaserMask;
 import sep.view.lib.                EAnimation;
 import sep.view.lib.                RGearMask;
 import sep.view.lib.                EFigure;
