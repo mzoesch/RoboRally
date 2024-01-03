@@ -3,6 +3,7 @@ package sep.view.viewcontroller;
 import sep.view.clientcontroller.RemotePlayer;
 import sep.view.lib.RCoordinate;
 import sep.view.lib.Types;
+import sep.view.lib.ERotation;
 import sep.view.scenecontrollers.GameJFXController;
 import sep.view.lib.RRotation;
 
@@ -207,6 +208,7 @@ public class RobotView
         final Tile t                                = tiles[this.position.x()][this.position.y()];
         final Types.ERotation rot                   = this.rotation.toEnum();
         final ArrayList<Types.RLaserMask> masks     = new ArrayList<Types.RLaserMask>();
+        final ERotation rot                   = this.rotation.toEnum();
 
         System.out.printf("Player rotation: %s\n", rot);
 

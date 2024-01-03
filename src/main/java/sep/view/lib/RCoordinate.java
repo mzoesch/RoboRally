@@ -1,7 +1,6 @@
 package sep.view.lib;
 
 import sep.view.viewcontroller.     Tile;
-import sep.view.lib.Types.          ERotation;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 
