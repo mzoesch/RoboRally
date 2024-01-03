@@ -1,7 +1,8 @@
 package sep.view.viewcontroller;
 
 import sep.view.clientcontroller.   GameInstance    ;
-import sep.view.lib.                Types           ;
+import sep.view.lib.                RPopUpMask      ;
+import sep.view.lib.                EPopUp          ;
 
 import javafx.scene.                Scene           ;
 import java.util.                   Objects         ;
@@ -94,7 +95,7 @@ public final class SceneController
         return;
     }
 
-    private Pane createPopUp(final Pane target, final Types.RPopUpMask mask)
+    private Pane createPopUp(final Pane target, final RPopUpMask mask)
     {
         final AnchorPane container = new AnchorPane();
         container.setId("pop-up-container");
@@ -113,7 +114,7 @@ public final class SceneController
 
         final HBox form = new HBox();
         form.setId("pop-up-form");
-        if (Objects.requireNonNull(mask.type()) == Types.EPopUp.ERROR)
+        if (Objects.requireNonNull(mask.type()) == EPopUp.ERROR)
         {
             final Button b = new Button("OK");
             b.getStyleClass().add("secondary-btn");
@@ -197,7 +198,7 @@ public final class SceneController
         return null;
     }
 
-    public void renderPopUp(final Types.RPopUpMask mask)
+    public void renderPopUp(final RPopUpMask mask)
     {
         this.renderPopUp(this.createPopUp(this.getPopUpTarget(), mask));
 

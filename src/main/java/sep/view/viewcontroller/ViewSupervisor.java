@@ -8,7 +8,7 @@ import sep.view.json.game.          RebootDirectionModel;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
-import sep.view.lib.                Types;
+import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EAnimation;
 
 import javafx.scene.control.        Label;
@@ -334,13 +334,13 @@ public final class ViewSupervisor extends Application
 
     // endregion Game Events
 
-    public static void createPopUp(final Types.RPopUpMask mask)
+    public static void createPopUp(final RPopUpMask mask)
     {
         ViewSupervisor.getSceneController().renderPopUp(mask);
         return;
     }
 
-    public static void createPopUpLater(final Types.RPopUpMask mask)
+    public static void createPopUpLater(final RPopUpMask mask)
     {
         Platform.runLater(() ->
         {

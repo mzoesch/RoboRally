@@ -6,7 +6,8 @@ import sep.view.viewcontroller.ViewSupervisor;
 import sep.view.viewcontroller.SceneController;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.EClientInformation;
-import sep.view.lib.Types;
+import sep.view.lib.RPopUpMask;
+import sep.view.lib.EPopUp;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,7 +42,7 @@ public class MainMenuJFXController
             return;
         }
 
-        ViewSupervisor.createPopUp(new Types.RPopUpMask(Types.EPopUp.ERROR, "Server Connection Failed", EClientInformation.INSTANCE.getStdServerErrPipeline().toString()));
+        ViewSupervisor.createPopUp(new RPopUpMask(EPopUp.ERROR, "Server Connection Failed", EClientInformation.INSTANCE.getStdServerErrPipeline().toString()));
 
         return;
     }
@@ -72,7 +73,7 @@ public class MainMenuJFXController
             return;
         }
 
-        ViewSupervisor.createPopUp(new Types.RPopUpMask(Types.EPopUp.ERROR, "Server Connection Failed", EClientInformation.INSTANCE.getStdServerErrPipeline().toString()));
+        ViewSupervisor.createPopUp(new RPopUpMask(EPopUp.ERROR, "Server Connection Failed", EClientInformation.INSTANCE.getStdServerErrPipeline().toString()));
 
         return;
     }
@@ -80,7 +81,7 @@ public class MainMenuJFXController
     @FXML
     public void onPopUpTestBtn(final ActionEvent actionEvent)
     {
-        ViewSupervisor.createPopUp(new Types.RPopUpMask(Types.EPopUp.ERROR, "Test", "This is a test pop up."));
+        ViewSupervisor.createPopUp(new RPopUpMask(EPopUp.ERROR, "Test", "This is a test pop up."));
         return;
     }
 
