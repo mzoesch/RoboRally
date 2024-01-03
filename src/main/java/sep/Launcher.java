@@ -44,7 +44,7 @@ public final class Launcher
 
         if (Types.Configurations.isDev())
         {
-            l.error("Wrapper code is not meant to run outside of MVN packaged JAR files. Shutting down.");
+            l.error("Wrapper code is not meant to run outside of MVN packaged JAR files.");
         }
 
         /* This only works with jar files because else the getPath() will return a dir. */
