@@ -39,8 +39,7 @@ public final class Launcher
         final double t0 = System.currentTimeMillis();
 
         l.info(     "Starting application."                                             );
-        l.debug(    "Detected operating system: {}.",   Types.OS.getOS().toString()     );
-        l.debug(    "Protocol version: {}.",            Types.Props.VERSION.toString()  );
+        l.debug(    "Detected operating system: {}.",   Types.EOS.getOS().toString()     );
         l.debug(    "Protocol version: {}.",            Types.EProps.VERSION.toString()  );
 
         if (Types.Configurations.isDev())
@@ -62,7 +61,7 @@ public final class Launcher
             l.info("Command line argument [--cmd] detected. Starting new process terminal.");
 
             final ProcessBuilder pb =
-                Types.OS.isWindows()
+                Types.EOS.isWindows()
                 ?
                 new ProcessBuilder(
                     System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
@@ -74,7 +73,7 @@ public final class Launcher
                         )
                     )
                 :
-                Types.OS.isOSX()
+                Types.EOS.isOSX()
                 ?
                 new ProcessBuilder(
                     "osascript", "-e",
@@ -98,7 +97,7 @@ public final class Launcher
             }
 
             /* The process cannot start if not packaged in a jar file. We inherit to get the stderr. */
-            if (Types.Configurations.isDev())
+            if (Types.EConfigurations.isDev())
             {
                 pb.inheritIO();
             }
@@ -226,7 +225,7 @@ public final class Launcher
                 }
 
                 final ProcessBuilder pb =
-                    Types.OS.isWindows()
+                    Types.EOS.isWindows()
                     ?
                     new ProcessBuilder(
                         System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
@@ -240,7 +239,7 @@ public final class Launcher
                             )
                         )
                     :
-                    Types.OS.isOSX()
+                    Types.EOS.isOSX()
                     ?
                     new ProcessBuilder(
                         "osascript", "-e",

@@ -53,43 +53,43 @@ public final class Types
 
     }
 
-    public enum OS
+    public enum EOS
     {
         WINDOWS,
         OSX,
         OTHER,
         ;
 
-        public static OS getOS()
+        public static EOS getOS()
         {
             final String os = System.getProperty("os.name").toLowerCase();
 
             if (os.contains("windows"))
             {
-                return OS.WINDOWS;
+                return EOS.WINDOWS;
             }
 
             if (os.contains("mac"))
             {
-                return OS.OSX;
+                return EOS.OSX;
             }
 
-            return OS.OTHER;
+            return EOS.OTHER;
         }
 
         public static boolean isWindows()
         {
-            return OS.getOS() == OS.WINDOWS;
+            return EOS.getOS() == EOS.WINDOWS;
         }
 
         public static boolean isOSX()
         {
-            return OS.getOS() == OS.OSX;
+            return EOS.getOS() == EOS.OSX;
         }
 
         public static boolean isOther()
         {
-            return OS.getOS() == OS.OTHER;
+            return EOS.getOS() == EOS.OTHER;
         }
     }
 
