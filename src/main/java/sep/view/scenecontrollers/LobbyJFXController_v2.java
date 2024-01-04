@@ -125,7 +125,7 @@ public final class LobbyJFXController_v2
             this.formScrollPane.getViewportBounds().getWidth(), this.formScrollPane.viewportBoundsProperty()
         ));
 
-        this.updateAvailableCourses();
+        this.onAvailableCourseUpdate();
 
         final boolean bSuccess;
         try
@@ -159,224 +159,38 @@ public final class LobbyJFXController_v2
         return;
     }
 
-    private void onSubmitLobbyMsg()
-    {
-        String token = this.getChatMsg();
-        this.lobbyMsgInputTextField.clear();
-
-        if (this.isChatMsgACommand(token))
-        {
-            if (this.getCommand(token).isEmpty() || this.getCommand(token).isBlank())
-            {
-                this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Type /h for help on commands.", false);
-                return;
-            }
-
-            if (this.getCommand(token).equals("w"))
-            {
-                if (!token.contains("\""))
-                {
-                    this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
-                    return;
-                }
-                int idxBSBegin = token.indexOf("\"");
-                String sub = token.substring(idxBSBegin + 1);
-                if (!sub.contains("\""))
-                {
-                    this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
-                    return;
-                }
-                int idxBSEnd = sub.indexOf("\"");
-
-                String targetPlayer = token.substring(idxBSBegin + 1, idxBSBegin + idxBSEnd + 1);
-                if (targetPlayer.isEmpty() || targetPlayer.isBlank())
-                {
-                    this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
-                    return;
-                }
-
-                String msgToWhisper;
-                try
-                {
-                    msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
-                }
-                catch (IndexOutOfBoundsException e)
-                {
-                    this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid message.", false);
-                    return;
-                }
-                if (msgToWhisper.isEmpty() || msgToWhisper.isBlank())
-                {
-                    return;
-                }
-
-                RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
-                if (target == null)
-                {
-                    this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, String.format("Player %s not found.", targetPlayer), false);
-                    return;
-                }
-
-                new ChatMsgModel(msgToWhisper, target.getPlayerID()).send();
-                if (EClientInformation.INSTANCE.getPlayerID() != target.getPlayerID())
-                {
-                    this.addToChatMsgToScrollPane(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
-                }
-
-                l.debug("Whispering to {}.", targetPlayer);
-
-                return;
-            }
-
-            if (this.getCommand(token).equals("h"))
-            {
-                this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Commands:", false);
-                this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "/h - Show this help.", false);
-                this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "/w [\"player name\"] [msg] - Whisper to a player.", false);
-                return;
-            }
-
-            this.addToChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, String.format("Unknown command: %s", this.getCommand(token)), false);
-            return;
-        }
-
-        if (!this.isChatMsgValid(token))
-        {
-            return;
-        }
-        new ChatMsgModel(token, ChatMsgModel.CHAT_MSG_BROADCAST).send();
-        return;
-    }
-
-    /** Always call from another thread. */
-    public void updatePlayerSelection()
-    {
-        Platform.runLater(() -> {
-            this.updateView();
-            return;
-        });
-    }
-
-    private void addToChatMsgToScrollPane(int caller, String msg, boolean bIsPrivate)
-    {
-        if (caller == ChatMsgModel.SERVER_ID)
-        {
-            Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
-            l.getStyleClass().add("lobby-msg-server");
-            l.setWrapText(true);
-            this.lobbyMsgContainer.getChildren().add(l);
-
-            /* Kinda sketchy. But is there a better way? */
-            PauseTransition p = new PauseTransition(Duration.millis(15));
-            p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
-            p.play();
-
-            return;
-        }
-
-        if (caller == ChatMsgModel.CLIENT_ID)
-        {
-            Label l = new Label(String.format("[%s] %s", ChatMsgModel.CLIENT_NAME, msg));
-            l.getStyleClass().add("lobby-msg-client");
-            l.setWrapText(true);
-            this.lobbyMsgContainer.getChildren().add(l);
-
-            /* Kinda sketchy. But is there a better way? */
-            PauseTransition p = new PauseTransition(Duration.millis(15));
-            p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
-            p.play();
-
-            return;
-        }
-
-        Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
-        if (bIsPrivate)
-        {
-            l.getStyleClass().add("lobby-msg-whisper");
-        }
-        else
-        {
-            l.getStyleClass().add("lobby-msg");
-        }
-        l.setWrapText(true);
-        this.lobbyMsgContainer.getChildren().add(l);
-
-        /* Kinda sketchy. But is there a better way? */
-        PauseTransition p = new PauseTransition(Duration.millis(15));
-        p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
-        p.play();
-
-        return;
-    }
-
-    /** Will add a new chat msg from another thread. */
-    public void handleChatMessage(int sourceID, String msg, boolean bIsPrivate)
-    {
-        Platform.runLater(() -> {
-            this.addToChatMsgToScrollPane(sourceID, msg, bIsPrivate);
-            return;
-        });
-
-        return;
-    }
-
-    /** Will update the player status from another thread. */
-    public void handlePlayerStatusUpdate()
-    {
-        Platform.runLater(() -> {
-            this.updateView();
-            return;
-        });
-        return;
-    }
-
-    private Node createHSpacer()
-    {
-        final Region s = new Region();
-        HBox.setHgrow(s, Priority.ALWAYS);
-        return s;
-    }
-
-    private Node createVSpacer()
-    {
-        final Region s = new Region();
-        VBox.setVgrow(s, Priority.ALWAYS);
-        return s;
-    }
+    // region Rendering Methods
 
     private Node createRobotSelectorBox(final EFigure f)
     {
-        Label l = new Label(EGameState.INSTANCE.isPlayerRobotUnavailable(f) ? EGameState.INSTANCE.getRemotePlayerByFigureID(f) == null ? "Available" : Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByFigureID(f)).getPlayerName() : "Available");
+        if (f == null)
+        {
+            l.error("Could not create robot selector box. Figure is null.");
+            return null;
+        }
+
+        final Label     l   = new Label(f.toString());
+        final Button    b   = new Button(EGameState.INSTANCE.isPlayerRobotUnavailable(f) ? EGameState.INSTANCE.getRemotePlayerByFigureID(f) == null ? "Available" : Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByFigureID(f)).getPlayerName() : "Available");
+
         l.getStyleClass().add("text-base");
 
-        Button b = new Button(f.toString());
-        if (EGameState.INSTANCE.hasClientSelectedARobot())
-        {
-            if (EGameState.INSTANCE.getClientSelectedFigure() == f)
-            {
-                b.getStyleClass().add("primary-btn-mini");
-            }
-            else
-            {
-                b.getStyleClass().add("secondary-btn-mini");
-            }
-        }
-        else
-        {
-            if (EGameState.INSTANCE.isPlayerRobotUnavailable(f))
-            {
-                b.getStyleClass().add("secondary-btn-mini");
-            }
-            else
-            {
-                b.getStyleClass().add("primary-btn-mini");
-            }
-        }
+        b.getStyleClass().add(
+              EGameState.INSTANCE.hasClientSelectedARobot()
+            ? EGameState.INSTANCE.getClientSelectedFigure() == f
+            ? "primary-btn-mini"
+            : "secondary-btn-mini"
+            : EGameState.INSTANCE.isPlayerRobotUnavailable(f)
+            ? "secondary-btn-mini"
+            : "primary-btn-mini"
+        );
+        b.setStyle("-fx-min-width: 170px;");
+
         if (EGameState.INSTANCE.getRemotePlayerByFigureID(f) != null)
         {
             b.setDisable(EGameState.INSTANCE.getClientSelectedFigure() != f);
         }
-        b.setOnAction(actionEvent ->
+        b.setOnAction(
+        actionEvent ->
         {
             this.formErrorLabel.setText("");
 
@@ -412,18 +226,80 @@ public final class LobbyJFXController_v2
             return;
         });
 
-        VBox v = new VBox(l, b);
+        final VBox v = new VBox(l, b);
         v.getStyleClass().add("player-robot-selector-vbox");
 
         return v;
     }
 
-    private void updateView()
+    private void addChatMsgToScrollPane(final int caller, final String msg, final boolean bIsPrivate)
     {
-        this.addPlayerRobotSelector_v2();
-        this.updatePlayersInSession();
-        this.updateReadyBtn();
-        this.updateSessionCourseLabel();
+        if (caller == ChatMsgModel.SERVER_ID)
+        {
+            final Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
+            l.getStyleClass().add("lobby-msg-server");
+            l.setWrapText(true);
+            this.lobbyMsgContainer.getChildren().add(l);
+
+            /* Kinda sketchy. But is there a better way? */
+            final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY));
+            p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
+            p.play();
+
+            return;
+        }
+
+        if (caller == ChatMsgModel.CLIENT_ID)
+        {
+            final Label l = new Label(String.format("[%s] %s", ChatMsgModel.CLIENT_NAME, msg));
+            l.getStyleClass().add("lobby-msg-client");
+            l.setWrapText(true);
+            this.lobbyMsgContainer.getChildren().add(l);
+
+            /* Kinda sketchy. But is there a better way? */
+            final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY));
+            p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
+            p.play();
+
+            return;
+        }
+
+        final Label l = new Label(String.format("<%s>%s %s", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(caller)).getPlayerName(), bIsPrivate ? " whispers: " : "", msg));
+        l.getStyleClass().add(bIsPrivate ? "lobby-msg-whisper" : "lobby-msg");
+        l.setWrapText(true);
+        this.lobbyMsgContainer.getChildren().add(l);
+
+        /* Kinda sketchy. But is there a better way? */
+        final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY));
+        p.setOnFinished(f -> this.lobbyMsgScrollPane.setVvalue(1.0));
+        p.play();
+
+        return;
+    }
+
+    private void addPlayerRobotSelector_v2()
+    {
+        final double scrollPos = this.formScrollPane.getVvalue();
+
+        this.playerRobotSelectorArea.getChildren().clear();
+
+        for (int i = 0; i < EFigure.NUM.i; i++)
+        {
+            if (i % 2 == 0)
+            {
+                this.playerRobotSelectorArea.getChildren().add(new HBox() {{ this.getStyleClass().add("player-robot-selector-hbox"); }});
+            }
+
+            ( (HBox) this.playerRobotSelectorArea.getChildren().get(this.playerRobotSelectorArea.getChildren().size() - 1) ).getChildren().add(this.createRobotSelectorBox(EFigure.fromInt(i)));
+
+            continue;
+        }
+
+        // TODO This is highly experimental. But Platform.runLater() does not work (and ofc setting it
+        //      directly does not work either). Duration has to be increased on slower end devices.
+        final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY));
+        p.setOnFinished(f -> this.formScrollPane.setVvalue(scrollPos));
+        p.play();
 
         return;
     }
@@ -432,16 +308,16 @@ public final class LobbyJFXController_v2
     {
         this.playerListContainer.getChildren().clear();
 
-        for (RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
             if (rp.getPlayerName().startsWith(EClientInformation.AGENT_PREFIX))
             {
-                Label l = new Label(rp.getPlayerName());
+                final Label l = new Label(rp.getPlayerName());
                 l.getStyleClass().clear();
                 l.getStyleClass().add("player-in-session-label-ready-agent");
                 l.setPrefWidth(1_000);
 
-                Button b = new Button("Remove");
+                final Button b = new Button("Remove");
                 b.setStyle("-fx-min-width: 55px;");
                 b.getStyleClass().add("danger-btn-tiny");
 
@@ -452,18 +328,19 @@ public final class LobbyJFXController_v2
                     return;
                 });
 
-                HBox h = new HBox(l, b);
+                final HBox h = new HBox(l, b);
                 h.getStyleClass().add("player-in-session-hbox-agent");
                 this.playerListContainer.getChildren().add(h);
                 continue;
             }
 
-            Label l = new Label(rp.getPlayerName());
+            final Label l = new Label(rp.getPlayerName());
             l.getStyleClass().clear();
-            l.getStyleClass().add(rp.isReady() ? "player-in-session-label-ready" : "player-in-session-label-not-ready");
-            l.getStyleClass().add(rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID() ? "player-in-session-label-client" : "");
-            l.setPrefWidth(1_000);
+            l.getStyleClass().add(rp.isReady()      ? "player-in-session-label-ready"           : "player-in-session-label-not-ready"           );
+            l.getStyleClass().add(rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID() ? "player-in-session-label-client"      : ""    );
+            l.setPrefWidth(1_000); /* We want the label to take the whole space and center itself. */
             this.playerListContainer.getChildren().add(l);
+
             continue;
         }
 
@@ -474,6 +351,7 @@ public final class LobbyJFXController_v2
     {
         this.readyButton.setDisable(!EGameState.INSTANCE.hasClientSelectedARobot());
         this.readyButton.getStyleClass().clear();
+
         if (EGameState.INSTANCE.getClientRemotePlayer() == null)
         {
             this.readyButton.setText("Not Ready");
@@ -486,17 +364,18 @@ public final class LobbyJFXController_v2
             if (!EGameState.INSTANCE.getClientRemotePlayer().isReady())
             {
                 EGameState.INSTANCE.setServerCourses(new String[0]);
-                this.updateAvailableCourses();
+                this.onAvailableCourseUpdate();
             }
         }
+
         this.bReadyBtnClicked = false;
 
         return;
     }
 
-    public void updateAvailableCourses()
+    private void updateSessionCourseLabel()
     {
-        this.updateAvailableCourses(false);
+        this.serverCourseLabel.setText(String.format("Course: %s", EGameState.INSTANCE.getCurrentServerCourse().isBlank() || EGameState.INSTANCE.getCurrentServerCourse().isEmpty() ? "None" : EGameState.INSTANCE.getCurrentServerCourse()));
         return;
     }
 
@@ -579,13 +458,14 @@ public final class LobbyJFXController_v2
 
         Platform.runLater(() ->
         {
-            double scrollPos = this.formScrollPane.getVvalue();
+            final double scrollPos = this.formScrollPane.getVvalue();
+
             this.updateSessionCourseLabel();
             this.serverCourseSelectorArea.getChildren().clear();
 
             if (EGameState.INSTANCE.getServerCourses().length == 0)
             {
-                Label l = new Label("Your are currently not allowed to select a course.");
+                final Label l = new Label("Your are currently not allowed to select a course.");
                 l.getStyleClass().add("text-base");
                 this.serverCourseSelectorArea.getChildren().add(l);
                 return;
@@ -595,29 +475,20 @@ public final class LobbyJFXController_v2
             {
                 if (i % 2 == 0)
                 {
-                    this.serverCourseSelectorArea.getChildren().add(new HBox() {{ getStyleClass().add("server-course-selector-hbox"); }});
+                    this.serverCourseSelectorArea.getChildren().add(new HBox() {{ this.getStyleClass().add("server-course-selector-hbox"); }});
                 }
 
-                Button b = new Button(EGameState.INSTANCE.getServerCourses()[i]);
-                if (EGameState.INSTANCE.getCurrentServerCourse().isEmpty())
-                {
-                    b.getStyleClass().add("primary-btn-mini");
-                    b.setStyle("-fx-min-width: 250px;");
-                }
-                else
-                {
-                    if (Objects.equals(EGameState.INSTANCE.getCurrentServerCourse(), EGameState.INSTANCE.getServerCourses()[i]))
-                    {
-                        b.getStyleClass().add("primary-btn-mini");
-                        b.setStyle("-fx-min-width: 250px;");
-                    }
-                    else
-                    {
-                        b.getStyleClass().add("secondary-btn-mini");
-                        b.setStyle("-fx-min-width: 250px;");
-                    }
-                }
-                int finalI = i;
+                final Button b = new Button(EGameState.INSTANCE.getServerCourses()[i]);
+                b.getStyleClass().add(
+                      EGameState.INSTANCE.getCurrentServerCourse().isEmpty()
+                    ? "primary-btn-mini"
+                    : Objects.equals(EGameState.INSTANCE.getCurrentServerCourse(), EGameState.INSTANCE.getServerCourses()[i])
+                    ? "primary-btn-mini"
+                    : "secondary-btn-mini"
+                );
+                b.setStyle("-fx-min-width: 250px;");
+
+                final int finalI = i;
                 b.setOnAction(actionEvent ->
                 {
                     l.debug("Player clicked course selection button.");
@@ -640,23 +511,24 @@ public final class LobbyJFXController_v2
                     return;
                 });
 
-                ( (HBox) this.serverCourseSelectorArea.getChildren().get(this.serverCourseSelectorArea.getChildren().size() - 1)).getChildren().add(b);
+                ( (HBox) this.serverCourseSelectorArea.getChildren().get(this.serverCourseSelectorArea.getChildren().size() - 1) ).getChildren().add(b);
 
                 continue;
             }
 
             if (bScrollToEnd)
             {
-                // This is super ludicrous and should be changed :D. Works for now
-                // but could cause unpredictable behavior in the future.
-                /* Must be higher than addPlayerRobotSelector_v2 delay. */
-                PauseTransition p = new PauseTransition(Duration.millis(30));
+                // TODO
+                //      This is super ludicrous and should be changed :D. Works for now
+                //      but could cause unpredictable behavior in the future. The delay
+                //      must be higher than the {@link #addPlayerRobotSelector_v2} delay.
+                final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY * 2));
                 p.setOnFinished(f -> this.formScrollPane.setVvalue(1.0));
                 p.play();
                 return;
             }
 
-            PauseTransition p = new PauseTransition(Duration.millis(15));
+            final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY));
             p.setOnFinished(f -> this.formScrollPane.setVvalue(scrollPos));
             p.play();
 
@@ -666,76 +538,100 @@ public final class LobbyJFXController_v2
         return;
     }
 
-    public void updateCourseSelected()
+    // endregion Update Methods
+
+    // region Game Events
+
+    private void onSubmitLobbyMsg()
     {
-        Platform.runLater(() ->
+        final String token = this.getChatMsg();
+
+        this.lobbyMsgInputTextField.clear();
+
+        if (this.isChatMsgACommand(token))
         {
-            this.updateAvailableCourses();
-            return;
-        });
-
-        return;
-    }
-
-    private void updateSessionCourseLabel()
-    {
-        this.serverCourseLabel.setText(String.format("Course: %s", EGameState.INSTANCE.getCurrentServerCourse().isBlank() || EGameState.INSTANCE.getCurrentServerCourse().isEmpty() ? "None" : EGameState.INSTANCE.getCurrentServerCourse()));
-        return;
-    }
-
-    /** Will create the btn to select the different robots. */
-    private void addPlayerRobotSelector_v2()
-    {
-        double scrollPos = this.formScrollPane.getVvalue();
-
-        this.playerRobotSelectorArea.getChildren().clear();
-
-        int half = EFigure.NUM.i / 2;
-        HBox hTop = new HBox();
-        hTop.getStyleClass().add("player-robot-selector-hbox");
-        for (int i = 0; i < half; i++)
-        {
-            hTop.getChildren().add(this.createRobotSelectorBox(EFigure.fromInt(i)));
-            if (i + 1 < half)
+            if (this.getCommand(token).isEmpty() || this.getCommand(token).isBlank())
             {
-                hTop.getChildren().add(this.createHSpacer());
+                this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Type /h for help on commands.", false);
+                return;
             }
 
-            continue;
-        }
-
-        HBox hBot = new HBox();
-        hBot.getStyleClass().add("player-robot-selector-hbox");
-        for (int i = half; i < EFigure.NUM.i; i++)
-        {
-            hBot.getChildren().add(this.createRobotSelectorBox(EFigure.fromInt(i)));
-            if (i + 1 < EFigure.NUM.i)
+            if (this.getCommand(token).equals("w"))
             {
-                hBot.getChildren().add(this.createHSpacer());
+                if (!token.contains("\""))
+                {
+                    this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+
+                final int idxBSBegin = token.indexOf("\"");
+                final String sub = token.substring(idxBSBegin + 1);
+                if (!sub.contains("\""))
+                {
+                    this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+
+                final int idxBSEnd = sub.indexOf("\"");
+                final String targetPlayer = token.substring(idxBSBegin + 1, idxBSBegin + idxBSEnd + 1);
+                if (targetPlayer.isEmpty() || targetPlayer.isBlank())
+                {
+                    this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid player name.", false);
+                    return;
+                }
+
+                final String msgToWhisper;
+                try
+                {
+                    msgToWhisper = token.substring(idxBSBegin + idxBSEnd + 3);
+                }
+                catch (final IndexOutOfBoundsException e)
+                {
+                    this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Invalid message.", false);
+                    return;
+                }
+                if (msgToWhisper.isEmpty() || msgToWhisper.isBlank())
+                {
+                    return;
+                }
+
+                final RemotePlayer target = EGameState.INSTANCE.getRemotePlayerByPlayerName(targetPlayer);
+                if (target == null)
+                {
+                    this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, String.format("Player %s not found.", targetPlayer), false);
+                    return;
+                }
+
+                new ChatMsgModel(msgToWhisper, target.getPlayerID()).send();
+                if (EClientInformation.INSTANCE.getPlayerID() != target.getPlayerID())
+                {
+                    this.addChatMsgToScrollPane(EClientInformation.INSTANCE.getPlayerID(), msgToWhisper, true);
+                }
+
+                l.debug("Whispering to {}.", targetPlayer);
+
+                return;
             }
 
-            continue;
+            if (this.getCommand(token).equals("h"))
+            {
+                this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "Commands:", false);
+                this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "/h - Show this help.", false);
+                this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, "/w [\"player name\"] [msg] - Whisper to a player.", false);
+                return;
+            }
+
+            this.addChatMsgToScrollPane(ChatMsgModel.CLIENT_ID, String.format("Unknown command: %s", this.getCommand(token)), false);
+
+            return;
         }
 
-        this.playerRobotSelectorArea.getChildren().add(hTop);
-        this.playerRobotSelectorArea.getChildren().add(hBot);
-
-        // TODO This is highly experimental. But Platform.runLater() does not work (and ofc setting it
-        //      directly does not work either). Duration has to be increased on slower hardware.
-        PauseTransition p = new PauseTransition(Duration.millis(15));
-        p.setOnFinished(f -> this.formScrollPane.setVvalue(scrollPos));
-        p.play();
-
-        return;
-    }
-
-    public void onPlayerRemoved()
-    {
-        Platform.runLater(() ->
+        if (!this.isChatMsgValid(token))
         {
-            this.updateView();
             return;
-        });
+        }
+
+        new ChatMsgModel(token, ChatMsgModel.CHAT_MSG_BROADCAST).send();
 
         return;
     }
@@ -760,9 +656,10 @@ public final class LobbyJFXController_v2
         }
         this.bReadyBtnClicked = true;
 
-        // TODO Some input validation needed.
+        /* TODO Some input validation needed. */
         l.debug("Player wants to be {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "not ready" : "ready");
         new SetStatusModel(!Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady()).send();
+
         return;
     }
 
@@ -771,10 +668,27 @@ public final class LobbyJFXController_v2
     {
         l.debug("Client wants to add a bot to this session.");
         EClientInformation.INSTANCE.sendAddAgentRequest();
+
         return;
     }
 
+    // endregion Game Events
+
     // region Getters and Setters
+
+    private Node createHSpacer()
+    {
+        final Region s = new Region();
+        HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
+        return s;
+    }
 
     private String getCommand(final String token)
     {
