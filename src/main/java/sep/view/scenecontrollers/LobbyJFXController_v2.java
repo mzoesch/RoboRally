@@ -1,16 +1,16 @@
 package sep.view.scenecontrollers;
 
-import sep.view.json.lobby.PlayerValuesModel;
-import sep.view.lib.EFigure;
-import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.clientcontroller.GameInstance;
-import sep.view.clientcontroller.EGameState;
-import sep.view.json.ChatMsgModel;
-import sep.view.clientcontroller.RemotePlayer;
-import sep.view.clientcontroller.EClientInformation;
-import sep.view.json.lobby.SetStatusModel;
-import sep.view.json.lobby.CourseSelectedModel;
-import sep.view.viewcontroller.SceneController;
+import sep.view.json.lobby.         PlayerValuesModel;
+import sep.view.json.lobby.         SetStatusModel;
+import sep.view.json.lobby.         CourseSelectedModel;
+import sep.view.lib.                EFigure;
+import sep.view.clientcontroller.   GameInstance;
+import sep.view.clientcontroller.   EGameState;
+import sep.view.clientcontroller.   RemotePlayer;
+import sep.view.clientcontroller.   EClientInformation;
+import sep.view.json.               ChatMsgModel;
+import sep.view.viewcontroller.     ViewSupervisor;
+import sep.view.viewcontroller.     SceneController;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -42,45 +42,51 @@ public final class LobbyJFXController_v2
 
     private boolean bReadyBtnClicked;
     private boolean bSelectBtnClicked;
+    private boolean     bReadyBtnClicked;
+    private boolean     bSelectBtnClicked;
 
     public LobbyJFXController_v2()
     {
         super();
         this.bReadyBtnClicked = false;
         this.bSelectBtnClicked = false;
+
+        this.bReadyBtnClicked   = false;
+        this.bSelectBtnClicked  = false;
         return;
     }
 
-    @FXML private VBox playersInSessionLabelContainer;
-    @FXML private Label serverCourseLabel;
-    @FXML private VBox serverCourseSelectorArea;
-    @FXML private Button readyButton;
-    @FXML private VBox playerListContainer;
-    @FXML private VBox readyLabelContainerWrapper;
-    @FXML private ScrollPane formScrollPane;
-    @FXML private VBox formArea;
-    @FXML private Label sessionIDLabel;
-    @FXML private TextField lobbyMsgInputTextField;
-    @FXML private ScrollPane lobbyMsgScrollPane;
+    @FXML private VBox          playersInSessionLabelContainer;
+    @FXML private Label         serverCourseLabel;
+    @FXML private VBox          serverCourseSelectorArea;
+    @FXML private Button        readyButton;
+    @FXML private VBox          playerListContainer;
+    @FXML private VBox          readyLabelContainerWrapper;
+    @FXML private ScrollPane    formScrollPane;
+    @FXML private VBox          formArea;
+    @FXML private Label         sessionIDLabel;
+    @FXML private TextField     lobbyMsgInputTextField;
+    @FXML private ScrollPane    lobbyMsgScrollPane;
+    @FXML private VBox          playerNameContainer;
+    @FXML private TextField     playerNameField;
+    @FXML private Label         formErrorLabel;
+    @FXML private HBox          playerRobotsSelectorContainer;
+    @FXML private VBox          playerRobotSelectorArea;
+    @FXML private HBox          readyLabelContainer;
+
     private VBox lobbyMsgContainer;
-    @FXML private VBox playerNameContainer;
-    @FXML private TextField playerNameField;
-    @FXML private Label formErrorLabel;
-    @FXML private HBox playerRobotsSelectorContainer;
-    @FXML private VBox playerRobotSelectorArea;
-    @FXML private HBox readyLabelContainer;
 
     @FXML
     private void initialize()
     {
-        HBox.setHgrow(this.playersInSessionLabelContainer, Priority.ALWAYS);
-        HBox.setHgrow(this.playerNameContainer, Priority.ALWAYS);
-        VBox.setVgrow(this.lobbyMsgScrollPane, Priority.ALWAYS);
-        HBox.setHgrow(this.readyLabelContainer, Priority.ALWAYS);
-        HBox.setHgrow(this.readyLabelContainerWrapper, Priority.ALWAYS);
+        HBox.setHgrow(  this.playersInSessionLabelContainer,    Priority.ALWAYS );
+        HBox.setHgrow(  this.playerNameContainer,               Priority.ALWAYS );
+        VBox.setVgrow(  this.lobbyMsgScrollPane,                Priority.ALWAYS );
+        HBox.setHgrow(  this.readyLabelContainer,               Priority.ALWAYS );
+        HBox.setHgrow(  this.readyLabelContainerWrapper,        Priority.ALWAYS );
 
-        this.readyLabelContainerWrapper.getChildren().add(1, this.createVSpacer());
-        this.readyLabelContainer.getChildren().add(1, this.createHSpacer());
+        this.readyLabelContainerWrapper .getChildren().add(1, this.createVSpacer());
+        this.readyLabelContainer        .getChildren().add(1, this.createHSpacer());
 
         this.lobbyMsgInputTextField.lengthProperty().addListener(
         new ChangeListener<Number>()
@@ -97,8 +103,8 @@ public final class LobbyJFXController_v2
             }
         });
 
-        this.lobbyMsgInputTextField.setOnKeyPressed(
-        (keyEvent ->
+        this.lobbyMsgInputTextField.setOnKeyPressed((
+        keyEvent ->
         {
             if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.ENTER)
             {
@@ -106,8 +112,8 @@ public final class LobbyJFXController_v2
             }
 
             return;
-        })
-        );
+        }
+        ));
 
         this.updateView();
 
@@ -122,17 +128,17 @@ public final class LobbyJFXController_v2
 
         this.updateAvailableCourses();
 
-        boolean bSuccess = false;
+        final boolean bSuccess;
         try
         {
             bSuccess = GameInstance.connectToSessionPostLogin();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             ViewSupervisor.getSceneController().killCurrentScreen();
             return;
         }
-        catch (JSONException e)
+        catch (final JSONException e)
         {
             l.error("Client did not understand the server's JSON.");
             l.error(e.getMessage());
