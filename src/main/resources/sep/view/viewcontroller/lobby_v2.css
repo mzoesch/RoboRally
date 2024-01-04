@@ -23,6 +23,10 @@
     -fx-background-color: rgba(0, 34, 255, 0.1);
 }
 
+#player-name-form-container-top-spacer {
+    -fx-min-height: 16px;
+}
+
 #player-name-form-container {
     -fx-spacing: 8px;
     -fx-alignment: center;
