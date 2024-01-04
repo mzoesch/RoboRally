@@ -79,13 +79,6 @@ public final class MainMenuJFXController
     }
 
     @FXML
-    public void onPopUpTestBtn(final ActionEvent actionEvent)
-    {
-        ViewSupervisor.createPopUp(new RPopUpMask(EPopUp.ERROR, "Test", "This is a test pop up."));
-        return;
-    }
-
-    @FXML
     private void onExitBtn(final ActionEvent actionEvent)
     {
         GameInstance.kill();
