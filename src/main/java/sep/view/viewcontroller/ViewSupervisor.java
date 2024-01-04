@@ -97,7 +97,7 @@ public final class ViewSupervisor extends Application
 
         if (ctrl instanceof final LobbyJFXController_v2 lCtrl)
         {
-            lCtrl.handleChatMessage(dsrp.getChatMsgSourceID(), dsrp.getChatMsg(), dsrp.isChatMsgPrivate());
+            lCtrl.onChatMsg(dsrp.getChatMsgSourceID(), dsrp.getChatMsg(), dsrp.isChatMsgPrivate());
             return;
         }
 
@@ -118,7 +118,7 @@ public final class ViewSupervisor extends Application
 
         if (ctrl instanceof final LobbyJFXController_v2 lCtrl)
         {
-            lCtrl.handleChatMessage(ChatMsgModel.SERVER_ID, info, false);
+            lCtrl.onChatMsg(ChatMsgModel.SERVER_ID, info, false);
             return;
         }
 
