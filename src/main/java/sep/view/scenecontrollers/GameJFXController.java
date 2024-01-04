@@ -63,7 +63,6 @@ public final class GameJFXController
     private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
     private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT             = 15    ;
-    private static final int    CENTERING_SCROLL_TIMEOUT        = 2_000 ;
     private static final int    GEAR_ANIMATION_DURATION         = 1_000 ;
 
     @FXML private Label         UIHeaderPhaseLabel;
@@ -165,7 +164,7 @@ public final class GameJFXController
 
         this.renderView();
 
-        this.centerCourseLater();
+        this.onCenterCourse();
 
         this.chatContainer = new VBox();
         this.chatContainer.setId("chat-scroll-pane-inner");
@@ -1685,20 +1684,6 @@ public final class GameJFXController
         return;
     }
 
-    /** TODO Highly sketchy. Needs some testing. */
-    private void centerCourseLater()
-    {
-        final PauseTransition p = new PauseTransition(new Duration(GameJFXController.CENTERING_SCROLL_TIMEOUT));
-        p.setOnFinished(e ->
-        {
-            this.centerCourse();
-            return;
-        });
-        p.play();
-
-        return;
-    }
-
     private void updateGlobalVariables()
     {
         /* We can do this because even if there is no tile, it must always be annotated with a null JSON Object. */
@@ -2175,6 +2160,17 @@ public final class GameJFXController
         {
             this.bFooterCollapsed = bCollapsed;
             this.renderHUDFooter();
+            return;
+        });
+
+        return;
+    }
+
+    private void onCenterCourse()
+    {
+        Platform.runLater(() ->
+        {
+            this.centerCourse();
             return;
         });
 
