@@ -1,29 +1,30 @@
 package sep.view.scenecontrollers;
 
-import sep.EArgs;
-import sep.view.clientcontroller.GameInstance;
-import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.viewcontroller.SceneController;
-import sep.view.clientcontroller.EGameState;
-import sep.view.clientcontroller.EClientInformation;
-import sep.view.lib.RPopUpMask;
-import sep.view.lib.EPopUp;
+import sep.view.viewcontroller.     ViewSupervisor;
+import sep.view.viewcontroller.     SceneController;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
+import sep.view.clientcontroller.   GameInstance;
+import sep.view.clientcontroller.   EGameState;
+import sep.view.clientcontroller.   EClientInformation;
+import sep.                         EArgs;
+import sep.                         Types;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Label;
-import java.io.IOException;
+import javafx.scene.control.    TextField;
+import javafx.scene.control.    Label;
+import javafx.event.            ActionEvent;
+import java.io.                 IOException;
+import javafx.fxml.             FXML;
 
-// TODO Some sort of loading screen while connecting to server. The server connection is blocking the JFX Thread.
-public class MainMenuJFXController
+/* TODO Some sort of loading screen while connecting to server. The server connection is blocking the JFX Thread. */
+public final class MainMenuJFXController
 {
-    @FXML private TextField serverAddressField;
-    @FXML private TextField sessionIDField;
-    @FXML private Label sessionJoinErrorField;
+    @FXML private TextField     serverAddressField;
+    @FXML private TextField     sessionIDField;
+    @FXML private Label         sessionJoinErrorField;
 
     @FXML
-    protected void onHostBtn(ActionEvent actionEvent) throws IOException
+    private void onHostBtn(final ActionEvent actionEvent) throws IOException
     {
         if (this.isServerAddressInvalid())
         {
@@ -47,7 +48,7 @@ public class MainMenuJFXController
     }
 
     @FXML
-    protected void onJoinBtn(ActionEvent actionEvent) throws IOException
+    private void onJoinBtn(final ActionEvent actionEvent) throws IOException
     {
         if (this.isServerAddressInvalid())
         {
@@ -85,7 +86,7 @@ public class MainMenuJFXController
     }
 
     @FXML
-    protected void onExitBtn(ActionEvent actionEvent)
+    private void onExitBtn(final ActionEvent actionEvent)
     {
         GameInstance.kill();
         return;
@@ -94,7 +95,7 @@ public class MainMenuJFXController
     @FXML
     private void initialize()
     {
-        // TODO Un focus session ID field. It's annoying. See this fxml file for more information.
+        /* TODO Un-focus session ID field. It's annoying. See this associated FXML file for more information. */
         return;
     }
 
@@ -102,7 +103,8 @@ public class MainMenuJFXController
     {
         if (!(this.serverAddressField.getText().isEmpty() || this.serverAddressField.getText().isBlank()))
         {
-            String[] tokens = this.serverAddressField.getText().split(":");
+            final String[] tokens = this.serverAddressField.getText().split(":");
+
             if (tokens.length != 2)
             {
                 this.sessionJoinErrorField.setText("Server address is invalid.");
@@ -122,16 +124,17 @@ public class MainMenuJFXController
             }
 
             EClientInformation.INSTANCE.setServerIP(tokens[0]);
+
             try
             {
-                if (Integer.parseInt(tokens[1]) < sep.Types.EPort.MIN.i || Integer.parseInt(tokens[1]) > sep.Types.EPort.MAX.i)
+                if (Integer.parseInt(tokens[1]) < Types.EPort.MIN.i || Integer.parseInt(tokens[1]) > Types.EPort.MAX.i)
                 {
                     this.sessionJoinErrorField.setText("Server port is invalid.");
                     return true;
                 }
                 EClientInformation.INSTANCE.setServerPort(Integer.parseInt(tokens[1]));
             }
-            catch (NumberFormatException e)
+            catch (final NumberFormatException e)
             {
                 this.sessionJoinErrorField.setText("Server port is invalid.");
                 return true;
