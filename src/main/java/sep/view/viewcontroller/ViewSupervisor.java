@@ -173,7 +173,7 @@ public final class ViewSupervisor extends Application
 
         if (ctrl instanceof final LobbyJFXController_v2 lCtrl)
         {
-            lCtrl.updatePlayerSelection();
+            lCtrl.onPlayerSelectionUpdate();
             return;
         }
 
