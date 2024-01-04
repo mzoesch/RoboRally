@@ -50,6 +50,9 @@
                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
                     >
                         <children>
+                            <HBox
+                                id="player-name-form-container-top-spacer" stylesheets="@lobby_v2.css"
+                            />
                             <VBox
                                 id="player-name-form-container" stylesheets="@lobby_v2.css"
                                 fx:id="playerNameContainer"
