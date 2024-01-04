@@ -85,6 +85,7 @@
     -fx-border-width: 1px;
     -fx-background-radius: 3px;
     -fx-alignment: center;
+    -fx-min-width: 230px;
 }
 
 #player-robot-selector-container {
