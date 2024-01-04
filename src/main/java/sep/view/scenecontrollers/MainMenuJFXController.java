@@ -16,7 +16,6 @@ import javafx.scene.control.Label;
 import java.io.IOException;
 
 // TODO Some sort of loading screen while connecting to server. The server connection is blocking the JFX Thread.
-/** JavaFX controller for the main menu screen. Handles session creation and joining. */
 public class MainMenuJFXController
 {
     @FXML private TextField serverAddressField;
