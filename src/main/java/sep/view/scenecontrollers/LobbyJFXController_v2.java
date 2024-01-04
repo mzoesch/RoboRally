@@ -12,47 +12,46 @@ import sep.view.json.               ChatMsgModel;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.scene.control.ScrollPane;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import java.io.IOException;
-import java.util.Objects;
-import javafx.scene.input.KeyCode;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import javafx.scene.Node;
-import javafx.scene.layout.Region;
-import javafx.beans.binding.Bindings;
-import javafx.util.Duration;
-import javafx.animation.PauseTransition;
-import javafx.event.ActionEvent;
-import org.json.JSONException;
+import javafx.application.          Platform;
+import javafx.fxml.                 FXML;
+import javafx.scene.control.        ScrollPane;
+import javafx.scene.control.        Button;
+import javafx.scene.control.        TextField;
+import javafx.scene.control.        Label;
+import javafx.scene.layout.         Priority;
+import javafx.scene.layout.         HBox;
+import javafx.scene.layout.         VBox;
+import javafx.scene.                Node;
+import javafx.beans.binding.        Bindings;
+import java.io.                     IOException;
+import javafx.scene.input.          KeyCode;
+import java.util.                   Objects;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import javafx.beans.value.          ChangeListener;
+import javafx.beans.value.          ObservableValue;
+import javafx.util.                 Duration;
+import javafx.animation.            PauseTransition;
+import org.json.                    JSONException;
+import javafx.event.                ActionEvent;
+import javafx.scene.layout.         Region;
 
 public final class LobbyJFXController_v2
 {
     private static final Logger l = LogManager.getLogger(LobbyJFXController_v2.class);
 
-    private boolean bReadyBtnClicked;
-    private boolean bSelectBtnClicked;
+    private static final int SCROLL_TO_END_DELAY = 15;
+
     private boolean     bReadyBtnClicked;
     private boolean     bSelectBtnClicked;
 
     public LobbyJFXController_v2()
     {
         super();
-        this.bReadyBtnClicked = false;
-        this.bSelectBtnClicked = false;
 
         this.bReadyBtnClicked   = false;
         this.bSelectBtnClicked  = false;
+
         return;
     }
 
@@ -501,7 +500,80 @@ public final class LobbyJFXController_v2
         return;
     }
 
-    public void updateAvailableCourses(boolean bScrollToEnd)
+    private void updateView()
+    {
+        this.addPlayerRobotSelector_v2();
+        this.updatePlayersInSession();
+        this.updateReadyBtn();
+        this.updateSessionCourseLabel();
+
+        return;
+    }
+
+    // endregion Rendering Methods
+
+    // region Update Methods
+
+    public void onCourseSelected()
+    {
+        Platform.runLater(() ->
+        {
+            this.onAvailableCourseUpdate();
+            return;
+        });
+
+        return;
+    }
+
+    public void onPlayerStatusUpdate()
+    {
+        Platform.runLater(() ->
+        {
+            this.updateView();
+            return;
+        });
+
+        return;
+    }
+
+    public void onPlayerSelectionUpdate()
+    {
+        Platform.runLater(() ->
+        {
+            this.updateView();
+            return;
+        });
+    }
+
+    public void onChatMsg(final int sourceID, final String msg, final boolean bIsPrivate)
+    {
+        Platform.runLater(() ->
+        {
+            this.addChatMsgToScrollPane(sourceID, msg, bIsPrivate);
+            return;
+        });
+
+        return;
+    }
+
+    public void onPlayerRemoved()
+    {
+        Platform.runLater(() ->
+        {
+            this.updateView();
+            return;
+        });
+
+        return;
+    }
+
+    public void onAvailableCourseUpdate()
+    {
+        this.onAvailableCourseUpdate(false);
+        return;
+    }
+
+    public void onAvailableCourseUpdate(final boolean bScrollToEnd)
     {
         this.bSelectBtnClicked = false;
 
