@@ -209,7 +209,7 @@ public final class ViewSupervisor extends Application
     {
         try
         {
-            ( (LobbyJFXController_v2) ViewSupervisor.getSceneController().getCurrentController() ).updateCourseSelected();
+            ( (LobbyJFXController_v2) ViewSupervisor.getSceneController().getCurrentController() ).onCourseSelected();
             return;
         }
         catch (final ClassCastException e)
