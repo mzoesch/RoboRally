@@ -458,10 +458,7 @@ public final class ServerListener implements Runnable
         EGameState.INSTANCE.setShopState(EShopState.DAMAGE);
         EGameState.INSTANCE.setDamageCardsCountToDraw(this.dsrp.getDamageCardsCountToDraw());
         String [] availableCards = this.dsrp.getAvailableDamagePilesToDraw();
-        for(int i = 0; i < availableCards.length; i++) {
-            EGameState.INSTANCE.addShopSlot(i, availableCards[i]);
-        }
-        ViewSupervisor.updateFooter();
+        ViewSupervisor.createDamageCardSelectionDialogLater(this.dsrp.getAvailableDamagePilesToDraw(),this.dsrp.getDamageCardsCountToDraw());
         return true;
     }
 

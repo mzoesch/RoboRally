@@ -279,3 +279,19 @@
     -fx-max-width: 800px;
     -fx-max-height: 200px;
 }
+
+#damage-card-selection-dialog-container{
+    -fx-background-color: rgba(43, 42, 51, 0.95);
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 600px;
+    -fx-min-height: 300px;
+    -fx-max-width: 1600px;
+    -fx-max-height: 300px;
+}
+#damage-card-selection-dialog-body{
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
