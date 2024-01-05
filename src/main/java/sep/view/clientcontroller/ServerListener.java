@@ -210,7 +210,10 @@ public final class ServerListener implements Runnable
     public boolean onPhaseChange() throws JSONException
     {
         l.debug("Game phase has changed. New phase: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
-        ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
+        //TODO entfernen, sobald UpgradePhase spielbar
+        if(this.dsrp.getPhase() != 1) {
+            ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
+        }
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
         return true;
     }
