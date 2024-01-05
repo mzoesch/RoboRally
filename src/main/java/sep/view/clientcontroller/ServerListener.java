@@ -21,6 +21,8 @@ import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
 
+import javax.swing.text.View;
+
 /**
  * We create a special object for listening to the server socket on a separate
  * thread to avoid blocking the main thread of the application.
@@ -208,6 +210,7 @@ public final class ServerListener implements Runnable
     public boolean onPhaseChange() throws JSONException
     {
         l.debug("Game phase has changed. New phase: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
+        ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
         return true;
     }

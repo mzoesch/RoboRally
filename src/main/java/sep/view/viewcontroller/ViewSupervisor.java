@@ -1,6 +1,7 @@
 package sep.view.viewcontroller;
 
 import sep.Types;
+import sep.view.lib.EGamePhase;
 import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
 import sep.view.json.               ChatMsgModel;
@@ -521,6 +522,52 @@ public final class ViewSupervisor extends Application
             ViewSupervisor.createRebootDialog();
             return;
         });
+
+        return;
+    }
+
+    public static void createPhaseUpdatePopUpLater(EGamePhase newPhase)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createPhaseUpdatePopUp(newPhase);
+            return;
+        });
+
+        return;
+    }
+
+    public static void createPhaseUpdatePopUp(EGamePhase newPhase)
+    {
+        final HBox h = new HBox();
+        h.setAlignment(javafx.geometry.Pos.CENTER);
+
+        final Label header = new Label(newPhase.name());
+        header.getStyleClass().add("text-xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 50.0     );
+
+        final HBox form = new HBox();
+        form.setId("reboot-dialog-body");
+
+        AnchorPane.setLeftAnchor(       form, 0.0      );
+        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setBottomAnchor(     form, 50.0      );
+
+        final AnchorPane p = new AnchorPane(header, form);
+        p.setId("reboot-dialog-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h, 2000);
 
         return;
     }
