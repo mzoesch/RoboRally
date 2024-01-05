@@ -554,12 +554,11 @@ public final class ViewSupervisor extends Application
         AnchorPane.setTopAnchor(        header, 50.0     );
 
         final Label form = new Label(newPhase.phaseDescription());
-        l.debug("Show PopUpText" + newPhase.phaseDescription());
         form.getStyleClass().add("text-base");
         form.setStyle("-fx-alignment: center;");
 
-        AnchorPane.setLeftAnchor(       form, 0.0      );
-        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setLeftAnchor(       form, 10.0      );
+        AnchorPane.setRightAnchor(      form, 10.0      );
         AnchorPane.setBottomAnchor(     form, 50.0      );
 
         final AnchorPane p = new AnchorPane(header, form);
@@ -642,6 +641,53 @@ public final class ViewSupervisor extends Application
             ViewSupervisor.createDamageCardSelectionDialog(availableCards, countToDraw);
             return;
         });
+
+        return;
+    }
+
+    public static void createDrawDamagePopUpLater(String drawnCards)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createDrawDamagePopUp(drawnCards);
+            return;
+        });
+
+        return;
+    }
+
+    public static void createDrawDamagePopUp(String drawnCards)
+    {
+        final HBox h = new HBox();
+        h.setAlignment(javafx.geometry.Pos.CENTER);
+
+        final Label header = new Label("Damage Cards drawn");
+        header.getStyleClass().add("text-xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 50.0     );
+
+        final Label form = new Label("You have drawn following damage cards: " + drawnCards);
+        form.getStyleClass().add("text-base");
+        form.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       form, 0.0      );
+        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setBottomAnchor(     form, 50.0      );
+
+        final AnchorPane p = new AnchorPane(header, form);
+        p.setId("phase-update-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h, 2000);
 
         return;
     }

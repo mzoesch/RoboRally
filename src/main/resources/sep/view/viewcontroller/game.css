@@ -274,9 +274,9 @@
     -fx-border-color: #ffffff;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-min-width: 400px;
+    -fx-min-width: 500px;
     -fx-min-height: 200px;
-    -fx-max-width: 800px;
+    -fx-max-width: 1000px;
     -fx-max-height: 200px;
 }
 
