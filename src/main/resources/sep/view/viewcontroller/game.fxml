@@ -67,6 +67,16 @@
                     fx:id="footerBtn"
                     AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"
                 />
+                <Label
+                        text="Registers"
+                        styleClass="text-base"
+                        AnchorPane.leftAnchor="10.0" AnchorPane.bottomAnchor="0.0"
+                    />
+                <Label
+                        text="Handcards"
+                        styleClass="text-base"
+                        AnchorPane.leftAnchor="575.0" AnchorPane.bottomAnchor="0.0"
+                />
                 <AnchorPane
                     id="register-container" stylesheets="@game.css"
                     fx:id="registerContainer"
