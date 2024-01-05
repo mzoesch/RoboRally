@@ -28,12 +28,12 @@ public record RRotation(int rotation)
     {
         if (r.equals("clockwise"))
         {
-            return new RRotation((this.rotation + 90) % 360);
+            return new RRotation(this.rotation + 90);
         }
 
         if (r.equals("counterclockwise"))
         {
-            return new RRotation((this.rotation + 270) % 360);
+            return new RRotation(this.rotation + -90);
         }
 
         /* Legacy */
@@ -87,29 +87,53 @@ public record RRotation(int rotation)
         return String.format("%d", this.rotation);
     }
 
+    private static int normalize(final int inR)
+    {
+        final int r = (inR % 360 + 360) % 360;
+
+        if (r >= 315 || r < 45)
+        {
+            return 0;
+        }
+
+        if (r < 135)
+        {
+            return 90;
+        }
+
+        if (r < 225)
+        {
+            return 180;
+        }
+
+        return 270;
+    }
+
     public ERotation toEnum()
     {
-        if (this.rotation == 0)
+        final int r = RRotation.normalize(this.rotation);
+
+        if (r == 0)
         {
             return ERotation.NORTH;
         }
 
-        if (this.rotation == 90)
+        if (r == 90)
         {
             return ERotation.EAST;
         }
 
-        if (this.rotation == 180)
+        if (r == 180)
         {
             return ERotation.SOUTH;
         }
 
-        if (this.rotation == 270)
+        if (r == 270)
         {
             return ERotation.WEST;
         }
 
-        l.error("Invalid rotation: {}", this.rotation);
+        l.error("Invalid rotation: {}, normalized: {}.", this.rotation, r);
         return null;
     }
 
