@@ -210,8 +210,6 @@ public final class RobotView
         final ERotation rot                   = this.rotation.toEnum();
         final ArrayList<RLaserMask> masks     = new ArrayList<RLaserMask>();
 
-        System.out.printf("Player rotation: %s\n", rot);
-
         if (rot == null)
         {
             l.warn("Tried to animate a robot shooting with an invalid rotation.");
