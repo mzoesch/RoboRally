@@ -25,25 +25,25 @@ public final class RobotView
 
     private final RemotePlayer possessor;
 
-    // TODO To Remove. We want to calculate the pos with the given iv maybe?
-    RCoordinate position;
-    RRotation rotation;
+    /* TODO To Remove. We want to calculate the pos with the given iv maybe? */
+    private RCoordinate position;
+    private RRotation   rotation;
 
-    ImageView iv;
+    private ImageView   iv;
     /** The actual item in the view. */
-    AnchorPane ap;
+    private AnchorPane  ap;
 
-    boolean bIsNextRotationLerp;
+    private boolean     bIsNextRotationLerp;
 
-    public RobotView(RemotePlayer possessor)
+    public RobotView(final RemotePlayer possessor)
     {
         super();
-        this.possessor = possessor;
-        this.position = null;
-        this.rotation = null;
+        this.possessor  = possessor;
+        this.position   = null;
+        this.rotation   = null;
 
-        this.iv = null;
-        this.ap = null;
+        this.iv     = null;
+        this.ap     = null;
 
         this.bIsNextRotationLerp = false;
 
