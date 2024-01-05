@@ -529,6 +529,10 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * Gateway-method to create a PhaseUpdatePopUp from outside ViewSupervisor
+     * @param newPhase phase, which should be shown
+     */
     public static void createPhaseUpdatePopUpLater(EGamePhase newPhase)
     {
         Platform.runLater(() ->
@@ -540,6 +544,10 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * method to create an PopUp with the new GamePhase (auto-deletes after 2000 ms)
+     * @param newPhase phase, which should be shown
+     */
     public static void createPhaseUpdatePopUp(EGamePhase newPhase)
     {
         final HBox h = new HBox();
@@ -576,6 +584,12 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * method to create a DamageCardSelectionDialog. The player can select the cards by clicking on buttons.
+     * PopUp auto-deletes after the right ammount of cards has been chosen
+     * @param availableCards available piles of damageCards
+     * @param countToDraw ammount of cards to draw
+     */
     public static void createDamageCardSelectionDialog(String[] availableCards, final int countToDraw)
     {
         ArrayList<String> selectedCards = new ArrayList<>();
@@ -634,6 +648,11 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * Gateway-method to create a DamageCardSelectionDialog from outside ViewSupervisor
+     * @param availableCards available piles of damageCards
+     * @param countToDraw ammount of cards to draw
+     */
     public static void createDamageCardSelectionDialogLater(String[] availableCards, int countToDraw)
     {
         Platform.runLater(() ->
@@ -645,6 +664,10 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * Gateway-method to create a drawDamagePopUp from outside ViewSupervisor
+     * @param drawnCards all drawn damageCards as one String
+     */
     public static void createDrawDamagePopUpLater(String drawnCards)
     {
         Platform.runLater(() ->
@@ -656,6 +679,10 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * method to create a drawDamagePopUp to inform the player about the damageCards drawn (auto-deletes after 2000 ms)
+     * @param drawnCards all drawn damageCards as one String
+     */
     public static void createDrawDamagePopUp(String drawnCards)
     {
         final HBox h = new HBox();
