@@ -550,15 +550,17 @@ public final class ViewSupervisor extends Application
         AnchorPane.setRightAnchor(      header, 0.0      );
         AnchorPane.setTopAnchor(        header, 50.0     );
 
-        final HBox form = new HBox();
-        form.setId("reboot-dialog-body");
+        final Label form = new Label(newPhase.phaseDescription());
+        l.debug("Show PopUpText" + newPhase.phaseDescription());
+        form.getStyleClass().add("text-base");
+        form.setStyle("-fx-alignment: center;");
 
         AnchorPane.setLeftAnchor(       form, 0.0      );
         AnchorPane.setRightAnchor(      form, 0.0      );
         AnchorPane.setBottomAnchor(     form, 50.0      );
 
         final AnchorPane p = new AnchorPane(header, form);
-        p.setId("reboot-dialog-container");
+        p.setId("phase-update-container");
 
         h.getChildren().add(p);
 

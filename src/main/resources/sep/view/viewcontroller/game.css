@@ -251,9 +251,9 @@
     -fx-border-color: #ffffff;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-min-width: 800px;
+    -fx-min-width: 600px;
     -fx-min-height: 300px;
-    -fx-max-width: 800px;
+    -fx-max-width: 900px;
     -fx-max-height: 300px;
 }
 
@@ -266,4 +266,16 @@
     -fx-min-width: 170px;
     -fx-max-width: 170px;
     -fx-wrap-text: false;
+}
+
+#phase-update-container {
+    -fx-background-color: rgba(43, 42, 51, 0.95);
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 400px;
+    -fx-min-height: 200px;
+    -fx-max-width: 800px;
+    -fx-max-height: 200px;
 }
