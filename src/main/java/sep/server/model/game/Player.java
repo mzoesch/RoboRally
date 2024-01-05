@@ -172,7 +172,9 @@ public class Player {
 
         IPlayableCard newCardFromDeck = playerDeck.remove(0);
         setCardInRegister(currentRoundNumber, newCardFromDeck);
-        newCardFromDeck.playCard(this, currentRoundNumber);
+
+        if (newCardFromDeck != null) {
+        newCardFromDeck.playCard(this, currentRoundNumber);}
 
         String newCardString = newCardFromDeck.getCardType();
         getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
