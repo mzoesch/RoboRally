@@ -373,8 +373,10 @@ public final class ServerListener implements Runnable
             return true;
         }
 
-        String info = String.format("Player %s received following card %s as replacement.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getNewCard());
-        ViewSupervisor.handleChatInfo(info);
+        if ((EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())) != null) {
+            String info = String.format("Player %s received following card %s as replacement.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getNewCard());
+            ViewSupervisor.handleChatInfo(info);
+        }
 
         return true;
     }
@@ -479,6 +481,7 @@ public final class ServerListener implements Runnable
 
         if (this.serverReq.containsKey(this.dsrp.getType_v2()))
         {
+
             if (this.serverReq.get(this.dsrp.getType_v2()).get())
             {
                 this.dsrp = null;
