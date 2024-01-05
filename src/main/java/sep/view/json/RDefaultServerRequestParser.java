@@ -143,7 +143,12 @@ public record RDefaultServerRequestParser(JSONObject request)
 
     public String getActiveCardFromIdx(final int idx) throws JSONException
     {
-        return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getString("card");
+        if (this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).has("card"))
+        {
+            return this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(idx).getString("card");
+        }
+
+        return null;
     }
 
     public int getPlayerIDFromActiveCardIdx(final int idx) throws JSONException
