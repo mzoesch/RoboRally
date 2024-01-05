@@ -880,45 +880,6 @@ public final class GameJFXController
 
     // endregion Got Register Slot Action Methods
 
-    // region Shop Slot Action Methods
-
-    private void onShopSlotClicked(int idx) {
-        if (EGameState.INSTANCE.getShopState() == EShopState.DEACTIVATED) {
-            l.debug("Player clicked on a empty Shop Slot");
-            return;
-        }
-        else if (EGameState.INSTANCE.getShopState() == EShopState.REBOOT){
-            RebootDirectionModel reboot = new RebootDirectionModel(EGameState.INSTANCE.getShopSlot(idx));
-            reboot.send();
-            l.debug("Player clicked on {} shop slot. RebootDirection {} has been sent.", idx, EGameState.INSTANCE.getShopSlot(idx));
-            EGameState.INSTANCE.clearShopSlots();
-            EGameState.INSTANCE.setShopState(EShopState.DEACTIVATED);
-            ViewSupervisor.updateFooter();
-        } else if (EGameState.INSTANCE.getShopState() == EShopState.DAMAGE){
-            if(EGameState.INSTANCE.getDamageCardsCountToDraw() > 1){
-                EGameState.INSTANCE.addSelectedDamageCards(idx, EGameState.INSTANCE.getShopSlot(idx));
-                EGameState.INSTANCE.subtractDamageCardsCountsToDrawByOne();
-                l.debug("DamageCard selected. You need to select {} more", EGameState.INSTANCE.getDamageCardsCountToDraw());
-                ViewSupervisor.handleChatInfo(String.format("You selected a damageCard. You need to select %s more", EGameState.INSTANCE.getDamageCardsCountToDraw()));
-                ViewSupervisor.updateFooter();
-            } else{
-                EGameState.INSTANCE.addSelectedDamageCards(idx, EGameState.INSTANCE.getShopSlot(idx));
-                SelectedDamageModel damageModel = new SelectedDamageModel(EGameState.INSTANCE.getSelectedDamageCards());
-                damageModel.send();
-                EGameState.INSTANCE.setDamageCardsCountToDraw(0);
-                EGameState.INSTANCE.clearSelectedDamageCards();
-                EGameState.INSTANCE.setShopState(EShopState.DEACTIVATED);
-                EGameState.INSTANCE.clearShopSlots();
-                l.debug("Selection of DamageCard finished. DamageCards have been sent");
-                ViewSupervisor.handleChatInfo("Selection of DamageCard finished. DamageCards have been sent");
-                ViewSupervisor.updateFooter();
-            }
-        }
-
-    }
-
-    // endregion Shop Slot Action Methods
-
     // region Chat
 
     private void scrollChatToEnd()
@@ -1310,143 +1271,6 @@ public final class GameJFXController
         return;
     }
 
-    private void renderGotTemporaryUpgradeCardSlot(final int idx, final String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName);
-//
-//        switch (idx) {
-//            case 0:
-//                this.gotTemporaryUpgradeCardSlot1.getChildren().clear();
-//                this.gotTemporaryUpgradeCardSlot1.getChildren().add(iv);
-//                this.gotTemporaryUpgradeCardSlot1.getStyleClass().clear();
-//                this.gotTemporaryUpgradeCardSlot1.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 1:
-//                this.gotTemporaryUpgradeCardSlot2.getChildren().clear();
-//                this.gotTemporaryUpgradeCardSlot2.getChildren().add(iv);
-//                this.gotTemporaryUpgradeCardSlot2.getStyleClass().clear();
-//                this.gotTemporaryUpgradeCardSlot2.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 2:
-//                this.gotTemporaryUpgradeCardSlot3.getChildren().clear();
-//                this.gotTemporaryUpgradeCardSlot3.getChildren().add(iv);
-//                this.gotTemporaryUpgradeCardSlot3.getStyleClass().clear();
-//                this.gotTemporaryUpgradeCardSlot3.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//        }
-
-        return;
-    }
-
-    private void renderGotPermanentUpgradeCardSlot(final int idx, final String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH, ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT, cardName);
-
-//        switch (idx) {
-//            case 0:
-//                this.gotPermanentUpgradeCardSlot1.getChildren().clear();
-//                this.gotPermanentUpgradeCardSlot1.getChildren().add(iv);
-//                this.gotPermanentUpgradeCardSlot1.getStyleClass().clear();
-//                this.gotPermanentUpgradeCardSlot1.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 1:
-//                this.gotPermanentUpgradeCardSlot2.getChildren().clear();
-//                this.gotPermanentUpgradeCardSlot2.getChildren().add(iv);
-//                this.gotPermanentUpgradeCardSlot2.getStyleClass().clear();
-//                this.gotPermanentUpgradeCardSlot2.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 2:
-//                this.gotPermanentUpgradeCardSlot3.getChildren().clear();
-//                this.gotPermanentUpgradeCardSlot3.getChildren().add(iv);
-//                this.gotPermanentUpgradeCardSlot3.getStyleClass().clear();
-//                this.gotPermanentUpgradeCardSlot3.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//        }
-
-        return;
-    }
-
-    private void renderShopSlot(final int idx, final String cardName)
-    {
-        final ImageView iv = this.getCardRegisterSlot(ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT, cardName);
-//
-//        switch (idx)
-//        {
-//            case 0:
-//                this.shopSlot1.getChildren().clear();
-//                this.shopSlot1.getChildren().add(iv);
-//                this.shopSlot1.getStyleClass().clear();
-//                this.shopSlot1.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 1:
-//                this.shopSlot2.getChildren().clear();
-//                this.shopSlot2.getChildren().add(iv);
-//                this.shopSlot2.getStyleClass().clear();
-//                this.shopSlot2.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 2:
-//                this.shopSlot3.getChildren().clear();
-//                this.shopSlot3.getChildren().add(iv);
-//                this.shopSlot3.getStyleClass().clear();
-//                this.shopSlot3.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 3:
-//                this.shopSlot4.getChildren().clear();
-//                this.shopSlot4.getChildren().add(iv);
-//                this.shopSlot4.getStyleClass().clear();
-//                this.shopSlot4.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//
-//            case 4:
-//                this.shopSlot5.getChildren().clear();
-//                this.shopSlot5.getChildren().add(iv);
-//                this.shopSlot5.getStyleClass().clear();
-//                this.shopSlot5.getStyleClass()
-//                        .add(
-//                                "register-slot-disabled"
-//                        );
-//                break;
-//        }
-
-        return;
-    }
 
     private void renderRegisterSlots()
     {
@@ -1488,43 +1312,6 @@ public final class GameJFXController
 
             continue;
         }
-
-        return;
-    }
-
-    private void renderShopSlots()
-    {
-        this.renderShopSlot(0, EGameState.INSTANCE.getShopSlot(0));
-        this.renderShopSlot(1, EGameState.INSTANCE.getShopSlot(1));
-        this.renderShopSlot(2, EGameState.INSTANCE.getShopSlot(2));
-        this.renderShopSlot(3, EGameState.INSTANCE.getShopSlot(3));
-        this.renderShopSlot(4, EGameState.INSTANCE.getShopSlot(4));
-
-        return;
-    }
-
-    private void renderGotUpgradeCardSlots()
-    {
-        this.renderGotPermanentUpgradeCardSlots();
-        this.renderGotTemporaryUpgradeCardSlots();
-
-        return;
-    }
-
-    private void renderGotPermanentUpgradeCardSlots()
-    {
-        this.renderGotPermanentUpgradeCardSlot(0, EGameState.INSTANCE.getPermanentUpgradeCard(0));
-        this.renderGotPermanentUpgradeCardSlot(1, EGameState.INSTANCE.getPermanentUpgradeCard(1));
-        this.renderGotPermanentUpgradeCardSlot(2, EGameState.INSTANCE.getPermanentUpgradeCard(2));
-
-        return;
-    }
-
-    private void renderGotTemporaryUpgradeCardSlots()
-    {
-        this.renderGotTemporaryUpgradeCardSlot(0, EGameState.INSTANCE.getPermanentUpgradeCard(0));
-        this.renderGotTemporaryUpgradeCardSlot(1, EGameState.INSTANCE.getPermanentUpgradeCard(1));
-        this.renderGotTemporaryUpgradeCardSlot(2, EGameState.INSTANCE.getPermanentUpgradeCard(2));
 
         return;
     }
@@ -1574,8 +1361,6 @@ public final class GameJFXController
     private void renderHUDFooter()
     {
         this.renderRegisterSlots();
-        this.renderShopSlots();
-        this.renderGotUpgradeCardSlots();
         this.setFooterBtnText();
         this.setChatBtnText();
         this.translateFooter();
