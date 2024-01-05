@@ -1,6 +1,7 @@
 package sep.view.viewcontroller;
 
 import sep.Types;
+import sep.view.json.game.SelectedDamageModel;
 import sep.view.lib.EGamePhase;
 import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
@@ -27,6 +28,8 @@ import javafx.stage.                Stage;
 import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
+
+import java.util.ArrayList;
 
 /**
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
@@ -570,6 +573,75 @@ public final class ViewSupervisor extends Application
         AnchorPane.setBottomAnchor(     h, 0.0      );
 
         ViewSupervisor.createPopUp(h, 2000);
+
+        return;
+    }
+
+    public static void createDamageCardSelectionDialog(String[] availableCards, final int countToDraw)
+    {
+        ArrayList<String> selectedCards = new ArrayList<>();
+        final HBox h = new HBox();
+        h.setAlignment(javafx.geometry.Pos.CENTER);
+
+        final Label header = new Label(String.format("You have to select %s DamageCards to receive.", countToDraw));
+        header.getStyleClass().add("text-xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 50.0     );
+
+        final HBox form = new HBox();
+        form.setId("damage-card-selection-dialog-body");
+
+        AnchorPane.setLeftAnchor(       form, 0.0      );
+        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setBottomAnchor(     form, 50.0      );
+
+        for (String name : availableCards) {
+
+                final Button b = new Button(name);
+                b.getStyleClass().add("secondary-btn");
+                b.getStyleClass().add("reboot-btn");
+                form.getChildren().add(b);
+                b.setOnAction(e ->
+                        {
+                            if ((selectedCards.size() + 1) == countToDraw) {
+                                selectedCards.add(name);
+                                new SelectedDamageModel(selectedCards);
+                                l.debug("DamageCard JSON sent with contents: " + selectedCards.toString());
+                                ViewSupervisor.getSceneController().destroyPopUp(h);
+                                return;
+                            } else {
+                                selectedCards.add(name);
+                                header.setText(String.format("You have to select %s DamageCards to recieve.", (countToDraw - selectedCards.size())));
+                            }
+                        }
+                );
+        }
+
+        final AnchorPane p = new AnchorPane(header, form);
+        p.setId("damage-card-selection-dialog-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h);
+
+        return;
+    }
+
+    public static void createDamageCardSelectionDialogLater(String[] availableCards, int countToDraw)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createDamageCardSelectionDialog(availableCards, countToDraw);
+            return;
+        });
 
         return;
     }
