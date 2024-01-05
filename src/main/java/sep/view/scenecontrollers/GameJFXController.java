@@ -75,6 +75,7 @@ public final class GameJFXController
     @FXML private TextField     chatInputTextField;
     @FXML private Button        footerBtn;
     @FXML private AnchorPane    footerContainer;
+    @FXML private Button        chatBtn;
 
     private static final int RCARD_WIDTH                = 50;
     private static final int RCARD_HEIGHT               = 88;
@@ -91,6 +92,7 @@ public final class GameJFXController
     private static final int    INVALID_GOT_REGISTER_SLOT = -1;
 
     private boolean             bFooterCollapsed;
+
     private HBox                registerHBox;
     private static final int    FOOTER_PEEK_HEIGHT = 50;
     /** During initialization. */
@@ -117,6 +119,7 @@ public final class GameJFXController
 
         this.bFooterCollapsed   = true;
         this.registerHBox       = null;
+        this.showServerInfo = false;
 
         this.files                  = 0;
         this.ranks                  = 0;
@@ -318,6 +321,14 @@ public final class GameJFXController
     private void onFooterBtn(final ActionEvent actionEvent)
     {
         this.bFooterCollapsed = !this.bFooterCollapsed;
+        this.renderHUDFooter();
+        return;
+    }
+
+    @FXML
+    private void onChatBtn(final ActionEvent actionEvent)
+    {
+        this.showServerInfo = !this.showServerInfo;
         this.renderHUDFooter();
         return;
     }
@@ -1524,6 +1535,10 @@ public final class GameJFXController
         return;
     }
 
+    private void setChatBtnText(){
+        this.chatBtn.setText(this.showServerInfo ? "Hide Info" : "Show Info");
+    }
+
     private void translateFooter()
     {
         /* TODO Maybe with a timeline? */
@@ -1562,6 +1577,7 @@ public final class GameJFXController
         this.renderShopSlots();
         this.renderGotUpgradeCardSlots();
         this.setFooterBtnText();
+        this.setChatBtnText();
         this.translateFooter();
 
         return;

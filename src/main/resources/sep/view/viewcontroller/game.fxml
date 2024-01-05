@@ -72,9 +72,15 @@
                     fx:id="registerContainer"
                     AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="0.0"
                 />
+                <Button
+                        styleClass="secondary-btn-tiny"
+                        onAction="#onChatBtn"
+                        fx:id="chatBtn"
+                        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+                />
                 <VBox
                     id="chat-container" stylesheets="@game.css"
-                    AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="0.0"
                 >
                     <children>
                         <ScrollPane
