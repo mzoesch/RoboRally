@@ -937,11 +937,13 @@ public class GameMode {
     }
 
     public int getAvailableCheckpoints(final String courseName) {
-        if (courseName.equals("DizzyHighway")) {
-            return 1;
+        switch(courseName) {
+            case "DizzyHighway" : return 1;
+            case "ExtraCrispy" :
+            case "LostBearings" : return 4;
+            case "DeathTrap" : return 5;
+            default : return 0;
         }
-
-        return 0;
     }
 
     public PlayerController[] getRemotePlayers()
