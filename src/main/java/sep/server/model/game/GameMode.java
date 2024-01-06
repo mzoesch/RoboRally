@@ -566,6 +566,7 @@ public class GameMode {
 
                 for (Player player : players) {
                     if (player.getPlayerRobot() == occupyingRobot) {
+                        l.debug(player + " got hit by a laser.");
 
                         if(this.spamCardDeck.size() >= laserCount) {
                             for(int i=0; i<laserCount; i++) {
@@ -702,7 +703,7 @@ public class GameMode {
      * @return True if the activation phase should continue. False otherwise.
      */
     private boolean runActivationPhase() {
-        l.debug("Starting register phase {}.", this.currentRegisterIndex);
+        l.debug("Starting register phase {}.", this.currentRegisterIndex + 1);
 
         this.determinePriorities();
         this.sortPlayersByPriorityInDesc();
