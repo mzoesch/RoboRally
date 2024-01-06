@@ -566,7 +566,7 @@ public class GameMode {
 
                 for (Player player : players) {
                     if (player.getPlayerRobot() == occupyingRobot) {
-                        l.debug(player + " got hit by a laser.");
+                        l.debug(player.getController().getName() + " got hit by a laser at " + tile.getCoordinate());
 
                         if(this.spamCardDeck.size() >= laserCount) {
                             for(int i=0; i<laserCount; i++) {
