@@ -27,7 +27,7 @@ public class Again extends AProgrammingCard implements IPlayableCard {
         } else if (previousRoundCard instanceof AUpgradeCard) {
             handleUpgradeCard(player,  currentRoundNumber);
         } else {
-            previousRoundCard.playCard(player, currentRoundNumber - 1); //If not, play the Card
+            previousRoundCard.playCard(player, currentRoundNumber); //If not, play the Card
         }
     }
 
