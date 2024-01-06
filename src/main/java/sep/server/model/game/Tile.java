@@ -48,6 +48,7 @@ public class Tile {
     }
 
     public boolean isOccupied(){
+        l.debug("Tile at " + this.getCoordinate() + " is occupied by a robot.");
         return occupiedBy != null;
     }
 
