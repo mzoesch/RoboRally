@@ -529,6 +529,10 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * Gateway-method to create a PhaseUpdatePopUp from outside ViewSupervisor
+     * @param newPhase phase, which should be shown
+     */
     public static void createPhaseUpdatePopUpLater(EGamePhase newPhase)
     {
         Platform.runLater(() ->
@@ -540,6 +544,10 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * method to create an PopUp with the new GamePhase (auto-deletes after 2000 ms)
+     * @param newPhase phase, which should be shown
+     */
     public static void createPhaseUpdatePopUp(EGamePhase newPhase)
     {
         final HBox h = new HBox();
@@ -554,12 +562,11 @@ public final class ViewSupervisor extends Application
         AnchorPane.setTopAnchor(        header, 50.0     );
 
         final Label form = new Label(newPhase.phaseDescription());
-        l.debug("Show PopUpText" + newPhase.phaseDescription());
         form.getStyleClass().add("text-base");
         form.setStyle("-fx-alignment: center;");
 
-        AnchorPane.setLeftAnchor(       form, 0.0      );
-        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setLeftAnchor(       form, 10.0      );
+        AnchorPane.setRightAnchor(      form, 10.0      );
         AnchorPane.setBottomAnchor(     form, 50.0      );
 
         final AnchorPane p = new AnchorPane(header, form);
@@ -577,6 +584,12 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * method to create a DamageCardSelectionDialog. The player can select the cards by clicking on buttons.
+     * PopUp auto-deletes after the right ammount of cards has been chosen
+     * @param availableCards available piles of damageCards
+     * @param countToDraw ammount of cards to draw
+     */
     public static void createDamageCardSelectionDialog(String[] availableCards, final int countToDraw)
     {
         ArrayList<String> selectedCards = new ArrayList<>();
@@ -635,6 +648,11 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    /**
+     * Gateway-method to create a DamageCardSelectionDialog from outside ViewSupervisor
+     * @param availableCards available piles of damageCards
+     * @param countToDraw ammount of cards to draw
+     */
     public static void createDamageCardSelectionDialogLater(String[] availableCards, int countToDraw)
     {
         Platform.runLater(() ->
@@ -642,6 +660,61 @@ public final class ViewSupervisor extends Application
             ViewSupervisor.createDamageCardSelectionDialog(availableCards, countToDraw);
             return;
         });
+
+        return;
+    }
+
+    /**
+     * Gateway-method to create a drawDamagePopUp from outside ViewSupervisor
+     * @param drawnCards all drawn damageCards as one String
+     */
+    public static void createDrawDamagePopUpLater(String drawnCards)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createDrawDamagePopUp(drawnCards);
+            return;
+        });
+
+        return;
+    }
+
+    /**
+     * method to create a drawDamagePopUp to inform the player about the damageCards drawn (auto-deletes after 2000 ms)
+     * @param drawnCards all drawn damageCards as one String
+     */
+    public static void createDrawDamagePopUp(String drawnCards)
+    {
+        final HBox h = new HBox();
+        h.setAlignment(javafx.geometry.Pos.CENTER);
+
+        final Label header = new Label("Damage Cards drawn");
+        header.getStyleClass().add("text-xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 50.0     );
+
+        final Label form = new Label("You have drawn following damage cards: " + drawnCards);
+        form.getStyleClass().add("text-base");
+        form.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       form, 0.0      );
+        AnchorPane.setRightAnchor(      form, 0.0      );
+        AnchorPane.setBottomAnchor(     form, 50.0      );
+
+        final AnchorPane p = new AnchorPane(header, form);
+        p.setId("phase-update-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h, 2000);
 
         return;
     }

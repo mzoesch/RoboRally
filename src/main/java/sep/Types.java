@@ -20,7 +20,7 @@ public final class Types
 
         private final String prop;
 
-        private EProps(final String prop)
+        private EProps(final String prop) throws RuntimeException
         {
             final Properties props = new Properties();
             try

@@ -1,12 +1,10 @@
 package sep.view.lib;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
 
-/**
- * Represents a rotation of an actor in degrees. A rotation of zero degrees means that the actor is facing north.
- */
-public record RRotation(int rotation)
+/** Represents a rotation of an actor in degrees. A rotation of zero degrees means that the actor is facing north. */
+public final record RRotation(int rotation)
 {
     private static final Logger l = LogManager.getLogger(RRotation.class);
 
@@ -18,46 +16,41 @@ public record RRotation(int rotation)
         return;
     }
 
-    /**
-     * Valid rotation inputs are "clockwise", "counterclockwise", "NORTH", "EAST", "SOUTH", "WEST".
-     *
-     * @param r The rotation to add to this rotation.
-     * @return  The sum of this rotation and the given rotation.
-     */
+    /** Valid rotation inputs are "clockwise", "counterclockwise", "NORTH", "EAST", "SOUTH", "WEST". */
     public RRotation addRotation(final String r)
     {
         if (r.equals("clockwise"))
         {
-            return new RRotation((this.rotation + 90) % 360);
+            return new RRotation(this.rotation + 90);
         }
 
         if (r.equals("counterclockwise"))
         {
-            return new RRotation((this.rotation + 270) % 360);
+            return new RRotation(this.rotation + -90);
         }
 
         /* Legacy */
         {
 
-            if (r.equals("NORTH"))
-            {
-                return new RRotation(0);
-            }
+        if (r.equals("NORTH"))
+        {
+            return new RRotation(0);
+        }
 
-            if (r.equals("EAST"))
-            {
-                return new RRotation(90);
-            }
+        if (r.equals("EAST"))
+        {
+            return new RRotation(90);
+        }
 
-            if (r.equals("SOUTH"))
-            {
-                return new RRotation(180);
-            }
+        if (r.equals("SOUTH"))
+        {
+            return new RRotation(180);
+        }
 
-            if (r.equals("WEST"))
-            {
-                return new RRotation(270);
-            }
+        if (r.equals("WEST"))
+        {
+            return new RRotation(270);
+        }
 
         }
 
@@ -87,29 +80,53 @@ public record RRotation(int rotation)
         return String.format("%d", this.rotation);
     }
 
+    private static int normalize(final int inR)
+    {
+        final int r = (inR % 360 + 360) % 360;
+
+        if (r >= 315 || r < 45)
+        {
+            return 0;
+        }
+
+        if (r < 135)
+        {
+            return 90;
+        }
+
+        if (r < 225)
+        {
+            return 180;
+        }
+
+        return 270;
+    }
+
     public ERotation toEnum()
     {
-        if (this.rotation == 0)
+        final int r = RRotation.normalize(this.rotation);
+
+        if (r == 0)
         {
             return ERotation.NORTH;
         }
 
-        if (this.rotation == 90)
+        if (r == 90)
         {
             return ERotation.EAST;
         }
 
-        if (this.rotation == 180)
+        if (r == 180)
         {
             return ERotation.SOUTH;
         }
 
-        if (this.rotation == 270)
+        if (r == 270)
         {
             return ERotation.WEST;
         }
 
-        l.error("Invalid rotation: {}", this.rotation);
+        l.error("Invalid rotation: {}, normalized: {}.", this.rotation, r);
         return null;
     }
 
