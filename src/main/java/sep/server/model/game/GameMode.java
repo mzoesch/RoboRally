@@ -662,6 +662,9 @@ public class GameMode {
                     this.getSession().broadcastCheckPointReached(player.getController().getPlayerID(), player.getCheckpointsCollected());
 
                     if(player.getCheckpointsCollected() == availableCheckPoints) {
+                        l.debug("Collected checkpoints: " + player.getCheckpointsCollected() +
+                                ", Checkpoints needed: " + availableCheckPoints);
+                        l.debug("Player has collected last checkpoint.");
                         endGame(player);
                         this.getSession().broadcastGameFinish(player.getController().getPlayerID());
                     }
@@ -938,9 +941,13 @@ public class GameMode {
 
     public int getAvailableCheckpoints(final String courseName) {
         switch(courseName) {
+            case "Dizzy Highway" :
             case "DizzyHighway" : return 1;
+            case "Extra Crispy" :
             case "ExtraCrispy" :
+            case "Lost Bearings" :
             case "LostBearings" : return 4;
+            case "Death Trap" :
             case "DeathTrap" : return 5;
             default : return 0;
         }
