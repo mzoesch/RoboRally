@@ -8,6 +8,8 @@ import sep.server.model.game.tiles.Coordinate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Objects;
+
 public class Robot {
     private static final Logger l = LogManager.getLogger(GameState.class);
 
@@ -237,7 +239,12 @@ public class Robot {
 
         switch (sourceTile.getBoardName()) {
             case "StartA" -> {
-                restartPoint = startingPoint;
+                if((Objects.equals(this.getSession().getGameState().getCourseName(), "Death Trap")) ||
+                        (Objects.equals(this.getSession().getGameState().getCourseName(), "DeathTrap"))) {
+                    restartPoint = course.getTileByNumbers(12,9);
+                } else {
+                    restartPoint = startingPoint;
+                }
             }
             case "StartAR", "1A", "2A", "4A" -> {
                 restartPoint = course.getTileByNumbers(0, 0);
