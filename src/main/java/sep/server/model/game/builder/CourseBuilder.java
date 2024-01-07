@@ -30,7 +30,7 @@ public class CourseBuilder {
             case("Lost Bearings") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board1A = buildBoard("1A");
-                changeFieldType(boardStartA, 0, 0, new RestartPoint("left"));
+                changeFieldType(boardStartA, 0, 0, new RestartPoint("top"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board1A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
@@ -38,7 +38,7 @@ public class CourseBuilder {
             case("Extra Crispy") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board4A = buildBoard("4A");
-                changeFieldType(boardStartA, 0, 0, new RestartPoint("left"));
+                changeFieldType(boardStartA, 0, 0, new RestartPoint("top"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board4A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
