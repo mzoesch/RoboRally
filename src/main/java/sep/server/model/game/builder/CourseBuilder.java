@@ -35,14 +35,15 @@ public class CourseBuilder {
                 return entireCourse;
             }
             case("Extra Crispy") -> {
-                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartAR");
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board4A = buildBoard("4A");
+                changeFieldType(boardStartA, 0, 0, new RestartPoint("left"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board4A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
             case("Death Trap") -> {
-                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartAR");
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board2A = buildBoard("2A");
                 ArrayList<ArrayList<Tile>> rotatedCourse = rotate180(boardStartA);
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, rotatedCourse);
