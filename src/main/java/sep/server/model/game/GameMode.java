@@ -316,26 +316,46 @@ public class GameMode {
                     if (beltSpeed == speed) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                        Coordinate newCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
-                        curvedArrowCheck(player, newCoordinate);
+                        Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                        curvedArrowCheck(player, targetCoordinate);
                         if(speed>1) {
-                            newCoordinate = calculateNewCoordinate(outDirection, newCoordinate);
-                            curvedArrowCheck(player, newCoordinate);
+                            targetCoordinate = calculateNewCoordinate(outDirection, targetCoordinate);
+                            curvedArrowCheck(player, targetCoordinate);
                         }
 
-                        if (!course.isCoordinateWithinBounds(newCoordinate)) {
+                        //TODO refactor to use moveForward method from Robot class:
+
+                        if (!player.getPlayerRobot().getCourse().isCoordinateWithinBounds(targetCoordinate) ||
+                                player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+                            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .",
+                                    player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
+                                    targetCoordinate.toString());
                             player.getPlayerRobot().reboot();
+                            return;
                         }
 
-                        /*if (player.getPlayerRobot().isTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
+                        if(player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+                            l.debug("Player {}'s robot moved to {} and fell down a pit. Rebooting . . .",
+                                    player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
+                                    targetCoordinate.toString());
+                            player.getPlayerRobot().reboot();
                             return;
-                        }*/
+                        }
+
+                        if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
+                                getTileByCoordinate(oldCoordinate),
+                                player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
+                            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
+                                    "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
+                                    getPlayerID(), oldCoordinate.toString(), targetCoordinate.toString());
+                            return;
+                        }
 
                         player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
-                        course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+                        course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
                         player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
 
-                        this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), newCoordinate.getX(), newCoordinate.getY());
+                        this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), targetCoordinate.getX(), targetCoordinate.getY());
                     }
                 }
             }
@@ -533,10 +553,10 @@ public class GameMode {
             String robotDirection = playerRobot.getDirection();
 
             switch(robotDirection) {
-                case "top" -> handleLaserShooting("top", 1, robotTileXCoordinate + 0, robotTileYCoordinate -1 , 0, -1);
-                case "right" -> handleLaserShooting("right", 1, robotTileXCoordinate +1  , robotTileYCoordinate + 0, 1, 0);
-                case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate + 0, robotTileYCoordinate + 1  , 0, 1);
-                case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate - 1 , robotTileYCoordinate + 0, -1, 0);
+                case "top" -> handleLaserShooting("top", 1, robotTileXCoordinate, robotTileYCoordinate -1 , 0, -1);
+                case "right" -> handleLaserShooting("right", 1, robotTileXCoordinate +1  , robotTileYCoordinate, 1, 0);
+                case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate + 1  , 0, 1);
+                case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate - 1 , robotTileYCoordinate, -1, 0);
             }
         }
     }
@@ -958,17 +978,12 @@ public class GameMode {
     }
 
     public int getAvailableCheckpoints(final String courseName) {
-        switch(courseName) {
-            case "Dizzy Highway" :
-            case "DizzyHighway" : return 1;
-            case "Extra Crispy" :
-            case "ExtraCrispy" :
-            case "Lost Bearings" :
-            case "LostBearings" : return 4;
-            case "Death Trap" :
-            case "DeathTrap" : return 5;
-            default : return 0;
-        }
+        return switch (courseName) {
+            case "Dizzy Highway", "DizzyHighway" -> 1;
+            case "Extra Crispy", "ExtraCrispy", "Lost Bearings", "LostBearings" -> 4;
+            case "Death Trap", "DeathTrap" -> 5;
+            default -> 0;
+        };
     }
 
     public PlayerController[] getRemotePlayers()

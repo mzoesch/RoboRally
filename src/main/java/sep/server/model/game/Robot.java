@@ -130,6 +130,7 @@ public class Robot {
         if(this.getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
             l.debug("Player {}'s robot moved to {} and fell down a pit. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), targetCoordinate.toString());
             this.reboot();
+            return;
         }
 
         if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(targetCoordinate))) {
