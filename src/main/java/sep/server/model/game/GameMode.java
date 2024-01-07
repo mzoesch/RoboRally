@@ -454,21 +454,41 @@ public class GameMode {
                             String pushOrientation = pushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
 
-                            Coordinate newCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
+                            Coordinate targetCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
 
-                            if (!course.isCoordinateWithinBounds(newCoordinate)) {
+                            //TODO refactor to use moveForward method from Robot class:
+
+                            if (!player.getPlayerRobot().getCourse().isCoordinateWithinBounds(targetCoordinate) ||
+                                    player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+                                l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .",
+                                        player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
+                                        targetCoordinate.toString());
                                 player.getPlayerRobot().reboot();
+                                return;
                             }
 
-                            /*if (player.getPlayerRobot().isTraversable(currentTile, course.getTileByCoordinate(newCoordinate))) {
+                            if(player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+                                l.debug("Player {}'s robot moved to {} and fell down a pit. Rebooting . . .",
+                                        player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
+                                        targetCoordinate.toString());
+                                player.getPlayerRobot().reboot();
                                 return;
-                            }*/
+                            }
+
+                            if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
+                                            getTileByCoordinate(oldCoordinate),
+                                    player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
+                                l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
+                                        "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
+                                        getPlayerID(), oldCoordinate.toString(), targetCoordinate.toString());
+                                return;
+                            }
 
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
-                            course.updateRobotPosition(player.getPlayerRobot(), newCoordinate);
+                            course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
 
-                            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), newCoordinate.getX(), newCoordinate.getY());
+                            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), targetCoordinate.getX(), targetCoordinate.getY());
                         } else {
                             l.debug("Push Panel is not activated.");
                         }
