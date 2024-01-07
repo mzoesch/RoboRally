@@ -68,11 +68,7 @@ public class Tile {
             currentOccupier.getAuthGameMode().getSession().broadcastPositionUpdate(
                     currentOccupier.determineRobotOwner().getController().getPlayerID(), currentOccupier.determineRobotOwner().getPosition());
 
-            if(currentOccupier.getCurrentTile() == this) {
-                return true;
-            }
-
-            return false;
+            return currentOccupier.getCurrentTile() == this;
         }
         return false;
     }
@@ -167,6 +163,15 @@ public class Tile {
     public boolean isStartingPoint(){
         for (FieldType fieldType : fieldTypes) {
             if (fieldType instanceof StartPoint) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPit() {
+        for(FieldType fieldType : fieldTypes) {
+            if(fieldType instanceof Pit) {
                 return true;
             }
         }
