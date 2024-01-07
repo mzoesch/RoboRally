@@ -46,6 +46,13 @@ public class CourseBuilder {
             case("Death Trap") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board2A = buildBoard("2A");
+                changeFieldType(boardStartA, 0, 9, new RestartPoint("bottom"));
+                changeFieldType(boardStartA, 2, 9, new ConveyorBelt(1, "left", new String[] {"right"}));
+                changeFieldType(boardStartA, 2, 0, new ConveyorBelt(1, "left", new String[] {"right"}));
+                changeFieldType(boardStartA, 2, 4, new Wall(new String[]{"left"}));
+                changeFieldType(boardStartA, 2, 5, new Wall(new String[]{"left"}));
+                changeFieldType(boardStartA, 0, 4, new Empty());
+                changeFieldType(boardStartA, 0, 5, new Antenna("left"));
                 ArrayList<ArrayList<Tile>> rotatedCourse = rotate180(boardStartA);
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(board2A, rotatedCourse);
                 settingCoordinates(entireCourse);
