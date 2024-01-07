@@ -1022,6 +1022,14 @@ public class GameMode {
         return this.gameState.getSession();
     }
 
+    public int getEnergyBank() {
+        return energyBank;
+    }
+
+    public void setEnergyBank(int energyBank) {
+        this.energyBank = energyBank;
+    }
+
     // endregion Getters and Setters
 
 }

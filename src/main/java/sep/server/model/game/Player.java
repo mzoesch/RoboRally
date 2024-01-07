@@ -1,9 +1,6 @@
 package sep.server.model.game;
 
 import sep.server.model.game.cards.IPlayableCard;
-import sep.server.model.game.cards.damage.SpamDamage;
-import sep.server.model.game.cards.damage.TrojanHorseDamage;
-import sep.server.model.game.cards.damage.VirusDamage;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.IOwnershipable;
@@ -43,6 +40,8 @@ public class Player {
         this.playerHand = new ArrayList<>();
 
         this.energyCollected = GameMode.STARTING_ENERGY;
+        this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
+
         this.checkpointsCollected = 0;
     }
 
