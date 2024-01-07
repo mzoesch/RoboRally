@@ -167,15 +167,20 @@ public class Player {
         registers[currentRoundNumber] = null;
 
         if (playerDeck.isEmpty()) {
-            shuffleAndRefillDeck();
+            playerDeck.add(discardPile.remove(0));
         }
 
-        IPlayableCard newCardFromDeck = playerDeck.remove(0);
-        setCardInRegister(currentRoundNumber, newCardFromDeck);
-        newCardFromDeck.playCard(this, currentRoundNumber);
+        if(!playerDeck.isEmpty()) {
+            IPlayableCard newCardFromDeck = playerDeck.remove(0);
+            setCardInRegister(currentRoundNumber, newCardFromDeck);
 
-        String newCardString = newCardFromDeck.getCardType();
-        getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
+            if (newCardFromDeck != null) {
+                newCardFromDeck.playCard(this, currentRoundNumber);
+            }
+
+            String newCardString = newCardFromDeck.getCardType();
+            getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
+        }
 
     }
 
