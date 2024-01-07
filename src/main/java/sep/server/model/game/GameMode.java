@@ -516,10 +516,10 @@ public class GameMode {
             String robotDirection = playerRobot.getDirection();
 
             switch(robotDirection) {
-                case "top" -> handleLaserShooting("top", 1, robotTileXCoordinate, robotTileYCoordinate, 0, -1);
-                case "right" -> handleLaserShooting("right", 1, robotTileXCoordinate, robotTileYCoordinate, 1, 0);
-                case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate, 0, 1);
-                case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate, robotTileYCoordinate, -1, 0);
+                case "top" -> handleLaserShooting("top", 1, robotTileXCoordinate + 0, robotTileYCoordinate -1 , 0, -1);
+                case "right" -> handleLaserShooting("right", 1, robotTileXCoordinate +1  , robotTileYCoordinate + 0, 1, 0);
+                case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate + 0, robotTileYCoordinate + 1  , 0, 1);
+                case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate - 1 , robotTileYCoordinate + 0, -1, 0);
             }
         }
     }
