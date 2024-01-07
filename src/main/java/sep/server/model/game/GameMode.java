@@ -46,7 +46,7 @@ public class GameMode {
     private Player curPlayerInRegistration;
 
     /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
-    private int currentRegister;
+    private int currentRegisterIndex;
 
     /** @deprecated This is currently not initialized. Fix or remove. */
     private int energyBank;
@@ -72,7 +72,7 @@ public class GameMode {
         this.players = Arrays.stream(this.getControllers()).map(ctrl -> new Player(ctrl, this.course)).collect(Collectors.toCollection(ArrayList::new));
         Arrays.stream(this.getControllers()).forEach(ctrl -> this.players.stream().filter(p -> p.getController() == ctrl).findFirst().ifPresent(ctrl::setPlayer));
         this.curPlayerInRegistration = this.players.get(0);
-        this.currentRegister = 0;
+        this.currentRegisterIndex = 0;
 
         this.handleNewPhase(EGamePhase.REGISTRATION);
     }
@@ -412,7 +412,8 @@ public class GameMode {
                     int[] activateAtRegister = pushPanel.getActivateAtRegister();
 
                     for(int register : activateAtRegister) {
-                        if(register == currentRegister) {
+                        if(register == (currentRegisterIndex +1)) {
+                            l.debug("Push Panel is activated.");
                             String pushOrientation = pushPanel.getOrientation();
                             Coordinate oldCoordinate = currentTile.getCoordinate();
 
@@ -431,6 +432,8 @@ public class GameMode {
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
 
                             this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), newCoordinate.getX(), newCoordinate.getY());
+                        } else {
+                            l.debug("Push Panel is not activated.");
                         }
                     }
                 }
@@ -563,6 +566,7 @@ public class GameMode {
 
                 for (Player player : players) {
                     if (player.getPlayerRobot() == occupyingRobot) {
+                        l.debug(player.getController().getName() + " got hit by a laser at " + tile.getCoordinate());
 
                         if(this.spamCardDeck.size() >= laserCount) {
                             for(int i=0; i<laserCount; i++) {
@@ -624,7 +628,7 @@ public class GameMode {
                 if(fieldType instanceof EnergySpace energySpace) {
                     int availableEnergy = energySpace.getAvailableEnergy();
                     int currentEnergy = player.getEnergyCollected();
-                    if(currentRegister == 5) {
+                    if(currentRegisterIndex == 4) {
                         if(energyBank > 0) {
                             player.setEnergyCollected(currentEnergy + 1);
                             energyBank -= 1;
@@ -659,6 +663,9 @@ public class GameMode {
                     this.getSession().broadcastCheckPointReached(player.getController().getPlayerID(), player.getCheckpointsCollected());
 
                     if(player.getCheckpointsCollected() == availableCheckPoints) {
+                        l.debug("Collected checkpoints: " + player.getCheckpointsCollected() +
+                                ", Checkpoints needed: " + availableCheckPoints);
+                        l.debug("Player has collected last checkpoint.");
                         endGame(player);
                         this.getSession().broadcastGameFinish(player.getController().getPlayerID());
                     }
@@ -696,21 +703,21 @@ public class GameMode {
      * @return True if the activation phase should continue. False otherwise.
      */
     private boolean runActivationPhase() {
-        l.debug("Starting register phase {}.", this.currentRegister);
+        l.debug("Starting register phase {}.", this.currentRegisterIndex + 1);
 
         this.determinePriorities();
         this.sortPlayersByPriorityInDesc();
-        this.getSession().broadcastCurrentCards(this.currentRegister);
+        this.getSession().broadcastCurrentCards(this.currentRegisterIndex);
 
         for (Player p : this.players) {
-            if (p.getRegisters()[this.currentRegister] != null) {
-                l.info("Player {} is playing card {}.", p.getController().getPlayerID(), p.getRegisters()[this.currentRegister].getCardType());
-                p.getRegisters()[this.currentRegister].playCard(p, this.currentRegister);
+            if (p.getRegisters()[this.currentRegisterIndex] != null) {
+                l.info("Player {} is playing card {}.", p.getController().getPlayerID(), p.getRegisters()[this.currentRegisterIndex].getCardType());
+                p.getRegisters()[this.currentRegisterIndex].playCard(p, this.currentRegisterIndex);
                 addDelay(2000);
                 continue;
             }
 
-            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegister);
+            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex);
         }
 
         this.activateConveyorBelts(2);
@@ -722,9 +729,9 @@ public class GameMode {
         this.checkEnergySpaces();
         this.checkCheckpoints();
 
-        this.currentRegister++;
+        this.currentRegisterIndex++;
 
-        return this.currentRegister < GameMode.REGISTER_PHASE_COUNT;
+        return this.currentRegisterIndex < GameMode.REGISTER_PHASE_COUNT;
     }
 
     /**
@@ -752,10 +759,10 @@ public class GameMode {
         {
             l.debug("Activation Phase started.");
 
-            this.currentRegister = 0;
+            this.currentRegisterIndex = 0;
             while (this.runActivationPhase())
             {
-                l.debug("Register {} in Activation Phase ended. Waiting 5s for the next register iteration . . .", this.currentRegister);
+                l.debug("Register {} in Activation Phase ended. Waiting 5s for the next register iteration . . .", this.currentRegisterIndex);
                 try
                 {
                     Thread.sleep(5_000); /* Just for debugging right now. */
@@ -889,14 +896,14 @@ public class GameMode {
      * @param card card that will be added instead
      */
     public void replaceCardInRegister(Player player, IPlayableCard card) {
-        player.getDiscardPile().add(player.getCardByRegisterIndex(currentRegister));
-        player.getRegisters()[currentRegister] = null;
+        player.getDiscardPile().add(player.getCardByRegisterIndex(currentRegisterIndex));
+        player.getRegisters()[currentRegisterIndex] = null;
 
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
-        player.setCardInRegister(currentRegister, topCardFromDiscardPile);
+        player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile);
 
-        this.getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRegister, newCard);
+        this.getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRegisterIndex, newCard);
     }
 
     /* TODO Remove player after connection loss */
@@ -934,11 +941,17 @@ public class GameMode {
     }
 
     public int getAvailableCheckpoints(final String courseName) {
-        if (courseName.equals("DizzyHighway")) {
-            return 1;
+        switch(courseName) {
+            case "Dizzy Highway" :
+            case "DizzyHighway" : return 1;
+            case "Extra Crispy" :
+            case "ExtraCrispy" :
+            case "Lost Bearings" :
+            case "LostBearings" : return 4;
+            case "Death Trap" :
+            case "DeathTrap" : return 5;
+            default : return 0;
         }
-
-        return 0;
     }
 
     public PlayerController[] getRemotePlayers()

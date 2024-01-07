@@ -12,7 +12,7 @@ public class Tile {
     private static final Logger l = LogManager.getLogger(Tile.class);
 
     private Coordinate coordinate;
-    private Robot occupiedBy = null;
+    private Robot occupiedBy;
     private ArrayList<FieldType> fieldTypes;
 
     /** Name of the board (not course) the tile is on. */
@@ -22,6 +22,7 @@ public class Tile {
         boardName = onBoard;
         coordinate = fieldCoordinate;
         fieldTypes = arrayFieldTypes;
+        this.occupiedBy = null;
     }
 
     public Robot getRobot() {

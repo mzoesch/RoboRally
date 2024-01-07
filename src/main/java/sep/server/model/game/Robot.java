@@ -77,6 +77,7 @@ public class Robot {
         startingPoint = course.getTileByNumbers(x, y);
         direction = setStartDirection();
         currentTile = startingPoint;
+        currentTile.setOccupiedBy(this);
         startingPoint.setRobot(this);
     }
 

@@ -138,21 +138,6 @@ public class CourseBuilder {
     }
 
 
-    // TODO wird eigentlich nicht benutzt, kann es weg?
-    /**
-     * Appends a board to the bottom of another board. Only works for boards of the same width.
-     * @param topBoard top board
-     * @param bottomBoard bottom board (is appended)
-     * @return ArrayList that represents the entire board
-     */
-    public  ArrayList<ArrayList<Tile>> appendBottom(ArrayList<ArrayList<Tile>> topBoard, ArrayList<ArrayList<Tile>> bottomBoard){
-        for(int i = 0; i< topBoard.size(); i++){
-            topBoard.get(i).addAll(bottomBoard.get(i));
-        }
-        return topBoard;
-    }
-
-
     /**
      * Rotates a board 180 degrees.
      * @param board board to be rotated

@@ -19,7 +19,7 @@ public class Again extends AProgrammingCard implements IPlayableCard {
         }
 
         IPlayableCard[] registers = player.getRegisters();
-        IPlayableCard previousRoundCard = registers[currentRoundNumber - 1];
+        IPlayableCard previousRoundCard = registers[currentRoundNumber];
 
         // Check if the previous card is a Damage Card or a Upgrade Card
         if (previousRoundCard instanceof ADamageCard) {
