@@ -48,7 +48,6 @@ public class GameMode {
     /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
     private int currentRegisterIndex;
 
-    /** @deprecated This is currently not initialized. Fix or remove. */
     private int energyBank;
 
     private Thread activationPhaseThread;
@@ -68,6 +67,8 @@ public class GameMode {
         this.trojanCardDeck = deckBuilder.buildTrojanDeck();
         this.virusCardDeck = deckBuilder.buildVirusDeck();
         this.wormDamageDeck = deckBuilder.buildWormDeck();
+
+        this.energyBank = 48;
 
         this.players = Arrays.stream(this.getControllers()).map(ctrl -> new Player(ctrl, this.course)).collect(Collectors.toCollection(ArrayList::new));
         Arrays.stream(this.getControllers()).forEach(ctrl -> this.players.stream().filter(p -> p.getController() == ctrl).findFirst().ifPresent(ctrl::setPlayer));
