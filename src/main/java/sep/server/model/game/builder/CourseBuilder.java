@@ -152,6 +152,25 @@ public class CourseBuilder {
         return rotatedBoard;
     }
 
+    /**
+     * Changes the FieldType of a Tile at the specified coordinates in the given game board.
+     * @param board game board represented as a ArrayList of Tiles
+     * @param x x-coordinate of the Tile to be modified
+     * @param y y-coordinate of the Tile to be modified
+     * @param newFieldType new FieldType to be assigned to the targeted Tile
+     */
+    public void changeFieldType(ArrayList<ArrayList<Tile>> board, int x, int y, FieldType newFieldType) {
+        if (x >= 0 && x < board.size() && y >= 0 && y < board.get(0).size()) {
+            ArrayList<Tile> row = board.get(x);
+            Tile tile = row.get(y);
+            ArrayList<FieldType> fieldTypes = new ArrayList<>();
+            fieldTypes.add(newFieldType);
+            tile.setFieldTypes(fieldTypes);
+        } else {
+            System.out.println("Invalid Coordinates");
+        }
+    }
+
 
     /**
      * Builds a board depending on board name
@@ -165,9 +184,6 @@ public class CourseBuilder {
                 return buildTestA();
             }
             case("StartA") -> {
-                return buildStartA();
-            }
-            case("StartAR") -> {
                 return buildStartA();
             }
             case("5B") -> {
