@@ -30,6 +30,7 @@ public class CourseBuilder {
             case("Lost Bearings") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board1A = buildBoard("1A");
+                changeFieldType(boardStartA, 0, 0, new RestartPoint("left"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board1A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
