@@ -289,6 +289,7 @@ public class Player {
     }
 
     public void clearOldHand() {
+        discardPile.addAll(playerHand);
         this.playerHand.clear();
     }
 

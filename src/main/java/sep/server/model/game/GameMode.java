@@ -210,13 +210,30 @@ public class GameMode {
     private void triggerProgrammingPhase() {
         for (Player p : players) {
             p.clearOldHand();
-            for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++) {
+
+            int maxCards = Math.min(GameMode.NEW_PROGRAMMING_CARDS, p.getPlayerDeck().size());
+
+            for (int i = 0; i < maxCards; i++) {
+                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+            }
+
+            p.shuffleAndRefillDeck();
+            this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
+
+            int remainingCards = 9 - maxCards;
+            for (int i = 0; i < remainingCards; i++) {
+                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+            }
+
+
+            //alter Code
+            /*for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++) {
                 if (p.getPlayerDeck().isEmpty()) {
                     p.shuffleAndRefillDeck();
                     this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
                 }
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
-            }
+            }*/
 
             if (p.getController() instanceof PlayerController pc)
             {
