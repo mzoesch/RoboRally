@@ -40,7 +40,7 @@ public class Player {
         this.playerHand = new ArrayList<>();
 
         this.energyCollected = GameMode.STARTING_ENERGY;
-        this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
+        //this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
 
         this.checkpointsCollected = 0;
     }
