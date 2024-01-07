@@ -48,6 +48,10 @@ public class Tile {
         return fieldTypes;
     }
 
+    public void setFieldTypes(ArrayList<FieldType> fieldTypes) {
+        this.fieldTypes = fieldTypes;
+    }
+
     public boolean isOccupied(){
         return occupiedBy != null;
     }
