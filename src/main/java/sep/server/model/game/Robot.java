@@ -127,6 +127,11 @@ public class Robot {
             return;
         }
 
+        if(this.getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+            l.debug("Player {}'s robot moved to {} and fell down a pit. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), targetCoordinate.toString());
+            this.reboot();
+        }
+
         if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(targetCoordinate))) {
             l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), targetCoordinate.toString());
             return;
