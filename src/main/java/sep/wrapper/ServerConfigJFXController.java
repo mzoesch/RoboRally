@@ -1,32 +1,33 @@
 package sep.wrapper;
 
-import sep.EArgs;
-import sep.server.model.game.GameState;
+import sep.                     Types;
+import sep.                     EArgs;
+import sep.server.model.game.   GameState;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.event.            ActionEvent;
+import javafx.scene.control.    Label;
+import javafx.scene.control.    TextField;
+import javafx.fxml.             FXML;
 
 public final class ServerConfigJFXController
 {
-    @FXML private Label alertLabel;
-    @FXML private TextField serverIPTextField;
-    @FXML private TextField serverPortTextField;
-    @FXML private TextField minRemotePlayersTextField;
+    @FXML private Label         alertLabel;
+    @FXML private TextField     serverIPTextField;
+    @FXML private TextField     serverPortTextField;
+    @FXML private TextField     minRemotePlayersTextField;
 
     @FXML
     private void onStartServerBtn(final ActionEvent actionEvent)
     {
         this.alertLabel.setText("");
 
-        final String ip = this.serverIPTextField.getText();
-        final String port = this.serverPortTextField.getText();
-        final String minRemotePlayers = this.minRemotePlayersTextField.getText();
+        final String ip                 = this.serverIPTextField.getText();
+        final String port               = this.serverPortTextField.getText();
+        final String minRemotePlayers   = this.minRemotePlayersTextField.getText();
 
         if (!(port.isEmpty() || port.isBlank()))
         {
-            if (Integer.parseInt(port) < sep.Types.EPort.MIN.i || Integer.parseInt(port) > sep.Types.EPort.MAX.i)
+            if (Integer.parseInt(port) < Types.EPort.MIN.i || Integer.parseInt(port) > Types.EPort.MAX.i)
             {
                 this.showAlert("Invalid port number.");
                 return;
@@ -53,6 +54,7 @@ public final class ServerConfigJFXController
 
         EArgs.setMode(EArgs.SERVER);
         Wrapper.exitWrapper();
+
         return;
     }
 
