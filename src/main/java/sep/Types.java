@@ -6,6 +6,7 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import java.io.                     IOException;
 
+/** Common types and constants used throughout the application. */
 public final class Types
 {
     private static final Logger l = LogManager.getLogger(Types.class);
