@@ -3,6 +3,7 @@ package sep.view.viewcontroller;
 import sep.                         Types;
 import sep.view.lib.                ERotation;
 import sep.view.lib.                RGearMask;
+import sep.view.lib.                RImageMask;
 import sep.view.clientcontroller.   GameInstance;
 
 import java.io.                     IOException;
@@ -26,11 +27,11 @@ public final class TileModifier
 
     private final JSONObject tile;
 
-    /** TODO This is currently fine but if we have to many images this will get really big and significantly increases memory */
-    private static final HashMap<String, Image>     IMG_CACHE   = new HashMap<String, Image>();
-    private static final String                     PATH_DEV    = "file:src/main/resources/public/";
-    private static final String                     PATH_PROD   = "/public/";
-    private static final String                     EXTENSION   = ".png";
+    /** TODO This is currently fine but if we have to many images this will get really big and significantly increases memory usage. */
+    private static final HashMap<String, RImageMask>    IMG_CACHE   = new HashMap<String, RImageMask>();
+    private static final String                         PATH_DEV    = "file:src/main/resources/public/";
+    private static final String                         PATH_PROD   = "/public/";
+    private static final String                         EXTENSION   = ".png";
 
     public TileModifier(final JSONObject tile)
     {

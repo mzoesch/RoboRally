@@ -10,6 +10,12 @@ public final class Types
 {
     private static final Logger l = LogManager.getLogger(Types.class);
 
+    private Types() throws RuntimeException
+    {
+        l.error("Types class should not be instantiated.");
+        throw new RuntimeException("Types class should not be instantiated.");
+    }
+
     public enum EProps
     {
         GROUP_ID        (   "groupId"       ),
@@ -23,6 +29,7 @@ public final class Types
         private EProps(final String prop) throws RuntimeException
         {
             final Properties props = new Properties();
+
             try
             {
                 props.load(Types.class.getClassLoader().getResourceAsStream(".properties"));
@@ -117,9 +124,10 @@ public final class Types
         PROD,
         ;
 
-        /** Kinda sketchy but works for now. This is only a temporary sln. And should be removed later on.  */
+        /** TODO Kinda sketchy but works for now. This is only a temporary sln. And should be removed later on.  */
         public static EConfigurations getConfiguration()
         {
+            /* Depending on if we are in a JAR or compiled .class files, we get a dir or file as a return path. */
             final String fp = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
             if (fp.lastIndexOf("/") == -1)
