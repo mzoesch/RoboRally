@@ -1576,7 +1576,7 @@ public final class GameJFXController
                 final Tile t = this.tiles[i][j];
                 final AnchorPane AP = new AnchorPane();
                 /* Warning: This is not commutative. Do not change the order here. */
-                for (int k = t.getImageViews().length - 1; k >= 0; k--)
+                for (int k = t.getImageViews().length - 1; k >= 0; --k)
                 {
                     final ImageView iv = t.getImageViews()[k];
                     iv.setFitHeight(    this.tileDimensions );
@@ -1714,14 +1714,14 @@ public final class GameJFXController
         for (int i = 0; i < this.gears.size(); i++)
         {
             /* TODO Depending on the length of the game the rotation will increase drastically. We may want to reset it. */
-            final int newRot    = this.gears.get(i).rotation() + (this.gears.get(i).clockwise() ? 90 : -90);
+            final int newRot    = this.gears.get(i).rotation() + (this.gears.get(i).bClockwise() ? 90 : -90);
             final Timeline t    = new Timeline();
             final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.GEAR_ANIMATION_DURATION), new KeyValue(this.gears.get(i).iv().rotateProperty(), newRot));
             t.getKeyFrames().add(kf);
 
             t.play();
 
-            this.gears.set(i, new RGearMask(this.gears.get(i).iv(), this.gears.get(i).clockwise(), newRot));
+            this.gears.set(i, new RGearMask(this.gears.get(i).iv(), this.gears.get(i).bClockwise(), newRot));
 
             continue;
         }
