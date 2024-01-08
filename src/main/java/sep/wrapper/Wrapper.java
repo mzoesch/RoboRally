@@ -1,18 +1,18 @@
 package sep.wrapper;
 
-import sep.EArgs;
+import sep. EArgs;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.layout.Pane;
-import javafx.scene.Scene;
-import javafx.scene.Parent;
-import java.io.IOException;
-import javafx.stage.WindowEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import javafx.application.Platform;
+import javafx.scene.layout.         Pane;
+import javafx.application.          Application;
+import javafx.stage.                Stage;
+import javafx.stage.                WindowEvent;
+import javafx.application.          Platform;
+import javafx.scene.                Scene;
+import javafx.scene.                Parent;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.io.                     IOException;
+import javafx.fxml.                 FXMLLoader;
 
 public final class Wrapper extends Application
 {
@@ -20,11 +20,11 @@ public final class Wrapper extends Application
 
     private static Wrapper INSTANCE;
 
-    private static final String WIN_TITLE = "WRAPPER";
-    private static final String PATH_TP_WRAPPER_MENU = "wrapper.fxml";
-    private static final String PATH_TP_SERVER_CONFIG = "server-config.fxml";
-    private static final int PREF_WIDTH = 1_280;
-    private static final int PREF_HEIGHT = 720;
+    private static final String     WIN_TITLE               = "WRAPPER";
+    private static final String     PATH_TP_WRAPPER_MENU    = "wrapper.fxml";
+    private static final String     PATH_TP_SERVER_CONFIG   = "server-config.fxml";
+    private static final int        PREF_WIDTH              = 1_280;
+    private static final int        PREF_HEIGHT             = 720;
 
     private Stage stage;
 
@@ -69,17 +69,19 @@ public final class Wrapper extends Application
     private static boolean loadFXML(final String path)
     {
         final FXMLLoader ldr = new FXMLLoader(Wrapper.class.getResource(path));
+
         final Pane p;
         try
         {
             p = ldr.load();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.fatal("Failed to load wrapper menu.");
             l.fatal(e);
             return false;
         }
+
         Wrapper.INSTANCE.stage.getScene().setRoot(p);
 
         return true;
@@ -95,7 +97,7 @@ public final class Wrapper extends Application
             return;
         }
 
-        l.info("Wrapper menu loaded.");
+        l.info("Wrapper menu scene loaded.");
 
         return;
     }
@@ -110,7 +112,7 @@ public final class Wrapper extends Application
             return;
         }
 
-        l.info("Server config loaded.");
+        l.info("Server config scene loaded.");
 
         return;
     }
@@ -118,6 +120,7 @@ public final class Wrapper extends Application
     public static void exitWrapper()
     {
         Platform.exit();
+        l.debug("Platform exited.");
         return;
     }
 
