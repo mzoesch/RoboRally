@@ -2,6 +2,7 @@ package sep;
 
 import sep.Types.   EPort;
 
+/** Singleton class for storing universal program arguments. */
 public enum EArgs
 {
     INSTANCE;
