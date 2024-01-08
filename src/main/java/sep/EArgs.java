@@ -1,36 +1,38 @@
 package sep;
 
+import sep.Types.   EPort;
+
 public enum EArgs
 {
     INSTANCE;
 
-    public final static int OK = 0;
-    public final static int ERR = 1;
+    public final static int     OK          = 0;
+    public final static int     ERR         = 1;
 
-    public final static int DEFAULT = 0;
-    public final static int CLIENT = 1;
-    public final static int SERVER = 2;
-    public final static int EXIT = 3;
+    public final static int     DEFAULT     = 0;
+    public final static int     CLIENT      = 1;
+    public final static int     SERVER      = 2;
+    public final static int     EXIT        = 3;
 
-    public static final String PREF_SERVER_IP = "localhost";
-    public static final Types.EPort PREF_SERVER_PORT = Types.EPort.DEFAULT;
-    private String customServerIP;
-    private int customServerPort;
-    public static final int DEFAULT_MIN_REMOTE_PLAYERS = -1;
-    private int customMinRemotePlayers;
-
-    private int mode;
+    public static final String  PREF_SERVER_IP              = "localhost";
+    public static final EPort   PREF_SERVER_PORT            = EPort.DEFAULT;
+    private String              customServerIP;
+    private int                 customServerPort;
+    public static final int     DEFAULT_MIN_REMOTE_PLAYERS  = -1;
+    private int                 customMinRemotePlayers;
+    private int                 mode;
 
     private EArgs()
     {
-        this.customServerIP = "";
-        this.customServerPort = Types.EPort.INVALID.i;
-        this.customMinRemotePlayers = EArgs.DEFAULT_MIN_REMOTE_PLAYERS;
-
-        this.mode = EArgs.DEFAULT;
+        this.customServerIP             = "";
+        this.customServerPort           = EPort.INVALID.i;
+        this.customMinRemotePlayers     = EArgs.DEFAULT_MIN_REMOTE_PLAYERS;
+        this.mode                       = EArgs.DEFAULT;
 
         return;
     }
+
+    // region Getters and Setters
 
     public static int getMode()
     {
@@ -76,5 +78,7 @@ public enum EArgs
         EArgs.INSTANCE.customMinRemotePlayers = min;
         return;
     }
+
+    // endregion Getters and Setters
 
 }
