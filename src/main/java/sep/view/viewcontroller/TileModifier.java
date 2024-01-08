@@ -333,13 +333,12 @@ public final class TileModifier
     {
         if (TileModifier.IMG_CACHE.containsKey(modName))
         {
-            return TileModifier.IMG_CACHE.get(modName);
+            return TileModifier.IMG_CACHE.get(modName).i();
         }
 
         l.debug("Loading and caching image: {}.", modName);
         final Image i = TileModifier.loadImage(modName);
-        TileModifier.IMG_CACHE.put(modName, i);
-
+        TileModifier.IMG_CACHE.put(modName, new RImageMask(i, Types.EConfigurations.isDev() ? null : String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION)));
         return i;
     }
 
@@ -660,12 +659,55 @@ public final class TileModifier
 
     public static boolean isGear(final Image i)
     {
-        return Objects.equals(i.getUrl(), TileModifier.loadCachedImage("GearClockwise").getUrl()) || Objects.equals(i.getUrl(), TileModifier.loadCachedImage("GearCounterclockwise").getUrl());
+        if (Types.EConfigurations.isDev())
+        {
+            return Objects.equals(i.getUrl(), TileModifier.loadCachedImage("GearClockwise").getUrl()) || Objects.equals(i.getUrl(), TileModifier.loadCachedImage("GearCounterclockwise").getUrl());
+        }
+
+        final RImageMask rim = TileModifier.getCachedImageMask(i);
+        if (rim == null)
+        {
+            l.error("Could not check if image is gear because the image mask could not be found.");
+            return false;
+        }
+
+        return rim.getSanitizedURL().contains("GearClockwise") || rim.getSanitizedURL().contains("GearCounterclockwise");
     }
 
     public static RGearMask generateGearMask(final ImageView iv)
     {
-        return new RGearMask(iv, Objects.equals(iv.getImage().getUrl(), TileModifier.loadCachedImage("GearClockwise").getUrl()), 0);
+        l.debug("Generating gear mask for image: {}.", iv);
+
+        if (Types.EConfigurations.isDev())
+        {
+            return new RGearMask(iv, Objects.equals(iv.getImage().getUrl(), TileModifier.loadCachedImage("GearClockwise").getUrl()), 0);
+        }
+
+        return new RGearMask(iv, Objects.requireNonNull(TileModifier.getCachedImageMask(iv.getImage())).getSanitizedURL().contains("GearClockwise"), 0);
+    }
+
+    private static RImageMask getCachedImageMask(final Image i)
+    {
+        if (Types.EConfigurations.isDev())
+        {
+            l.error("This method should not be called in dev mode as the image urls can be easily compared instead.");
+            return null;
+        }
+
+        for (final RImageMask rim : TileModifier.IMG_CACHE.values())
+        {
+            if (Objects.equals(rim.i(), i))
+            {
+                return rim;
+            }
+
+            continue;
+        }
+
+        /* As an image could not have an url. */
+        l.error("Could not find image mask for image: {} [url: {}]", i, i.getUrl());
+
+        return null;
     }
 
     // endregion Getters and Setters
