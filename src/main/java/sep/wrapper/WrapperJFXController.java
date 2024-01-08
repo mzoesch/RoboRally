@@ -1,12 +1,12 @@
 package sep.wrapper;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
+import javafx.event.    ActionEvent;
+import javafx.fxml.     FXML;
 
-public class WrapperJFXController
+public final class WrapperJFXController
 {
     @FXML
-    protected void onStartClientBtn(final ActionEvent actionEvent)
+    private void onStartClientBtn(final ActionEvent actionEvent)
     {
         sep.EArgs.setMode(sep.EArgs.CLIENT);
         Wrapper.exitWrapper();
@@ -14,14 +14,14 @@ public class WrapperJFXController
     }
 
     @FXML
-    protected void onStartServerBtn(final ActionEvent actionEvent)
+    private void onStartServerBtn(final ActionEvent actionEvent)
     {
         Wrapper.loadServerConfig();
         return;
     }
 
     @FXML
-    protected void onExitBtn(final ActionEvent actionEvent)
+    private void onExitBtn(final ActionEvent actionEvent)
     {
         sep.EArgs.setMode(sep.EArgs.EXIT);
         Wrapper.exitWrapper();
