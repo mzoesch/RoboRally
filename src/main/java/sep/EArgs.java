@@ -2,10 +2,15 @@ package sep;
 
 import sep.Types.   EPort;
 
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+
 /** Singleton class for storing universal program arguments. */
 public enum EArgs
 {
     INSTANCE;
+
+    private static final Logger l = LogManager.getLogger(EArgs.class);
 
     public final static int     OK          = 0;
     public final static int     ERR         = 1;
@@ -49,7 +54,8 @@ public enum EArgs
     {
         if (mode.ordinal() > EMode.NUM.ordinal())
         {
-            throw new IllegalArgumentException("Invalid mode.");
+            l.fatal("Invalid mode ({} {}).", mode.ordinal(), mode.toString());
+            throw new IllegalArgumentException(String.format("Invalid mode (%d %s).", mode.ordinal(), mode.toString()));
         }
 
         EArgs.INSTANCE.mode = mode;
