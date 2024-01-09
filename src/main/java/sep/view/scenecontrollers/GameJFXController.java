@@ -26,16 +26,20 @@ import javafx.scene.layout.         AnchorPane;
 import javafx.scene.layout.         Priority;
 import javafx.scene.layout.         Region;
 import javafx.scene.layout.         Pane;
+import javafx.animation.            Animation;
 import javafx.animation.            PauseTransition;
 import javafx.animation.            Timeline;
 import javafx.animation.            KeyFrame;
 import javafx.animation.            KeyValue;
+import javafx.animation.            FillTransition;
 import javafx.fxml.                 FXML;
 import javafx.beans.value.          ChangeListener;
 import javafx.beans.value.          ObservableValue;
 import javafx.scene.                Node;
+import javafx.scene.image.          ImageView;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import javafx.scene.shape.          Rectangle;
 import javafx.event.                ActionEvent;
 import javafx.scene.input.          KeyCode;
 import javafx.util.                 Duration;
@@ -43,7 +47,7 @@ import javafx.scene.control.        Label;
 import javafx.scene.control.        TextField;
 import javafx.scene.control.        ScrollPane;
 import javafx.scene.control.        Button;
-import javafx.scene.image.          ImageView;
+import javafx.scene.paint.          Color;
 
 public final class GameJFXController
 {
@@ -61,6 +65,7 @@ public final class GameJFXController
     private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT             = 15    ;
     private static final int    GEAR_ANIMATION_DURATION         = 1_000 ;
+    private static final int    BLINK_DURATION                  = 800   ;
 
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -1631,16 +1636,27 @@ public final class GameJFXController
                         return;
                     });
 
-                    // Since there is AFAIK no "::before" or "::after" css
-                    // support for JavaFX. We add a pseudo elem here.
-                    final AnchorPane after = new AnchorPane();
+                    final AnchorPane ap = new AnchorPane();
+                    ap.setPrefWidth(this.tileDimensions);
+                    ap.setPrefHeight(this.tileDimensions);
+                    ap.getStyleClass().add("tile-after");
 
-                    after.getStyleClass().add("tile-after");
+                    final Rectangle rec = new Rectangle();
+                    rec.setWidth(this.tileDimensions);
+                    rec.setHeight(this.tileDimensions);
 
-                    after.setPrefWidth(this.tileDimensions);
-                    after.setPrefHeight(this.tileDimensions);
+                    ap.getChildren().add(rec);
 
-                    AP.getChildren().add(after);
+                    final FillTransition ft = new FillTransition(Duration.millis(GameJFXController.BLINK_DURATION), rec, Color.valueOf("#ffffff3c"), Color.valueOf("#0000003c"));
+                    ft.setCycleCount(Animation.INDEFINITE);
+                    ft.setAutoReverse(true);
+
+                    /* Kinda sketchy. */
+                    ft.play();
+                    ap.setOnMouseEntered(   e ->    ft.stop()   );
+                    ap.setOnMouseExited(    e ->    ft.play()   );
+
+                    AP.getChildren().add(ap);
                 }
 
                 continue;
