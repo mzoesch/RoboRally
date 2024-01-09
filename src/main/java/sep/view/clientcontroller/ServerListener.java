@@ -491,6 +491,32 @@ public final class ServerListener implements Runnable
         return true;
     }
 
+    private boolean onExchangeShop() throws JSONException {
+        l.debug("Received exchange shop from server.");
+        return true;
+    }
+
+    private boolean onRefillShop() throws JSONException {
+        l.debug("Received refill shop from server.");
+        return true;
+    }
+
+    private boolean onUpgradeBought() throws JSONException {
+        l.debug("Received upgrade bought from server.");
+        return true;
+    }
+
+    private boolean onCheckpointMoved() throws JSONException {
+        l.debug("Received checkpoint moved from server.");
+        return true;
+    }
+
+    private boolean onDiscardSome() throws JSONException {
+        l.debug("Received discard some cards from server.");
+        return true;
+    }
+
+
     // endregion Server request handlers
 
     private void parseRequest(final RDefaultServerRequestParser dsrp) throws JSONException
