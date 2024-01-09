@@ -21,10 +21,11 @@ public final class Launcher
     }
 
     /**
-     * When wrapping. Support for Win and Mac OS X.
+     * When wrapping. Support for Win and OSX.
      *
      * @param args Valid program arguments in descending order of precedence. All arguments that are not consumed by
-     *             the wrapper will be passed down to the follow-up process:
+     *             the wrapper will be passed down to the follow-up process. Invalid arguments will be ignored (the
+     *             follow-up process might not ignore invalid arguments and may fail to start):
      *             <ul>
      *              <li>[--cmd]     - Start a new process terminal and run this application in it.
      *              <li>[--sv]      - Will instantly start a server process.
@@ -32,6 +33,7 @@ public final class Launcher
      *              <li>[--nocmd]   - Will not create a new process terminal for the follow-up server process.
      *              <li>[--noclose] - If allowed a new process terminal will not be closed after the follow-up process
      *                                has exited.
+     *              <li>[--help]    - Print help message.
      *             </ul>
      */
     public static void main(final String[] args)
