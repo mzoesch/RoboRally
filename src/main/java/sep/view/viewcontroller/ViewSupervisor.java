@@ -337,6 +337,32 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void centerGameCourse()
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onCenterCourse();
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during centering. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void centerGameCourseLater()
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.centerGameCourse();
+            return;
+        });
+
+        return;
+    }
+
     // endregion Game Events
 
     public static void createPopUp(final RPopUpMask mask)

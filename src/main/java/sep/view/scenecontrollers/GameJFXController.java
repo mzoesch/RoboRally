@@ -1964,7 +1964,7 @@ public final class GameJFXController
         return;
     }
 
-    private void onCenterCourse()
+    public void onCenterCourse()
     {
         Platform.runLater(() ->
         {
