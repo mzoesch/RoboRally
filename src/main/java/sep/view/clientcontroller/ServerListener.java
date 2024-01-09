@@ -1,7 +1,6 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.           RDefaultServerRequestParser;
-import sep.view.lib.            EShopState;
 import sep.view.lib.            EGamePhase;
 import sep.view.viewcontroller. SceneController;
 import sep.view.viewcontroller. ViewSupervisor;
@@ -20,8 +19,6 @@ import java.net.                    Socket;
 import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
-
-import javax.swing.text.View;
 
 /**
  * We create a special object for listening to the server socket on a separate
