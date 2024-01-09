@@ -354,10 +354,17 @@ public enum EGameState
         return;
     }
 
-    public void setCurrentPlayer(int playerID)
+    public void setCurrentPlayer(final int playerID, final boolean bDiscardViewUpdate)
     {
         this.currentPlayer = this.getRemotePlayer(playerID);
+
+        if (bDiscardViewUpdate)
+        {
+            return;
+        }
+
         ViewSupervisor.updatePlayerView();
+
         return;
     }
 

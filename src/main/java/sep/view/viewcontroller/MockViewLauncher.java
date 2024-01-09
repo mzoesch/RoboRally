@@ -984,7 +984,7 @@ public final class MockViewLauncher
             {
                 EGameState.INSTANCE.addGotRegister(s);
             }
-            EGameState.INSTANCE.setCurrentPlayer(0);
+            EGameState.INSTANCE.setCurrentPlayer(0, false);
 
             for (int i = 0; i < 5; i++)
             {
