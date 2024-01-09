@@ -237,13 +237,28 @@ public class Player {
         return registersArray;
     }
 
-    public String[] getPlayerHandAsStringArray() {
+    /*public String[] getPlayerHandAsStringArray() {
         final String[] handArray = new String[this.playerHand.size()];
         for (int i = 0; i < this.playerHand.size(); i++) {
             handArray[i] = this.playerHand.get(i).getCardType();
         }
         return handArray;
+    }*/
+
+    public String[] getPlayerHandAsStringArray() {
+        final String[] handArray = new String[this.playerHand.size()];
+        for (int i = 0; i < this.playerHand.size(); i++) {
+            IPlayableCard card = this.playerHand.get(i);
+            if (card == null) {
+                handArray[i] = "Card is null";
+            } else {
+                handArray[i] = card.getCardType();
+            }
+        }
+
+        return handArray;
     }
+
 
     public void setCardInRegister(final int idx, final IPlayableCard newCard) {
         if (this.registers[idx] != null) {

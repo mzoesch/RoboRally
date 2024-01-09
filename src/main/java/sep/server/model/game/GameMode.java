@@ -219,7 +219,7 @@ public class GameMode {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-            if (maxCards < GameMode.NEW_PROGRAMMING_CARDS ) {
+
                 p.shuffleAndRefillDeck();
                 l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
                 this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
@@ -228,7 +228,7 @@ public class GameMode {
                 for (int i = 0; i < remainingCards; i++) {
                     p.getPlayerHand().add(p.getPlayerDeck().remove(0));
                 }
-            }
+
 
             l.debug("P {} - Has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
