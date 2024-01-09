@@ -1321,8 +1321,6 @@ public final class GameJFXController
     private void renderHUDHeader()
     {
         this.renderPhaseTitle();
-        this.renderGameStateDescription();
-
         return;
     }
 
