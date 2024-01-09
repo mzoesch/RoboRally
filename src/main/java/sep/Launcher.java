@@ -135,12 +135,13 @@ public final class Launcher
         else if (Arrays.asList(args).contains("--sv"))
         {
             l.info("Command line argument [--sv] detected. Starting server.");
-            EArgs.setMode(EArgs.SERVER);
+            EArgs.setMode(EArgs.EMode.SERVER);
         }
         else if (Arrays.asList(args).contains("--cl"))
         {
             l.info("Command line argument [--cl] detected. Starting client.");
             EArgs.setMode(EArgs.CLIENT);
+            EArgs.setMode(EArgs.EMode.CLIENT);
         }
         else
         {
@@ -150,14 +151,14 @@ public final class Launcher
 
         l.info("Wrapping complete. Starting follow up process if necessary.");
 
-        if (EArgs.getMode() == EArgs.DEFAULT)
+        if (EArgs.getMode() == EArgs.EMode.DEFAULT)
         {
             l.fatal("No mode specified. Shutting down.");
             l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
             System.exit(EArgs.ERR);
             return;
         }
-        else if (EArgs.getMode() == EArgs.CLIENT)
+        else if (EArgs.getMode() == EArgs.EMode.CLIENT)
         {
             l.info("Launching client.");
 
@@ -202,7 +203,7 @@ public final class Launcher
 
             l.info("Client shutdown. Wrapping complete. Shutting down.");
         }
-        else if (EArgs.getMode() == EArgs.SERVER)
+        else if (EArgs.getMode() == EArgs.EMode.SERVER)
         {
             l.info("Launching server.");
 
@@ -300,7 +301,7 @@ public final class Launcher
                 return;
             }
         }
-        else if (EArgs.getMode() == EArgs.EXIT)
+        else if (EArgs.getMode() == EArgs.EMode.EXIT)
         {
             l.info("Shutdown requested. Ok.");
             l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);

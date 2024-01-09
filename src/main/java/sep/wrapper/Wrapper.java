@@ -50,7 +50,7 @@ public final class Wrapper extends Application
         this.stage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e ->
         {
             l.info("Window close request detected.");
-            sep.EArgs.setMode(sep.EArgs.EXIT);
+            sep.EArgs.setMode(sep.EArgs.EMode.EXIT);
             Wrapper.exitWrapper();
             return;
         });
@@ -92,7 +92,7 @@ public final class Wrapper extends Application
         final boolean bSuccess = Wrapper.loadFXML(Wrapper.PATH_TP_WRAPPER_MENU);
         if (!bSuccess)
         {
-            EArgs.setMode(EArgs.EXIT);
+            EArgs.setMode(EArgs.EMode.EXIT);
             Wrapper.exitWrapper();
             return;
         }
@@ -107,7 +107,7 @@ public final class Wrapper extends Application
         final boolean bSuccess = Wrapper.loadFXML(Wrapper.PATH_TP_SERVER_CONFIG);
         if (!bSuccess)
         {
-            EArgs.setMode(EArgs.EXIT);
+            EArgs.setMode(EArgs.EMode.EXIT);
             Wrapper.exitWrapper();
             return;
         }

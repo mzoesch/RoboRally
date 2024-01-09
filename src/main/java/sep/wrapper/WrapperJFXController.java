@@ -8,7 +8,7 @@ public final class WrapperJFXController
     @FXML
     private void onStartClientBtn(final ActionEvent actionEvent)
     {
-        sep.EArgs.setMode(sep.EArgs.CLIENT);
+        sep.EArgs.setMode(sep.EArgs.EMode.CLIENT);
         Wrapper.exitWrapper();
         return;
     }
@@ -23,7 +23,7 @@ public final class WrapperJFXController
     @FXML
     private void onExitBtn(final ActionEvent actionEvent)
     {
-        sep.EArgs.setMode(sep.EArgs.EXIT);
+        sep.EArgs.setMode(sep.EArgs.EMode.EXIT);
         Wrapper.exitWrapper();
         return;
     }

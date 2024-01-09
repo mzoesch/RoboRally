@@ -52,7 +52,7 @@ public final class ServerConfigJFXController
             EArgs.setCustomMinRemotePlayers(Integer.parseInt(minRemotePlayers));
         }
 
-        EArgs.setMode(EArgs.SERVER);
+        EArgs.setMode(EArgs.EMode.SERVER);
         Wrapper.exitWrapper();
 
         return;
