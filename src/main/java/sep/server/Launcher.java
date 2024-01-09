@@ -26,13 +26,14 @@ public final class Launcher
      * This is the entry point of the server part of the application.
      * The Server Instance is created here.
      *
-     * @param args Invalid arguments will be ignored. Valid program arguments are:
+     * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
      *              <ul>
-     *              <li>[--port PORT]        - The port number to listen on. Default is
-     *                                         {@link sep.Types.EPort#DEFAULT EPort.DEFAULT}.
-     *              <li>[--minRemotePlayers] - The minimum number of remote players required to start a game. Default is
-     *                                         {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
-     *                                         MIN_REMOTE_PLAYERS}.
+     *               <li>[--port PORT]                           - The port number to listen on. Default is
+     *                                                             {@link sep.Types.EPort#DEFAULT EPort.DEFAULT}.
+     *               <li>[--minRemotePlayers MIN_REMOTE_PLAYERS] - The minimum number of remote clients required to
+     *                                                             start a game. Default is {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
+     *                                                             MIN_REMOTE_PLAYERS}.
+     *               <li>[--help]                                 - Print help message.
      *              </ul>
      */
     public static void main(final String[] args)
