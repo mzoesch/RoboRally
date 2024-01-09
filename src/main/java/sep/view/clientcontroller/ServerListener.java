@@ -65,6 +65,12 @@ public final class ServerListener implements Runnable
         put(    "ConnectionUpdate",     ServerListener.this::onClientConnectionUpdate           );
         put(    "PickDamage",           ServerListener.this::onPickDamageType                   );
         put(    "DrawDamage",           ServerListener.this::onDrawDamage                       );
+        put(    "ExchangeShop",         ServerListener.this::onExchangeShop                     );
+        put(    "RefillShop",           ServerListener.this::onRefillShop                       );
+        put(    "UpgradeBought",        ServerListener.this::onUpgradeBought                    );
+        put(    "CheckpointMoved",      ServerListener.this::onCheckpointMoved                  );
+        put(    "DiscardSome",          ServerListener.this::onDiscardSome                      );
+        put(    "RegisterChosen",       ServerListener.this::onRegisterChosen                   );
     }}
     ;
 
