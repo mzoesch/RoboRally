@@ -1086,7 +1086,6 @@ public final class GameJFXController
 
     // region HUD Side Panel
 
-    /** Updates the UI Phase Title in the Header. */
     private void renderPhaseTitle()
     {
         if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.INVALID)
