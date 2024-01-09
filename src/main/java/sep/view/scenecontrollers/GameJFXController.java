@@ -1095,39 +1095,7 @@ public final class GameJFXController
         return;
     }
 
-    /**
-     * Updates the UI Game State Description in the Header.
-     * What we are currently waiting for.
-     */
-    private void renderGameStateDescription()
-    {
-//
-//        switch (EGameState.INSTANCE.getCurrentPhase())
-//        {
-//            case REGISTRATION:
-//                this.UIHeaderGameStateDescriptionLabel.setText(String.format(": Waiting for %s to set their starting position.", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
-//                return;
-//
-//            case UPGRADE:
-//                this.UIHeaderGameStateDescriptionLabel.setText(": Select your upgradeCards");
-//                return;
-//
-//            case PROGRAMMING:
-//                this.UIHeaderGameStateDescriptionLabel.setText(": Select your cards by clicking on them and then on an empty register. " +
-//                        "To empty a register, click on it without having selected a card.");
-//                return;
-//
-//            case ACTIVATION:
-//                this.UIHeaderGameStateDescriptionLabel.setText(": Activation Phase. Just watch your robots move");
-//                return;
-//        }
-//
-//        this.UIHeaderGameStateDescriptionLabel.setText("Unknown game state.");
-
-        return;
-    }
-
-    // endregion HUD Header
+    // endregion HUD Side Panel
 
     // region HUD Footer
 
