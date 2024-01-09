@@ -38,7 +38,7 @@ public final class Launcher
     {
         final double t0 = System.currentTimeMillis();
 
-        l.info(     "Starting application."                                             );
+        l.info(     "Starting application."                                              );
         l.debug(    "Detected operating system: {}.",   Types.EOS.getOS().toString()     );
         l.debug(    "Protocol version: {}.",            Types.EProps.VERSION.toString()  );
 
@@ -140,8 +140,12 @@ public final class Launcher
         else if (Arrays.asList(args).contains("--cl"))
         {
             l.info("Command line argument [--cl] detected. Starting client.");
-            EArgs.setMode(EArgs.CLIENT);
             EArgs.setMode(EArgs.EMode.CLIENT);
+        }
+        else if (Arrays.asList(args).contains("--help"))
+        {
+            l.info("Command line argument [--help] detected. Printing help message.");
+            EArgs.setMode(EArgs.EMode.HELP);
         }
         else
         {
@@ -306,6 +310,41 @@ public final class Launcher
             l.info("Shutdown requested. Ok.");
             l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
             System.exit(EArgs.OK);
+            return;
+        }
+        else if (EArgs.getMode() == EArgs.EMode.HELP)
+        {
+            l.info("");
+            l.info("#################### WRAPPER HELP #####################");
+            l.info("Valid wrapper program arguments in descending order of precedence. All arguments that are not consumed by the wrapper will be passed down to the follow-up process. Invalid arguments will be ignored (the follow-up process might not ignore invalid arguments and may fail to start):");
+            l.info("Usage: java -jar {jar-name}.jar [--cmd] [--sv] [--cl] [--nocmd] [--noclose] [--help]");
+            l.info("  --cmd         Start a new process terminal and run this application in it.");
+            l.info("  --sv          Will instantly start a server process.");
+            l.info("  --cl          Will instantly start a client process (IO is inherited to calling process).");
+            l.info("  --nocmd       Will not create a new process terminal for the follow-up server process.");
+            l.info("  --noclose     If allowed a new process terminal will not be closed after the follow-up process has exited.");
+            l.info("  --help        Print this help message.");
+            l.info("");
+            l.info("##################### CLIENT HELP #####################");
+            l.info("Valid view program arguments in descending order of precedence. Invalid arguments will be ignored.");
+            l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--help]");
+            l.info("Valid server program arguments in descending order of precedence.");
+            l.info("  --dev         Start mock game view.");
+            l.info("  --help        Print view help message.");
+            l.info("");
+            l.info("##################### SERVER HELP #####################");
+            l.info("Valid server program arguments in descending order of precedence. Invalid arguments will be ignored.");
+            l.info("Usage: java -cp {jar-name}.jar sep.server.Launcher [--port PORT] [--minRemotePlayers MIN_REMOTE_PLAYERS] [--help]");
+            l.info("  --port <PORT>                             The port number to listen on. Default is {}.", sep.Types.EPort.DEFAULT.i);
+            l.info("  --minRemotePlayers <MIN_REMOTE_PLAYERS>   The minimum number of remote clients required to start a game. Default is {}.", sep.server.model.game.GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START);
+            l.info("  --help                                    Print server help message.");
+            l.info("");
+            l.info("#######################################################");
+            l.info("");
+
+            l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(EArgs.OK);
+
             return;
         }
         else
