@@ -27,20 +27,38 @@ public final class Launcher
     {
         double t0 = System.currentTimeMillis();
 
-        if (args.length > 0 && Arrays.asList(args).contains("--dev"))
+        if (args.length > 0)
         {
-            l.info("Starting mock game view.");
-            sep.view.viewcontroller.MockViewLauncher.run();
-            l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-            System.exit(sep.EArgs.OK);
-            return;
-        }
+
+            if (Arrays.asList(args).contains("--dev"))
+            {
+                l.info("Starting mock game view.");
+                sep.view.viewcontroller.MockViewLauncher.run();
+                l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                System.exit(sep.EArgs.OK);
+                return;
+            }
 
         GameInstance.run();
 
         l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
 
         System.exit(sep.EArgs.OK);
+            if (Arrays.asList(args).contains("--help"))
+            {
+                l.info("##################### CLIENT HELP #####################");
+                l.info("Valid view program arguments in descending order of precedence. Invalid arguments will be ignored.");
+                l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--help]");
+                l.info("Valid server program arguments in descending order of precedence.");
+                l.info("  --dev         Start mock game view.");
+                l.info("  --help        Print view help message.");
+                l.info("#######################################################");
+                System.exit(sep.EArgs.OK);
+                return;
+            }
+
+        }
+
 
         return;
     }
