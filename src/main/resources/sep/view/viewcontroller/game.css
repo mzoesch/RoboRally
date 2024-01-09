@@ -131,6 +131,8 @@
     -fx-background-radius: 5px;
     -fx-padding: 5px;
 
+    -fx-spacing: 5px;
+
     -fx-alignment: top-center;
 }
 .player-box-inactive {
