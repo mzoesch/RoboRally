@@ -1315,7 +1315,7 @@ public final class GameJFXController
     // endregion HUD Footer
 
     /**
-     * Updates every dependency of the header.
+     * Updates every dependency of the side panel.
      * No re-renders must be done after this method.
      */
     private void renderHUDHeader()
