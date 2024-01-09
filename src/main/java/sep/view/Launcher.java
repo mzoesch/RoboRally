@@ -21,7 +21,11 @@ public final class Launcher
      * This is the entry point of the client part of the application.
      * The Game Instance is created here.
      *
-     * @param args [--dev] - Starts mock game view.
+     * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
+     *             <ul>
+     *              <li>[--dev]  - Start mock game view.
+     *              <li>[--help] - Print help message.
+     *             </ul>
      */
     public static void main(String[] args)
     {
