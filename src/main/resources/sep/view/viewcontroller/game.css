@@ -186,6 +186,7 @@
 
 .tile-after:hover {
     -fx-background-color: rgba(176, 2, 2, 0.4);
+    -fx-background-color: rgba(0, 0, 0, 0.4);
 }
 
 #chat-container {
