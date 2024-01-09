@@ -516,6 +516,10 @@ public final class ServerListener implements Runnable
         return true;
     }
 
+    private boolean onRegisterChosen() throws JSONException {
+        l.debug("Received register chosen from server.");
+        return true;
+    }
 
     // endregion Server request handlers
 
