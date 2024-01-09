@@ -47,6 +47,8 @@ public final class ClientInstance implements Runnable
         put("PickDamage", ClientInstance.this::onDamageCardSelect);
         put("HelloServer", ClientInstance.this::onAddAgentRequest);
         put("RebootDirection", ClientInstance.this::onRebootDirection);
+        put("BuyUpgrade", ClientInstance.this::onBuyUpgrade);
+        put("ChooseRegister", ClientInstance.this::onChooseRegister);
     }};
 
     public Thread thread;
