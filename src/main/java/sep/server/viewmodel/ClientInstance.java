@@ -284,6 +284,18 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
+    private boolean onBuyUpgrade() {
+        l.debug("Received buy upgrade from client.");
+        return true;
+    }
+
+    private boolean onChooseRegister() {
+        l.debug("Received choose register from client.");
+        return true;
+    }
+
+
+
     // endregion Client Request Handlers
 
     private void parseRequest(RDefaultClientRequestParser dcrp) throws JSONException
