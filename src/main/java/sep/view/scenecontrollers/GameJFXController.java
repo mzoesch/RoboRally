@@ -121,7 +121,6 @@ public final class GameJFXController
 
         this.bFooterCollapsed   = true;
         this.registerHBox       = null;
-        this.showServerInfo = false;
 
         this.files                  = 0;
         this.ranks                  = 0;
