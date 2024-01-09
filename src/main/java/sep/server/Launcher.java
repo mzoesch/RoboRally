@@ -41,6 +41,7 @@ public final class Launcher
 
         if (args.length > 0)
         {
+
             if (Arrays.asList(args).contains("--port"))
             {
                 final int i = Arrays.asList(args).indexOf("--port");
@@ -112,6 +113,20 @@ public final class Launcher
                     System.exit(EArgs.ERR);
                     return;
                 }
+            }
+
+            if (Arrays.asList(args).contains("--help"))
+            {
+                l.info("##################### SERVER HELP #####################");
+                l.info("Valid server program arguments in descending order of precedence. Invalid arguments will be ignored.");
+                l.info("Usage: java -cp {jar-name}.jar sep.server.Launcher [--port PORT] [--minRemotePlayers MIN_REMOTE_PLAYERS] [--help]");
+                l.info("  --port <PORT>                             The port number to listen on. Default is {}.", sep.Types.EPort.DEFAULT.i);
+                l.info("  --minRemotePlayers <MIN_REMOTE_PLAYERS>   The minimum number of remote clients required to start a game. Default is {}.", sep.server.model.game.GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START);
+                l.info("  --help                                    Print this help message.");
+                l.info("#######################################################");
+                l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                System.exit(EArgs.OK);
+                return;
             }
 
         }
