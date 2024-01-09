@@ -39,11 +39,6 @@ public final class Launcher
                 return;
             }
 
-        GameInstance.run();
-
-        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-
-        System.exit(sep.EArgs.OK);
             if (Arrays.asList(args).contains("--help"))
             {
                 l.info("##################### CLIENT HELP #####################");
@@ -59,6 +54,21 @@ public final class Launcher
 
         }
 
+        try
+        {
+            GameInstance.run();
+        }
+        catch (final Exception e)
+        {
+            l.fatal("An unexpected error occurred.");
+            l.fatal(e.getMessage());
+            l.fatal(e.getStackTrace());
+        }
+        finally
+        {
+            l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(sep.EArgs.OK);
+        }
 
         return;
     }
