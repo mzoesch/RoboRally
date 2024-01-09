@@ -1080,7 +1080,7 @@ public final class GameJFXController
 
     // region Head Up Display
 
-    // region HUD Header
+    // region HUD Side Panel
 
     /** Updates the UI Phase Title in the Header. */
     private void renderPhaseTitle()
