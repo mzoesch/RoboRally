@@ -1388,13 +1388,15 @@ public final class GameJFXController
 
             final AnchorPane ap = new AnchorPane();
             HBox.setHgrow(ap, Priority.ALWAYS);
-            for (int j = 0; j < rp.getPlayedRCards().length; j++)
+            for (int j = 0; j < rp.getPlayedRCards().length; ++j)
             {
                 final ImageView iv = new ImageView();
-                iv.setFitWidth(GameJFXController.RCARD_WIDTH);
-                iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
-                iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+
+                iv.setFitWidth(     GameJFXController.RCARD_WIDTH   );
+                iv.setFitHeight(    GameJFXController.RCARD_HEIGHT  );
                 iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (i % 2 == 0 ? 1 : -1));
+                iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+
                 if (i % 2 == 0)
                 {
                     AnchorPane.setLeftAnchor(iv, 10.0);
@@ -1403,6 +1405,9 @@ public final class GameJFXController
                 {
                     AnchorPane.setRightAnchor(iv, 10.0);
                 }
+
+                AnchorPane.setTopAnchor(iv, 6.0);
+
                 ap.getChildren().add(iv);
                 continue;
             }
