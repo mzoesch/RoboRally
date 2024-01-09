@@ -1,22 +1,24 @@
 package sep.view.viewcontroller;
 
-import sep.view.json.RDefaultServerRequestParser;
-import sep.view.clientcontroller.EGameState;
-import sep.view.clientcontroller.EClientInformation;
-import sep.view.lib.EGamePhase;
-import sep.Types;
-import sep.view.lib.RRegisterCard;
+import sep.view.json.               RDefaultServerRequestParser;
+import sep.view.clientcontroller.   EGameState;
+import sep.view.clientcontroller.   EClientInformation;
+import sep.                         Types;
+import sep.view.lib.                EGamePhase;
+import sep.view.lib.                RRegisterCard;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.JSONObject;
+import org.json.                    JSONObject;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
 
 /** Mocking Game View with no server connection required. */
 public final class MockViewLauncher
 {
     private static final Logger l = LogManager.getLogger(MockViewLauncher.class);
 
-    private static final int MOCK_PLAYER_COUNT = 6;
+    private static final int    MOCK_PLAYER_COUNT      = 6;
+    private static final int    INIT_TIMEOUT_OSX       = 7_000;
+    private static final int    INIT_TIMEOUT_OTHER     = 1_000;
 
     private MockViewLauncher() throws RuntimeException
     {
@@ -39,11 +41,11 @@ public final class MockViewLauncher
                 //      and only fixed in newer JFX Versions.
                 if (Types.EOS.isOSX())
                 {
-                    Thread.sleep(7_000);
+                    Thread.sleep(MockViewLauncher.INIT_TIMEOUT_OSX);
                 }
                 else
                 {
-                    Thread.sleep(1_000);
+                    Thread.sleep(MockViewLauncher.INIT_TIMEOUT_OTHER);
                 }
             }
             catch (InterruptedException e)
