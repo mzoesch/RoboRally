@@ -53,19 +53,21 @@ public final class GameJFXController
 {
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
-    private static final String COLOR_HAMMER    = "#ff000033";
-    private static final String COLOR_TRUNDLE   = "#0000ff33";
-    private static final String COLOR_SQUASH    = "#ffc0cb33";
-    private static final String COLOR_X90       = "#00ff0033";
-    private static final String COLOR_SPIN      = "#00ffff33";
-    private static final String COLOR_TWONKY    = "#ffff0033";
-    private static final String COLOR_TWITCH    = "#aaaaaa33";
+    private static final String     COLOR_HAMMER                = "#ff000033";
+    private static final String     COLOR_TRUNDLE               = "#0000ff33";
+    private static final String     COLOR_SQUASH                = "#ffc0cb33";
+    private static final String     COLOR_X90                   = "#00ff0033";
+    private static final String     COLOR_SPIN                  = "#00ffff33";
+    private static final String     COLOR_TWONKY                = "#ffff0033";
+    private static final String     COLOR_TWITCH                = "#aaaaaa33";
+    private static final String     COLOR_RCARD_PREVIEW_BG      = "#707070e5";
 
     private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
     private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
     private static final int    CHAT_SCROLL_TIMEOUT             = 15    ;
     private static final int    GEAR_ANIMATION_DURATION         = 1_000 ;
     private static final int    BLINK_DURATION                  = 800   ;
+    private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
 
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -79,26 +81,28 @@ public final class GameJFXController
     @FXML private AnchorPane    footerContainer;
     @FXML private Button        chatBtn;
 
-    private static final int RCARD_WIDTH                = 50;
-    private static final int RCARD_HEIGHT               = 88;
-    private static final int RCARD_TRANSLATION_DIFF_X   = 10;
+    private static final int    RCARD_WIDTH                             = 50;
+    private static final int    RCARD_HEIGHT                            = 88;
+    private static final int    RCARD_TRANSLATION_DIFF_X                = 10;
+    private static final int    RCARD_PREVIEW_TRANSLATION_X             = 50;
+    private static final int    RCARD_PREVIEW_TRANSLATION_X_CLEANUP     = 5;
+    private static final int    RCARD_PREVIEW_TRANSLATION_X_ALPHA       = 2;
 
-    private VBox        chatContainer;
-    private boolean     showServerInfo;
+    private VBox                chatContainer;
+    private boolean             showServerInfo;
 
     private int                 tileDimensions;
-    private static final int    RESIZE_AMOUNT = 10;
+    private static final int    RESIZE_AMOUNT   = 10;
 
     private boolean             bClickedOnTile;
     private int                 gotRegisterSlotClicked;
-    private static final int    INVALID_GOT_REGISTER_SLOT = -1;
+    private static final int    INVALID_GOT_REGISTER_SLOT   = -1;
 
     private boolean             bFooterCollapsed;
 
     private HBox                registerHBox;
-    private static final int    FOOTER_PEEK_HEIGHT = 50;
-    /** During initialization. */
-    private static final int    NULL_FOOTER_HEIGHT = 200;
+    private static final int    FOOTER_PEEK_HEIGHT  = 50;
+    private static final int    NULL_FOOTER_HEIGHT  = 200;
 
     private int                         files;
     private int                         ranks;
@@ -1345,7 +1349,7 @@ public final class GameJFXController
     {
         this.playerContainer.getChildren().clear();
 
-        for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; i++)
+        for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; ++i)
         {
             final RemotePlayer rp = EGameState.INSTANCE.getRemotePlayers()[i];
 
@@ -1409,8 +1413,91 @@ public final class GameJFXController
                 AnchorPane.setTopAnchor(iv, 6.0);
 
                 ap.getChildren().add(iv);
+
                 continue;
             }
+
+            final int finalI = i;
+
+            if (ap.getWidth() > 0)
+            {
+                /* Legacy */
+                ap.setMaxWidth(ap.getWidth());
+            }
+
+            ap.setOnMouseEntered(e ->
+            {
+                final ArrayList<Integer> newTranslations = new ArrayList<Integer>();
+
+                for (int j = ap.getChildren().size() - 1; j >= 0; --j)
+                {
+                    newTranslations.add( (int) ( (-GameJFXController.RCARD_PREVIEW_TRANSLATION_X * (ap.getChildren().size() - 1 - j)) + Math.abs(ap.getChildren().get(j).getTranslateX())) );
+                    continue;
+                }
+
+                /* East translation cleanup. */
+                if (finalI % 2 == 1)
+                {
+                    for (int j = 0; j < ap.getChildren().size(); j++)
+                    {
+                        newTranslations.set(j, newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP));
+                        continue;
+                    }
+                }
+
+                for (int j = 0; j < ap.getChildren().size(); j++)
+                {
+                    final Timeline t    = new Timeline();
+                    final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.RCARDS_TRANSLATION_DURATION), new KeyValue(ap.getChildren().get(j).translateXProperty(), newTranslations.get(j)));
+                    t.getKeyFrames().add(kf);
+                    t.play();
+
+                    continue;
+                }
+
+                for (final Rectangle r : GameJFXController.getHoverPCardBackgrounds(ap, newTranslations, finalI))
+                {
+                    ap.getChildren().add(0, r);
+                    continue;
+                }
+
+                return;
+            }
+            );
+
+            ap.setOnMouseExited(e ->
+            {
+                ap.getChildren().clear();
+                ap.setStyle("");
+
+                for (int j = 0; j < rp.getPlayedRCards().length; ++j)
+                {
+                    final ImageView iv = new ImageView();
+
+                    iv.setFitWidth(GameJFXController.RCARD_WIDTH);
+                    iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
+                    iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+                    iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (finalI % 2 == 0 ? 1 : -1));
+
+                    if (finalI % 2 == 0)
+                    {
+                        AnchorPane.setLeftAnchor(iv, 10.0);
+                    }
+                    else
+                    {
+                        AnchorPane.setRightAnchor(iv, 10.0);
+                    }
+
+                    AnchorPane.setTopAnchor(iv, 6.0);
+
+                    ap.getChildren().add(iv);
+
+                    continue;
+                }
+
+                return;
+            }
+            );
 
             final HBox h = new HBox();
             h.getStyleClass().add("player-information-container");
@@ -2023,6 +2110,27 @@ public final class GameJFXController
         }
 
         return wallLasers.toArray(new Tile[0]);
+    }
+
+    private static ArrayList<Rectangle> getHoverPCardBackgrounds(final AnchorPane target, final ArrayList<Integer> newTranslations, final int idx)
+    {
+        final ArrayList<Rectangle> rs = new ArrayList<Rectangle>();
+
+        for (int j = 0; j < target.getChildren().size(); j++)
+        {
+            final Rectangle r = new Rectangle();
+
+            r.setWidth(GameJFXController.RCARD_PREVIEW_TRANSLATION_X + 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP);
+            r.setHeight(target.getHeight());
+            r.setStyle(String.format("-fx-fill: %s", GameJFXController.COLOR_RCARD_PREVIEW_BG));
+            r.setTranslateX(newTranslations.get(j) + (idx % 2 == 0 ? GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP : GameJFXController.RCARD_PREVIEW_TRANSLATION_X - RCARD_PREVIEW_TRANSLATION_X_CLEANUP - GameJFXController.RCARD_PREVIEW_TRANSLATION_X_ALPHA));
+
+            rs.add(r);
+
+            continue;
+        }
+
+        return rs;
     }
 
     // endregion Getters and Setters
