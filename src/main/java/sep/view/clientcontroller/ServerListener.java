@@ -218,8 +218,24 @@ public final class ServerListener implements Runnable
     private boolean onPlayerTurnChange() throws JSONException
     {
         l.debug("It is now player {}'s turn.", this.dsrp.getPlayerID());
-        EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID());
         ViewSupervisor.handleChatInfo(String.format("Player %s is now current Player.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
+        {
+            if (this.dsrp.getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
+            {
+                EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), true);
+                ViewSupervisor.updateCourseView();
+
+                return true;
+            }
+
+            EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), false);
+            return true;
+        }
+
+        EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), false);
+
         return true;
     }
 
@@ -244,8 +260,18 @@ public final class ServerListener implements Runnable
     {
         l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
-        ViewSupervisor.updatePlayerTransforms();
         ViewSupervisor.handleChatInfo(String.format("Player %s has selected a starting Point.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+
+        /* We must discard the hover effects. */
+        if (this.dsrp.getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
+        {
+            ViewSupervisor.updateCourseView();
+        }
+        else
+        {
+            ViewSupervisor.updatePlayerTransforms();
+        }
+
         return true;
     }
 
