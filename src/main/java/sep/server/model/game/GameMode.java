@@ -211,6 +211,7 @@ public class GameMode {
     private void triggerProgrammingPhase() {
         for (Player p : players) {
             p.clearOldHand();
+            p.clearOldRegister();
 
             int maxCards = Math.min(GameMode.NEW_PROGRAMMING_CARDS, p.getPlayerDeck().size());
 
@@ -218,18 +219,18 @@ public class GameMode {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-            p.shuffleAndRefillDeck();
-            l.debug("P Shuffling and refilling deck for player {}.", p.getController().getName());
-            this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
+            if (maxCards < GameMode.NEW_PROGRAMMING_CARDS ) {
+                p.shuffleAndRefillDeck();
+                l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
+                this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
 
-            int remainingCards = 9 - maxCards;
-            for (int i = 0; i < remainingCards; i++) {
-                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+                int remainingCards = 9 - maxCards;
+                for (int i = 0; i < remainingCards; i++) {
+                    p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+                }
             }
-            l.debug("P Player {} has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
-
-
+            l.debug("P {} - Has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
             //alter Code
             /*for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++) {

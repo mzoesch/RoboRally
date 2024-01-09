@@ -8,6 +8,7 @@ import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.tiles.Coordinate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -288,9 +289,29 @@ public class Player {
     }
 
     public void clearOldHand() {
-        discardPile.addAll(playerHand);
-        this.playerHand.clear();
+        if (!playerHand.isEmpty()) {
+            l.debug("P {} - Clearing old Hand. {} Cards has been moved to discard pile: {}", getController().getName(), playerHand.size(), getPlayerHandAsStringArray());
+            discardPile.addAll(playerHand);
+            this.playerHand.clear();
+        } else {
+            l.debug("P {} -  Hand is Empty. No cards has been moved to discard pile.", getController().getName());
+        }
     }
+
+
+    public void clearOldRegister() {
+        if (Arrays.asList(registers).isEmpty()) {
+            l.debug("P {} - Clearing old Register. {} Cards has been moved to discard pile: {}", getController().getName(), registers.length, getRegistersAsStringArray());
+            discardPile.addAll(Arrays.asList(registers));
+            Arrays.fill(registers, null);
+        } else {
+            l.debug("P {} - Register is empty. No cards moved to discard pile.", getController().getName());
+        }
+    }
+
+
+
+
 
     public Coordinate getPosition()
     {
