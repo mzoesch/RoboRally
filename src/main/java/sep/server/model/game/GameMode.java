@@ -219,12 +219,16 @@ public class GameMode {
             }
 
             p.shuffleAndRefillDeck();
+            l.debug("P Shuffling and refilling deck for player {}.", p.getController().getName());
             this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
 
             int remainingCards = 9 - maxCards;
             for (int i = 0; i < remainingCards; i++) {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
+            l.debug("P Player {} has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
+
+
 
 
             //alter Code
@@ -806,6 +810,14 @@ public class GameMode {
 
     private void triggerActivationPhase()
     {
+
+        for (Player p : players) {
+            l.debug("P Player {} - Cards in register {}.",
+                    p.getController().getName(),
+                    p.getRegistersAsStringArray());
+        }
+
+
         if (this.activationPhaseThread != null && this.activationPhaseThread.isAlive())
         {
             l.warn("Activation Phase is already running. Skipping . . .");
