@@ -1577,8 +1577,8 @@ public final class GameJFXController
         {
             for (int j = 0; j < this.ranks; j++)
             {
-                final Tile t = this.tiles[i][j];
-                final AnchorPane AP = new AnchorPane();
+                final Tile t            = this.tiles[i][j];
+                final AnchorPane AP     = new AnchorPane();
                 /* Warning: This is not commutative. Do not change the order here. */
                 for (int k = t.getImageViews().length - 1; k >= 0; --k)
                 {
@@ -1596,7 +1596,7 @@ public final class GameJFXController
                 }
                 this.renderOnPosition(AP, t.getTileLocation());
 
-                if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
+                if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION && EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
                 {
                     AP.setOnMouseClicked(e ->
                     {
