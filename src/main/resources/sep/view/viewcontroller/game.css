@@ -34,7 +34,7 @@
 
 #ui-footer {
     -fx-min-height: 200px;
-    -fx-background-color: rgb(45, 45, 45);
+    -fx-background-color: #2d2d2dff;
     -fx-spacing: 12px;
     -fx-alignment: center-left;
     -fx-padding: 12px 12px 12px 12px;
@@ -54,13 +54,13 @@
 }
 
 .register-slot {
-    -fx-background-color: rgba(57, 0, 255, 0.2);
+    -fx-background-color: #3900ff33;
     -fx-border-color: #000000ff;
     -fx-border-width: 1px;
 }
 
 .register-slot:hover {
-    -fx-background-color: rgba(39, 2, 157, 0.2);
+    -fx-background-color: #27029d33;
 }
 
 .register-slot-active {
@@ -70,7 +70,7 @@
 }
 
 .register-slot-disabled {
-    -fx-background-color: rgba(96, 96, 96, 0.8);
+    -fx-background-color: #606060cc;
     -fx-border-color: #3f0909;
     -fx-border-width: 1px;
 }
@@ -82,7 +82,7 @@
 }
 
 .register-slot-available:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.2);
+    -fx-background-color: #ffffff33;
 }
 
 #got-register-cards-hbox {
@@ -154,7 +154,7 @@
 }
 
 .player-box:hover {
-    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-background-color: #00000066;
 }
 
 .player-box-text {
@@ -163,7 +163,7 @@
 }
 
 .player-information-container {
-    -fx-background-color: rgba(0, 0, 0, 0.45);
+    -fx-background-color: #00000072;
     -fx-padding: 5px;
     -fx-min-width: 200px;
     -fx-max-width: 200px;
@@ -173,7 +173,7 @@
 }
 
 #course-scroll-pane {
-    -fx-background: rgba(255, 0, 255, 0.01);
+    -fx-background: #ff00ff02;
 }
 
 #course-scroll-pane-content {
@@ -187,7 +187,7 @@
 }
 
 .tile-after:hover {
-    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-background-color: #00000066;
     -fx-cursor: hand;
 }
 
@@ -249,7 +249,7 @@
 }
 
 #reboot-dialog-container {
-    -fx-background-color: rgba(43, 42, 51, 0.95);
+    -fx-background-color: #2b2a33f2;
     -fx-border-width: 2px;
     -fx-border-color: #ffffff;
     -fx-border-radius: 5px;
@@ -272,7 +272,7 @@
 }
 
 #phase-update-container {
-    -fx-background-color: rgba(43, 42, 51, 0.95);
+    -fx-background-color: #2b2a33f2;
     -fx-border-width: 2px;
     -fx-border-color: #ffffff;
     -fx-border-radius: 5px;
@@ -284,7 +284,7 @@
 }
 
 #damage-card-selection-dialog-container{
-    -fx-background-color: rgba(43, 42, 51, 0.95);
+    -fx-background-color: #2b2a33f2;
     -fx-border-width: 2px;
     -fx-border-color: #ffffff;
     -fx-border-radius: 5px;
