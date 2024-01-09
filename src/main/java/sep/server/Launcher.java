@@ -1,14 +1,15 @@
 package sep.server;
 
-import sep.EArgs;
-import sep.server.model.EServerInformation;
-import sep.server.viewmodel.ServerInstance;
-import sep.server.model.game.GameState;
+import sep.                     EArgs;
+import sep.server.viewmodel.    ServerInstance;
+import sep.server.model.        EServerInformation;
+import sep.Types.               EPort;
+import sep.server.model.game.   GameState;
 
-import java.io.IOException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.util.Arrays;
+import java.io.                     IOException;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.util.                   Arrays;
 
 public final class Launcher
 {
@@ -57,6 +58,14 @@ public final class Launcher
                     {
                         l.fatal("Invalid port number.");
                         l.fatal(e.getMessage());
+                        l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(EArgs.ERR);
+                        return;
+                    }
+
+                    if (p < EPort.MIN.i || p > EPort.MAX.i)
+                    {
+                        l.fatal("Invalid port number. Must be between {} and {}.", EPort.MIN.i, EPort.MAX.i);
                         l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                         System.exit(EArgs.ERR);
                         return;
