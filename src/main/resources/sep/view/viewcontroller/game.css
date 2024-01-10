@@ -69,10 +69,14 @@
     -fx-background-color: #3900ff33;
     -fx-border-color: #000000ff;
     -fx-border-width: 1px;
+
+    -fx-cursor: hand;
 }
 
 .register-slot:hover {
     -fx-background-color: #27029d33;
+
+    -fx-cursor: hand;
 }
 
 .register-slot-active {
@@ -96,7 +100,7 @@
 }
 
 .register-slot-available:hover {
-    -fx-background-color: #ffffff33;
+    -fx-background-color: #ffffff99;
 
     -fx-cursor: hand;
 }
