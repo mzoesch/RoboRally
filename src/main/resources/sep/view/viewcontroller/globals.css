@@ -101,17 +101,23 @@
 
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
+
+    -fx-cursor: hand;
 }
 
 .primary-btn-mini:hover,
 .primary-btn:hover {
     -fx-background-color: -primary-btn-color-hover;
+
+    -fx-cursor: hand;
 }
 
 .primary-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+
+    -fx-cursor: hand;
 }
 
 .secondary-btn-tiny,
@@ -125,24 +131,32 @@
 
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
+
+    -fx-cursor: hand;
 }
 
 .secondary-btn-tiny:hover,
 .secondary-btn-mini:hover,
 .secondary-btn:hover {
     -fx-background-color: -secondary-btn-color-hover;
+
+    -fx-cursor: hand;
 }
 
 .secondary-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+
+    -fx-cursor: hand;
 }
 
 .secondary-btn-tiny {
     -fx-font-size: 12px;
     -fx-font-weight: 300;
     -fx-padding: 2px 6px 2px 6px;
+
+    -fx-cursor: hand;
 }
 
 .danger-btn-tiny,
@@ -156,24 +170,32 @@
 
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
+
+    -fx-cursor: hand;
 }
 
 .danger-btn-tiny:hover,
 .danger-btn-mini:hover,
 .danger-btn:hover {
     -fx-background-color: -danger-btn-color-hover;
+
+    -fx-cursor: hand;
 }
 
 .danger-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+
+    -fx-cursor: hand;
 }
 
 .danger-btn-tiny {
     -fx-font-size: 12px;
     -fx-font-weight: 300;
     -fx-padding: 2px 6px 2px 6px;
+
+    -fx-cursor: hand;
 }
 
 .confirm-btn-mini,
@@ -186,17 +208,23 @@
 
     -fx-padding: 16px 48px 16px 48px;
     -fx-border-radius: 0px;
+
+    -fx-cursor: hand;
 }
 
 .confirm-btn-mini:hover,
 .confirm-btn:hover {
     -fx-background-color: -confirm-btn-color-hover;
+
+    -fx-cursor: hand;
 }
 
 .confirm-btn-mini {
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+
+    -fx-cursor: hand;
 }
 
 /*#endregion Buttons*/
