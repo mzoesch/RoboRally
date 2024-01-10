@@ -317,6 +317,13 @@ public final class GameJFXController
         ViewSupervisor.getSceneController().getMasterScene().setOnKeyPressed(
         (keyEvent ->
         {
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.Q)
+            {
+                this.bFooterCollapsed = !this.bFooterCollapsed;
+                this.renderHUDFooter();
+                return;
+            }
+
             if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.DIGIT1 || Objects.requireNonNull(keyEvent.getCode()) == KeyCode.NUMPAD1)
             {
                 if (this.gotRegisterSlotClicked == GameJFXController.INVALID_GOT_REGISTER_SLOT)
