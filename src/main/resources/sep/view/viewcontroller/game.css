@@ -6,7 +6,7 @@
 #information-container {
     -fx-min-width: 450px;
     -fx-padding: 12px 12px 12px 12px;
-    -fx-background-color: #2b2a33ff;
+    -fx-background-color: linear-gradient(#2b2a33ff, #2a2941ff, #2c2369ff);
 }
 
 #information-container-header {
@@ -40,8 +40,16 @@
 
 #footer-container {
     -fx-min-height: 200px;
-    -fx-background-color: #490000;
+    -fx-background-color: linear-gradient(#313131, #2b2a33ff, #2b2a33ff, #2b2a33ff, #222026ff, #131317ff);
     -fx-padding: 12px 12px 12px 12px;
+    -fx-border-style: solid none none none;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+}
+
+#register-slots-label-container {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
 }
 
 #ui-footer {
@@ -60,7 +68,20 @@
 #register-container {
 }
 
+#got-register-container {
+}
+
 #register-hbox {
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+#register-wrapper {
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+#got-register-hbox {
     -fx-spacing: 8px;
     -fx-alignment: center-left;
 }
@@ -92,7 +113,7 @@
 }
 
 .register-slot-available {
-    -fx-background-color: #ffffff;
+    -fx-background-color: #ffffffff;
     -fx-border-color: #000000ff;
     -fx-border-width: 1px;
 
