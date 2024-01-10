@@ -573,26 +573,7 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    /**
-     * Gateway-method to create a PhaseUpdatePopUp from outside ViewSupervisor
-     * @param newPhase phase, which should be shown
-     */
-    public static void createPhaseUpdatePopUpLater(EGamePhase newPhase)
-    {
-        Platform.runLater(() ->
-        {
-            ViewSupervisor.createPhaseUpdatePopUp(newPhase);
-            return;
-        });
-
-        return;
-    }
-
-    /**
-     * method to create an PopUp with the new GamePhase (auto-deletes after 2000 ms)
-     * @param newPhase phase, which should be shown
-     */
-    public static void createPhaseUpdatePopUp(EGamePhase newPhase)
+    public static void createPhaseUpdatePopUpLater(final EGamePhase phase)
     {
         final HBox h = new HBox();
         h.setAlignment(Pos.CENTER);
