@@ -595,7 +595,7 @@ public final class ViewSupervisor extends Application
     public static void createPhaseUpdatePopUp(EGamePhase newPhase)
     {
         final HBox h = new HBox();
-        h.setAlignment(javafx.geometry.Pos.CENTER);
+        h.setAlignment(Pos.CENTER);
 
         final Label header = new Label(newPhase.name());
         header.getStyleClass().add("text-xl");
