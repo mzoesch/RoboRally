@@ -42,7 +42,6 @@
                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
                 >
                     <Label
-                        text="30s"
                         styleClass="text-xl"
                         fx:id="programmingTimerLabel"
                     />
@@ -50,7 +49,6 @@
                         HBox.hgrow="ALWAYS"
                     />
                     <Label
-                        text="Current Phase ???"
                         id="ui-header-phase" stylesheets="@game.css"
                         fx:id="UIHeaderPhaseLabel"
                     />
