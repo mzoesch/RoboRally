@@ -1,21 +1,22 @@
 package sep.view.viewcontroller;
 
-import sep.Types;
-import sep.view.json.game.SelectedDamageModel;
-import sep.view.lib.EGamePhase;
+import sep.view.json.game.          SelectedDamageModel;
+import sep.view.json.game.          RebootDirectionModel;
+import sep.                         Types;
 import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
 import sep.view.json.               ChatMsgModel;
 import sep.view.json.               RDefaultServerRequestParser;
-import sep.view.json.game.          RebootDirectionModel;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
+import sep.view.lib.                EGamePhase;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EAnimation;
 
 import javafx.scene.control.        Label;
 import javafx.scene.control.        Button;
+import javafx.geometry.             Pos;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
@@ -28,8 +29,7 @@ import javafx.stage.                Stage;
 import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
-
-import java.util.ArrayList;
+import java.util.                   ArrayList;
 import java.util.concurrent.atomic. AtomicReference;
 
 /**
@@ -482,7 +482,7 @@ public final class ViewSupervisor extends Application
     public static void createRebootDialog()
     {
         final HBox h = new HBox();
-        h.setAlignment(javafx.geometry.Pos.CENTER);
+        h.setAlignment(Pos.CENTER);
 
         final Label header = new Label("You robot has been rebooted. Select a direction to continue.");
         header.getStyleClass().add("text-xl");
@@ -638,7 +638,7 @@ public final class ViewSupervisor extends Application
     {
         ArrayList<String> selectedCards = new ArrayList<>();
         final HBox h = new HBox();
-        h.setAlignment(javafx.geometry.Pos.CENTER);
+        h.setAlignment(Pos.CENTER);
 
         final Label header = new Label(String.format("You have to select %s DamageCards to receive.", countToDraw));
         header.getStyleClass().add("text-xl");
@@ -730,7 +730,7 @@ public final class ViewSupervisor extends Application
     public static void createDrawDamagePopUp(String drawnCards)
     {
         final HBox h = new HBox();
-        h.setAlignment(javafx.geometry.Pos.CENTER);
+        h.setAlignment(Pos.CENTER);
 
         final Label header = new Label("Damage Cards drawn");
         header.getStyleClass().add("text-xl");
