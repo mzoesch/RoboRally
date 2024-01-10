@@ -84,7 +84,6 @@ public final class GameJFXController
     @FXML private TextField     chatInputTextField;
     @FXML private Button        footerBtn;
     @FXML private AnchorPane    footerContainer;
-    @FXML private Button        chatBtn;
 
     private static final int    RCARD_WIDTH                             = 50;
     private static final int    RCARD_HEIGHT                            = 88;
@@ -321,6 +320,12 @@ public final class GameJFXController
             {
                 this.bFooterCollapsed = !this.bFooterCollapsed;
                 this.renderHUDFooter();
+                return;
+            }
+
+            if (Objects.requireNonNull(keyEvent.getCode()) == KeyCode.C)
+            {
+                this.onCenterCourse();
                 return;
             }
 
