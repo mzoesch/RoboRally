@@ -340,3 +340,12 @@
     -fx-spacing: 8px;
     -fx-alignment: center;
 }
+
+#quick-tip-popup {
+    -fx-background-color: #171717e5;
+    -fx-padding: 12px 12px 12px 12px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 1px;
+    -fx-background-radius: 1px;
+    -fx-border-width: 1px;
+}
