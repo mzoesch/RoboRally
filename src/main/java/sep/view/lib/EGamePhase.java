@@ -43,4 +43,15 @@ public enum EGamePhase
         return "Can not describe ProgrammingPhase";
     }
 
+    public String getDisplayName()
+    {
+        return switch (i)
+        {
+            case 0      ->  "Registration Phase";
+            case 1      ->  "Upgrade Phase";
+            case 2      ->  "Programming Phase";
+            case 3      ->  "Activation Phase";
+            default     ->  "INVALID PHASE";
+        };
+    }
 }
