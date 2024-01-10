@@ -388,7 +388,7 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    public static void createPopupLater(final Pane p)
+    public static void createPopUpLater(final Pane p)
     {
         Platform.runLater(() ->
         {
