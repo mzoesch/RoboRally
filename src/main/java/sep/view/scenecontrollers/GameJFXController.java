@@ -47,6 +47,7 @@ import javafx.scene.control.        Label;
 import javafx.scene.control.        TextField;
 import javafx.scene.control.        ScrollPane;
 import javafx.scene.control.        Button;
+import javafx.geometry.             Insets;
 import javafx.scene.paint.          Color;
 
 public final class GameJFXController
@@ -69,6 +70,7 @@ public final class GameJFXController
     private static final int    BLINK_DURATION                  = 800   ;
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
 
+    @FXML private Label         programmingTimerLabel;
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
     @FXML private VBox          playerContainer;
@@ -140,7 +142,9 @@ public final class GameJFXController
     @FXML
     private void initialize()
     {
-        VBox.setVgrow(this.chatScrollPane, Priority.ALWAYS);
+        VBox.setVgrow(  this.chatScrollPane,            Priority.ALWAYS         );
+        HBox.setMargin( this.programmingTimerLabel,     new Insets(0, 0, 0, 10) );
+        HBox.setMargin( this.UIHeaderPhaseLabel,        new Insets(0, 10, 0, 0) );
 
         this.courseScrollPane.setFitToWidth(    true    );
         this.courseScrollPane.setFitToHeight(   true    );
