@@ -732,7 +732,7 @@ public final class ViewSupervisor extends Application
         AnchorPane.setTopAnchor(        h, 0.0      );
         AnchorPane.setBottomAnchor(     h, 0.0      );
 
-        ViewSupervisor.createPopUp(h, 2000);
+        ViewSupervisor.createPopUp(h, 2000, false);
 
         return;
     }
