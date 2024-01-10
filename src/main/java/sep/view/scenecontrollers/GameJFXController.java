@@ -439,14 +439,6 @@ public final class GameJFXController
         return;
     }
 
-    @FXML
-    private void onChatBtn(final ActionEvent actionEvent)
-    {
-        this.showServerInfo = !this.showServerInfo;
-        this.renderHUDFooter();
-        return;
-    }
-
     // region Slot Action Methods
 
     // region Register Slot Action Methods
