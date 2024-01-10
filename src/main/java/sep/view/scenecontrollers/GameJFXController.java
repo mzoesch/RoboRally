@@ -1260,6 +1260,16 @@ public final class GameJFXController
             this.registerHBox.getChildren().clear();
         }
 
+        if (this.gotRegisterHBox == null)
+        {
+            this.gotRegisterHBox = new HBox();
+            this.gotRegisterHBox.setId("got-register-hbox");
+        }
+        else
+        {
+            this.gotRegisterHBox.getChildren().clear();
+        }
+
         this.registerContainer.getChildren().clear();
         this.registerContainer.getChildren().add(this.registerHBox);
         for (int i = 0; i < 5; i++)
@@ -1268,19 +1278,21 @@ public final class GameJFXController
             continue;
         }
 
-        this.registerHBox.getChildren().add(new VBox());
+        this.gotRegisterContainer.getChildren().clear();
+        this.gotRegisterContainer.getChildren().add(this.gotRegisterHBox);
+        this.gotRegisterHBox.getChildren().add(new VBox());
         for (int i = 0; i < 9; i++)
         {
             if (i % 3 == 0)
             {
-                ( (Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1) ).getChildren().add(new HBox());
+                ( (Pane) this.gotRegisterHBox.getChildren().get(this.gotRegisterHBox.getChildren().size() - 1) ).getChildren().add(new HBox());
             }
 
             this.addRegisterSlot
             (
               i
             , true
-            , (Pane) ( (Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1) ).getChildren().get( ( (Pane) this.registerHBox.getChildren().get(this.registerHBox.getChildren().size() - 1) ).getChildren().size() - 1)
+            , (Pane) ( (Pane) this.gotRegisterHBox.getChildren().get(this.gotRegisterHBox.getChildren().size() - 1) ).getChildren().get( ( (Pane) this.gotRegisterHBox.getChildren().get(this.gotRegisterHBox.getChildren().size() - 1) ).getChildren().size() - 1)
             , ViewSupervisor.GOT_REGISTER_SLOT_WIDTH
             , ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT
             )
