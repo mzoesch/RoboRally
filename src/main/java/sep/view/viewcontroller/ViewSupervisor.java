@@ -488,7 +488,7 @@ public final class ViewSupervisor extends Application
         bW.setOnAction(e ->
         {
             new RebootDirectionModel("right").send();
-            ViewSupervisor.getSceneController().destroyPopUp(h);
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
             return;
         }
         );
@@ -500,7 +500,7 @@ public final class ViewSupervisor extends Application
         bN.setOnAction(e ->
         {
             new RebootDirectionModel("top").send();
-            ViewSupervisor.getSceneController().destroyPopUp(h);
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
             return;
         }
         );
@@ -512,7 +512,7 @@ public final class ViewSupervisor extends Application
         bS.setOnAction(e ->
         {
             new RebootDirectionModel("bottom").send();
-            ViewSupervisor.getSceneController().destroyPopUp(h);
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
             return;
         }
         );
@@ -524,7 +524,7 @@ public final class ViewSupervisor extends Application
         bE.setOnAction(e ->
         {
             new RebootDirectionModel("left").send();
-            ViewSupervisor.getSceneController().destroyPopUp(h);
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
             return;
         }
         );
@@ -649,7 +649,7 @@ public final class ViewSupervisor extends Application
                                 selectedCards.add(name);
                                 new SelectedDamageModel(selectedCards);
                                 l.debug("DamageCard JSON sent with contents: " + selectedCards.toString());
-                                ViewSupervisor.getSceneController().destroyPopUp(h);
+                                ViewSupervisor.getSceneController().destroyPopUp(h, false);
                                 return;
                             } else {
                                 selectedCards.add(name);

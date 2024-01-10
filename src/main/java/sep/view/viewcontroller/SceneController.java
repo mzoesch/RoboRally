@@ -225,12 +225,18 @@ public final class SceneController
         return;
     }
 
-    public void destroyPopUp(final Pane target)
+    public void destroyPopUp(final Pane target, final boolean bSoft)
     {
         if (target == null)
         {
             l.fatal("Failed to destroy pop up. Target is null.");
             GameInstance.kill();
+            return;
+        }
+
+        if (bSoft && !Objects.requireNonNull(this.getPopUpTarget()).getChildren().contains(target))
+        {
+            l.warn("Pop up is already destroyed or was never rendered. Ignoring.");
             return;
         }
 
