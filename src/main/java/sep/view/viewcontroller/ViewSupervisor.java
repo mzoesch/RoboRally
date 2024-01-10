@@ -30,6 +30,7 @@ import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic. AtomicReference;
 
 /**
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
@@ -45,13 +46,14 @@ public final class ViewSupervisor extends Application
     private static ViewSupervisor   INSTANCE;
     private SceneController         sceneController;
 
-    public static final int TILE_DIMENSIONS             = 96;
-    public static final int VIRTUAL_SPACE_VERTICAL      = 512;
-    public static final int VIRTUAL_SPACE_HORIZONTAL    = 512;
-    public static final int REGISTER_SLOT_WIDTH         = 102;
-    public static final int REGISTER_SLOT_HEIGHT        = 180;
-    public static final int GOT_REGISTER_SLOT_WIDTH     = 34;
-    public static final int GOT_REGISTER_SLOT_HEIGHT    = 58;
+    public static final int     TILE_DIMENSIONS             = 96;
+    public static final int     VIRTUAL_SPACE_VERTICAL      = 512;
+    public static final int     VIRTUAL_SPACE_HORIZONTAL    = 512;
+    public static final int     REGISTER_SLOT_WIDTH         = 102;
+    public static final int     REGISTER_SLOT_HEIGHT        = 180;
+    public static final int     GOT_REGISTER_SLOT_WIDTH     = 34;
+    public static final int     GOT_REGISTER_SLOT_HEIGHT    = 58;
+    public static final int     PHASE_POPUP_TIME            = 5_000;
 
     public ViewSupervisor()
     {
@@ -399,51 +401,67 @@ public final class ViewSupervisor extends Application
         return;
     }
 
-    public static void createPopUp(final Pane p, final int autoDestroyDelay)
+    public static Thread createPopUp(final Pane p, final int autoDestroyDelay, final boolean bSoftDestroy)
     {
         ViewSupervisor.createPopUp(p);
 
         if (autoDestroyDelay <= 0)
         {
-            return;
+            return null;
         }
 
-        new Thread(() ->
+        final Thread t = new Thread(() ->
         {
             l.debug("Waiting {}ms before destroying pop up.", autoDestroyDelay);
+
             try
             {
                 Thread.sleep(autoDestroyDelay);
             }
             catch (final InterruptedException e)
             {
+                if (bSoftDestroy)
+                {
+                    l.debug("Pop up was soft destroyed before auto destroy delay was reached. Ok.");
+                    return;
+                }
+
                 l.error("Failed to sleep thread for {}ms.", autoDestroyDelay);
                 l.error(e.getMessage());
+
                 return;
             }
 
             Platform.runLater(() ->
             {
-                ViewSupervisor.getSceneController().destroyPopUp(p);
+                ViewSupervisor.getSceneController().destroyPopUp(p, bSoftDestroy);
                 return;
             });
 
             return;
-        })
-        .start();
+        });
 
-        return;
+        t.start();
+
+        return t;
     }
 
-    public static void createPopUpLater(final Pane p, final int autoDestroyDelay)
+    public static AtomicReference<Thread> createPopUpLater(final Pane p, final int autoDestroyDelay)
     {
+        return ViewSupervisor.createPopUpLater(p, autoDestroyDelay, false);
+    }
+
+    public static AtomicReference<Thread> createPopUpLater(final Pane p, final int autoDestroyDelay, final boolean bSoftDestroy)
+    {
+        final AtomicReference<Thread> atom = new AtomicReference<Thread>();
+
         Platform.runLater(() ->
         {
-            ViewSupervisor.createPopUp(p, autoDestroyDelay);
+            atom.set(ViewSupervisor.createPopUp(p, autoDestroyDelay, bSoftDestroy));
             return;
         });
 
-        return;
+        return atom;
     }
 
     public static void playAnimation(final EAnimation anim)
