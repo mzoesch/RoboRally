@@ -49,6 +49,7 @@ import javafx.scene.control.        ScrollPane;
 import javafx.scene.control.        Button;
 import javafx.geometry.             Insets;
 import javafx.scene.paint.          Color;
+import java.util.concurrent.atomic. AtomicReference;
 
 public final class GameJFXController
 {
@@ -69,6 +70,7 @@ public final class GameJFXController
     private static final int    GEAR_ANIMATION_DURATION         = 1_000 ;
     private static final int    BLINK_DURATION                  = 800   ;
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
+    private static final int    QUICK_TIP_DURATION              = 60_000;
 
     @FXML private Label         programmingTimerLabel;
     @FXML private Label         UIHeaderPhaseLabel;
@@ -181,6 +183,79 @@ public final class GameJFXController
         this.chatContainer = new VBox();
         this.chatContainer.setId("chat-scroll-pane-inner");
         this.chatScrollPane.setContent(this.chatContainer);
+
+        this.createQuickTip();
+
+        return;
+    }
+
+    private void createQuickTip()
+    {
+        final Label     l       = new Label("Quick Tips:");
+        final Label     lQKey   = new Label("Q:");
+        final Label     lQDesc  = new Label("To toggle the footer.");
+        final Label     lZKey   = new Label("W/S:");
+        final Label     lZDesc  = new Label("To zoom in and out.");
+        final Label     lVKey   = new Label("MW:");
+        final Label     lVDesc  = new Label("To move vertically.");
+        final Label     lHKey   = new Label("SHIFT + MW:");
+        final Label     lHDesc  = new Label("To move horizontally.");
+        final Label     lCKey   = new Label("C:");
+        final Label     lCDesc  = new Label("To center the course.");
+
+        l.getStyleClass().add("text-base");
+        l.setStyle("-fx-underline: true;");
+        lQKey   .getStyleClass().add(   "text-base" );
+        lQDesc  .getStyleClass().add(   "text-base" );
+        lZKey   .getStyleClass().add(   "text-base" );
+        lZDesc  .getStyleClass().add(   "text-base" );
+        lVKey   .getStyleClass().add(   "text-base" );
+        lVDesc  .getStyleClass().add(   "text-base" );
+        lHKey   .getStyleClass().add(   "text-base" );
+        lHDesc  .getStyleClass().add(   "text-base" );
+        lCKey   .getStyleClass().add(   "text-base" );
+        lCDesc  .getStyleClass().add(   "text-base" );
+
+        final VBox hKey     = new VBox( lQKey, lZKey, lVKey, lHKey, lCKey       );
+        final VBox hDesc    = new VBox( lQDesc, lZDesc, lVDesc, lHDesc, lCDesc  );
+        final HBox list     = new HBox( hKey, hDesc                             );
+        final VBox labels   = new VBox( l, list                                 );
+
+        final Button b      = new Button("X");
+        final AnchorPane p  = new AnchorPane(labels, b);
+
+        list.setSpacing(20.0);
+        b.getStyleClass().add("danger-btn-tiny");
+        p.setId("quick-tip-popup");
+
+        AnchorPane.setLeftAnchor(   labels, 0.0 );
+        AnchorPane.setRightAnchor(  labels, 0.0 );
+        AnchorPane.setTopAnchor(    labels, 0.0 );
+        AnchorPane.setBottomAnchor( labels, 0.0 );
+
+        AnchorPane.setRightAnchor(  b,      0.0 );
+        AnchorPane.setTopAnchor(    b,      0.0 );
+
+        AnchorPane.setLeftAnchor(   p,      10.0 );
+        AnchorPane.setTopAnchor(    p,      10.0 );
+
+        final AtomicReference<Thread> atom =  ViewSupervisor.createPopUpLater(p, GameJFXController.QUICK_TIP_DURATION, true);
+
+        b.setOnAction(e ->
+        {
+            ViewSupervisor.getSceneController().destroyPopUp(p, false);
+
+            if (atom.get() != null)
+            {
+                GameJFXController.l.debug("Interrupting quick tip thread.");
+                atom.get().interrupt();
+                return;
+            }
+
+            GameJFXController.l.error("Tried to interrupt quick tip thread but something went wrong. The thread reference was null.");
+
+            return;
+        });
 
         return;
     }
