@@ -92,6 +92,8 @@ public final class GameJFXController
     private static final int    RCARD_PREVIEW_TRANSLATION_X             = 50;
     private static final int    RCARD_PREVIEW_TRANSLATION_X_CLEANUP     = 5;
     private static final int    RCARD_PREVIEW_TRANSLATION_X_ALPHA       = 2;
+    private static final int    MIN_ALLOW_ZOOM                          = 30;
+    private static final int    MAX_ALLOW_ZOOM                          = 120;
 
     private VBox                chatContainer;
     private boolean             showServerInfo;
@@ -281,16 +283,30 @@ public final class GameJFXController
             // TODO Add min max
             switch (e.getCode())
             {
+
             /* Zoom in. */
             case W:
+                if (this.tileDimensions + GameJFXController.RESIZE_AMOUNT > GameJFXController.MAX_ALLOW_ZOOM)
+                {
+                    l.debug("User tried to zoom in but the zoom level is already at max. {}", this.tileDimensions);
+                    return;
+                }
+
                 this.tileDimensions += GameJFXController.RESIZE_AMOUNT;
                 this.renderCourse();
+
                 break;
 
             /* Zoom out. */
             case S:
+                if (this.tileDimensions - GameJFXController.RESIZE_AMOUNT < GameJFXController.MIN_ALLOW_ZOOM)
+                {
+                    return;
+                }
+
                 this.tileDimensions -= GameJFXController.RESIZE_AMOUNT;
                 this.renderCourse();
+
                 break;
             }
 
