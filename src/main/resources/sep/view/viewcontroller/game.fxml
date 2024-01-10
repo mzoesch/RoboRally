@@ -74,30 +74,50 @@
                     fx:id="footerBtn"
                     AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"
                 />
-                <Label
-                        text="Registers"
-                        styleClass="text-base"
-                        AnchorPane.leftAnchor="10.0" AnchorPane.bottomAnchor="0.0"
-                    />
-                <Label
-                        text="Handcards"
-                        styleClass="text-base"
-                        AnchorPane.leftAnchor="575.0" AnchorPane.bottomAnchor="0.0"
-                />
-                <AnchorPane
-                    id="register-container" stylesheets="@game.css"
-                    fx:id="registerContainer"
-                    AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="0.0"
-                />
-                <Button
-                        styleClass="secondary-btn-tiny"
-                        onAction="#onChatBtn"
-                        fx:id="chatBtn"
-                        AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-                />
+                <HBox
+                        id="register-wrapper" stylesheets="@game.css"
+                        AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="30.0" AnchorPane.bottomAnchor="0.0"
+                >
+                    <VBox>
+                        <AnchorPane
+                            id="register-container" stylesheets="@game.css"
+                            fx:id="registerContainer"
+                            VBox.vgrow="ALWAYS"
+                        />
+                        <HBox>
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                                id="register-slots-label-container" stylesheets="@game.css"
+                            >
+                                <Label
+                                    text="Register Phase Slots"
+                                    styleClass="text-base" stylesheets="@game.css"
+                                />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                    <VBox>
+                        <AnchorPane
+                            id="got-register-container" stylesheets="@game.css"
+                            fx:id="gotRegisterContainer"
+                            VBox.vgrow="ALWAYS"
+                        />
+                        <HBox>
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                                id="register-slots-label-container" stylesheets="@game.css"
+                            >
+                                <Label
+                                    text="Hand Cards"
+                                    styleClass="text-base" stylesheets="@game.css"
+                                />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </HBox>
                 <VBox
                     id="chat-container" stylesheets="@game.css"
-                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0"
                 >
                     <children>
                         <ScrollPane
