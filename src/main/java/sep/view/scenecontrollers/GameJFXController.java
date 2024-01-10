@@ -1310,10 +1310,6 @@ public final class GameJFXController
         return;
     }
 
-    private void setChatBtnText(){
-        this.chatBtn.setText(this.showServerInfo ? "Hide Info" : "Show Info");
-    }
-
     private void translateFooter()
     {
         /* TODO Maybe with a timeline? */
@@ -1348,7 +1344,6 @@ public final class GameJFXController
     {
         this.renderRegisterSlots();
         this.setFooterBtnText();
-        this.setChatBtnText();
         this.translateFooter();
 
         return;
