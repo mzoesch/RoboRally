@@ -72,6 +72,7 @@ public final class GameJFXController
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
     private static final int    QUICK_TIP_DURATION              = 60_000;
 
+    @FXML private AnchorPane    gotRegisterContainer;
     @FXML private Label         programmingTimerLabel;
     @FXML private Label         UIHeaderPhaseLabel;
     @FXML private AnchorPane    masterContainer;
@@ -105,6 +106,7 @@ public final class GameJFXController
     private boolean             bFooterCollapsed;
 
     private HBox                registerHBox;
+    private HBox                gotRegisterHBox;
     private static final int    FOOTER_PEEK_HEIGHT  = 50;
     private static final int    NULL_FOOTER_HEIGHT  = 200;
 
@@ -120,23 +122,23 @@ public final class GameJFXController
     {
         super();
 
-        this.showServerInfo = false;
+        this.showServerInfo             = false;
 
-        this.tileDimensions = ViewSupervisor.TILE_DIMENSIONS;
+        this.tileDimensions             = ViewSupervisor.TILE_DIMENSIONS;
 
-        this.bClickedOnTile         = false;
-        this.gotRegisterSlotClicked = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+        this.bClickedOnTile             = false;
+        this.gotRegisterSlotClicked     = GameJFXController.INVALID_GOT_REGISTER_SLOT;
 
-        this.bFooterCollapsed   = true;
-        this.registerHBox       = null;
+        this.bFooterCollapsed           = true;
+        this.registerHBox               = null;
 
-        this.files                  = 0;
-        this.ranks                  = 0;
-        this.tiles                  = null;
-        this.gears                  = new ArrayList<>();
-        this.minXTranslation        = 0.0;
-        this.maxXTranslation        = 0.0;
-        this.centralXTranslation    = 0.0;
+        this.files                      = 0;
+        this.ranks                      = 0;
+        this.tiles                      = null;
+        this.gears                      = new ArrayList<RGearMask>();
+        this.minXTranslation            = 0.0;
+        this.maxXTranslation            = 0.0;
+        this.centralXTranslation        = 0.0;
 
         return;
     }
