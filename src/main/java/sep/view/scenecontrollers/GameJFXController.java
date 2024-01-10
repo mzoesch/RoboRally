@@ -109,7 +109,7 @@ public final class GameJFXController
     private HBox                registerHBox;
     private HBox                gotRegisterHBox;
     private static final int    FOOTER_PEEK_HEIGHT  = 50;
-    private static final int    NULL_FOOTER_HEIGHT  = 200;
+    private static final int    NULL_FOOTER_HEIGHT  = 265;
 
     private int                         files;
     private int                         ranks;
