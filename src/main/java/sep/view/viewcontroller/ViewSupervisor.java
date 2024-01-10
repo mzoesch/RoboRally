@@ -597,33 +597,26 @@ public final class ViewSupervisor extends Application
         final HBox h = new HBox();
         h.setAlignment(Pos.CENTER);
 
-        final Label header = new Label(newPhase.name());
+        final Label header = new Label(phase.getDisplayName());
         header.getStyleClass().add("text-xl");
         header.setStyle("-fx-alignment: center;");
 
         AnchorPane.setLeftAnchor(       header, 0.0      );
         AnchorPane.setRightAnchor(      header, 0.0      );
-        AnchorPane.setTopAnchor(        header, 50.0     );
+        AnchorPane.setTopAnchor(        header, 0.0     );
+        AnchorPane.setBottomAnchor(     header, 0.0     );
 
-        final Label form = new Label(newPhase.phaseDescription());
-        form.getStyleClass().add("text-base");
-        form.setStyle("-fx-alignment: center;");
-
-        AnchorPane.setLeftAnchor(       form, 10.0      );
-        AnchorPane.setRightAnchor(      form, 10.0      );
-        AnchorPane.setBottomAnchor(     form, 50.0      );
-
-        final AnchorPane p = new AnchorPane(header, form);
+        final AnchorPane p = new AnchorPane(header);
+        p.setMouseTransparent(true);
         p.setId("phase-update-container");
 
         h.getChildren().add(p);
 
         AnchorPane.setLeftAnchor(       h, 0.0      );
         AnchorPane.setRightAnchor(      h, 0.0      );
-        AnchorPane.setTopAnchor(        h, 0.0      );
-        AnchorPane.setBottomAnchor(     h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 50.0      );
 
-        ViewSupervisor.createPopUp(h, 2000);
+        ViewSupervisor.createPopUpLater(h, ViewSupervisor.PHASE_POPUP_TIME);
 
         return;
     }
