@@ -1,0 +1,113 @@
+#config-container {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-min-width: 700px;
+    -fx-max-width: 700px;
+    -fx-min-height: 570px;
+    -fx-max-height: 570px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-color: #000000ff;
+    -fx-background-color: #ffffff0c;
+}
+
+#misc-config-container {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-padding: 0px 0px 25px 0px;
+}
+
+#agent-config-container {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-padding: 0px 0px 25px 0px;
+}
+
+#added-agent-container {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+}
+
+.misc-container {
+    -fx-alignment: center;
+    -fx-max-width: 300px;
+}
+
+.text-field-min-human-players {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+
+    -fx-pref-width: 200px;
+    -fx-min-width: 50px;
+    -fx-max-width: 50px;
+}
+
+#text-field-host {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+}
+
+#text-field-port {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+
+    -fx-pref-width: 200px;
+    -fx-min-width: 75px;
+    -fx-max-width: 75px;
+}
+
+.text-field-agent-name {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+}
+
+.divider {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+    -fx-min-width: 5px;
+    -fx-background-radius: 2px;
+    -fx-max-height: 500px;
+}
+
+#text-field-session-id {
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-text-fill: -primary-text-fill;
+
+    -fx-background-color: -std-background-color;
+
+    -fx-border-color: #ffffff;
+}
+
+.alert {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+    -fx-min-width: 500px;
+    -fx-max-width: 500px;
+    -fx-min-height: 300px;
+    -fx-max-height: 300px;
+    -fx-border-color: white;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-border-width: 1px;
+    -fx-background-color: rgba(0, 0, 0, 0.96);
+}
