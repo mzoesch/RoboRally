@@ -29,7 +29,7 @@ public final class Launcher
      */
     public static void main(String[] args)
     {
-        double t0 = System.currentTimeMillis();
+        final double t0 = System.currentTimeMillis();
 
         if (args.length > 0)
         {
@@ -41,6 +41,12 @@ public final class Launcher
                 l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                 System.exit(sep.EArgs.OK);
                 return;
+            }
+
+            if (Arrays.asList(args).contains("--isAgent"))
+            {
+                l.info("Detected agent view. Starting in agent view mode.");
+                EClientInformation.INSTANCE.setIsAgent(true);
             }
 
             if (Arrays.asList(args).contains("--help"))

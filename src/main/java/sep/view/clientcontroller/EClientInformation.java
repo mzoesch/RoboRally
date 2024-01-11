@@ -52,6 +52,8 @@ public enum EClientInformation
     /** Cannot be changed for the duration of a session connection. */
     private int playerID;
 
+    private boolean bIsAgent;
+
     private EClientInformation()
     {
         this.JFX_INSTANCE = null;
@@ -72,6 +74,8 @@ public enum EClientInformation
 
         this.playerID = -1;
         this.preferredSessionID = "";
+
+        this.bIsAgent = false;
 
         return;
     }
@@ -117,7 +121,7 @@ public enum EClientInformation
 
     /**
      * Will block the calling thread until a response from the server is received. Only use this method for the
-     * initial connection to the server. After that, use the {@link #listen()} method.
+     * initial connection to the server. After that, use the {@link #listen(boolean)} method.
      */
     public String waitForServerResponse() throws IOException
     {
@@ -135,7 +139,7 @@ public enum EClientInformation
      *
      * @see sep.view.clientcontroller.ServerListener
      */
-    public void listen()
+    public void listen(final boolean bBlock)
     {
         if (this.serverListener != null)
         {
@@ -143,8 +147,16 @@ public enum EClientInformation
             return;
         }
 
-        this.executorService = Executors.newFixedThreadPool(1);
-        this.serverListener = new ServerListener(this.socket, this.inputStreamReader, this.bufferedReader);
+        if (bBlock)
+        {
+            this.serverListener = new AgentSL(this.socket, this.inputStreamReader, this.bufferedReader);
+            l.debug("Now listening for standard server responses.");
+            this.serverListener.run();
+            return;
+        }
+
+        this.executorService    = Executors.newFixedThreadPool(1);
+        this.serverListener     = new HumanSL(this.socket, this.inputStreamReader, this.bufferedReader);
         this.executorService.execute(this.serverListener);
 
         l.debug("Now listening for standard server responses.");
@@ -304,6 +316,17 @@ public enum EClientInformation
         }
 
         return;
+    }
+
+    public void setIsAgent(boolean bIsAgent)
+    {
+        this.bIsAgent = bIsAgent;
+        return;
+    }
+
+    public boolean isAgent()
+    {
+        return this.bIsAgent;
     }
 
     // endregion Getters and Setters
