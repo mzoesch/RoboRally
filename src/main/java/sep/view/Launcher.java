@@ -1,6 +1,7 @@
 package sep.view;
 
 import sep.view.clientcontroller.   GameInstance;
+import sep.view.clientcontroller.   EClientInformation;
 
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -56,6 +57,7 @@ public final class Launcher
                 l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--help]");
                 l.info("Valid server program arguments in descending order of precedence.");
                 l.info("  --dev         Start mock game view.");
+                l.info("  --isAgent     Start agent view.");
                 l.info("  --help        Print view help message.");
                 l.info("#######################################################");
                 System.exit(sep.EArgs.OK);
