@@ -20,6 +20,12 @@ public final class WrapperJFXController
         return;
     }
 
+    public void onAgentConfigBtn(ActionEvent actionEvent)
+    {
+        Wrapper.loadAgentConfig();
+        return;
+    }
+
     @FXML
     private void onExitBtn(final ActionEvent actionEvent)
     {
