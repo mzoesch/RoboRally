@@ -24,21 +24,26 @@
     </top>
     <center>
         <VBox
-            style="-fx-spacing: 16px; -fx-alignment: center; -fx-max-width: 400px; -fx-max-height: 300px; -fx-border-radius: 5px; -fx-background-radius: 5px;-fx-border-color: #000000ff; -fx-background-color: #ffffff0c;"
+            id="btn-container" stylesheets="@wrapper.css"
         >
             <Button
                 text="START CLIENT"
-                styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                styleClass="secondary-btn" style="-fx-min-width: 350px;"
                 onAction="#onStartClientBtn"
             />
             <Button
                 text="START SERVER"
-                styleClass="secondary-btn" style="-fx-min-width: 300px;"
+                styleClass="secondary-btn" style="-fx-min-width: 350px;"
                 onAction="#onStartServerBtn"
             />
             <Button
+                text="CONFIGURE AGENTS"
+                styleClass="secondary-btn" style="-fx-min-width: 350px;"
+                onAction="#onAgentConfigBtn"
+            />
+            <Button
                 text="EXIT APP"
-                styleClass="danger-btn" style="-fx-min-width: 300px;"
+                styleClass="danger-btn" style="-fx-min-width: 350px;"
                 onAction="#onExitBtn"
             />
         </VBox>
