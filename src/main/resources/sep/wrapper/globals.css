@@ -97,6 +97,8 @@
 .danger-btn-mini:hover,
 .danger-btn:hover {
     -fx-background-color: -danger-btn-color-hover;
+
+    -fx-cursor: hand;
 }
 
 .danger-btn-mini {
