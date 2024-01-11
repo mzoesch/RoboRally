@@ -24,8 +24,9 @@ public final class Launcher
      *
      * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
      *             <ul>
-     *              <li>[--dev]  - Start mock game view.
-     *              <li>[--help] - Print help message.
+     *              <li>[--dev]     - Start mock game view.
+     *              <li>[--isAgent] - Start agent view.
+     *              <li>[--help]    - Print help message.
      *             </ul>
      */
     public static void main(String[] args)
