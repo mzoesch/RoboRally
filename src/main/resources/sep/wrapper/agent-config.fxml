@@ -43,7 +43,7 @@
                         <Button
                             fx:id="addAgentBtn"
                             text="ADD AGENT"
-                            styleClass="secondary-btn" style="-fx-min-width: 300px; -fx-max-width: 300px;"
+                            styleClass="secondary-btn-mini" style="-fx-min-width: 300px; -fx-max-width: 300px;"
                             onAction="#onAddAgentBtn"
                         />
                     </children>
@@ -63,9 +63,6 @@
                                 styleClass="text-xl"
                             />
                         </VBox>
-                        <VBox
-                            VBox.vgrow="ALWAYS"
-                        />
                         <HBox
                             styleClass="misc-container" stylesheets="@agent-config.css"
                         >
@@ -160,16 +157,41 @@
                                 styleClass="text-xl"
                             />
                         </HBox>
-                        <Button
-                            text="CONFIRM"
-                            styleClass="secondary-btn" style="-fx-min-width: 300px; -fx-max-width: 300px;"
-                            onAction="#onConfirmBtn"
+                        <HBox
+                            styleClass="misc-container" stylesheets="@agent-config.css"
+                        >
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                            >
+                                <Label
+                                    text="bNoTerminalClose"
+                                    styleClass="text-xl"
+                                />
+                            </VBox>
+                            <CheckBox
+                                fx:id="bNoCloseTerminal"
+                                styleClass="text-xl"
+                            />
+                        </HBox>
+                        <VBox
+                                VBox.vgrow="ALWAYS"
                         />
-                        <Button
-                            text="CANCEL"
-                            styleClass="danger-btn" style="-fx-min-width: 300px; -fx-max-width: 300px;"
-                            onAction="#onCancelBtn"
-                        />
+                        <HBox
+                            id="misc-container-confirm" stylesheets="@agent-config.css"
+                        >
+                            <children>
+                                <Button
+                                    text="CANCEL"
+                                    styleClass="danger-btn-mini" style="-fx-min-width: 150px; -fx-max-width: 150px;"
+                                    onAction="#onCancelBtn"
+                                />
+                                <Button
+                                    text="CONFIRM"
+                                    styleClass="secondary-btn-mini" style="-fx-min-width: 150px; -fx-max-width: 150px;"
+                                    onAction="#onConfirmBtn"
+                                />
+                            </children>
+                        </HBox>
                     </children>
                 </VBox>
             </children>
