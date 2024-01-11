@@ -41,6 +41,7 @@ public enum EArgs
     private String              customSessionID;
     private boolean             bAllowServerStart;
     private boolean             bAllowClientStart;
+    private boolean             bNoClose;
 
     private EArgs()
     {
@@ -53,6 +54,7 @@ public enum EArgs
         this.customSessionID            = "";
         this.bAllowServerStart          = true;
         this.bAllowClientStart          = true;
+        this.bNoClose                   = false;
 
         return;
     }
@@ -156,6 +158,17 @@ public enum EArgs
     public static void setAllowClientStart(final boolean bAllowClientStart)
     {
         EArgs.INSTANCE.bAllowClientStart = bAllowClientStart;
+        return;
+    }
+
+    public static boolean getNoClose()
+    {
+        return EArgs.INSTANCE.bNoClose;
+    }
+
+    public static void setNoClose(final boolean bNoClose)
+    {
+        EArgs.INSTANCE.bNoClose = bNoClose;
         return;
     }
 
