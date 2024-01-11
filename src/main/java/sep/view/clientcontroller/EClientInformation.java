@@ -149,9 +149,10 @@ public enum EClientInformation
 
         if (bBlock)
         {
-            this.serverListener = new AgentSL(this.socket, this.inputStreamReader, this.bufferedReader);
+            this.serverListener = new AgentSL_v2(this.socket, this.inputStreamReader, this.bufferedReader);
             l.debug("Now listening for standard server responses.");
             this.serverListener.run();
+
             return;
         }
 
