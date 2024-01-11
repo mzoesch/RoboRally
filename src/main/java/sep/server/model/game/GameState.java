@@ -1,13 +1,13 @@
 package sep.server.model.game;
 
-import sep.server.viewmodel.PlayerController;
-import sep.server.model.IOwnershipable;
-import sep.server.viewmodel.Session;
-import sep.server.model.Agent;
-import sep.server.model.EServerInformation;
+import sep.server.viewmodel.    PlayerController;
+import sep.server.viewmodel.    Session;
+import sep.server.model.        IOwnershipable;
+import sep.server.model.        Agent;
+import sep.server.model.        EServerInformation;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
 
 /**
  * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
@@ -17,17 +17,18 @@ public class GameState
 {
     private static final Logger l = LogManager.getLogger(GameState.class);
 
-    private static final String[] AVAILABLE_COURSES = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap" };
+    private static final String[]   AVAILABLE_COURSES                           = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap" };
 
-    public static final int MIN_CONTROLLERS_ALLOWED = 2;
-    public static final int MAX_CONTROLLERS_ALLOWED = 6;
-    public static final int DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START = 1;
+    public static final int         MIN_CONTROLLERS_ALLOWED                     = 2;
+    public static final int         MAX_CONTROLLERS_ALLOWED                     = 6;
+    public static final int         DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START    = 1;
+    public static final int         DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START     = 1;
 
-    private String courseName;
-    private GameMode gameMode;
-    private final Session session;
-    private boolean bGameStarted;
-    private final int minRemotePlayerCountToStart;
+    private String          courseName;
+    private GameMode        gameMode;
+    private final Session   session;
+    private boolean         bGameStarted;
+    private final int       minRemotePlayerCountToStart;
 
     public GameState(final Session session)
     {
