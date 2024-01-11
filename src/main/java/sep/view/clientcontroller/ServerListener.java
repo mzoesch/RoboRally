@@ -13,11 +13,8 @@ import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
 
-/**
- * We create a special object for listening to the server socket on a separate
- * thread to avoid blocking the main thread of the application.
- */
-public final class ServerListener implements Runnable
+/** Default way to handle server requests. */
+public sealed abstract class ServerListener implements Runnable permits AgentSL, HumanSL, AgentSL_v2
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
 
