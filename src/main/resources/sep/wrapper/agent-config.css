@@ -111,3 +111,8 @@
     -fx-border-width: 1px;
     -fx-background-color: rgba(0, 0, 0, 0.96);
 }
+
+#misc-container-confirm {
+    -fx-spacing: 16px;
+    -fx-alignment: center;
+}
