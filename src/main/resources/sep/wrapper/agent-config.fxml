@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane
+        id="master-container" stylesheets="@globals.css, @agent-config.css"
+        fx:controller="sep.wrapper.AgentConfigJFXController"
+        xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+>
+    <Label
+        text="Configure Agents"
+        styleClass="text-2xl" alignment="CENTER"
+        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
+    />
+    <HBox
+        style="-fx-alignment: center;"
+        AnchorPane.topAnchor="70.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.bottomAnchor="0.0"
+    >
+        <HBox
+            id="config-container" stylesheets="@agent-config.css"
+        >
+            <children>
+                <VBox
+                    id="agent-config-container" stylesheets="@agent-config.css"
+                >
+                    <children>
+                        <VBox
+                            style="-fx-padding: 25px 0px 0px 0px; -fx-alignment: center;"
+                        >
+                            <Label
+                                text="AGENT CONFIG"
+                                styleClass="text-xl"
+                            />
+                        </VBox>
+                        <VBox
+                            fx:id="addedAgentsContainer"
+                            id="added-agent-container" stylesheets="@agent-config.css"
+                        />
+                        <HBox
+                            VBox.vgrow="ALWAYS"
+                        />
+                        <Button
+                            fx:id="addAgentBtn"
+                            text="ADD AGENT"
+                            styleClass="secondary-btn" style="-fx-min-width: 300px; -fx-max-width: 300px;"
+                            onAction="#onAddAgentBtn"
+                        />
+                    </children>
+                </VBox>
+                <HBox
+                    styleClass="divider" stylesheets="@agent-config.css"
+                />
+                <VBox
+                    id="misc-config-container" stylesheets="@agent-config.css"
+                >
+                    <children>
+                        <VBox
+                            style="-fx-padding: 25px 0px 0px 0px; -fx-alignment: center;"
+                        >
+                            <Label
+                                text="MISC"
+                                styleClass="text-xl"
+                            />
+                        </VBox>
+                        <VBox
+                            VBox.vgrow="ALWAYS"
+                        />
+                        <HBox
+                            styleClass="misc-container" stylesheets="@agent-config.css"
+                        >
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                            >
+                                <Label
+                                    text="bAllowServerStart"
+                                    styleClass="text-xl"
+                                    HBox.hgrow="ALWAYS"
+                                />
+                            </VBox>
+                            <CheckBox
+                                fx:id="bAllowServerStart"
+                                styleClass="text-xl"
+                            />
+                        </HBox>
+                        <HBox
+                            styleClass="misc-container" stylesheets="@agent-config.css"
+                        >
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                            >
+                                <Label
+                                    text="Min Human Players: "
+                                    styleClass="text-xl"
+                                />
+                            </VBox>
+                            <TextField
+                                fx:id="minHumanPlayersTextField"
+                                styleClass="text-field-min-human-players" stylesheets="@agent-config.css"
+                            />
+                        </HBox>
+                        <HBox
+                            styleClass="misc-container" stylesheets="@agent-config.css"
+                        >
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                            >
+                                <Label
+                                    text="Server Address: "
+                                    styleClass="text-xl"
+                                />
+                                <HBox>
+                                    <TextField
+                                        fx:id="serverIPTextField"
+                                        id="text-field-host" stylesheets="@agent-config.css"
+                                        HBox.hgrow="ALWAYS"
+                                    />
+                                    <Label
+                                        text=":"
+                                        styleClass="text-xl"
+                                    />
+                                    <TextField
+                                        fx:id="serverPortTextField"
+                                        id="text-field-port" stylesheets="@agent-config.css"
+                                    />
+                                </HBox>
+                            </VBox>
+                        </HBox>
+                        <HBox
+                            styleClass="misc-container" stylesheets="@agent-config.css"
+                        >
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                            >
+                                <Label
+                                    text="Session ID: "
+                                    styleClass="text-xl"
+                                    style="-fx-min-width: 130px;"
+                                />
+                            </VBox>
+                            <TextField
+                                HBox.hgrow="ALWAYS"
+                                fx:id="sessionIDTextField"
+                                id="text-field-session-id" stylesheets="@agent-config.css"
+                            />
+                        </HBox>
+                        <HBox
+                            styleClass="misc-container" stylesheets="@agent-config.css"
+                        >
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                            >
+                                <Label
+                                    text="bAllowClientStart"
+                                    styleClass="text-xl"
+                                />
+                            </VBox>
+                            <CheckBox
+                                fx:id="bAllowClientStart"
+                                styleClass="text-xl"
+                            />
+                        </HBox>
+                        <Button
+                            text="CONFIRM"
+                            styleClass="secondary-btn" style="-fx-min-width: 300px; -fx-max-width: 300px;"
+                            onAction="#onConfirmBtn"
+                        />
+                        <Button
+                            text="CANCEL"
+                            styleClass="danger-btn" style="-fx-min-width: 300px; -fx-max-width: 300px;"
+                            onAction="#onCancelBtn"
+                        />
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </HBox>
+</AnchorPane>
