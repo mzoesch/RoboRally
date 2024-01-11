@@ -23,6 +23,7 @@ public final class Wrapper extends Application
     private static final String     WIN_TITLE               = "WRAPPER";
     private static final String     PATH_TP_WRAPPER_MENU    = "wrapper.fxml";
     private static final String     PATH_TP_SERVER_CONFIG   = "server-config.fxml";
+    private static final String     PATH_TO_AGENT_CONFIG    = "agent-config.fxml";
     private static final int        PREF_WIDTH              = 1_280;
     private static final int        PREF_HEIGHT             = 720;
 
@@ -113,6 +114,21 @@ public final class Wrapper extends Application
         }
 
         l.info("Server config scene loaded.");
+
+        return;
+    }
+
+    public static void loadAgentConfig()
+    {
+        final boolean bSuccess = Wrapper.loadFXML(Wrapper.PATH_TO_AGENT_CONFIG);
+        if (!bSuccess)
+        {
+            EArgs.setMode(EArgs.EMode.EXIT);
+            Wrapper.exitWrapper();
+            return;
+        }
+
+        l.info("Agent config scene loaded.");
 
         return;
     }
