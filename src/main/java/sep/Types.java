@@ -23,6 +23,7 @@ public final class Types
         ARTIFACT_ID     (   "artifactId"    ),
         VERSION         (   "version"       ),
         NAME            (   "name"          ),
+        DESCRIPTION     (   "description"   ),
         ;
 
         private final String prop;
