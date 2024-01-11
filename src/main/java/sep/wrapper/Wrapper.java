@@ -76,9 +76,9 @@ public final class Wrapper extends Application
         {
             p = ldr.load();
         }
-        catch (final IOException e)
+        catch (final IOException | IllegalStateException e)
         {
-            l.fatal("Failed to load wrapper menu.");
+            l.fatal("Failed to load wrapper scene: {}.", path);
             l.fatal(e);
             return false;
         }
