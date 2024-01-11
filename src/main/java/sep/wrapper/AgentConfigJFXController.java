@@ -23,6 +23,7 @@ import sep.view.clientcontroller.GameInstance;
 
 public final class AgentConfigJFXController
 {
+    @FXML private CheckBox      bNoCloseTerminal;
     @FXML private TextField     sessionIDTextField;
     @FXML private Button        addAgentBtn;
     @FXML private VBox          addedAgentsContainer;
@@ -132,6 +133,7 @@ public final class AgentConfigJFXController
         final String minHumanPlayers        = this.minHumanPlayersTextField.getText();
         final boolean bAllowServerStart     = this.bAllowServerStart.isSelected();
         final boolean bAllowClientStart     = this.bAllowClientStart.isSelected();
+        final boolean bNoClose              = this.bNoCloseTerminal.isSelected();
 
         if (!(sessionID.isEmpty() || sessionID.isBlank()))
         {
@@ -167,6 +169,7 @@ public final class AgentConfigJFXController
 
         EArgs.setAllowServerStart(bAllowServerStart);
         EArgs.setAllowClientStart(bAllowClientStart);
+        EArgs.setNoClose(bNoClose);
 
         EArgs.setMode(EArgs.EMode.AGENT);
         Wrapper.exitWrapper();
@@ -183,6 +186,7 @@ public final class AgentConfigJFXController
         this.minHumanPlayersTextField   .setPromptText(String.valueOf(GameState.DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START));
         this.bAllowServerStart          .setSelected(true);
         this.bAllowClientStart          .setSelected(true);
+        this.bNoCloseTerminal           .setSelected(true);
 
         return;
     }
