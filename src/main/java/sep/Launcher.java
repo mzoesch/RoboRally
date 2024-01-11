@@ -2,10 +2,11 @@ package sep;
 
 import sep.wrapper. Wrapper;
 
-import java.io.                     IOException;
 import java.util.                   Arrays;
+import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import java.io.                     IOException;
 
 /* TODO Save screen size and position of the wrapper Graphical User Interface and inherit it to the follow-up process. */
 /* TODO Osascript will always open a new window (Meaning two if Terminal is not running). */
@@ -344,6 +345,174 @@ public final class Launcher
             l.info("");
             l.info("#######################################################");
             l.info("");
+
+            l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+            System.exit(EArgs.OK);
+
+            return;
+        }
+        else if (EArgs.getMode() == EArgs.EMode.AGENT)
+        {
+            l.info("Parsing agent configurations.");
+
+            if (EArgs.getAllowClientStart())
+            {
+                l.info("Detected client start request.");
+            }
+
+            if (EArgs.getAllowServerStart())
+            {
+                l.info("Detected server start request.");
+            }
+
+            if (!EArgs.getAgentNames().isEmpty())
+            {
+                l.info("Detected {} agent starting request{}.", EArgs.getAgentNames().size(), EArgs.getAgentNames().size() > 1 ? "s" : "");
+            }
+
+            if (!Objects.equals(EArgs.getCustomServerIP(), ""))
+            {
+                l.info("Detected custom server ip request: {}.", EArgs.getCustomServerIP());
+            }
+
+            if (EArgs.getCustomServerPort() != sep.Types.EPort.INVALID.i)
+            {
+                l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
+            }
+
+            if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS)
+            {
+                l.info("Detected custom minimum remote players request: {}.", EArgs.getCustomMinRemotePlayers());
+            }
+
+            if (EArgs.getCustomMinHumanPlayers() != EArgs.DEFAULT_MIN_HUMAN_PLAYERS)
+            {
+                l.info("Detected custom minimum human players request: {}.", EArgs.getCustomMinRemotePlayers());
+            }
+
+            if (EArgs.getAllowClientStart())
+            {
+                l.info("Launching client.");
+                try
+                {
+                    /* TODO We may want to give information to the process. Like a requested custom ip address, session id etc. */
+                    new ProcessBuilder("java", "-cp", f, "sep.view.Launcher", String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cl")).toArray(String[]::new))).start();
+                }
+                catch (final IOException e)
+                {
+                    l.error("Failed to start client. Ignoring. Trying to start other requested processes.");
+                }
+            }
+
+            if (EArgs.getAllowServerStart())
+            {
+                l.info("Launching server.");
+
+                final ProcessBuilder pb =
+                    Types.EOS.isWindows()
+                    ?
+                    new ProcessBuilder(
+                        System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
+                        String.format(
+                            "java -cp %s sep.Launcher --sv --nocmd %s %s %s %s",
+                            f,
+                            EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            EArgs.getCustomMinHumanPlayers() != EArgs.DEFAULT_MIN_HUMAN_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinHumanPlayers()) : "",
+                            String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd") && !s.equals("--sv") ).toArray(String[]::new)),
+                            Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                        )
+                    )
+                    :
+                    Types.EOS.isOSX()
+                    ?
+                    new ProcessBuilder(
+                        "osascript", "-e",
+                        String.format(
+                            "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s\"",
+                            fp.substring(0, fp.lastIndexOf("/")),
+                            f,
+                            EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            EArgs.getCustomMinHumanPlayers() != EArgs.DEFAULT_MIN_HUMAN_PLAYERS ? String.format("--minRemotePlayers %d", EArgs.getCustomMinHumanPlayers()) : "",
+                            String.join(" ", Arrays.stream(args).filter(s -> !s.equals("--cmd")).toArray(String[]::new)),
+                            EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                        )
+                    )
+                    : null
+                    ;
+
+                if (pb == null)
+                {
+                    Launcher.stdoutForNoOSSupport(t0);
+                    System.exit(EArgs.ERR);
+                    return;
+                }
+
+                try
+                {
+                    pb.start();
+                }
+                catch (final IOException e)
+                {
+                    l.error("Failed to start server. Ignoring. Trying to start other requested processes.");
+                }
+            }
+
+            for (int i = 0; i < EArgs.getAgentNames().size(); ++i)
+            {
+                l.info("Launching agent {} [{} of {}].", EArgs.getAgentNames().get(i), i + 1, EArgs.getAgentNames().size());
+
+                final ProcessBuilder pb =
+                    Types.EOS.isWindows()
+                    ?
+                    new ProcessBuilder(
+                        System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
+                        String.format(
+                            "java -cp %s sep.Launcher --cl --nocmd %s %s %s %s %s",
+                            f,
+                            "--isAgent",
+                            !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
+                            EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            String.format("--name %s", EArgs.getAgentNames().get(i)),
+                            EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                        )
+                    )
+                    :
+                    Types.EOS.isOSX()
+                    ?
+                    new ProcessBuilder(
+                        "osascript", "-e",
+                        String.format(
+                            "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s %s\"",
+                            fp.substring(0, fp.lastIndexOf("/")),
+                            f,
+                            "--isAgent",
+                            !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
+                            EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                            String.format("--name %s", EArgs.getAgentNames().get(i)),
+                            EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                        )
+                    )
+                    : null
+                    ;
+
+                if (pb == null)
+                {
+                    Launcher.stdoutForNoOSSupport(t0);
+                    System.exit(EArgs.ERR);
+                    return;
+                }
+
+                try
+                {
+                    pb.start();
+                }
+                catch (final IOException e)
+                {
+                    l.error("Failed to start agent. Ignoring. Trying to start other requested processes.");
+                }
+
+                continue;
+            }
 
             l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
             System.exit(EArgs.OK);
