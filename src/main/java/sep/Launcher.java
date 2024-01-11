@@ -222,12 +222,12 @@ public final class Launcher
             }
             else
             {
-                if (EArgs.getCustomServerPort() != sep.Types.EPort.INVALID.i) /* Set through Graphical User Interface. */
+                if (EArgs.getCustomServerPort() != sep.Types.EPort.INVALID.i)
                 {
                     l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
                 }
 
-                if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS) /* Set through Graphical User Interface. */
+                if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS)
                 {
                     l.info("Detected custom minimum remote players request: {}.", EArgs.getCustomMinRemotePlayers());
                 }
