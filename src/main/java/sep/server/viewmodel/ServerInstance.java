@@ -124,6 +124,11 @@ public final class ServerInstance
         return String.format("%s %s", Agent.AGENT_PREFIX, Agent.AGENT_NAMES[idx]);
     }
 
+    public static String createRandomAgentName()
+    {
+        return String.format("%s %s", Agent.AGENT_PREFIX, Agent.AGENT_NAMES[(int) (Math.random() * Agent.AGENT_NAMES.length)]);
+    }
+
     // endregion Getters and Setters
 
 }
