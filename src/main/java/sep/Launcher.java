@@ -521,6 +521,22 @@ public final class Launcher
                     l.error("Failed to start agent. Ignoring. Trying to start other requested processes.");
                 }
 
+                // TODO
+                //      We to this to prevent a rare case of a Concurrent Modification Exception in the server.
+                //      This is a bug on the server and not on the client and should properly be fixed ASAP.
+                try
+                {
+                    //noinspection BusyWait
+                    Thread.sleep(200); /* On slower end hardware, this delay must be increased. */
+                }
+                catch (final InterruptedException e)
+                {
+                    l.fatal("Wrapper was interrupted. This was probably unintentional. Shutting down.");
+                    l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(EArgs.ERR);
+                    return;
+                }
+
                 continue;
             }
 
