@@ -162,7 +162,6 @@ public final class GameInstance
         return EClientInformation.INSTANCE.establishAServerConnection();
     }
 
-    /** Called after the client loaded the lobby screen. */
     public static boolean connectToSessionPostLogin() throws IOException, JSONException
     {
         if (!EClientInformation.INSTANCE.hasServerConnection())
