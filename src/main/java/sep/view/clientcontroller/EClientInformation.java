@@ -53,6 +53,7 @@ public enum EClientInformation
     private int playerID;
 
     private boolean bIsAgent;
+    private String prefAgentName;
 
     private EClientInformation()
     {
@@ -76,6 +77,7 @@ public enum EClientInformation
         this.preferredSessionID = "";
 
         this.bIsAgent = false;
+        this.prefAgentName = "";
 
         return;
     }
@@ -328,6 +330,17 @@ public enum EClientInformation
     public boolean isAgent()
     {
         return this.bIsAgent;
+    }
+
+    public void setPrefAgentName(final String prefAgentName)
+    {
+        this.prefAgentName = prefAgentName;
+        return;
+    }
+
+    public String getPrefAgentName()
+    {
+        return this.prefAgentName;
     }
 
     // endregion Getters and Setters
