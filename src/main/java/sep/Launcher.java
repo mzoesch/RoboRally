@@ -383,6 +383,11 @@ public final class Launcher
                 l.info("Detected custom port request: {}.", EArgs.getCustomServerPort());
             }
 
+            if (!Objects.equals(EArgs.getCustomSessionID(), ""))
+            {
+                l.info("Detected custom session id request: {}.", EArgs.getCustomSessionID());
+            }
+
             if (EArgs.getCustomMinRemotePlayers() != EArgs.DEFAULT_MIN_REMOTE_PLAYERS)
             {
                 l.info("Detected custom minimum remote players request: {}.", EArgs.getCustomMinRemotePlayers());
@@ -470,12 +475,13 @@ public final class Launcher
                     new ProcessBuilder(
                         System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
                         String.format(
-                            "java -cp %s sep.Launcher --cl --nocmd %s %s %s %s %s",
+                            "java -cp %s sep.Launcher --cl --nocmd %s %s %s %s %s %s",
                             f,
                             "--isAgent",
                             !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
                             EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
-                            String.format("--name %s", EArgs.getAgentNames().get(i)),
+                            String.format("--name \"%s\"", EArgs.getAgentNames().get(i)),
+                            !Objects.equals(EArgs.getCustomSessionID(), "") ? String.format("--sid %s", EArgs.getCustomSessionID()) : "",
                             EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
                         )
                     )
@@ -485,13 +491,14 @@ public final class Launcher
                     new ProcessBuilder(
                         "osascript", "-e",
                         String.format(
-                            "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s %s\"",
+                            "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s %s %s\"",
                             fp.substring(0, fp.lastIndexOf("/")),
                             f,
                             "--isAgent",
                             !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
                             EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
-                            String.format("--name %s", EArgs.getAgentNames().get(i)),
+                            String.format("--name \"%s\"", EArgs.getAgentNames().get(i)),
+                            !Objects.equals(EArgs.getCustomSessionID(), "") ? String.format("--sid %s", EArgs.getCustomSessionID()) : "",
                             EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
                         )
                     )
