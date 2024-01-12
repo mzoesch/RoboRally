@@ -1,15 +1,15 @@
 package sep.view.json.mainmenu;
 
-import sep.Types;
-import sep.view.clientcontroller.EClientInformation;
-import sep.view.clientcontroller.GameInstance;
+import sep.                         Types;
+import sep.view.clientcontroller.   EClientInformation;
+import sep.view.clientcontroller.   GameInstance;
 
-import org.json.JSONObject;
-import org.json.JSONException;
-import java.io.IOException;
-import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.                   UUID;
+import org.json.                    JSONObject;
+import org.json.                    JSONException;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.io.                     IOException;
 
 public final class InitialClientConnectionModel
 {
@@ -18,44 +18,45 @@ public final class InitialClientConnectionModel
     private InitialClientConnectionModel() throws IllegalStateException
     {
         super();
-        throw new IllegalStateException("Utility class");
+        throw new IllegalStateException("Utility class.");
     }
 
-    public static boolean checkServerProtocolVersion(JSONObject jsonObject) throws JSONException
+    public static boolean checkServerProtocolVersion(final JSONObject obj) throws JSONException
     {
-        if (!jsonObject.getString("messageType").equals("HelloClient"))
+        if (!obj.getString("messageType").equals("HelloClient"))
         {
             return false;
         }
 
-        l.debug("Server Protocol Version: {}", jsonObject.getJSONObject("messageBody").getString("protocol"));
-        l.debug("Client Protocol Version: {}", String.format("Version %s", Types.EProps.VERSION.toString()));
-        return jsonObject.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", Types.EProps.VERSION.toString()));
+        l.debug(    "Server Protocol Version: {}",  obj.getJSONObject("messageBody").getString("protocol")          );
+        l.debug(    "Client Protocol Version: {}",  String.format("Version %s", Types.EProps.VERSION.toString())    );
+
+        return obj.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", Types.EProps.VERSION.toString()));
     }
 
     public static void sendProtocolVersionConfirmation() throws IOException
     {
-        // TODO Validate group
+        /* TODO Validate group. */
         if (EClientInformation.INSTANCE.getPreferredSessionID().isEmpty() || EClientInformation.INSTANCE.getPreferredSessionID().isBlank())
         {
-            EClientInformation.INSTANCE.setPreferredSessionID(UUID.randomUUID().toString().substring(0, 5));
+            EClientInformation.INSTANCE.setPreferredSessionID(Types.EConfigurations.isDev() ? UUID.randomUUID().toString().substring(0, 5) : Types.EProps.DESCRIPTION.toString());
         }
 
-        JSONObject messageBody = new JSONObject();
-        messageBody.put("group", EClientInformation.INSTANCE.getPreferredSessionID());
-        messageBody.put("isAI", false);
-        messageBody.put("protocol", String.format("Version %s", Types.EProps.VERSION.toString()));
+        final JSONObject b = new JSONObject();
+        b.put(  "group",        EClientInformation.INSTANCE.getPreferredSessionID()             );
+        b.put(  "isAI",         EClientInformation.INSTANCE.isAgent()                           );
+        b.put(  "protocol",     String.format("Version %s", Types.EProps.VERSION.toString())    );
 
-        JSONObject j = new JSONObject();
-        j.put("messageType", "HelloServer");
-        j.put("messageBody", messageBody);
+        final JSONObject j = new JSONObject();
+        j.put(  "messageType",  "HelloServer"   );
+        j.put(  "messageBody",  b               );
 
         GameInstance.sendServerRequest(j);
 
         return;
     }
 
-    public static boolean checkPlayerID(JSONObject welcome) throws JSONException
+    public static boolean checkPlayerID(final JSONObject welcome) throws JSONException
     {
         if (!welcome.getString("messageType").equals("Welcome"))
         {
