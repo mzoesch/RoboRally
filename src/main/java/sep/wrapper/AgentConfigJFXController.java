@@ -1,25 +1,25 @@
 package sep.wrapper;
 
-import javafx.geometry.Pos;
-import javafx.scene.layout.VBox;
-import sep.                     Types;
-import sep.                     EArgs;
-import sep.server.model.game.   GameState;
+import sep.server.viewmodel.        ServerInstance;
+import sep.view.clientcontroller.   GameInstance;
+import sep.                         Types;
+import sep.                         EArgs;
+import sep.server.model.game.       GameState;
 
+import javafx.scene.text.       TextAlignment;
 import javafx.fxml.             FXML;
+import javafx.event.            ActionEvent;
 import javafx.scene.control.    TextField;
 import javafx.scene.control.    CheckBox;
-import javafx.event.            ActionEvent;
-import javafx.scene.layout.     HBox;
 import javafx.scene.control.    Label;
 import javafx.scene.control.    Button;
-import sep.server.viewmodel.ServerInstance;
-import javafx.scene.layout.Priority;
-import javafx.scene.Node;
-import javafx.application.Platform;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.TextAlignment;
-import sep.view.clientcontroller.GameInstance;
+import javafx.geometry.         Pos;
+import javafx.scene.            Node;
+import javafx.scene.layout.     Priority;
+import javafx.scene.layout.     HBox;
+import javafx.scene.layout.     VBox;
+import javafx.scene.layout.     AnchorPane;
+import javafx.application.      Platform;
 
 public final class AgentConfigJFXController
 {
@@ -127,13 +127,14 @@ public final class AgentConfigJFXController
             continue;
         }
 
-        final String sessionID              = this.sessionIDTextField.getText();
-        final String port                   = this.serverPortTextField.getText();
-        final String ip                     = this.serverIPTextField.getText();
-        final String minHumanPlayers        = this.minHumanPlayersTextField.getText();
-        final boolean bAllowServerStart     = this.bAllowServerStart.isSelected();
-        final boolean bAllowClientStart     = this.bAllowClientStart.isSelected();
-        final boolean bNoClose              = this.bNoCloseTerminal.isSelected();
+        final String    sessionID               = this.sessionIDTextField.getText();
+        final String    port                    = this.serverPortTextField.getText();
+        final String    ip                      = this.serverIPTextField.getText();
+        final String    sid                     = this.sessionIDTextField.getText();
+        final String    minHumanPlayers         = this.minHumanPlayersTextField.getText();
+        final boolean   bAllowServerStart       = this.bAllowServerStart.isSelected();
+        final boolean   bAllowClientStart       = this.bAllowClientStart.isSelected();
+        final boolean   bNoClose                = this.bNoCloseTerminal.isSelected();
 
         if (!(sessionID.isEmpty() || sessionID.isBlank()))
         {
@@ -154,6 +155,11 @@ public final class AgentConfigJFXController
         if (!(ip.isEmpty() || ip.isBlank()))
         {
             EArgs.setCustomServerIP(ip);
+        }
+
+        if (!(sid.isEmpty() || sid.isBlank()))
+        {
+            EArgs.setCustomSessionID(sid);
         }
 
         if (!(minHumanPlayers.isEmpty() || minHumanPlayers.isBlank()))
