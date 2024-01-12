@@ -199,7 +199,7 @@ public final class GameInstance
         }
         l.debug("Player ID received.");
 
-        l.info("Client successfully connected to server.");
+        l.info("Client successfully connected to server in session {}.", EClientInformation.INSTANCE.getPreferredSessionID());
 
         l.info("Starting server listener ({}).", EClientInformation.INSTANCE.isAgent() ? "Agent mode" : "JFX mode");
         EClientInformation.INSTANCE.listen(EClientInformation.INSTANCE.isAgent());
