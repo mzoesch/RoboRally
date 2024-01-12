@@ -11,7 +11,9 @@
     <Appenders>
 
         <Console name="stdout" target="SYSTEM_OUT">
+            <!-- Use the disableAnsi version when developing in an ANSI support env on Windows. -->
             <PatternLayout disableAnsi="false" pattern="%d{mm:ss.SSS} [%t] %highlight{%-5level} %logger{1} - %highlight{%msg}%n" />
+<!--            <PatternLayout pattern="%d{mm:ss.SSS} [%t] %highlight{%-5level} %logger{1} - %highlight{%msg}%n" />-->
         </Console>
 
         <RollingFile name="wrapper" fileName="${path}/wrapper.log" filePattern="${path}/$${date:yyyy-MM-dd}/wrapper-%d{yyyy-MM-dd}-%i.log.gz">
