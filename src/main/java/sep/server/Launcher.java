@@ -46,6 +46,8 @@ public final class Launcher
 
             if (Arrays.asList(args).contains("--port"))
             {
+                l.info("Command line argument [--port] detected.");
+
                 final int i = Arrays.asList(args).indexOf("--port");
                 if (i + 1 < args.length)
                 {
@@ -71,7 +73,7 @@ public final class Launcher
                         return;
                     }
 
-                    l.info("Detected custom port: {}.", p);
+                    l.info("Set port to {}.", p);
                     EServerInformation.INSTANCE.setPort(p);
                 }
                 else
@@ -86,6 +88,8 @@ public final class Launcher
 
             if (Arrays.asList(args).contains("--minRemotePlayers"))
             {
+                l.info("Command line argument [--minRemotePlayers] detected.");
+
                 final int i = Arrays.asList(args).indexOf("--minRemotePlayers");
                 if (i + 1 < args.length)
                 {
@@ -112,7 +116,7 @@ public final class Launcher
                         return;
                     }
 
-                    l.info("Detected request to change minimum required remote players: {}.", min);
+                    l.info("Set minimum number of remote players to {}.", min);
                     EServerInformation.INSTANCE.setMinRemotePlayerCountToStart(min);
                 }
                 else
