@@ -50,7 +50,6 @@ public final class Launcher
             l.error("Wrapper code is not meant to run outside of MVN packaged JAR files.");
         }
 
-        /* This only works with jar files because else the getPath() will return a dir. */
         final String fp     = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         final String f      = fp.substring(fp.lastIndexOf("/") + 1);
 
