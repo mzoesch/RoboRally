@@ -29,8 +29,8 @@ public enum EClientInformation
 
     private static final Logger l = LogManager.getLogger(EClientInformation.class);
 
-    private String SERVER_IP;
-    private int SERVER_PORT;
+    private String serverIP;
+    private int serverPort;
 
     public static final String AGENT_PREFIX = "[BOT]";
 
@@ -58,8 +58,8 @@ public enum EClientInformation
     {
         this.JFX_INSTANCE = null;
 
-        this.SERVER_IP = EArgs.PREF_SERVER_IP;
-        this.SERVER_PORT = sep.Types.EPort.DEFAULT.i;
+        this.serverIP = EArgs.PREF_SERVER_IP;
+        this.serverPort = sep.Types.EPort.DEFAULT.i;
 
         this.bMockView = false;
 
@@ -91,8 +91,8 @@ public enum EClientInformation
 
         try
         {
-            l.info(String.format("Connecting to server [%s:%d].", EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT));
-            this.socket = new Socket(EClientInformation.INSTANCE.SERVER_IP, EClientInformation.INSTANCE.SERVER_PORT);
+            l.info(String.format("Connecting to server [%s:%d].", EClientInformation.INSTANCE.serverIP, EClientInformation.INSTANCE.serverPort));
+            this.socket = new Socket(EClientInformation.INSTANCE.serverIP, EClientInformation.INSTANCE.serverPort);
         }
         catch (ConnectException e)
         {
@@ -276,13 +276,13 @@ public enum EClientInformation
 
     public void setServerIP(String SERVER_IP)
     {
-        this.SERVER_IP = SERVER_IP;
+        this.serverIP = SERVER_IP;
         return;
     }
 
     public void setServerPort(int PORT)
     {
-        this.SERVER_PORT = PORT;
+        this.serverPort = PORT;
         return;
     }
 
