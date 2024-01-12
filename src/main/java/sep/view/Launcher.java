@@ -72,6 +72,48 @@ public final class Launcher
                 }
             }
 
+            if (Arrays.asList(args).contains("--port"))
+            {
+                l.info("Command line argument [--port] detected.");
+
+                if (Arrays.asList(args).indexOf("--port") + 1 < args.length)
+                {
+                    final int p;
+                    try
+                    {
+                        p = Integer.parseInt(args[Arrays.asList(args).indexOf("--port") + 1]);
+                    }
+                    catch (final NumberFormatException e)
+                    {
+                        l.fatal("Invalid port number.");
+                        l.fatal(e.getMessage());
+                        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(sep.EArgs.ERR);
+                        return;
+                    }
+
+                    if (p < sep.Types.EPort.MIN.i || p > sep.Types.EPort.MAX.i)
+                    {
+                        l.fatal("Invalid port number. Must be between {} and {}.", sep.Types.EPort.MIN.i, sep.Types.EPort.MAX.i);
+                        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(sep.EArgs.ERR);
+                        return;
+                    }
+
+                    l.info("Setting server port target to {}.", p);
+                    EClientInformation.INSTANCE.setServerPort(p);
+                }
+                else
+                {
+                    l.fatal("Invalid port number.");
+                    l.info("Type --help for more information.");
+                    l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(sep.EArgs.ERR);
+                    return;
+                }
+            }
+
+
             if (Arrays.asList(args).contains("--help"))
             {
                 l.info("##################### CLIENT HELP #####################");
