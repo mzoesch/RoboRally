@@ -332,9 +332,13 @@ public final class Launcher
             l.info("Valid view program arguments in descending order of precedence. Invalid arguments will be ignored.");
             l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--help]");
             l.info("Valid server program arguments in descending order of precedence.");
-            l.info("  --dev         Start mock game view.");
-            l.info("  --isAgent     Start agent view.");
-            l.info("  --help        Print view help message.");
+            l.info("  --dev             Start mock game view.");
+            l.info("  --isAgent         Start agent view.");
+            l.info("  --addr <ADDR>     The address to auto connect to (if isAgent flag is set). Default is {}.", Types.EPort.DEFAULT.i);
+            l.info("  --port <PORT>     The port number to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_PORT);
+            l.info("  --sid <SID>       The session ID to auto connect to (if isAgent flag is set). Default is {}.", sep.Types.EProps.DESCRIPTION);
+            l.info("  --name <NAME>     The name of the agent (if isAgent flag is set).");
+            l.info("  --help            Print view help message.");
             l.info("");
             l.info("##################### SERVER HELP #####################");
             l.info("Valid server program arguments in descending order of precedence. Invalid arguments will be ignored.");
