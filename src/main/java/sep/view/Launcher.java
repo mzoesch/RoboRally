@@ -113,6 +113,43 @@ public final class Launcher
                 }
             }
 
+            if (Arrays.asList(args).contains("--sid"))
+            {
+                l.info("Command line argument [--sid] detected.");
+
+                if (Arrays.asList(args).indexOf("--sid") + 1 < args.length)
+                {
+                    l.info("Setting session ID to {}.", args[Arrays.asList(args).indexOf("--sid") + 1]);
+                    EClientInformation.INSTANCE.setPreferredSessionID(args[Arrays.asList(args).indexOf("--sid") + 1]);
+                }
+                else
+                {
+                    l.fatal("Invalid session ID.");
+                    l.info("Type --help for more information.");
+                    l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(sep.EArgs.ERR);
+                    return;
+                }
+            }
+
+            if (Arrays.asList(args).contains("--name"))
+            {
+                l.info("Command line argument [--name] detected.");
+
+                if (Arrays.asList(args).indexOf("--name") + 1 < args.length)
+                {
+                    l.info("Setting agent name to {}.", args[Arrays.asList(args).indexOf("--name") + 1]);
+                    EClientInformation.INSTANCE.setPrefAgentName(args[Arrays.asList(args).indexOf("--name") + 1]);
+                }
+                else
+                {
+                    l.fatal("Invalid agent name.");
+                    l.info("Type --help for more information.");
+                    l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(sep.EArgs.ERR);
+                    return;
+                }
+            }
 
             if (Arrays.asList(args).contains("--help"))
             {
