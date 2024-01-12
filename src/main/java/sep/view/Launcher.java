@@ -51,6 +51,25 @@ public final class Launcher
                 EClientInformation.INSTANCE.setIsAgent(true);
             }
 
+            if (Arrays.asList(args).contains("--addr"))
+            {
+                l.info("Command line argument [--addr] detected.");
+
+                if (Arrays.asList(args).indexOf("--addr") + 1 < args.length)
+                {
+                    l.info("Setting server address to {}.", args[Arrays.asList(args).indexOf("--addr") + 1]);
+                    EClientInformation.INSTANCE.setServerIP(args[Arrays.asList(args).indexOf("--addr") + 1]);
+                }
+                else
+                {
+                    l.fatal("Invalid address.");
+                    l.info("Type --help for more information.");
+                    l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(sep.EArgs.ERR);
+                    return;
+                }
+            }
+
             if (Arrays.asList(args).contains("--help"))
             {
                 l.info("##################### CLIENT HELP #####################");
@@ -59,6 +78,7 @@ public final class Launcher
                 l.info("Valid server program arguments in descending order of precedence.");
                 l.info("  --dev         Start mock game view.");
                 l.info("  --isAgent     Start agent view.");
+                l.info("  --addr <ADDR> The address to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_IP);
                 l.info("  --help        Print view help message.");
                 l.info("#######################################################");
                 System.exit(sep.EArgs.OK);
