@@ -30,7 +30,7 @@ public final class Launcher
      * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
      *              <ul>
      *               <li>[--port PORT]                           - The port number to listen on. Default is
-     *                                                             {@link sep.Types.EPort#DEFAULT EPort.DEFAULT}.
+     *                                                             {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
      *               <li>[--minRemotePlayers MIN_REMOTE_PLAYERS] - The minimum number of remote clients required to
      *                                                             start a game. Default is {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
      *                                                             MIN_REMOTE_PLAYERS}.
@@ -143,8 +143,8 @@ public final class Launcher
 
         if (EServerInformation.INSTANCE.getPort() == sep.Types.EPort.INVALID.i)
         {
-            l.info("No port change request detected. Using default port: {}.", sep.Types.EPort.DEFAULT.i);
-            EServerInformation.INSTANCE.setPort(sep.Types.EPort.DEFAULT.i);
+            l.info("No port change request detected. Using default port: {}.", EArgs.PREF_SERVER_PORT.i);
+            EServerInformation.INSTANCE.setPort(sep.EArgs.PREF_SERVER_PORT.i);
         }
 
         try
