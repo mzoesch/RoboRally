@@ -204,7 +204,7 @@ public final class Launcher
         {
             ServerInstance.run();
         }
-        catch (final IOException e)
+        catch (final Exception e)
         {
             l.fatal("Server failed.");
             l.fatal(e.getMessage());
