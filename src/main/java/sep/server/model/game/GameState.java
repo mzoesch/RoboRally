@@ -29,16 +29,20 @@ public class GameState
     private final Session   session;
     private boolean         bGameStarted;
     private final int       minRemotePlayerCountToStart;
+    private final int       minHumanPlayerCountToStart;
 
     public GameState(final Session session)
     {
         super();
 
-        this.courseName = "";
-        this.gameMode = null;
-        this.session = session;
-        this.bGameStarted = false;
-        this.minRemotePlayerCountToStart = EServerInformation.INSTANCE.getMinRemotePlayerCountToStart();
+        this.courseName                     = "";
+        this.gameMode                       = null;
+        this.session                        = session;
+        this.bGameStarted                   = false;
+
+        /* In the future, we might want to have this session independent. This is why we save the value here. */
+        this.minRemotePlayerCountToStart    = EServerInformation.INSTANCE.getMinRemotePlayerCountToStart();
+        this.minHumanPlayerCountToStart     = EServerInformation.INSTANCE.getMinHumanPlayerCountToStart();
 
         return;
     }
@@ -164,6 +168,11 @@ public class GameState
     public int getMinRemotePlayersToStart()
     {
         return this.minRemotePlayerCountToStart;
+    }
+
+    public int getMinHumanPlayersToStart()
+    {
+        return this.minHumanPlayerCountToStart;
     }
 
     // endregion Getters and Setters
