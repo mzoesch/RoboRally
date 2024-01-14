@@ -141,7 +141,7 @@ public final class Session
             return;
         }
 
-        /* If a local player is removed. */
+        /* If a local player is removed. They cannot disconnect mid-game. */
         l.info("Agent {} was successfully removed from the session [{}]. Executing post behaviour.", ctrl.getPlayerID(), this.sessionID);
         this.broadcastConnectionUpdate(ctrl, EConnectionLoss.REMOVE, false);
         this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("The %s was removed from the session.", ctrl.getName().replaceAll("[\\[\\]]", "")));
