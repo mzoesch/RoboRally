@@ -12,10 +12,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * The EServerInformation enum is a singleton class that represents the server itself. The EServerInstance is spawned
- * at application startup by the Server Listener and is not destroyed until the application is killed. The
- * EServerInstance can be created only once and is shared across all threads. It implements high-level logic for the
- * server application, for example, connecting clients to existing session or creating new ones.
+ * The Server Information enum is a singleton class that represents the server itself. The Server Instance is spawned
+ * at application startup by the {@link sep.server.viewmodel.ServerListener ServerListener} and is not destroyed until
+ * the application is killed. The Server Instance can be created only once and is shared across all threads. It
+ * implements high-level logic for the server application itself, for example, connecting clients to existing
+ * session or creating new ones if necessary.
  */
 public enum EServerInformation
 {
