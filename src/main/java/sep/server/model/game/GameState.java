@@ -28,6 +28,8 @@ public class GameState
     private GameMode        gameMode;
     private final Session   session;
     private boolean         bGameStarted;
+
+    /** @deprecated */
     private final int       minRemotePlayerCountToStart;
     private final int       minHumanPlayerCountToStart;
 
@@ -165,6 +167,7 @@ public class GameState
         }
     }
 
+    /** @deprecated */
     public int getMinRemotePlayersToStart()
     {
         return this.minRemotePlayerCountToStart;
