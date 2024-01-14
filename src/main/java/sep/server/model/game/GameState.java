@@ -109,6 +109,7 @@ public class GameState
 
     public void setRebootDirection(PlayerController playerController, String direction) {
         playerController.getPlayer().getPlayerRobot().setDirection(direction);
+
         switch(direction) {
             case "right" -> this.getSession().broadcastRotationUpdate(playerController.getPlayerID(), "counterclockwise");
             case "bottom" -> {
