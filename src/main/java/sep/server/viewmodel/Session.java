@@ -129,7 +129,13 @@ public final class Session
 
             l.debug("Client {} disconnected.", pc.getClientInstance().getAddr());
             this.broadcastConnectionUpdate(pc, EConnectionLoss.REMOVE, false);
-            this.readyCharacterOrder.remove(pc);
+            this.readyCharacterOrder.clear();
+            for (final PlayerController humanPC : this.getHumanRemotePlayers())
+            {
+                humanPC.setReady(false);
+                this.broadcastPlayerLobbyReadyStatus(humanPC);
+                continue;
+            }
             l.info("Client {} was successfully removed from the session.", pc.getClientInstance().getAddr());
 
             return;
