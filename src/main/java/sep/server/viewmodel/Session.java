@@ -399,6 +399,12 @@ public final class Session
 
         if (!bIsReady)
         {
+            if (this.awaitGameStartThread != null)
+            {
+                this.awaitGameStartThread.interrupt();
+                this.awaitGameStartThread = null;
+            }
+
             if (!this.readyCharacterOrder.contains(pc))
             {
                 return;
