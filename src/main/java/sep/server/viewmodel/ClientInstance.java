@@ -51,12 +51,12 @@ public final class ClientInstance implements Runnable
         put("ChooseRegister", ClientInstance.this::onChooseRegister);
     }};
 
-    public Thread thread;
     private final Socket socket;
     private final InputStreamReader inputStreamReader;
     private final BufferedReader bufferedReader;
     private final OutputStreamWriter outputStreamWriter;
     private final BufferedWriter bufferedWriter;
+    private Thread                      thread;
 
     private boolean                     bIsRemoteAgent;
     /** Must be created to join a given session. */
@@ -456,6 +456,12 @@ public final class ClientInstance implements Runnable
     public boolean isRemoteAgent()
     {
         return this.bIsRemoteAgent;
+    }
+
+    public void setThread(final Thread thread)
+    {
+        this.thread = thread;
+        return;
     }
 
     // endregion Getters and Setters
