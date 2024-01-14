@@ -422,7 +422,7 @@ public final class Session
             return;
         }
 
-        if (this.readyCharacterOrder.isEmpty())
+        if (this.readyCharacterOrder.isEmpty() && !pc.isRemoteAgent())
         {
             this.readyCharacterOrder.add(pc);
             this.updateCourseSelectorPower();
@@ -441,7 +441,10 @@ public final class Session
             return;
         }
 
-        this.readyCharacterOrder.add(pc);
+        if (!pc.isRemoteAgent())
+        {
+            this.readyCharacterOrder.add(pc);
+        }
 
         if (this.isReadyToStartGame())
         {
@@ -919,10 +922,44 @@ public final class Session
     /** @return All remote players in this session. */
     public ArrayList<PlayerController> getRemotePlayers()
     {
-        ArrayList<PlayerController> t = new ArrayList<PlayerController>();
+        final ArrayList<PlayerController> t = new ArrayList<PlayerController>();
         for (final IOwnershipable ctrl : this.ctrls)
         {
             if (ctrl instanceof PlayerController)
+            {
+                t.add((PlayerController) ctrl);
+                continue;
+            }
+
+            continue;
+        }
+
+        return t;
+    }
+
+    public ArrayList<PlayerController> getAgentRemotePlayers()
+    {
+        final ArrayList<PlayerController> t = new ArrayList<PlayerController>();
+        for (final IOwnershipable ctrl : this.ctrls)
+        {
+            if (ctrl instanceof PlayerController && ((PlayerController) ctrl).isRemoteAgent())
+            {
+                t.add((PlayerController) ctrl);
+                continue;
+            }
+
+            continue;
+        }
+
+        return t;
+    }
+
+    public ArrayList<PlayerController> getHumanRemotePlayers()
+    {
+        final ArrayList<PlayerController> t = new ArrayList<PlayerController>();
+        for (final IOwnershipable ctrl : this.ctrls)
+        {
+            if (ctrl instanceof PlayerController && !((PlayerController) ctrl).isRemoteAgent())
             {
                 t.add((PlayerController) ctrl);
                 continue;
@@ -994,11 +1031,11 @@ public final class Session
                 && !    msg.substring(msg.indexOf(ChatMsgModel.ARG_BEGIN) + 1, msg.lastIndexOf(ChatMsgModel.ARG_END) - 1).isEmpty();
     }
 
-    private PlayerController getPlayerControllerByID(final int ID)
+    private PlayerController getPlayerControllerByID(final int id)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
-            if (pc.getPlayerID() == ID)
+            if (pc.getPlayerID() == id)
             {
                 return pc;
             }
