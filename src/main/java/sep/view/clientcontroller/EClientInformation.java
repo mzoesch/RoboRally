@@ -49,7 +49,7 @@ public enum EClientInformation
     private ExecutorService         executorService;
 
     /** The main thread. */
-    private GameInstance            JFX_INSTANCE;
+    private GameInstance            JFXInstance;
 
     private String                  preferredSessionID;
     /** Cannot be changed for the duration of a session connection. */
@@ -61,7 +61,7 @@ public enum EClientInformation
 
     private EClientInformation()
     {
-        this.JFX_INSTANCE           = null;
+        this.JFXInstance = null;
 
         this.serverIP               = EArgs.PREF_SERVER_IP;
         this.serverPort             = sep.Types.EPort.DEFAULT.i;
@@ -276,13 +276,13 @@ public enum EClientInformation
 
     public void setJFXInstance(final GameInstance JFX_INSTANCE)
     {
-        this.JFX_INSTANCE = JFX_INSTANCE;
+        this.JFXInstance = JFX_INSTANCE;
         return;
     }
 
     public GameInstance getJFXInstance()
     {
-        return this.JFX_INSTANCE;
+        return this.JFXInstance;
     }
 
     public void setServerIP(final String SERVER_IP)
