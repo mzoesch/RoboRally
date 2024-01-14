@@ -38,6 +38,7 @@ import sep.server.model.game.tiles.             Coordinate;
 import sep.server.json.game.                    GameStartedModel;
 import sep.server.json.game.                    StartingPointTakenModel;
 import sep.server.model.game.cards.             Card;
+import sep.                                     Types;
 
 import java.util.                   ArrayList;
 import java.util.                   Objects;
@@ -53,15 +54,17 @@ public final class Session
 {
     private static final Logger l = LogManager.getLogger(Session.class);
 
-    private static final int DEFAULT_SESSION_ID_LENGTH = 5;
+    private static final int    DEFAULT_SESSION_ID_LENGTH       = 5;
+    private static final int    DEV_SESSION_GAME_START_DELAY    = 5;
+    private static final int    PROD_SESSION_GAME_START_DELAY   = 5_000;
 
-    private final ArrayList<IOwnershipable> ctrls;
-    private final ArrayList<PlayerController> readyCharacterOrder;
-    private final String sessionID;
+    private final ArrayList<IOwnershipable>     ctrls;
+    private final ArrayList<PlayerController>   readyCharacterOrder;
+    private final String                        sessionID;
 
-    private final GameState gameState;
+    private final GameState                     gameState;
 
-    private Thread awaitGameStartThread;
+    private Thread                              awaitGameStartThread;
 
     public Session()
     {
@@ -73,12 +76,12 @@ public final class Session
     {
         super();
 
-        this.ctrls = new ArrayList<IOwnershipable>();
-        this.readyCharacterOrder = new ArrayList<PlayerController>();
-        this.sessionID = sessionID;
-        this.gameState = new GameState(this);
+        this.ctrls                  = new ArrayList<IOwnershipable>();
+        this.readyCharacterOrder    = new ArrayList<PlayerController>();
+        this.sessionID              = sessionID;
+        this.gameState              = new GameState(this);
 
-        this.awaitGameStartThread = null;
+        this.awaitGameStartThread   = null;
 
         return;
     }
@@ -118,7 +121,11 @@ public final class Session
                 return;
             }
 
-            /* TODO If the await thread is already running. */
+            if (this.awaitGameStartThread != null)
+            {
+                this.awaitGameStartThread.interrupt();
+                this.awaitGameStartThread = null;
+            }
 
             l.debug("Client {} disconnected.", pc.getClientInstance().getAddr());
             this.broadcastConnectionUpdate(pc, EConnectionLoss.REMOVE, false);
