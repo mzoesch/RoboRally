@@ -28,14 +28,17 @@ public final class Launcher
      * The Server Instance is created here.
      *
      * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
-     *              <ul>
-     *               <li>[--port PORT]                           - The port number to listen on. Default is
-     *                                                             {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
-     *               <li>[--minRemotePlayers MIN_REMOTE_PLAYERS] - The minimum number of remote clients required to
-     *                                                             start a game. Default is {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
-     *                                                             MIN_REMOTE_PLAYERS}.
-     *               <li>[--help]                                 - Print help message.
-     *              </ul>
+     *             <ul>
+     *              <li>[--port PORT]                           - The port number to listen on. Default is
+     *                                                            {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
+     *              <li>[--minRemotePlayers MIN_REMOTE_PLAYERS] - The minimum number of remote clients required to
+     *                                                            start a game. Default is {@link sep.server.model.game.GameState#DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START
+     *                                                            MIN_REMOTE_PLAYERS}. Only used in legacy games.
+     *              <li>[--minHumanPlayers MIN_HUMAN_PLAYERS]   - The minimum number of human players required to
+     *                                                            start a game. Default is {@link sep.server.model.game.GameState#DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START
+     *                                                            MIN_HUMAN_PLAYERS}.
+     *              <li>[--help]                                - Print help message.
+     *             </ul>
      */
     public static void main(final String[] args)
     {
@@ -122,6 +125,49 @@ public final class Launcher
                 else
                 {
                     l.fatal("Invalid minimum number of remote players.");
+                    l.info("Type --help for more information.");
+                    l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(EArgs.ERR);
+                    return;
+                }
+            }
+
+            if (Arrays.asList(args).contains("--minHumanPlayers"))
+            {
+                l.info("Command line argument [--minHumanPlayers] detected.");
+
+                final int i = Arrays.asList(args).indexOf("--minHumanPlayers");
+                if (i + 1 < args.length)
+                {
+                    final int min;
+                    try
+                    {
+                        min = Integer.parseInt(args[i + 1]);
+                    }
+                    catch (final NumberFormatException e)
+                    {
+                        l.fatal("Invalid min human player count.");
+                        l.fatal(e.getMessage());
+                        l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(EArgs.ERR);
+                        return;
+                    }
+
+                    if (min < 0 || min > GameState.MAX_CONTROLLERS_ALLOWED)
+                    {
+                        l.fatal("Invalid minimum number of human players.");
+                        l.info("Type --help for more information.");
+                        l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(EArgs.ERR);
+                        return;
+                    }
+
+                    l.info("Set minimum number of human players to {}.", min);
+                    EServerInformation.INSTANCE.setMinHumanPlayerCount(min);
+                }
+                else
+                {
+                    l.fatal("Invalid minimum number of human players.");
                     l.info("Type --help for more information.");
                     l.debug("Server shutting down. The server took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                     System.exit(EArgs.ERR);
