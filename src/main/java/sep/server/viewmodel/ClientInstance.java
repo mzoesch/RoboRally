@@ -6,20 +6,21 @@ import sep.server.json.             RDefaultClientRequestParser;
 import sep.server.json.mainmenu.    InitialClientConnectionModel_v2;
 import sep.server.model.            EServerInformation;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.net.Socket;
-import java.util.Objects;
-import org.json.JSONObject;
-import org.json.JSONException;
-import java.net.SocketException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.util.function.Supplier;
-import java.util.HashMap;
+import java.util.                   Objects;
+import java.util.                   HashMap;
+import java.io.                     IOException;
+import java.io.                     InputStreamReader;
+import java.io.                     OutputStreamWriter;
+import java.io.                     BufferedReader;
+import java.io.                     BufferedWriter;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.net.                    SocketException;
+import java.net.                    Socket;
+import java.net.                    SocketTimeoutException;
+import java.util.function.          Supplier;
+import org.json.                    JSONObject;
+import org.json.                    JSONException;
 
 /**
  * High-level manager object for a client connection to the server. A Client Instance is spawned at connection
@@ -33,25 +34,34 @@ public final class ClientInstance implements Runnable
 {
     private static final Logger l = LogManager.getLogger(ClientInstance.class);
 
-    private final HashMap<String, Supplier<Boolean>> clientReq =
     private static final int ORDERLY_CLOSE                      = -1;
+    private static final int SOCKET_OPERATION_TIMEOUT_INIT      = 1_000;
+    /**
+     * This is an additional timeout for socket operations. This is used to prevent the server from hanging
+     * indefinitely if a client does not respond to a request. This is an additional hard timeout on top of the
+     * keep-alive interval to prevent fishy behavior. If the keep-alive fails for whatever reason and the server
+     * does not know about this, the server should always crash intentionally.
+     */
+    private static final int SOCKET_OPERATION_TIMOUT            = 15_000;
+
     private final HashMap<String, Supplier<Boolean>> clientReq  =
     new HashMap<String, Supplier<Boolean>>()
     {{
-        put("Alive", ClientInstance.this::onAlive);
-        put("PlayerValues", ClientInstance.this::onCorePlayerAttributesChanged);
-        put("SendChat", ClientInstance.this::onChatMsg);
-        put("SetStatus", ClientInstance.this::onLobbyStatus);
-        put("MapSelected", ClientInstance.this::onCourseSelect);
-        put("PlayCard", ClientInstance.this::onCardPlay);
-        put("SelectedCard", ClientInstance.this::onRegisterSlotUpdate);
-        put("SetStartingPoint", ClientInstance.this::onStartingPointSet);
-        put("PickDamage", ClientInstance.this::onDamageCardSelect);
-        put("HelloServer", ClientInstance.this::onAddAgentRequest);
-        put("RebootDirection", ClientInstance.this::onRebootDirection);
-        put("BuyUpgrade", ClientInstance.this::onBuyUpgrade);
-        put("ChooseRegister", ClientInstance.this::onChooseRegister);
-    }};
+        put(    "Alive",                ClientInstance.this::onAlive                        );
+        put(    "PlayerValues",         ClientInstance.this::onCorePlayerAttributesChanged  );
+        put(    "SendChat",             ClientInstance.this::onChatMsg                      );
+        put(    "SetStatus",            ClientInstance.this::onLobbyStatus                  );
+        put(    "MapSelected",          ClientInstance.this::onCourseSelect                 );
+        put(    "PlayCard",             ClientInstance.this::onCardPlay                     );
+        put(    "SelectedCard",         ClientInstance.this::onRegisterSlotUpdate           );
+        put(    "SetStartingPoint",     ClientInstance.this::onStartingPointSet             );
+        put(    "PickDamage",           ClientInstance.this::onDamageCardSelect             );
+        put(    "HelloServer",          ClientInstance.this::onAddAgentRequest              );
+        put(    "RebootDirection",      ClientInstance.this::onRebootDirection              );
+        put(    "BuyUpgrade",           ClientInstance.this::onBuyUpgrade                   );
+        put(    "ChooseRegister",       ClientInstance.this::onChooseRegister               );
+    }}
+    ;
 
     private Thread                      thread;
     private final Socket                socket;
@@ -155,7 +165,7 @@ public final class ClientInstance implements Runnable
         this.playerController.getSession().joinSession(this.playerController);
         this.bIsRegistered      = true;
 
-        l.info("Client {} registered successfully.", this.getAddr());
+        l.info("Client {} registered successfully in session [{}].", this.getAddr(), this.playerController.getSession().getSessionID());
 
         return true;
     }
@@ -175,7 +185,7 @@ public final class ClientInstance implements Runnable
                 return null;
             }
 
-            return String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+            return String.format("%s%s", (char) escapeCharacter, this.in.readLine());
         }
         catch (final IOException e)
         {
@@ -326,6 +336,8 @@ public final class ClientInstance implements Runnable
 
     private void defaultClientListener() throws IOException
     {
+        this.socket.setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMOUT);
+
         while (true)
         {
             final int escapeCharacter;
@@ -414,11 +426,25 @@ public final class ClientInstance implements Runnable
 
             return;
         }
-        catch (IOException e)
+        catch (final SocketTimeoutException e)
         {
-            //noinspection CallToPrintStackTrace
-            e.printStackTrace();
-            this.handleDisconnect();
+            if (ServerInstance.INSTANCE.getKeepAliveThread() == null)
+            {
+                l.fatal("Server failed. It was not notified about the keep-alive thread failure.");
+                ServerInstance.INSTANCE.kill(ServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            l.fatal("Client {} exceeded a connection timeout even though the keep-alive was successful.", this.getAddr());
+            ServerInstance.INSTANCE.kill(ServerInstance.EServerCodes.FATAL);
+
+            return;
+        }
+        catch (final IOException e)
+        {
+            l.error("Client {}'s socket connection was closed unexpectedly. Executing post disconnect logic.", this.getAddr());
+            l.error(e.getMessage());
+            this.disconnect();
             return;
         }
     }
