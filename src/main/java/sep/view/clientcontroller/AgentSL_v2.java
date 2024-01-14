@@ -1,19 +1,14 @@
 package sep.view.clientcontroller;
 
-import sep.view.lib.                EGamePhase;
-import sep.view.viewcontroller.     ViewSupervisor;
-import sep.view.viewcontroller.     SceneController;
+import sep.view.json.lobby.         PlayerValuesModel;
+import sep.view.json.lobby.         SetStatusModel;
 
 import org.json.                    JSONException;
-import java.util.stream.            Collectors;
-import java.util.stream.            IntStream;
-import java.io.                     BufferedReader;
-import java.io.                     InputStreamReader;
-import java.util.                   Arrays;
-import java.util.                   Objects;
+import org.json.                    JSONObject;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
-import java.net.                    Socket;
+import java.io.                     BufferedReader;
+import java.util.                   Objects;
 
 /**
  * We create a special object for listening to the server socket on a separate
@@ -23,6 +18,8 @@ import java.net.                    Socket;
 public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(HumanSL.class);
+
+    private JSONObject serverCourse;
 
     public AgentSL_v2(final BufferedReader br)
     {
@@ -38,36 +35,59 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onCorePlayerAttributesChanged() throws JSONException
     {
+        l.debug("Player {}'s core attributes have changed. Updating.", this.dsrp.getPlayerID());
+        EGameState.addRemotePlayer(this.dsrp);
         return true;
     }
 
     @Override
-    protected boolean onChatMsg() throws JSONException
+    protected boolean onChatMsg()
     {
+        /* Ignored on purpose. */
         return true;
     }
 
     @Override
-    protected boolean onLobbyPlayerStatus() throws JSONException
+    protected boolean onLobbyPlayerStatus()
     {
+        /* Ignored on purpose. */
         return true;
     }
 
     @Override
-    protected boolean onSelectMapRequest() throws JSONException
+    protected boolean onSelectMapRequest() throws IllegalStateException
     {
-        return true;
+        throw new IllegalStateException("AgentSL_v2.onSelectMapRequest() was called. The server should never ask an agent to select a map.");
     }
 
     @Override
-    protected boolean onMapSelected() throws JSONException
+    protected boolean onMapSelected() throws RuntimeException
     {
+        if (this.dsrp.getCourseName() == null || this.dsrp.getCourseName().isEmpty())
+        {
+            return true;
+        }
+
+        l.info("Current session course updated to {}. Sending name and robot to server.", this.dsrp.getCourseName());
+        EGameState.INSTANCE.setCurrentServerCourse(this.dsrp.getCourseName());
+        new PlayerValuesModel(EClientInformation.INSTANCE.getPrefAgentName(), EClientInformation.INSTANCE.getPrefAgentRobot()).send();
+
+        if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady())
+        {
+            return true;
+        }
+
+        l.info("Sending Agent ready request to server.");
+        new SetStatusModel(true).send();
+
         return true;
     }
 
     @Override
     protected boolean onGameStart() throws JSONException
     {
+        l.debug("Game start received.");
+        this.serverCourse = this.dsrp.request();
         return true;
     }
 
