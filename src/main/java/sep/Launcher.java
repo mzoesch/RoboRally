@@ -1,6 +1,7 @@
 package sep;
 
-import sep.wrapper. Wrapper;
+import sep.wrapper.                 Wrapper;
+import sep.server.model.game.       GameState;
 
 import java.util.                   Arrays;
 import java.util.                   Objects;
@@ -341,9 +342,10 @@ public final class Launcher
             l.info("");
             l.info("##################### SERVER HELP #####################");
             l.info("Valid server program arguments in descending order of precedence. Invalid arguments will be ignored.");
-            l.info("Usage: java -cp {jar-name}.jar sep.server.Launcher [--port PORT] [--minRemotePlayers MIN_REMOTE_PLAYERS] [--help]");
+            l.info("Usage: java -cp {jar-name}.jar sep.server.Launcher [--port PORT] [--minRemotePlayers MIN_REMOTE_PLAYERS] [--minHumanPlayers MIN_HUMAN_PLAYERS] [--help]");
             l.info("  --port <PORT>                             The port number to listen on. Default is {}.", sep.Types.EPort.DEFAULT.i);
-            l.info("  --minRemotePlayers <MIN_REMOTE_PLAYERS>   The minimum number of remote clients required to start a game. Default is {}.", sep.server.model.game.GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START);
+            l.info("  --minRemotePlayers <MIN_REMOTE_PLAYERS>   The minimum number of remote clients required to start a game. Default is {}. Only used in legacy games.", GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START);
+            l.info("  --minHumanPlayers <MIN_HUMAN_PLAYERS>     The minimum number of human players required to start a game. Default is {}.", GameState.DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START);
             l.info("  --help                                    Print server help message.");
             l.info("");
             l.info("#######################################################");
