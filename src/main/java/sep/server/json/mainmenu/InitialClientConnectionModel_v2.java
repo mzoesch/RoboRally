@@ -9,7 +9,7 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 
 /** Handles the initial client server handshake. */
-public class InitialClientConnectionModel_v2
+public final class InitialClientConnectionModel_v2
 {
     private static final Logger l = LogManager.getLogger(InitialClientConnectionModel_v2.class);
 
