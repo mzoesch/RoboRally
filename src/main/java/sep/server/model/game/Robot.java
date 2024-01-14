@@ -16,6 +16,7 @@ public class Robot {
     String direction;
     private final Course course;
     private Tile startingPoint;
+    private boolean rebootTriggered;
 
     /* TODO WE MUST REMOVE THIS ASAP. THIS CAUSES SO MANY PROBLEMS!!!! */
     /** @deprecated Make to gateway method */
@@ -23,9 +24,10 @@ public class Robot {
 
     private final Player possessor;
 
-    public Robot(Player possessor, Course course) {
+    public Robot(boolean rebootTriggered, Player possessor, Course course) {
         this.course = course;
         startingPoint = null;
+        this.rebootTriggered = rebootTriggered;
         currentTile = null;
         this.possessor = possessor;
     }
@@ -121,16 +123,12 @@ public class Robot {
             return;
         }
 
-
-
         boolean loggingInProgress = false;
         if (!loggingInProgress) {
             loggingInProgress = true;
             l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
             loggingInProgress = false;
         }
-
-       //l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
 
         if (!this.getCourse().isCoordinateWithinBounds(targetCoordinate)) {
             l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), targetCoordinate.toString());
@@ -212,6 +210,7 @@ public class Robot {
         Player robotOwner = determineRobotOwner();
         Tile sourceTile = this.getCurrentTile();
         Tile restartPoint = null;
+        this.rebootTriggered = true;
 
         this.getAuthGameMode().getSession().broadcastReboot(robotOwner.getController().getPlayerID());
 
@@ -379,4 +378,11 @@ public class Robot {
         return possessor;
     }
 
+    public boolean isRebootTriggered() {
+        return rebootTriggered;
+    }
+
+    public void setRebootTriggered(boolean rebootTriggered) {
+        this.rebootTriggered = rebootTriggered;
+    }
 }

@@ -15,7 +15,12 @@ public class MoveIII extends AProgrammingCard implements IPlayableCard {
         player.getPlayerRobot().moveRobotOneTileForwards();
         player.getPlayerRobot().moveRobotOneTileForwards();
         player.getPlayerRobot().moveRobotOneTileForwards();
-        player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+
+        if(!player.getPlayerRobot().isRebootTriggered()) {
+            player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+        } else {
+            player.getPlayerRobot().setRebootTriggered(false);
+        }
     }
 
 }

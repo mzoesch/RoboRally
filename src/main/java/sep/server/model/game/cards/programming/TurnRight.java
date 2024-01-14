@@ -13,7 +13,11 @@ public class TurnRight extends AProgrammingCard implements IPlayableCard {
     @Override
     public void playCard(Player player, int currentRoundNumber) {
         player.getPlayerRobot().rotateRobotOnTileToTheRight();
-        player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
 
+        if(!player.getPlayerRobot().isRebootTriggered()) {
+            player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+        } else {
+            player.getPlayerRobot().setRebootTriggered(false);
+        }
     }
 }

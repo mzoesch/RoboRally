@@ -17,7 +17,10 @@ public class PowerUp extends AProgrammingCard implements IPlayableCard {
         int newEnergy= currentEnergy +1;
         player.setEnergyCollected(newEnergy);
 
-        player.getAuthGameMode().getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), newEnergy, "PowerUpCard");
-
+        if(!player.getPlayerRobot().isRebootTriggered()) {
+            player.getAuthGameMode().getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), newEnergy, "PowerUpCard");
+        } else {
+            player.getPlayerRobot().setRebootTriggered(false);
+        }
     }
 }

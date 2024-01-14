@@ -535,7 +535,7 @@ public class GameMode {
      * the handleLaserByDirection method.
      */
     private void findLasers() {
-
+        addDelay(2000);
         this.getSession().broadcastAnimation(EAnimation.WALL_SHOOTING);
 
         for (ArrayList<Tile> row : course.getCourse()) {
@@ -554,6 +554,7 @@ public class GameMode {
      * and calls the handleLaserShooting method depending on the direction the robot is facing to.
      */
     private void shootRobotLasers() {
+        addDelay(2000);
         this.getSession().broadcastAnimation(EAnimation.PLAYER_SHOOTING);
 
         for(Player player : players) {
@@ -767,9 +768,10 @@ public class GameMode {
                 continue;
             }
 
-            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex);
+            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex + 1);
         }
 
+        addDelay(2000);
         this.activateConveyorBelts(2);
         this.activateConveyorBelts(1);
         this.activatePushPanels();

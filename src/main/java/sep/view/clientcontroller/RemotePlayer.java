@@ -115,28 +115,6 @@ public final class RemotePlayer
         return this.registerSlots[i];
     }
 
-    //TODO @Refactoring was macht diese Methode bzw. kann die weg?
-    public int countCheckPoints() {
-        int checkpoint = 0;
-        for (String card : registerSlots) {
-            if ("CheckPoint".equals(card)) {
-                checkpoint++;
-            }
-        }
-        return checkpoint;
-    }
-
-    //TODO @Refactoring was macht diese Methode bzw. kann die weg?
-    public int countEnergy() {
-        int energy = 0;
-        for (String card : registerSlots) {
-            if ("Energy".equals(card)) {
-                energy++;
-            }
-        }
-        return energy;
-    }
-
     public boolean hasSelectionFinished()
     {
         return this.bSelectionFinished;

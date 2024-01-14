@@ -31,7 +31,7 @@ public class Player {
 
     public Player(final IOwnershipable ctrl, final Course currentCourse) {
         this.ctrl = ctrl;
-        this.playerRobot = new Robot(this, currentCourse);
+        this.playerRobot = new Robot(false, this, currentCourse);
 
         this.playerDeck = new DeckBuilder().buildProgrammingDeck();
         Collections.shuffle(this.playerDeck);
