@@ -540,7 +540,7 @@ public class GameMode {
      * the handleLaserByDirection method.
      */
     private void findLasers() {
-
+        addDelay(2000);
         this.getSession().broadcastAnimation(EAnimation.WALL_SHOOTING);
 
         for (ArrayList<Tile> row : course.getCourse()) {
@@ -559,6 +559,7 @@ public class GameMode {
      * and calls the handleLaserShooting method depending on the direction the robot is facing to.
      */
     private void shootRobotLasers() {
+        addDelay(2000);
         this.getSession().broadcastAnimation(EAnimation.PLAYER_SHOOTING);
 
         for(Player player : players) {
