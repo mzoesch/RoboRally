@@ -209,6 +209,7 @@ public enum EClientInformation
         return;
     }
 
+    /** @deprecated */
     public void sendRemoveAgentRequest(final int playerID)
     {
         // TODO WARNING
