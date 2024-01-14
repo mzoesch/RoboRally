@@ -760,7 +760,8 @@ public class GameMode {
      * be called five times in a row to complete the activation phase.
      * @return True if the activation phase should continue. False otherwise.
      */
-    private boolean runActivationPhase() {
+    private boolean runActivationPhase() throws InterruptedException
+    {
         l.debug("Starting register phase {}.", this.currentRegisterIndex + 1);
 
         this.determinePriorities();
@@ -771,7 +772,7 @@ public class GameMode {
             if (p.getRegisters()[this.currentRegisterIndex] != null) {
                 l.info("Player {} is playing card {}.", p.getController().getPlayerID(), p.getRegisters()[this.currentRegisterIndex].getCardType());
                 p.getRegisters()[this.currentRegisterIndex].playCard(p, this.currentRegisterIndex);
-                addDelay(2000);
+                Thread.sleep(Types.EDelay.CARD_PLAY.i);
                 continue;
             }
 
