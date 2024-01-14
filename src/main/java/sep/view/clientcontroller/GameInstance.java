@@ -197,7 +197,7 @@ public final class GameInstance
             l.fatal("Failed to retrieve player ID.");
             return false;
         }
-        l.debug("Player ID received.");
+        l.debug("Player ID [{}] received.", EClientInformation.INSTANCE.getPlayerID());
 
         l.info("Client successfully connected to server in session {}.", EClientInformation.INSTANCE.getPreferredSessionID());
 
