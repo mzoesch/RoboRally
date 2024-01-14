@@ -11,12 +11,21 @@ import org.apache.logging.log4j.    Logger;
 /** Implements methods relevant to the server itself. */
 public enum ServerInstance
 {
+    INSTANCE;
+
+    public enum EServerCodes
+    {
+        OK,
+        FATAL,
+        ;
+    }
+
     private static final Logger l = LogManager.getLogger(ServerInstance.class);
 
     private static final int SUFFIX_LENGTH = 4;
 
-    public static ServerInstance INSTANCE;
-    private final ServerListener SERVER_LISTENER;
+    private ServerListener      serverListener;
+    private Thread              keepAliveThread;
 
     private ServerInstance()
     {
@@ -30,9 +39,6 @@ public enum ServerInstance
         l.info("Starting server.");
 
         EServerInformation.INSTANCE.startServer();
-        ServerInstance.keepAlive();
-        this.SERVER_LISTENER = new ServerListener();
-        this.SERVER_LISTENER.listen(); /* Will block the main thread. */
         ServerInstance.INSTANCE.keepAlive();
         ServerInstance.INSTANCE.serverListener = new ServerListener();
         ServerInstance.INSTANCE.serverListener.listen(); /* Will block the main thread. */
@@ -40,6 +46,26 @@ public enum ServerInstance
         return;
     }
 
+    public void kill(final EServerCodes code)
+    {
+        l.info("Killing server.");
+
+        if (this.keepAliveThread != null)
+        {
+            this.keepAliveThread.interrupt();
+            try
+            {
+                this.keepAliveThread.join();
+            }
+            catch (final InterruptedException e)
+            {
+                l.fatal("Failed to join keep-alive thread.");
+            }
+            this.keepAliveThread = null;
+        }
+
+        /* Can we exit the server differently? So that we can get back to the wrapper? */
+        System.exit(code.ordinal());
 
         return;
     }
