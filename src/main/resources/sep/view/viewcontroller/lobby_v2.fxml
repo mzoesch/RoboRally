@@ -117,6 +117,7 @@
                                     </VBox>
                                     <Button
                                         text="Add Bot"
+                                        fx:id="addBotBtn"
                                         onAction="#onAddAgentBtn"
                                         styleClass="secondary-btn-tiny"
                                     />
