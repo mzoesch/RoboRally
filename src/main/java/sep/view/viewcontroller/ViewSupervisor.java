@@ -30,6 +30,7 @@ import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
 import java.util.                   ArrayList;
+import java.util.Objects;
 import java.util.concurrent.atomic. AtomicReference;
 
 /**
@@ -158,6 +159,7 @@ public final class ViewSupervisor extends Application
     {
         EGameState.INSTANCE.setCurrentServerCourseJSON(course);
         ViewSupervisor.getSceneController().renderNewScreen(SceneController.GAME_ID, SceneController.PATH_TO_GAME, false);
+        ViewSupervisor.createPhaseUpdatePopUpLater(EGameState.INSTANCE.getCurrentPhase());
         return;
     }
 
