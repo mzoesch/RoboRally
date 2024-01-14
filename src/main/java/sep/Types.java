@@ -152,4 +152,22 @@ public final class Types
 
     }
 
+    /** Delays that affect client and server to keep them in sync with each other. Delays must only be used for animations. */
+    public enum EDelay
+    {
+        REGISTER_PHASE_ITERATION    (   5_000   ),
+        PHASE_CHANGE                (   2_000   ),
+        CARD_PLAY                   (   1_000   ),
+        ;
+
+        public final int i;
+
+        private EDelay(final int i)
+        {
+            this.i = i;
+            return;
+        }
+
+    }
+
 }
