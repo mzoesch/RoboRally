@@ -215,26 +215,17 @@ public class GameMode {
             }
 
 
-                p.shuffleAndRefillDeck();
-                l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
-                this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
+            p.shuffleAndRefillDeck();
+            l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
+            this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
 
-                int remainingCards = 9 - maxCards;
-                for (int i = 0; i < remainingCards; i++) {
-                    p.getPlayerHand().add(p.getPlayerDeck().remove(0));
-                }
+            int remainingCards = 9 - maxCards;
+            for (int i = 0; i < remainingCards; i++) {
+                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+            }
 
 
             l.debug("P {} - Has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
-
-            //alter Code
-            /*for (int i = 0; i < GameMode.NEW_PROGRAMMING_CARDS; i++) {
-                if (p.getPlayerDeck().isEmpty()) {
-                    p.shuffleAndRefillDeck();
-                    this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
-                }
-                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
-            }*/
 
             if (p.getController() instanceof PlayerController pc)
             {
