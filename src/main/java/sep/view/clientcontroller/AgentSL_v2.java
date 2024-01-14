@@ -17,7 +17,7 @@ import java.util.                   Objects;
  */
 public final class AgentSL_v2 extends ServerListener
 {
-    private static final Logger l = LogManager.getLogger(HumanSL.class);
+    private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
     private JSONObject serverCourse;
 
