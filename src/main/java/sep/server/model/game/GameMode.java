@@ -772,7 +772,7 @@ public class GameMode {
                 continue;
             }
 
-            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex);
+            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex + 1);
         }
 
         this.activateConveyorBelts(2);
