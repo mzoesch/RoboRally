@@ -1,15 +1,15 @@
 package sep.server.viewmodel;
 
-import sep.server.model.EServerInformation;
-import sep.server.model.Agent;
+import sep.server.model.            EServerInformation;
+import sep.server.model.            Agent;
 
-import java.io.IOException;
-import java.util.UUID;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.io.                     IOException;
+import java.util.                   UUID;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
 
 /** Implements methods relevant to the server itself. */
-public final class ServerInstance
+public enum ServerInstance
 {
     private static final Logger l = LogManager.getLogger(ServerInstance.class);
 
@@ -18,17 +18,28 @@ public final class ServerInstance
     public static ServerInstance INSTANCE;
     private final ServerListener SERVER_LISTENER;
 
-    private ServerInstance() throws IOException
+    private ServerInstance()
     {
-        super();
+        this.serverListener     = null;
+        this.keepAliveThread    = null;
+        return;
+    }
 
+    public static void run() throws IOException
+    {
         l.info("Starting server.");
 
-        ServerInstance.INSTANCE = this;
         EServerInformation.INSTANCE.startServer();
         ServerInstance.keepAlive();
         this.SERVER_LISTENER = new ServerListener();
         this.SERVER_LISTENER.listen(); /* Will block the main thread. */
+        ServerInstance.INSTANCE.keepAlive();
+        ServerInstance.INSTANCE.serverListener = new ServerListener();
+        ServerInstance.INSTANCE.serverListener.listen(); /* Will block the main thread. */
+
+        return;
+    }
+
 
         return;
     }
