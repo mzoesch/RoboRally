@@ -46,8 +46,8 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 
 /**
- * Handles how clients can join and leave a session and also how to communicate with each other. For example,
- * chat messages. If a client disconnects mid-game, this class must handle that as well.
+ * Handles how clients can join and leave a session and also how to communicate with each other.
+ * If a client disconnects mid-game, this class must handle that as well.
  */
 public final class Session
 {
