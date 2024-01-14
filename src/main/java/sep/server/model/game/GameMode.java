@@ -1,5 +1,6 @@
 package sep.server.model.game;
 
+import sep.Types;
 import sep.server.json.common.ErrorMsgModel;
 import sep.server.json.game.damage.DrawDamageModel;
 import sep.server.model.game.cards.Card;
@@ -811,13 +812,11 @@ public class GameMode {
 
     private void triggerActivationPhase()
     {
-
         for (Player p : players) {
             l.debug("P Player {} - Cards in register {}.",
                     p.getController().getName(),
                     p.getRegistersAsStringArray());
         }
-
 
         if (this.activationPhaseThread != null && this.activationPhaseThread.isAlive())
         {
@@ -825,44 +824,10 @@ public class GameMode {
             return;
         }
 
-        this.activationPhaseThread = new Thread(
-        () ->
-        {
-            l.debug("Activation Phase started.");
-
-            this.currentRegisterIndex = 0;
-            while (this.runActivationPhase())
-            {
-                l.debug("Register {} in Activation Phase ended. Waiting 5s for the next register iteration . . .", this.currentRegisterIndex);
-                try
-                {
-                    Thread.sleep(5_000); /* Just for debugging right now. */
-                }
-                catch (InterruptedException e)
-                {
-                    l.error("Activation Phase was interrupted. This should not happen!", e);
-                    throw new RuntimeException(e);
-                }
-            }
-
-            this.endRound();
-
-            l.debug("Activation Phase ended successfully. Waiting 5s for the next phase . . .");
-
-            try
-            {
-                Thread.sleep(5_000); /* Just for debugging right now. */
-            }
-            catch (InterruptedException e)
-            {
-                l.error("Activation Phase was interrupted. This should not happen!", e);
-                throw new RuntimeException(e);
-            }
-
-            this.handleNewPhase(EGamePhase.UPGRADE);
-        });
-
+        this.activationPhaseThread = this.createActivationThread();
         this.activationPhaseThread.start();
+
+        return;
     }
 
     /**
@@ -1055,6 +1020,47 @@ public class GameMode {
 
     public void setEnergyBank(int energyBank) {
         this.energyBank = energyBank;
+    }
+
+    private Thread createActivationThread()
+    {
+        return new Thread(
+        () ->
+        {
+            l.debug("Activation Phase started.");
+
+            this.currentRegisterIndex = 0;
+
+            try
+            {
+                while (this.runActivationPhase())
+                {
+                    l.debug("Register {} in Activation Phase ended. Waiting 5s for the next register iteration . . .", this.currentRegisterIndex);
+
+                    //noinspection BusyWait
+                    Thread.sleep(Types.EDelay.REGISTER_PHASE_ITERATION.i);
+
+                    continue;
+                }
+
+                this.endRound();
+
+                l.debug("Activation Phase ended successfully. Waiting 2s for the next phase . . .");
+
+                Thread.sleep(Types.EDelay.PHASE_CHANGE.i);
+            }
+            catch (final InterruptedException e)
+            {
+                l.warn("Activation Phase was interrupted. If this was during session close, this can be ignored.");
+                l.warn(e.getMessage());
+                return;
+            }
+
+            this.handleNewPhase(EGamePhase.UPGRADE);
+            this.activationPhaseThread = null;
+
+            return;
+        });
     }
 
     // endregion Getters and Setters
