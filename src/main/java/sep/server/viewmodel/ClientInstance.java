@@ -1,10 +1,10 @@
 package sep.server.viewmodel;
 
-import sep.server.json.common.ChatMsgModel;
-import sep.server.json.mainmenu.InitialClientConnectionModel_v2;
-import sep.server.json.RDefaultClientRequestParser;
-import sep.server.model.EServerInformation;
-import sep.server.json.common.KeepAliveModel;
+import sep.server.json.common.      ChatMsgModel;
+import sep.server.json.common.      KeepAliveModel;
+import sep.server.json.             RDefaultClientRequestParser;
+import sep.server.json.mainmenu.    InitialClientConnectionModel_v2;
+import sep.server.model.            EServerInformation;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,6 +34,8 @@ public final class ClientInstance implements Runnable
     private static final Logger l = LogManager.getLogger(ClientInstance.class);
 
     private final HashMap<String, Supplier<Boolean>> clientReq =
+    private static final int ORDERLY_CLOSE                      = -1;
+    private final HashMap<String, Supplier<Boolean>> clientReq  =
     new HashMap<String, Supplier<Boolean>>()
     {{
         put("Alive", ClientInstance.this::onAlive);
@@ -51,25 +53,21 @@ public final class ClientInstance implements Runnable
         put("ChooseRegister", ClientInstance.this::onChooseRegister);
     }};
 
-    private final Socket socket;
-    private final InputStreamReader inputStreamReader;
-    private final BufferedReader bufferedReader;
-    private final OutputStreamWriter outputStreamWriter;
-    private final BufferedWriter bufferedWriter;
     private Thread                      thread;
+    private final Socket                socket;
+    private final BufferedReader        in;
+    private final BufferedWriter        out;
 
     private boolean                     bIsRemoteAgent;
     /** Must be created to join a given session. */
-    private PlayerController playerController;
+    private PlayerController            playerController;
+
     /** If the client is registered in a session. */
-    private boolean bIsRegistered;
+    private boolean                     bIsRegistered;
     /** Used to keep track if a client responded to the keep-alive request form the server. */
-    private boolean bIsAlive;
-    /**
-     * If a client disconnects unexpectedly, we may try to disconnect them multiple times.
-     * This variable is used to keep track of that.
-     */
-    private boolean bDisconnecting;
+    private boolean                     bIsAlive;
+    /** If a client disconnects unexpectedly, we may try to disconnect them multiple times. This variable is used to keep track of that. */
+    private boolean                     bDisconnecting;
 
     private RDefaultClientRequestParser dcrp;
 
@@ -77,25 +75,27 @@ public final class ClientInstance implements Runnable
     {
         super();
 
-        this.thread = null;
-        this.socket = socket;
-        this.inputStreamReader = new InputStreamReader(this.socket.getInputStream());
-        this.outputStreamWriter = new OutputStreamWriter(this.socket.getOutputStream());
-        this.bufferedReader = new BufferedReader(this.inputStreamReader);
-        this.bufferedWriter = new BufferedWriter(this.outputStreamWriter);
+        this.thread             = null;
+        this.socket             = socket;
+        this.socket.setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMEOUT_INIT);
 
-        this.playerController = null;
-        this.bIsRegistered = false;
-        this.bIsAlive = true;
-        this.bDisconnecting = false;
+        this.in                 = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+        this.out                = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+
         this.bIsRemoteAgent     = false;
+        this.playerController   = null;
 
-        this.dcrp = null;
+        this.bIsRegistered      = false;
+        this.bIsAlive           = true;
+        this.bDisconnecting     = false;
+
+        this.dcrp               = null;
 
         return;
     }
 
-    public void handleDisconnect()
+
+    public void disconnect()
     {
         /* Because this method may be called multiple times if the connection did not close in an orderly way. */
         if (this.bDisconnecting)
@@ -117,7 +117,7 @@ public final class ClientInstance implements Runnable
         {
             this.socket.close();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.warn("Could not close client {} socket connection in an orderly way.", this.getAddr());
             l.warn(e.getMessage());
@@ -137,7 +137,7 @@ public final class ClientInstance implements Runnable
      */
     private boolean registerClient() throws IOException
     {
-        InitialClientConnectionModel_v2 icc = new InitialClientConnectionModel_v2(this);
+        final InitialClientConnectionModel_v2 icc = new InitialClientConnectionModel_v2(this);
         icc.sendProtocolVersion();
 
         icc.waitForProtocolVersionConfirmation();
@@ -147,12 +147,13 @@ public final class ClientInstance implements Runnable
             return false;
         }
 
-        // TODO Check if session id is valid.
-        Session s = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
-        this.playerController = ServerInstance.createNewPlayerController(this, s);
+        /* TODO Check if session id is valid. */
+        this.bIsRemoteAgent     = icc.isRemoteAgent();
+        final Session s         = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
+        this.playerController   = ServerInstance.createNewPlayerController(this, s);
         icc.sendWelcome(this.playerController.getPlayerID());
         this.playerController.getSession().joinSession(this.playerController);
-        this.bIsRegistered = true;
+        this.bIsRegistered      = true;
 
         l.info("Client {} registered successfully.", this.getAddr());
 
@@ -167,23 +168,22 @@ public final class ClientInstance implements Runnable
     {
         try
         {
-            // If the client closed the connection in an orderly way, the server will receive -1.
-            int escapeCharacter = this.bufferedReader.read();
-            if (escapeCharacter == -1)
+            final int escapeCharacter = this.in.read();
+            if (escapeCharacter == ClientInstance.ORDERLY_CLOSE)
             {
-                this.handleDisconnect();
+                this.disconnect();
                 return null;
             }
 
             return String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.error("Failed to read from client {}. Disconnecting them.", this.getAddr());
             l.error(e.getMessage());
             return null;
         }
-        catch (JSONException e)
+        catch (final JSONException e)
         {
             l.error("Received invalid JSON from client {}. Disconnecting them.", this.getAddr());
             l.error(e.getMessage());
@@ -298,8 +298,6 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-
-
     // endregion Client Request Handlers
 
     private void parseRequest(RDefaultClientRequestParser dcrp) throws JSONException
@@ -334,23 +332,23 @@ public final class ClientInstance implements Runnable
             try
             {
                 // If the client closed the connection in an orderly way, the server will receive -1.
-                escapeCharacter = this.bufferedReader.read();
+                escapeCharacter = this.in.read();
             }
-            catch (SocketException e)
+            catch (final SocketException e)
             {
                 l.warn("Client {}'s socket connection was closed unexpectedly.", this.getAddr());
-                this.handleDisconnect();
+                this.disconnect();
                 return;
             }
 
             if (escapeCharacter == -1)
             {
                 l.debug("Client {} requested to close the server connection in an orderly way.", this.getAddr());
-                this.handleDisconnect();
+                this.disconnect();
                 return;
             }
 
-            final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+            final String r = String.format("%s%s", (char) escapeCharacter, this.in.readLine());
             l.trace("Received request from client {}. Parsing: {}", this.getAddr(), r);
 
             try
@@ -376,20 +374,17 @@ public final class ClientInstance implements Runnable
         return;
     }
 
-    public boolean sendRemoteRequest(JSONObject j)
+    public boolean sendRemoteRequest(final JSONObject j)
     {
-        if (!j.toString(0).contains("\"messageType\":\"Alive\""))
-        {
-            l.trace("Sending remote request to client {}. {}", this.getAddr(), j.toString(0));
-        }
+        l.trace("Sending remote request to client {}. {}", this.getAddr(), j.toString(0));
 
         try
         {
-            this.bufferedWriter.write(j.toString());
-            this.bufferedWriter.newLine();
-            this.bufferedWriter.flush();
+            this.out.write(j.toString());
+            this.out.newLine();
+            this.out.flush();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.error("Failed to send remote request to client {}.", this.getAddr());
             l.error(e.getMessage());
@@ -409,7 +404,7 @@ public final class ClientInstance implements Runnable
 
             if (!bSuccess)
             {
-                this.handleDisconnect();
+                this.disconnect();
                 return;
             }
 
