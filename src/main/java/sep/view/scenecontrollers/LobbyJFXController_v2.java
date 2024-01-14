@@ -18,13 +18,15 @@ import javafx.scene.control.        ScrollPane;
 import javafx.scene.control.        Button;
 import javafx.scene.control.        TextField;
 import javafx.scene.control.        Label;
+import javafx.scene.                Node;
 import javafx.scene.layout.         Priority;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         VBox;
-import javafx.scene.                Node;
-import javafx.beans.binding.        Bindings;
+import javafx.scene.layout.         Region;
+import javafx.scene.layout.         Pane;
 import java.io.                     IOException;
 import javafx.scene.input.          KeyCode;
+import javafx.beans.binding.        Bindings;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -34,7 +36,6 @@ import javafx.util.                 Duration;
 import javafx.animation.            PauseTransition;
 import org.json.                    JSONException;
 import javafx.event.                ActionEvent;
-import javafx.scene.layout.         Region;
 
 public final class LobbyJFXController_v2
 {
@@ -55,6 +56,7 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    @FXML private Button        addBotBtn;
     @FXML private VBox          playersInSessionLabelContainer;
     @FXML private Label         serverCourseLabel;
     @FXML private VBox          serverCourseSelectorArea;
@@ -149,6 +151,11 @@ public final class LobbyJFXController_v2
         {
             ViewSupervisor.getSceneController().killCurrentScreen();
             return;
+        }
+
+        if (!EClientInformation.INSTANCE.getAllowLegacyAgents())
+        {
+            ( (Pane) this.addBotBtn.getParent() ).getChildren().remove(this.addBotBtn);
         }
 
         this.sessionIDLabel.setText(String.format("Session ID: %s", EClientInformation.INSTANCE.getPreferredSessionID()));
