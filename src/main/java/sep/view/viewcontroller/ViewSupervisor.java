@@ -760,4 +760,9 @@ public final class ViewSupervisor extends Application
         return ViewSupervisor.INSTANCE.sceneController;
     }
 
+    public static boolean hasLoadedGameScene()
+    {
+        return Objects.equals(ViewSupervisor.getSceneController().getCurrentScreen().ID(), SceneController.GAME_ID);
+    }
+
 }
