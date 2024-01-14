@@ -88,13 +88,19 @@ public final class HumanSL extends ServerListener
     {
         l.debug("Game phase has changed. New phase: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
 
+        EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
+
+        if (!ViewSupervisor.hasLoadedGameScene())
+        {
+            l.warn("Game phase changed, but the game scene has not been loaded yet. Ignoring.");
+            return false;
+        }
+
         /* TODO Remove if upgrade phase is playable. */
         if (this.dsrp.getPhase() != 1)
         {
             ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
         }
-
-        EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
 
         return true;
     }
