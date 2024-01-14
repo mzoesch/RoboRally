@@ -1,14 +1,16 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.               RDefaultServerRequestParser;
+import sep.view.viewcontroller.     ViewSupervisor;
+import sep.view.viewcontroller.     SceneController;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
 
 import java.io.                     IOException;
-import java.io.                     InputStreamReader;
 import java.io.                     BufferedReader;
 import java.util.                   HashMap;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
-import java.net.                    Socket;
 import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
@@ -18,9 +20,9 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
 
-    private static final int ORDERLY_CLOSE = -1;
+    private static final int ORDERLY_CLOSE                      = -1;
 
-    private final HashMap<String, Supplier<Boolean>> serverReq =
+    private final HashMap<String, Supplier<Boolean>> serverReq  =
     new HashMap<String, Supplier<Boolean>>()
     {{
         put(    "Alive",                ServerListener.this::onAlive                            );
@@ -83,26 +85,35 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         EClientInformation.INSTANCE.closeSocket();
         EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
 
+        /* We are never connected to a server in the lobby scene. */
+        if (ViewSupervisor.getSceneController().getCurrentScreen().ID().equals(SceneController.MAIN_MENU_ID))
+        {
+            return;
+        }
+
         l.info("Client disconnected from server.");
 
         return;
     }
 
     @Override
-    public void run()
+    public void run() throws IllegalStateException
     {
         try
         {
             while (true)
             {
-                final int escapeCharacter = this.bufferedReader.read();
+                final int escapeCharacter = this.br.read();
                 if (escapeCharacter == ServerListener.ORDERLY_CLOSE)
                 {
+                    l.debug("Server request to close the server connection in an orderly way.");
                     GameInstance.handleServerDisconnect();
+                    ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
+                    ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
                     return;
                 }
 
-                final String r = String.format("%s%s", (char) escapeCharacter, this.bufferedReader.readLine());
+                final String r = String.format("%s%s", (char) escapeCharacter, this.br.readLine());
                 l.trace("Received request from server: Parsing: {}", r);
 
                 try
@@ -126,6 +137,8 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
             l.fatal("Failed to read from server.");
             l.fatal(e.getMessage());
             GameInstance.handleServerDisconnect();
+            ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
+            ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
 
             return;
         }
@@ -141,7 +154,7 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         {
             GameInstance.respondToKeepAlive();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             GameInstance.handleServerDisconnect();
             return false;
@@ -190,7 +203,7 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
 
     // endregion Server request handlers
 
-    private void parseRequest(final RDefaultServerRequestParser dsrp) throws JSONException
+    private void parseRequest(final RDefaultServerRequestParser dsrp) throws JSONException, IllegalStateException
     {
         this.dsrp = dsrp;
 
