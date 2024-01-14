@@ -796,6 +796,8 @@ public class GameMode {
     /**
      * The following method introduces a timeout. The length depends on the amount of milliseconds passed to the method.
      * @param milliseconds length of timeout
+     *
+     * @deprecated DO NOT USE. This method can easily crash the server. Marked as deprecated to prevent further usage.
      */
     public void addDelay(int milliseconds) {
         try {
