@@ -21,7 +21,6 @@ public final class ServerListener
         return;
     }
 
-    /** Accepts clients. */
     public void listen() throws IOException
     {
         //noinspection InfiniteLoopStatement
