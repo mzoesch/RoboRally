@@ -17,29 +17,29 @@ import sep.server.model.IOwnershipable;
  */
 public final class PlayerController implements IOwnershipable
 {
-    private final ClientInstance clientInstance;
-    private String playerName;
-    private final int playerID;
+    private final ClientInstance    clientInstance;
+    private String                  playerName;
+    private final int               playerID;
 
-    private final Session session;
-    private int figure;
-    private boolean bIsReady;
+    private final Session           session;
+    private int                     figure;
+    private boolean                 bIsReady;
 
-    private Player player;
+    private Player                  player;
 
     public PlayerController(final ClientInstance clientInstance, final String playerName, final int playerID, final Session session)
     {
         super();
 
-        this.clientInstance = clientInstance;
-        this.playerName = playerName;
-        this.playerID = playerID;
+        this.clientInstance     = clientInstance;
+        this.playerName         = playerName;
+        this.playerID           = playerID;
 
-        this.session = session;
-        this.figure = IOwnershipable.INVALID_FIGURE;
-        this.bIsReady = false;
+        this.session            = session;
+        this.figure             = IOwnershipable.INVALID_FIGURE;
+        this.bIsReady           = false;
 
-        this.player = null;
+        this.player             = null;
 
         return;
     }
@@ -89,7 +89,8 @@ public final class PlayerController implements IOwnershipable
     }
 
     @Override
-    public void setPlayer(final Player p) {
+    public void setPlayer(final Player p)
+    {
         this.player = p;
     }
 
@@ -124,6 +125,11 @@ public final class PlayerController implements IOwnershipable
     public GameMode getAuthGameMode()
     {
         return this.session.getGameState().getAuthGameMode();
+    }
+
+    public boolean isRemoteAgent()
+    {
+        return this.clientInstance.isRemoteAgent();
     }
 
     // endregion Getters and Setters
