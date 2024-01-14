@@ -181,12 +181,6 @@ public class GameMode {
     private void triggerRegistrationPhase() {
         this.getSession().broadcastGameStart(this.course.getCourse());
 
-        // TODO WARNING: This must stand here because the {@link Session#broadcastGameStart(ArrayList<ArrayList<Tile>>)}
-        //               method will instantiate the game screen of the client. Therefore, the client will not be able
-        //               to understand the following request if it is sent before the game screen is loaded. We may
-        //               want to fix this on the client side!
-        this.getSession().broadcastNewGamePhase(this.gamePhase);
-
         /* The current player is the first player that joined the game. */
         this.getSession().broadcastCurrentPlayer(this.curPlayerInRegistration.getController().getPlayerID());
 
@@ -838,11 +832,7 @@ public class GameMode {
     public void handleNewPhase(EGamePhase phase) {
         l.info("Session [{}] is entering a new phase. From {} to {}.", this.getSession().getSessionID(), this.gamePhase, phase);
 
-        // Because the game screen in the client is not yet loaded at this point.
-        // Therefore, they will not be able to understand this request.
-        if (phase != EGamePhase.REGISTRATION) {
-            this.getSession().broadcastNewGamePhase(phase);
-        }
+        this.getSession().broadcastNewGamePhase(phase);
 
         switch (phase) {
             case REGISTRATION -> {
