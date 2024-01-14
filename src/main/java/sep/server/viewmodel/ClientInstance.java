@@ -171,8 +171,8 @@ public final class ClientInstance implements Runnable
     }
 
     /**
-     * Only use this method for the initial client registration. For receiving information form the client
-     * after, use the {@link #defaultClientListener()} method.
+     * Only used for the initial client registration as it block the calling thread.
+     * The {@link #defaultClientListener()} method is used for receiving information from the client after that.
      */
     public String waitForResponse()
     {
