@@ -24,16 +24,18 @@ public final class Launcher
      *
      * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
      *             <ul>
-     *              <li>[--dev]         - Start mock game view.
-     *              <li>[--isAgent]     - Start agent view.
-     *              <li>[--addr ADDR]   - The address to auto connect to (if isAgent flag is set). Default is
-     *                                    {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
-     *              <li>[--port PORT]   - The port number to auto connect to (if isAgent flag is set). Default is
-     *                                    {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
-     *              <li>[--sid SID]     - The session ID to auto connect to (if isAgent flag is set). Default is
-     *                                    {@link sep.Types.EProps#DESCRIPTION EProps.DESCRIPTION}.
-     *              <li>[--name NAME]   - The name of the agent (if isAgent flag is set).
-     *              <li>[--help]        - Print help message.
+     *              <li>[--dev]                 - Start mock game view.
+     *              <li>[--isAgent]             - Start agent view.
+     *              <li>[--addr ADDR]           - The address to auto connect to (if isAgent flag is set). Default is
+     *                                            {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
+     *              <li>[--port PORT]           - The port number to auto connect to (if isAgent flag is set). Default is
+     *                                            {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
+     *              <li>[--sid SID]             - The session ID to auto connect to (if isAgent flag is set). Default is
+     *                                            {@link sep.Types.EProps#DESCRIPTION EProps.DESCRIPTION}.
+     *              <li>[--name NAME]           - The name of the agent (if isAgent flag is set).
+     *              <li>[--allowLegacyAgents]   - Allow legacy agent logic to be displayed in the client Graphical User
+     *                                            Interface (the deprecated server agent logic will be used).
+     *              <li>[--help]                - Print help message.
      *             </ul>
      */
     public static void main(String[] args)
@@ -156,6 +158,12 @@ public final class Launcher
                     System.exit(sep.EArgs.ERR);
                     return;
                 }
+            }
+
+            if (Arrays.asList(args).contains("--allowLegacyAgents"))
+            {
+                l.info("Command line argument [--allowLegacyAgents] detected.");
+                EClientInformation.INSTANCE.setAllowLegacyAgents(true);
             }
 
             if (Arrays.asList(args).contains("--help"))
