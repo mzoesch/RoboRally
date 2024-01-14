@@ -195,7 +195,10 @@ public final class Launcher
         {
             l.fatal("An unexpected error occurred.");
             l.fatal(e.getMessage());
-            l.fatal(e.getStackTrace());
+            for (final StackTraceElement ste : e.getStackTrace())
+            {
+                l.fatal(ste.toString());
+            }
         }
         finally
         {
