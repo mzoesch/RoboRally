@@ -24,9 +24,12 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(HumanSL.class);
 
-    public AgentSL_v2(final Socket socket, final InputStreamReader inputStreamReader, final BufferedReader bufferedReader)
+    public AgentSL_v2(final BufferedReader br)
     {
-        super(socket, inputStreamReader, bufferedReader);
+        super(br);
+
+        this.serverCourse = null;
+
         return;
     }
 

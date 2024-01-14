@@ -24,9 +24,9 @@ public final class HumanSL extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(HumanSL.class);
 
-    public HumanSL(final Socket socket, final InputStreamReader inputStreamReader, final BufferedReader bufferedReader)
+    public HumanSL(final BufferedReader br)
     {
-        super(socket, inputStreamReader, bufferedReader);
+        super(br);
         return;
     }
 

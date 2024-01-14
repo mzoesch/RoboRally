@@ -64,21 +64,16 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
     }}
     ;
 
-    private final Socket                socket;
-    private final InputStreamReader     inputStreamReader;
-    private final BufferedReader        bufferedReader;
+    private final BufferedReader br;
 
     protected RDefaultServerRequestParser dsrp;
 
-    public ServerListener(final Socket socket, final InputStreamReader inputStreamReader, final BufferedReader bufferedReader)
+    public ServerListener(final BufferedReader br)
     {
         super();
 
-        this.socket             = socket;
-        this.inputStreamReader  = inputStreamReader;
-        this.bufferedReader     = bufferedReader;
-
-        this.dsrp               = null;
+        this.br     = br;
+        this.dsrp   = null;
 
         return;
     }
