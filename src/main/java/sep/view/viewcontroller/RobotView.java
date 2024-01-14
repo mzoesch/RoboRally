@@ -7,6 +7,7 @@ import sep.view.lib.                RLaserMask;
 import sep.view.lib.                ERotation;
 import sep.view.lib.                EModifier;
 import sep.view.scenecontrollers.   GameJFXController;
+import sep.                         Types;
 
 import javafx.scene.image.          Image;
 import javafx.scene.image.          ImageView;
@@ -91,7 +92,7 @@ public final class RobotView
         final double tY = ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).calcYTranslation(c.y());
 
         final Timeline t = new Timeline();
-        final KeyFrame kf = new KeyFrame(Duration.seconds(2), new KeyValue(this.ap.translateXProperty(), tX), new KeyValue(this.ap.translateYProperty(), tY));
+        final KeyFrame kf = new KeyFrame(Duration.millis(Types.EDelay.CARD_PLAY.i), new KeyValue(this.ap.translateXProperty(), tX), new KeyValue(this.ap.translateYProperty(), tY));
         t.getKeyFrames().add(kf);
 
         t.play();
@@ -143,7 +144,7 @@ public final class RobotView
         }
 
         final Timeline t = new Timeline();
-        final KeyFrame kf = new KeyFrame(Duration.seconds(2), new KeyValue(this.iv.rotateProperty(), this.rotation.rotation()));
+        final KeyFrame kf = new KeyFrame(Duration.millis(Types.EDelay.CARD_PLAY.i), new KeyValue(this.iv.rotateProperty(), this.rotation.rotation()));
         t.getKeyFrames().add(kf);
 
         t.play();
