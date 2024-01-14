@@ -26,13 +26,10 @@ public enum EServerInformation
 
     public static final int KEEP_ALIVE_INTERVAL = 5_000;
 
-    private int port;
-    private ServerSocket serverSocket;
-    private final ArrayList<Session> sessions;
-    private int minRemotePlayerCountToStart;
     private int                         port;
     private ServerSocket                serverSocket;
     private final ArrayList<Session>    sessions;
+    /** @deprecated */
     private int                         minRemotePlayerCountToStart;
     private int                         minHumanPlayerCountToStart;
 
