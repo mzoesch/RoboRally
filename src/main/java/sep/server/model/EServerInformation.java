@@ -148,10 +148,23 @@ public enum EServerInformation
         return s;
     }
 
-    public void removeSession(final Session session)
+    public void removeSession(final Session session) throws RuntimeException
     {
         this.sessions.remove(session);
-        l.info("Session {} closed.", session.getSessionID());
+
+        try
+        {
+            session.onClose();
+        }
+        catch (final InterruptedException e)
+        {
+            l.fatal("Could not close session {}. Something fishy is going on. Shutting down.", session.getSessionID());
+            l.fatal(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+        l.info("Session [{}] closed successfully.", session.getSessionID());
+
         return;
     }
 

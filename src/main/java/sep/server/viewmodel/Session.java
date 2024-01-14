@@ -136,6 +136,19 @@ public final class Session
         return;
     }
 
+    public void onClose() throws InterruptedException
+    {
+        if (this.awaitGameStartThread != null)
+        {
+            this.awaitGameStartThread.interrupt();
+            this.awaitGameStartThread = null;
+        }
+
+        this.gameState.onClose();
+
+        return;
+    }
+
     private void broadcastConnectionUpdate(final IOwnershipable tCtrl, final EConnectionLoss eCL, final boolean bConnected)
     {
         if (tCtrl == null)

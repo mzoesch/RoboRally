@@ -67,6 +67,19 @@ public class GameState
         return;
     }
 
+    public void onClose() throws InterruptedException
+    {
+        if (this.gameMode != null)
+        {
+            this.gameMode.onClose();
+            this.gameMode = null;
+        }
+
+        l.debug("Game State of Session [{}] closed successfully.", this.session.getSessionID());
+
+        return;
+    }
+
     // region Getters and Setters
 
     public GameMode getAuthGameMode()

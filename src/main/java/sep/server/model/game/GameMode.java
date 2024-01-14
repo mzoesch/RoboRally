@@ -984,6 +984,20 @@ public class GameMode {
         return;
     }
 
+    public void onClose() throws InterruptedException
+    {
+        if (this.activationPhaseThread != null)
+        {
+            this.activationPhaseThread.interrupt();
+            this.activationPhaseThread.join();
+            this.activationPhaseThread = null;
+        }
+
+        l.debug("Game Mode of Session [{}] closed successfully.", this.getSession().getSessionID());
+
+        return;
+    }
+
     // region Getters and Setters
 
     public ArrayList<Player> getPlayers()
