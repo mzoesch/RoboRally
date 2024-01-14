@@ -1,41 +1,41 @@
 package sep.server.model;
 
-import sep.server.model.game.GameMode;
-import sep.server.viewmodel.Session;
-import sep.server.model.game.Player;
-import sep.server.model.game.Tile;
+import sep.server.viewmodel.        Session;
+import sep.server.model.game.       GameMode;
+import sep.server.model.game.       Player;
+import sep.server.model.game.       Tile;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.util.                   Arrays;
 
-import java.util.Arrays;
-
-public class Agent implements IOwnershipable
+/** @deprecated */
+public final class Agent implements IOwnershipable
 {
-    private static final Logger l = LogManager.getLogger(Agent.class);
+    private static final Logger     l               = LogManager.getLogger(Agent.class);
 
-    public static final String AGENT_PREFIX = "[BOT]";
-    public static final String[] AGENT_NAMES = new String[] { "Martinez", "Anderson", "Reynolds", "Thompson", "Mitchell", "Parker", "Turner", "Bennett", "Foster", "Ramirez" };
+    public static final String      AGENT_PREFIX    = "[BOT]";
+    public static final String[]    AGENT_NAMES     = new String[] { "Martinez", "Anderson", "Reynolds", "Thompson", "Mitchell", "Parker", "Turner", "Bennett", "Foster", "Ramirez" };
 
-    private final String agentName;
-    private final int agentID;
-    private final Session session;
+    private final String            agentName;
+    private final int               agentID;
+    private final Session           session;
 
-    private int figure;
+    private int                     figure;
 
-    private Player possessing;
+    private Player                  possessing;
 
     public Agent(final String agentName, final int agentID, final Session session)
     {
         super();
 
-        this.agentName = agentName;
-        this.agentID = agentID;
-        this.session = session;
+        this.agentName      = agentName;
+        this.agentID        = agentID;
+        this.session        = session;
 
-        this.figure = IOwnershipable.INVALID_FIGURE;
+        this.figure         = IOwnershipable.INVALID_FIGURE;
 
-        this.possessing = null;
+        this.possessing     = null;
 
         return;
     }
@@ -61,7 +61,7 @@ public class Agent implements IOwnershipable
         l.debug("Agent {} is evaluating for the current programming phase.", this.agentID);
 
         /* Very, very primitive. Just a framework for now. Open for later construction. */
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; ++i)
         {
             this.possessing.setCardToRegister(this.possessing.getPlayerHand().get(i).getCardType(), i);
             continue;
