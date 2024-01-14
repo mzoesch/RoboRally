@@ -74,38 +74,11 @@ public enum ServerInstance
      * Will create a separate thread for itself that will send a keep-alive message
      * to all registered remote clients every five seconds.
      */
-    private static void keepAlive()
+    private void keepAlive()
     {
-        new Thread(
-        () ->
-        {
-            while (true)
-            {
-                try
-                {
-                    //noinspection BusyWait
-                    Thread.sleep(EServerInformation.KEEP_ALIVE_INTERVAL);
-                }
-                catch (InterruptedException e)
-                {
-                    l.error("Keep-alive thread interrupted.");
-                    l.error(e.getMessage());
-                    return;
-                }
+        this.keepAliveThread = ServerInstance.createKeepAliveThread();
+        this.keepAliveThread.start();
 
-                EServerInformation.INSTANCE.sendKeepAlive();
-
-                continue;
-            }
-        })
-        .start();
-
-        return;
-    }
-
-    public static void run() throws IOException
-    {
-        new ServerInstance();
         return;
     }
 
@@ -113,7 +86,7 @@ public enum ServerInstance
 
     public static ServerListener getInstance()
     {
-        return ServerInstance.INSTANCE.SERVER_LISTENER;
+        return ServerInstance.INSTANCE.serverListener;
     }
 
     public static PlayerController createNewPlayerController(final ClientInstance ci, final Session s)
@@ -164,6 +137,38 @@ public enum ServerInstance
     public static String createRandomAgentName()
     {
         return String.format("%s %s", Agent.AGENT_PREFIX, Agent.AGENT_NAMES[(int) (Math.random() * Agent.AGENT_NAMES.length)]);
+    }
+
+    private static Thread createKeepAliveThread()
+    {
+        return new Thread(() ->
+            {
+                while (true)
+                {
+                    try
+                    {
+                        //noinspection BusyWait
+                        Thread.sleep(EServerInformation.KEEP_ALIVE_INTERVAL);
+                    }
+                    catch (final InterruptedException e)
+                    {
+                        l.warn("Keep-alive thread interrupted. If this was during shutdown, this is can be ignored.");
+                        l.warn(e.getMessage());
+                        break;
+                    }
+
+                    EServerInformation.INSTANCE.sendKeepAlive();
+
+                    continue;
+                }
+
+                return;
+            });
+    }
+
+    public Thread getKeepAliveThread()
+    {
+        return this.keepAliveThread;
     }
 
     // endregion Getters and Setters
