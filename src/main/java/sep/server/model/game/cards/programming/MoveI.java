@@ -13,6 +13,10 @@ public class MoveI extends AProgrammingCard implements IPlayableCard {
     public void playCard(Player player, int currentRoundNumber) {
         player.getPlayerRobot().moveRobotOneTileForwards();
 
-        player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+        if(!player.getPlayerRobot().isRebootTriggered()) {
+            player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
+        } else {
+            player.getPlayerRobot().setRebootTriggered(false);
+        }
     }
 }
