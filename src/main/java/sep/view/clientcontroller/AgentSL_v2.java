@@ -209,6 +209,8 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onGameEnd() throws JSONException
     {
+        l.info("Game ended. Killing the game instance.");
+        GameInstance.kill();
         return true;
     }
 
