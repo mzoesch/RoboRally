@@ -480,12 +480,12 @@ public final class Session
 
             try
             {
-                Thread.sleep(5);
+                Thread.sleep(Session.getSessionGameStartDelay());
             }
-            catch (InterruptedException e)
+            catch (final InterruptedException e)
             {
-                l.warn("Prepare Game Start thread was interrupted.");
-                l.warn(e.getMessage());
+                l.info("Aborting game start.");
+                l.debug(e.getMessage());
                 return;
             }
 
@@ -1007,6 +1007,17 @@ public final class Session
         }
 
         return null;
+    }
+
+    public static int getSessionGameStartDelay()
+    {
+        if (Types.EConfigurations.isDev())
+        {
+            l.warn("The session game start timeout is reduced because the server is in development mode.");
+            return Session.DEV_SESSION_GAME_START_DELAY;
+        }
+
+        return Session.PROD_SESSION_GAME_START_DELAY;
     }
 
     // endregion Getters and Setters
