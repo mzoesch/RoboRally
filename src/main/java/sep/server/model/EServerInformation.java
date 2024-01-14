@@ -78,7 +78,7 @@ public enum EServerInformation
             l.warn("Removing {} dead client{}.", dead.size(), dead.size() == 1 ? "" : "s");
             for (final ClientInstance ci : dead)
             {
-                ci.handleDisconnect();
+                ci.disconnect();
                 continue;
             }
 
