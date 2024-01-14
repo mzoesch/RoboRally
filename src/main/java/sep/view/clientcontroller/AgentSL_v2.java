@@ -86,7 +86,7 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onErrorMsg() throws JSONException
     {
-        return true;
+        l.error("Server sent an error message. Message: {}", this.dsrp.getErrorMessage());
         return false;
     }
 
