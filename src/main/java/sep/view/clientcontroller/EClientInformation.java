@@ -312,6 +312,12 @@ public enum EClientInformation
     {
         if (this.socket == null)
         {
+            /* We are never connected to a server in the lobby scene. */
+            if (ViewSupervisor.getSceneController().getCurrentScreen().ID().equals(SceneController.MAIN_MENU_ID))
+            {
+                return;
+            }
+
             l.warn("Tried to close socket, but socket was not initialized.");
 
             return;
@@ -331,7 +337,7 @@ public enum EClientInformation
         return;
     }
 
-    public void setIsAgent(boolean bIsAgent)
+    public void setIsAgent(final boolean bIsAgent)
     {
         this.bIsAgent = bIsAgent;
         return;
