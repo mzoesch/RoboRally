@@ -180,7 +180,7 @@ public final class Session
 
     public void broadcastChatMessage(final int caller, final String msg)
     {
-        // TODO Validate message.
+        /* TODO Validate message. */
         if (msg.isEmpty())
         {
             return;
@@ -195,13 +195,13 @@ public final class Session
         return;
     }
 
-    public void sendKeepAlive(final ArrayList<ClientInstance> dead)
+    public void sendKeepAlive(final ArrayList<ClientInstance> outDead)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
             if (!pc.getClientInstance().isAlive())
             {
-                dead.add(pc.getClientInstance());
+                outDead.add(pc.getClientInstance());
                 continue;
             }
 
