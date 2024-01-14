@@ -1,22 +1,25 @@
 package sep.view.clientcontroller;
 
-import sep.EArgs;
-import sep.view.json.common.IdentificationModel;
-import sep.view.json.ChatMsgModel;
+import sep.                         EArgs;
+import sep.view.json.common.        IdentificationModel;
+import sep.view.json.               ChatMsgModel;
+import sep.view.viewcontroller.     ViewSupervisor;
+import sep.view.viewcontroller.     SceneController;
 
-import org.json.JSONObject;
-import java.io.InputStreamReader;
-import java.net.Socket;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.io.BufferedWriter;
-import java.util.concurrent.Executors;
-import java.io.OutputStreamWriter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import java.net.ConnectException;
-import java.net.UnknownHostException;
+import org.json.                    JSONObject;
+import java.util.concurrent.        ExecutorService;
+import java.io.                     BufferedReader;
+import java.io.                     InputStreamReader;
+import java.io.                     BufferedWriter;
+import java.io.                     IOException;
+import java.io.                     OutputStreamWriter;
+import java.util.concurrent.        Executors;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.net.                    ConnectException;
+import java.net.                    UnknownHostException;
+import java.net.                    Socket;
+import sep.view.lib.                EFigure;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -29,55 +32,57 @@ public enum EClientInformation
 
     private static final Logger l = LogManager.getLogger(EClientInformation.class);
 
-    private String serverIP;
-    private int serverPort;
-
     public static final String AGENT_PREFIX = "[BOT]";
 
-    boolean bMockView;
+    private String                  serverIP;
+    private int                     serverPort;
 
-    private Socket socket;
-    private InputStreamReader inputStreamReader; // TODO We may remove the stream readers and writers.
-    private OutputStreamWriter outputStreamWriter;
-    private BufferedReader bufferedReader;
-    private BufferedWriter bufferedWriter;
-    private final StringBuilder stdServerErrPipeline;
-    private ServerListener serverListener;
-    private ExecutorService executorService;
+    boolean                         bMockView;
+
+    private Socket                  socket;
+    private InputStreamReader       inputStreamReader; /* TODO We may remove the stream readers and writers. */
+    private OutputStreamWriter      outputStreamWriter;
+    private BufferedReader          bufferedReader;
+    private BufferedWriter          bufferedWriter;
+    private final StringBuilder     stdServerErrPipeline;
+    private ServerListener          serverListener;
+    private ExecutorService         executorService;
 
     /** The main thread. */
-    private GameInstance JFX_INSTANCE;
+    private GameInstance            JFX_INSTANCE;
 
-    private String preferredSessionID;
+    private String                  preferredSessionID;
     /** Cannot be changed for the duration of a session connection. */
-    private int playerID;
+    private int                     playerID;
 
-    private boolean bIsAgent;
-    private String prefAgentName;
+    private boolean                 bIsAgent;
+    private String                  prefAgentName;
+    private boolean                 bAllowLegacyAgents;
 
     private EClientInformation()
     {
-        this.JFX_INSTANCE = null;
+        this.JFX_INSTANCE           = null;
 
-        this.serverIP = EArgs.PREF_SERVER_IP;
-        this.serverPort = sep.Types.EPort.DEFAULT.i;
+        this.serverIP               = EArgs.PREF_SERVER_IP;
+        this.serverPort             = sep.Types.EPort.DEFAULT.i;
 
-        this.bMockView = false;
+        this.bMockView              = false;
 
-        this.socket = null;
-        this.inputStreamReader = null;
-        this.outputStreamWriter = null;
-        this.bufferedReader = null;
-        this.bufferedWriter = null;
-        this.stdServerErrPipeline = new StringBuilder();
-        this.serverListener = null;
-        this.executorService = null;
+        this.socket                 = null;
+        this.inputStreamReader      = null;
+        this.outputStreamWriter     = null;
+        this.bufferedReader         = null;
+        this.bufferedWriter         = null;
+        this.stdServerErrPipeline   = new StringBuilder();
+        this.serverListener         = null;
+        this.executorService        = null;
 
-        this.playerID = -1;
-        this.preferredSessionID = "";
+        this.playerID               = -1;
+        this.preferredSessionID     = "";
 
-        this.bIsAgent = false;
-        this.prefAgentName = "";
+        this.bIsAgent               = false;
+        this.prefAgentName          = "";
+        this.bAllowLegacyAgents     = false;
 
         return;
     }
@@ -91,32 +96,37 @@ public enum EClientInformation
             return false;
         }
 
+        l.info(String.format("Connecting to server [%s:%d].", EClientInformation.INSTANCE.serverIP, EClientInformation.INSTANCE.serverPort));
+
         try
         {
-            l.info(String.format("Connecting to server [%s:%d].", EClientInformation.INSTANCE.serverIP, EClientInformation.INSTANCE.serverPort));
             this.socket = new Socket(EClientInformation.INSTANCE.serverIP, EClientInformation.INSTANCE.serverPort);
         }
-        catch (ConnectException e)
+        catch (final ConnectException e)
         {
             l.error("Failed to connect to server.");
             l.error(e.getMessage());
+
             this.stdServerErrPipeline.setLength(0);
             this.stdServerErrPipeline.append(String.format("Failed to connect to server. %s", e.getMessage()));
+
             return false;
         }
-        catch (UnknownHostException e)
+        catch (final UnknownHostException e)
         {
             l.error("Failed to connect to server.");
             l.error(e.getMessage());
+
             this.stdServerErrPipeline.setLength(0);
             this.stdServerErrPipeline.append("Failed to connect to server. Unknown host.");
+
             return false;
         }
 
-        this.inputStreamReader = new InputStreamReader(this.socket.getInputStream());
-        this.outputStreamWriter = new OutputStreamWriter(this.socket.getOutputStream());
-        this.bufferedReader = new BufferedReader(this.inputStreamReader);
-        this.bufferedWriter = new BufferedWriter(this.outputStreamWriter);
+        this.inputStreamReader      = new InputStreamReader(this.socket.getInputStream());
+        this.outputStreamWriter     = new OutputStreamWriter(this.socket.getOutputStream());
+        this.bufferedReader         = new BufferedReader(this.inputStreamReader);
+        this.bufferedWriter         = new BufferedWriter(this.outputStreamWriter);
 
         return true;
     }
@@ -151,7 +161,7 @@ public enum EClientInformation
 
         if (bBlock)
         {
-            this.serverListener = new AgentSL_v2(this.socket, this.inputStreamReader, this.bufferedReader);
+            this.serverListener = new AgentSL_v2(this.bufferedReader);
             l.debug("Now listening for standard server responses.");
             this.serverListener.run();
 
@@ -159,7 +169,7 @@ public enum EClientInformation
         }
 
         this.executorService    = Executors.newFixedThreadPool(1);
-        this.serverListener     = new HumanSL(this.socket, this.inputStreamReader, this.bufferedReader);
+        this.serverListener     = new HumanSL(this.bufferedReader);
         this.executorService.execute(this.serverListener);
 
         l.debug("Now listening for standard server responses.");
@@ -167,7 +177,7 @@ public enum EClientInformation
         return;
     }
 
-    public void sendServerRequest(JSONObject j)
+    public void sendServerRequest(final JSONObject j)
     {
         if (this.bufferedWriter == null)
         {
@@ -175,10 +185,7 @@ public enum EClientInformation
             return;
         }
 
-        if (!j.toString(0).contains("\"messageType\":\"Alive\""))
-        {
-            l.trace(String.format("Sending request to server: %s", j.toString(0)));
-        }
+        l.trace(String.format("Sending request to server: %s", j.toString(0)));
 
         try
         {
@@ -186,7 +193,7 @@ public enum EClientInformation
             this.bufferedWriter.newLine();
             this.bufferedWriter.flush();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.error("Failed to send request to server.");
             l.error(e.getMessage());
@@ -222,7 +229,7 @@ public enum EClientInformation
         return stdServerErrPipeline;
     }
 
-    public void setPlayerID(int playerID)
+    public void setPlayerID(final int playerID)
     {
         this.playerID = playerID;
         return;
@@ -235,16 +242,17 @@ public enum EClientInformation
 
     public void resetServerConnectionAfterDisconnect()
     {
-        this.socket = null;
-        this.inputStreamReader = null;
-        this.outputStreamWriter = null;
-        this.bufferedReader = null;
-        this.bufferedWriter = null;
+        this.socket                 = null;
+        this.inputStreamReader      = null;
+        this.outputStreamWriter     = null;
+        this.bufferedReader         = null;
+        this.bufferedWriter         = null;
         this.stdServerErrPipeline.setLength(0);
-        this.serverListener = null;
+        this.serverListener         = null;
+        this.executorService        = null;
 
-        this.playerID = -1;
-        this.preferredSessionID = "";
+        this.playerID               = -1;
+        this.preferredSessionID     = "";
 
         return;
     }
@@ -254,9 +262,9 @@ public enum EClientInformation
         return this.socket != null && this.bufferedReader != null && this.bufferedWriter != null;
     }
 
-    public void setPreferredSessionID(String text)
+    public void setPreferredSessionID(final String id)
     {
-        this.preferredSessionID = text;
+        this.preferredSessionID = id;
         return;
     }
 
@@ -265,7 +273,7 @@ public enum EClientInformation
         return this.preferredSessionID;
     }
 
-    public void setJFXInstance(GameInstance JFX_INSTANCE)
+    public void setJFXInstance(final GameInstance JFX_INSTANCE)
     {
         this.JFX_INSTANCE = JFX_INSTANCE;
         return;
@@ -276,19 +284,19 @@ public enum EClientInformation
         return this.JFX_INSTANCE;
     }
 
-    public void setServerIP(String SERVER_IP)
+    public void setServerIP(final String SERVER_IP)
     {
         this.serverIP = SERVER_IP;
         return;
     }
 
-    public void setServerPort(int PORT)
+    public void setServerPort(final int port)
     {
-        this.serverPort = PORT;
+        this.serverPort = port;
         return;
     }
 
-    public void setMockView(boolean bMockView)
+    public void setMockView(final boolean bMockView)
     {
         this.bMockView = bMockView;
         return;
@@ -304,6 +312,7 @@ public enum EClientInformation
         if (this.socket == null)
         {
             l.warn("Tried to close socket, but socket was not initialized.");
+
             return;
         }
 
@@ -311,7 +320,7 @@ public enum EClientInformation
         {
             this.socket.close();
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             l.error("Failed to close socket.");
             l.error(e.getMessage());
@@ -338,9 +347,30 @@ public enum EClientInformation
         return;
     }
 
-    public String getPrefAgentName()
+    public String getPrefAgentName() throws RuntimeException
     {
+        if (this.prefAgentName == null || this.prefAgentName.isEmpty())
+        {
+            throw new RuntimeException("Agent name not set.");
+        }
+
         return this.prefAgentName;
+    }
+
+    public void setAllowLegacyAgents(final boolean bAllowLegacyAgents)
+    {
+        this.bAllowLegacyAgents = bAllowLegacyAgents;
+        return;
+    }
+
+    public boolean getAllowLegacyAgents()
+    {
+        return this.bAllowLegacyAgents;
+    }
+
+    public EFigure getPrefAgentRobot()
+    {
+        return EFigure.SPIN;
     }
 
     // endregion Getters and Setters
