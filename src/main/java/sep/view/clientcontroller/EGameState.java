@@ -143,21 +143,18 @@ public enum EGameState
 
     public static void addRemotePlayer(final RDefaultServerRequestParser dsrp)
     {
-        // TODO This is not safe at all. More type checking needed.
+        /* TODO This is not safe at all. More type checking needed. */
 
         if (EGameState.INSTANCE.isRemotePlayerAlreadyAdded(dsrp.getPlayerID()))
         {
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setPlayerName(dsrp.getPlayerName());
             Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayer(dsrp.getPlayerID())).setFigure(dsrp.getFigure());
-            ViewSupervisor.updatePlayerSelection();
 
             l.debug("Remote player {} already added. Updating his name and figures.", dsrp.getPlayerID());
             return;
         }
 
-        RemotePlayer rp = new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigure(), false);
-        EGameState.INSTANCE.remotePlayers.add(rp);
-        ViewSupervisor.updatePlayerSelection();
+        EGameState.INSTANCE.remotePlayers.add(new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigure(), false));
 
         return;
     }
@@ -256,13 +253,15 @@ public enum EGameState
 
     public RemotePlayer getClientRemotePlayer()
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
             if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
             {
                 return rp;
             }
         }
+
+        l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored.");
 
         return null;
     }
@@ -283,7 +282,7 @@ public enum EGameState
         return this.currentServerCourse;
     }
 
-    public void setCurrentServerCourse(String currentServerCourse)
+    public void setCurrentServerCourse(final String currentServerCourse)
     {
         this.currentServerCourse = currentServerCourse;
         return;
