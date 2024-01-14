@@ -58,6 +58,7 @@ public final class ClientInstance implements Runnable
     private final OutputStreamWriter outputStreamWriter;
     private final BufferedWriter bufferedWriter;
 
+    private boolean                     bIsRemoteAgent;
     /** Must be created to join a given session. */
     private PlayerController playerController;
     /** If the client is registered in a session. */
@@ -87,6 +88,7 @@ public final class ClientInstance implements Runnable
         this.bIsRegistered = false;
         this.bIsAlive = true;
         this.bDisconnecting = false;
+        this.bIsRemoteAgent     = false;
 
         this.dcrp = null;
 
@@ -449,6 +451,11 @@ public final class ClientInstance implements Runnable
     public String getAddr()
     {
         return this.socket.getRemoteSocketAddress().toString();
+    }
+
+    public boolean isRemoteAgent()
+    {
+        return this.bIsRemoteAgent;
     }
 
     // endregion Getters and Setters
