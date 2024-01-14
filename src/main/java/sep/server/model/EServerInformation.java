@@ -1,15 +1,15 @@
 package sep.server.model;
 
-import sep.server.viewmodel.Session;
-import sep.server.viewmodel.ClientInstance;
-import sep.EArgs;
-import sep.server.model.game.GameState;
+import sep.server.viewmodel.        Session;
+import sep.server.viewmodel.        ClientInstance;
+import sep.                         Types;
+import sep.server.model.game.       GameState;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.ArrayList;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.net.                    ServerSocket;
+import java.io.                     IOException;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import java.util.                   ArrayList;
 
 /**
  * The Server Information enum is a singleton class that represents the server itself. The Server Instance is spawned
@@ -30,13 +30,19 @@ public enum EServerInformation
     private ServerSocket serverSocket;
     private final ArrayList<Session> sessions;
     private int minRemotePlayerCountToStart;
+    private int                         port;
+    private ServerSocket                serverSocket;
+    private final ArrayList<Session>    sessions;
+    private int                         minRemotePlayerCountToStart;
+    private int                         minHumanPlayerCountToStart;
 
     private EServerInformation()
     {
-        this.port = sep.Types.EPort.INVALID.i;
-        this.serverSocket = null;
-        this.sessions = new ArrayList<Session>();
-        this.minRemotePlayerCountToStart = GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START;
+        this.port                           = Types.EPort.INVALID.i;
+        this.serverSocket                   = null;
+        this.sessions                       = new ArrayList<Session>();
+        this.minRemotePlayerCountToStart    = GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START;
+        this.minHumanPlayerCountToStart     = GameState.DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START;
 
         return;
     }
@@ -51,6 +57,7 @@ public enum EServerInformation
 
         this.serverSocket = new ServerSocket(this.port);
         l.info("Server started on port {}.", this.port);
+
         return;
     }
 
@@ -171,6 +178,17 @@ public enum EServerInformation
     public int getMinRemotePlayerCountToStart()
     {
         return this.minRemotePlayerCountToStart;
+    }
+
+    public void setMinHumanPlayerCount(final int min)
+    {
+        this.minHumanPlayerCountToStart = min;
+        return;
+    }
+
+    public int getMinHumanPlayerCountToStart()
+    {
+        return this.minHumanPlayerCountToStart;
     }
 
     // region Getters and Setters
