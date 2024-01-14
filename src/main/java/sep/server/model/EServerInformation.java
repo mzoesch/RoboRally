@@ -140,7 +140,7 @@ public enum EServerInformation
         return this.createNewSession(sessionID);
     }
 
-    /** This method will not check if the session ID is valid. */
+    /** This method will not check if the session ID is already valid. */
     public Session createNewSession(final String sessionID)
     {
         final Session s = new Session(sessionID);
