@@ -714,15 +714,72 @@ public final class Session
 
     private boolean isReadyToStartGame()
     {
-        if (this.getRemotePlayers().size() < this.gameState.getMinRemotePlayersToStart())
+        if (this.awaitGameStartThread != null)
         {
-            l.debug("The server is awaiting more remote controllers to join before considering starting the game.");
+            l.debug("Tried to start gam but the session is already awaiting game start.");
+            return false;
+        }
+
+        /* This only exists for legacy reasons. */
+        boolean bIsLegacySession = false;
+        for (final IOwnershipable ctrl : this.getControllers())
+        {
+            if (ctrl instanceof Agent)
+            {
+                bIsLegacySession = true;
+                break;
+            }
+
+            continue;
+        }
+
+        if (bIsLegacySession)
+        {
+            l.warn("The session [{}] is a legacy session. And contains agents that should only be used for development purposes.", this.sessionID);
+
+            if (this.getRemotePlayers().size() < this.gameState.getMinRemotePlayersToStart())
+            {
+                l.debug("The server is awaiting more remote controllers to join before considering starting the game.");
+                return false;
+            }
+
+            if (this.ctrls.size() < GameState.MIN_CONTROLLERS_ALLOWED)
+            {
+                l.debug("The server is awaiting more controllers to join before considering starting the game.");
+                return false;
+            }
+
+            for (final PlayerController pc : this.getRemotePlayers())
+            {
+                if (!pc.isReady())
+                {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if (this.gameState.getCourseName().isEmpty() || this.gameState.getCourseName().isBlank())
+            {
+                l.info("All players are ready. The server is awaiting a course selection.");
+                this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("All players are ready. The server is awaiting %s to select a course.", this.readyCharacterOrder.get(0).getName()));
+                return false;
+            }
+
+            l.debug("All controllers are ready and the session decided that the game may start now.");
+
+            return true;
+        }
+
+        if (this.getHumanRemotePlayers().size() < this.gameState.getMinHumanPlayersToStart())
+        {
+            l.debug("The server is awaiting more human remote controllers to join before considering starting the game.");
             return false;
         }
 
         if (this.ctrls.size() < GameState.MIN_CONTROLLERS_ALLOWED)
         {
-            l.debug("The server is awaiting more controllers to join before considering starting the game.");
+            l.debug("The server is awaiting more remote controllers to join before considering starting the game.");
             return false;
         }
 
@@ -738,6 +795,12 @@ public final class Session
 
         if (this.gameState.getCourseName().isEmpty() || this.gameState.getCourseName().isBlank())
         {
+            if (this.ctrls.size() == this.getAgentRemotePlayers().size())
+            {
+                l.info("This is an agent only session. The server will automatically select a course.");
+                throw new UnsupportedOperationException("This is an agent only session. The server will automatically select a course. This is not implemented yet.");
+            }
+
             l.info("All players are ready. The server is awaiting a course selection.");
             this.broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("All players are ready. The server is awaiting %s to select a course.", this.readyCharacterOrder.get(0).getName()));
             return false;
