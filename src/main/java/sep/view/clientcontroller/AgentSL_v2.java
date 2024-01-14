@@ -74,115 +74,116 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPhaseChange() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onPlayerTurnChange() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onErrorMsg() throws JSONException
     {
         return true;
+        return false;
     }
 
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onStartingPointTaken() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onRobotRotationUpdate() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onRegisterSlotUpdate() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onPlayerFinishedProgramming() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onForcedFinishProgramming() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onPlayerProgrammingCardsReceived() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onProgrammingDeckShuffled() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onProgrammingTimerStart() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onProgrammingTimerEnd() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onProgrammingCardsReceived() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onCurrentRegisterCards() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onCurrentRegisterCardReplacement() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onAnimationPlay() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onCheckpointReached() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onEnergyTokenChanged() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -194,13 +195,13 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPlayerPositionUpdate() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onPlayerReboot() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
@@ -212,49 +213,49 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPickDamageType() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onDrawDamage() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onExchangeShop() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onRefillShop() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onCheckpointMoved() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onDiscardSome() throws JSONException
     {
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onRegisterChosen() throws JSONException
     {
-        return true;
+        return false;
     }
 
     // endregion Server request handlers
