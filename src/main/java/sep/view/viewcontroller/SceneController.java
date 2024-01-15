@@ -268,8 +268,40 @@ public final class SceneController
         final RGameScene<?> currentScreen = this.getCurrentScreen();
         if (!currentScreen.hasFallback())
         {
-            l.fatal("No fallback screen found.");
-            GameInstance.kill();
+            l.error("No fallback screen found. Rerouting to main menu.");
+
+            for (final RGameScene<?> s : this.screens)
+            {
+                if (s.id().equals(SceneController.MAIN_MENU_ID))
+                {
+                    continue;
+                }
+
+                this.screens.remove(s);
+                continue;
+            }
+
+            new Thread(() ->
+            {
+                try
+                {
+                    Thread.sleep(SceneController.MAIN_MENU_REROUTING_DELAY);
+                }
+                catch (final InterruptedException e)
+                {
+                    l.error("Interrupted while rerouting to main menu.");
+                    l.error(e.getMessage());
+                    GameInstance.kill();
+                    return;
+                }
+
+                this.activateScreen(SceneController.MAIN_MENU_ID);
+                l.debug("Successfully rerouted to main menu.");
+
+                return;
+            })
+            .start();
+
             return;
         }
 
