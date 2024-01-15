@@ -1763,6 +1763,27 @@ public final class GameJFXController
 
                 if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION && EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
                 {
+                    boolean bIsTaken = false;
+
+                    for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+                    {
+                        if (rp.hasStartingPosition())
+                        {
+                            if (Objects.equals(rp.getStartingPosition(), t.getTileLocation()))
+                            {
+                                bIsTaken = true;
+                                break;
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    if (bIsTaken)
+                    {
+                        continue;
+                    }
+
                     AP.setOnMouseClicked(e ->
                     {
                         l.info("User clicked on tile. Checking if valid move.");
