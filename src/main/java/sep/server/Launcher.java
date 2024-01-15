@@ -1,12 +1,11 @@
 package sep.server;
 
 import sep.                     EArgs;
-import sep.server.viewmodel.    ServerInstance;
+import sep.server.viewmodel.    EServerInstance;
 import sep.server.model.        EServerInformation;
 import sep.Types.               EPort;
 import sep.server.model.game.   GameState;
 
-import java.io.                     IOException;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import java.util.                   Arrays;
@@ -202,7 +201,7 @@ public final class Launcher
 
         try
         {
-            ServerInstance.run();
+            EServerInstance.run();
         }
         catch (final Exception e)
         {

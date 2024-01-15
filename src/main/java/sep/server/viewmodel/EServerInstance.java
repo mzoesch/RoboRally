@@ -9,7 +9,7 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 
 /** Implements methods relevant to the server itself. */
-public enum ServerInstance
+public enum EServerInstance
 {
     INSTANCE;
 
@@ -20,14 +20,14 @@ public enum ServerInstance
         ;
     }
 
-    private static final Logger l = LogManager.getLogger(ServerInstance.class);
+    private static final Logger l = LogManager.getLogger(EServerInstance.class);
 
     private static final int SUFFIX_LENGTH = 4;
 
     private ServerListener      serverListener;
     private Thread              keepAliveThread;
 
-    private ServerInstance()
+    private EServerInstance()
     {
         this.serverListener     = null;
         this.keepAliveThread    = null;
@@ -39,9 +39,9 @@ public enum ServerInstance
         l.info("Starting server.");
 
         EServerInformation.INSTANCE.startServer();
-        ServerInstance.INSTANCE.keepAlive();
-        ServerInstance.INSTANCE.serverListener = new ServerListener();
-        ServerInstance.INSTANCE.serverListener.listen(); /* Will block the main thread. */
+        EServerInstance.INSTANCE.keepAlive();
+        EServerInstance.INSTANCE.serverListener = new ServerListener();
+        EServerInstance.INSTANCE.serverListener.listen(); /* Will block the main thread. */
 
         return;
     }
@@ -76,7 +76,7 @@ public enum ServerInstance
      */
     private void keepAlive()
     {
-        this.keepAliveThread = ServerInstance.createKeepAliveThread();
+        this.keepAliveThread = EServerInstance.createKeepAliveThread();
         this.keepAliveThread.start();
 
         return;
@@ -86,17 +86,17 @@ public enum ServerInstance
 
     public static ServerListener getInstance()
     {
-        return ServerInstance.INSTANCE.serverListener;
+        return EServerInstance.INSTANCE.serverListener;
     }
 
     public static PlayerController createNewPlayerController(final ClientInstance ci, final Session s)
     {
-        return new PlayerController(ci, ServerInstance.createAnonymousPlayerName(), ServerInstance.createCtrlID(), s);
+        return new PlayerController(ci, EServerInstance.createAnonymousPlayerName(), EServerInstance.createCtrlID(), s);
     }
 
     public static Agent createNewAgent(final Session s)
     {
-        return new Agent(ServerInstance.createRandomAgentName(s), ServerInstance.createCtrlID(), s);
+        return new Agent(EServerInstance.createRandomAgentName(s), EServerInstance.createCtrlID(), s);
     }
 
     private static int createCtrlID()
@@ -107,7 +107,7 @@ public enum ServerInstance
 
     private static String createAnonymousPlayerName()
     {
-        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0, ServerInstance.SUFFIX_LENGTH));
+        return String.format("Anonymous Player %s", UUID.randomUUID().toString().substring(0, EServerInstance.SUFFIX_LENGTH));
     }
 
     private static String createRandomAgentName(final Session s)

@@ -1042,7 +1042,7 @@ public final class Session
             return;
         }
 
-        final Agent a = ServerInstance.createNewAgent(this);
+        final Agent a = EServerInstance.createNewAgent(this);
         this.joinSession(a);
         this.onPostJoin(a);
 
