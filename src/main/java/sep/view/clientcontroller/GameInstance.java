@@ -1,6 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.mainmenu.      InitialClientConnectionModel;
+import sep.view.lib.                OutErr;
 
 import javafx.application.          Platform;
 import java.io.                     IOException;
@@ -57,7 +58,7 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
         return EClientInformation.INSTANCE.establishAServerConnection();
     }
 
-    public static boolean connectToSessionPostLogin() throws IOException, JSONException
+    public static boolean connectToSessionPostLogin(final OutErr outErr) throws IOException, JSONException
     {
         if (!EClientInformation.INSTANCE.hasServerConnection())
         {
@@ -89,7 +90,20 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
         bOk = InitialClientConnectionModel.checkPlayerID(welcome);
         if (!bOk)
         {
+            if (InitialClientConnectionModel.isError(welcome))
+            {
+                l.error("Server sent an error message. Message: {}", InitialClientConnectionModel.getErrorMessage(welcome));
+
+                if (outErr != null)
+                {
+                    outErr.set(InitialClientConnectionModel.getErrorMessage(welcome));
+                }
+
+                return false;
+            }
+
             l.fatal("Failed to retrieve player ID.");
+
             return false;
         }
         l.debug("Player ID [{}] received.", EClientInformation.INSTANCE.getPlayerID());

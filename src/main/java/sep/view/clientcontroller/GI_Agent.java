@@ -88,7 +88,7 @@ public final class GI_Agent extends GameInstance
 
         try
         {
-            if (!GameInstance.connectToSessionPostLogin())
+            if (!GameInstance.connectToSessionPostLogin(null))
             {
                 l.fatal("Failed to connect to session.");
                 l.fatal("Requesting shutdown.");
