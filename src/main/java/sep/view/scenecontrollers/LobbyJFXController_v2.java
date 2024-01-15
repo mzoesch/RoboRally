@@ -107,6 +107,21 @@ public final class LobbyJFXController_v2
             }
         });
 
+        this.playerNameField.lengthProperty().addListener(
+        new ChangeListener<Number>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            {
+                if (t1.intValue() > GameInstance.MAX_PLAYER_NAME_LENGTH)
+                {
+                    playerNameField.setText(playerNameField.getText().substring(0, GameInstance.MAX_PLAYER_NAME_LENGTH));
+                }
+
+                return;
+            }
+        });
+
         this.lobbyMsgInputTextField.setOnKeyPressed((
         keyEvent ->
         {
