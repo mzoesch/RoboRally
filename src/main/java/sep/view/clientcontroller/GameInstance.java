@@ -43,7 +43,17 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
     {
         GameInstance.handleServerDisconnect();
         l.info("Game Instance killed.");
+
+        if (EClientInformation.INSTANCE.isAgent())
+        {
+            l.info("Shutting down agent.");
+            /* TODO Exit code. */
+            System.exit(0);
+            return;
+        }
+
         Platform.exit();
+
         return;
     }
 
