@@ -281,14 +281,9 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
-    private JSONObject serverCourse;
-
     public AgentSL_v2(final BufferedReader br)
     {
         super(br);
-
-        this.serverCourse = null;
-
         return;
     }
 
