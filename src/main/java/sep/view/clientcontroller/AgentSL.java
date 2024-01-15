@@ -3,15 +3,10 @@ package sep.view.clientcontroller;
 import org.json.JSONException;
 
 import java.io.                     BufferedReader;
-import java.io.                     InputStreamReader;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
-import java.net.                    Socket;
 
-/**
- * The main class for an agent. This class will must always be running on the main thread.
- * {@inheritDoc}
- */
+/** @deprecated  */
 public final class AgentSL extends ServerListener
 {
     private static final Logger l = LogManager.getLogger();
