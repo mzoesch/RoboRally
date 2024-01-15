@@ -189,7 +189,7 @@ public final class Launcher
 
         try
         {
-            GameInstance.run();
+            GameInstance.createGameInstance().run();
         }
         catch (final Exception e)
         {

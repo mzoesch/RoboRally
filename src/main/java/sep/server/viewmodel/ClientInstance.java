@@ -160,7 +160,7 @@ public final class ClientInstance implements Runnable
         /* TODO Check if session id is valid. */
         this.bIsRemoteAgent     = icc.isRemoteAgent();
         final Session s         = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
-        this.playerController   = ServerInstance.createNewPlayerController(this, s);
+        this.playerController   = EServerInstance.createNewPlayerController(this, s);
         icc.sendWelcome(this.playerController.getPlayerID());
         this.playerController.getSession().joinSession(this.playerController);
         this.bIsRegistered      = true;
@@ -428,15 +428,15 @@ public final class ClientInstance implements Runnable
         }
         catch (final SocketTimeoutException e)
         {
-            if (ServerInstance.INSTANCE.getKeepAliveThread() == null)
+            if (EServerInstance.INSTANCE.getKeepAliveThread() == null)
             {
                 l.fatal("Server failed. It was not notified about the keep-alive thread failure.");
-                ServerInstance.INSTANCE.kill(ServerInstance.EServerCodes.FATAL);
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
                 return;
             }
 
             l.fatal("Client {} exceeded a connection timeout even though the keep-alive was successful.", this.getAddr());
-            ServerInstance.INSTANCE.kill(ServerInstance.EServerCodes.FATAL);
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
 
             return;
         }

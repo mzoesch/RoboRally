@@ -15,7 +15,7 @@ import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
 
-/** Default way to handle server requests. */
+/** Default way to handle server requests after the initial client registration handshake. */
 public sealed abstract class ServerListener implements Runnable permits AgentSL, HumanSL, AgentSL_v2
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
@@ -66,9 +66,9 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
     }}
     ;
 
-    private final BufferedReader br;
+    private final BufferedReader            br;
 
-    protected RDefaultServerRequestParser dsrp;
+    protected RDefaultServerRequestParser   dsrp;
 
     public ServerListener(final BufferedReader br)
     {
@@ -209,7 +209,6 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
 
         if (this.serverReq.containsKey(this.dsrp.getType_v2()))
         {
-
             if (this.serverReq.get(this.dsrp.getType_v2()).get())
             {
                 this.dsrp = null;
