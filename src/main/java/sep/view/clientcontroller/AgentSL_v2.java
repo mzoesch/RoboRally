@@ -11,8 +11,7 @@ import java.io.                     BufferedReader;
 import java.util.                   Objects;
 
 /**
- * We create a special object for listening to the server socket on a separate
- * thread to avoid blocking the main thread of the application.
+ * The master class of an agent. An object of this class must always run on the main thread.
  * {@inheritDoc}
  */
 public final class AgentSL_v2 extends ServerListener
