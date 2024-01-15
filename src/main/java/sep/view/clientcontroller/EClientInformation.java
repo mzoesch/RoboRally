@@ -316,6 +316,12 @@ public enum EClientInformation
     {
         if (this.socket == null)
         {
+            if (EClientInformation.INSTANCE.isAgent())
+            {
+                l.warn("Tried to close socket, but socket was not initialized.");
+                return;
+            }
+
             /* We are never connected to a server in the lobby scene. */
             if (ViewSupervisor.getSceneController().getCurrentScreen().id().equals(SceneController.MAIN_MENU_ID))
             {
