@@ -411,7 +411,9 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onStartingPointTaken() throws JSONException
     {
-        return false;
+        l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
+        return true;
     }
 
     @Override
