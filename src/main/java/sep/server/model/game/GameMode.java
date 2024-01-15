@@ -162,7 +162,7 @@ public class GameMode {
             return false;
 
         } else if (ctrl.getPlayerID() != curPlayerInRegistration.getController().getPlayerID()) {
-            l.debug("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer");
+            l.error("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer. [CurrentPlayer: {}, ChoosingPlayer: {}]", curPlayerInRegistration.getController().getPlayerID(), ctrl.getPlayerID());
             if (ctrl instanceof PlayerController pc) {
                 new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
             }
