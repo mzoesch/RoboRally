@@ -107,9 +107,17 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
                 if (escapeCharacter == ServerListener.ORDERLY_CLOSE)
                 {
                     l.debug("Server request to close the server connection in an orderly way.");
+
+                    if (EClientInformation.INSTANCE.getDisconnectHandled())
+                    {
+                        l.debug("Disconnect already handled by other thread. Ignoring.");
+                        return;
+                    }
+
                     GameInstance.handleServerDisconnect();
                     ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
                     ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
+
                     return;
                 }
 
@@ -134,8 +142,15 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         }
         catch (final IOException e)
         {
-            l.fatal("Failed to read from server.");
-            l.fatal(e.getMessage());
+            l.error("Failed to read from server.");
+            l.error(e.getMessage());
+
+            if (EClientInformation.INSTANCE.getDisconnectHandled())
+            {
+                l.debug("Disconnect already handled by other thread. Ignoring.");
+                return;
+            }
+
             GameInstance.handleServerDisconnect();
             ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
             ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
