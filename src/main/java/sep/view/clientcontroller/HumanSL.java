@@ -1,6 +1,8 @@
 package sep.view.clientcontroller;
 
 import sep.view.lib.                EGamePhase;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
@@ -134,7 +136,7 @@ public final class HumanSL extends ServerListener
     protected boolean onErrorMsg() throws JSONException
     {
         l.debug("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
-        /* TODO Print err msg to UI Msg Scroll Pane. */
+        ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, this.dsrp.getErrorMessage()));
         return true;
     }
 
