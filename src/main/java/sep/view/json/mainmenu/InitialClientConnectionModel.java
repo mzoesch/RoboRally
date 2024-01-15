@@ -4,6 +4,7 @@ import sep.                         Types;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
 
+import java.util.                   Objects;
 import java.util.                   UUID;
 import org.json.                    JSONObject;
 import org.json.                    JSONException;
@@ -68,4 +69,20 @@ public final class InitialClientConnectionModel
         return true;
     }
 
+    public static boolean isError(final JSONObject j)
+    {
+        try
+        {
+            return Objects.equals(j.getString("messageType"), "Error");
+        }
+        catch (final JSONException e)
+        {
+            return false;
+        }
+    }
+
+    public static String getErrorMessage(final JSONObject j)
+    {
+        return j.getJSONObject("messageBody").getString("error");
+    }
 }
