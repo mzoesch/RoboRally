@@ -695,6 +695,7 @@ public final class LobbyJFXController_v2
     private void onLeaveBtn(final ActionEvent actionEvent)
     {
         l.debug("Player clicked leave button.");
+        EClientInformation.INSTANCE.setDisconnectHandled(true);
         GameInstance.handleServerDisconnect();
         ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
 
