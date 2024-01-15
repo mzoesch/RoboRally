@@ -637,7 +637,7 @@ public class GameMode {
                 }
             }
 
-            for (FieldType fieldType : tile.getFieldTypes()) {
+            /*for (FieldType fieldType : tile.getFieldTypes()) {
                 if (fieldType instanceof Wall wall) {
                     String[] orientations = wall.getOrientations();
 
@@ -658,11 +658,36 @@ public class GameMode {
                     laserGoing = false;
                     break;
                 }
+            }*/
+
+            for (FieldType fieldType : tile.getFieldTypes()) {
+                if (fieldType instanceof Wall wall) {
+                    String[] orientations = wall.getOrientations();
+
+                    for (String wallOrientation : orientations) {
+
+
+                        if ((laserOrientation.equals("top") && wallOrientation.equals("top")) ||
+                                (laserOrientation.equals("bottom") && wallOrientation.equals("bottom")) ||
+                                (laserOrientation.equals("right") && wallOrientation.equals("right")) ||
+                                (laserOrientation.equals("left") && wallOrientation.equals("left"))) {
+
+                            laserGoing = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (fieldType instanceof Antenna) {
+                    laserGoing = false;
+                    break;
+                }
             }
 
             x += xIncrement;
             y += yIncrement;
         }
+
     }
 
 
