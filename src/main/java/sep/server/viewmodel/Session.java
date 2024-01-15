@@ -1120,6 +1120,11 @@ public final class Session
         return Session.PROD_SESSION_GAME_START_DELAY;
     }
 
+    public boolean isFull()
+    {
+        return this.ctrls.size() >= GameState.MAX_CONTROLLERS_ALLOWED;
+    }
+
     // endregion Getters and Setters
 
 }
