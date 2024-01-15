@@ -102,6 +102,12 @@ public final class RobotView
 
     private void rotateIV()
     {
+        if (this.rotation == null)
+        {
+            l.error("Tried to rotate a robot without a rotation.");
+            return;
+        }
+
         this.iv.setRotate(this.rotation.rotation());
         return;
     }
