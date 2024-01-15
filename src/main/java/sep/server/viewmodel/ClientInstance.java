@@ -480,7 +480,7 @@ public final class ClientInstance implements Runnable
 
     public String getAddr()
     {
-        return this.socket.getRemoteSocketAddress().toString();
+        return String.format("[%s]", this.socket.getRemoteSocketAddress().toString());
     }
 
     public boolean isRemoteAgent()

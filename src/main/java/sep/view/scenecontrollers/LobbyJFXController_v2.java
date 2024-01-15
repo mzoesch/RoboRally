@@ -4,11 +4,14 @@ import sep.view.json.lobby.         PlayerValuesModel;
 import sep.view.json.lobby.         SetStatusModel;
 import sep.view.json.lobby.         CourseSelectedModel;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                OutErr;
+import sep.view.lib.                EPopUp;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.json.               ChatMsgModel;
+import sep.view.lib.RPopUpMask;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
@@ -93,7 +96,7 @@ public final class LobbyJFXController_v2
         new ChangeListener<Number>()
         {
             @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            public void changed(final ObservableValue<? extends Number> observableValue, final Number number, final Number t1)
             {
                 if (t1.intValue() > EGameState.MAX_CHAT_MESSAGE_LENGTH)
                 {

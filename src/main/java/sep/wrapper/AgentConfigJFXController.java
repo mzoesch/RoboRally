@@ -63,10 +63,10 @@ public final class AgentConfigJFXController
         h.setStyle("-fx-alignment: center;");
         final AnchorPane ap = new AnchorPane(h);
 
-        AnchorPane.setTopAnchor(        h, 0.0     );
-        AnchorPane.setBottomAnchor(     h, 0.0     );
-        AnchorPane.setLeftAnchor(       h, 0.0     );
-        AnchorPane.setRightAnchor(      h, 0.0     );
+        AnchorPane.setTopAnchor(        h,  0.0     );
+        AnchorPane.setBottomAnchor(     h,  0.0     );
+        AnchorPane.setLeftAnchor(       h,  0.0     );
+        AnchorPane.setRightAnchor(      h,  0.0     );
 
         AnchorPane.setTopAnchor(        ap, 0.0     );
         AnchorPane.setBottomAnchor(     ap, 0.0     );

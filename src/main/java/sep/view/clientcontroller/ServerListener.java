@@ -86,7 +86,7 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
 
         /* We are never connected to a server in the lobby scene. */
-        if (ViewSupervisor.getSceneController().getCurrentScreen().ID().equals(SceneController.MAIN_MENU_ID))
+        if (ViewSupervisor.getSceneController().getCurrentScreen().id().equals(SceneController.MAIN_MENU_ID))
         {
             return;
         }

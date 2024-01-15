@@ -29,21 +29,24 @@ public final class SceneController
 {
     private static final Logger l = LogManager.getLogger(SceneController.class);
 
-    public static final String  WIN_TITLE       = "CLIENT";
-    public static final int     PREF_WIDTH      = 1_280;
-    public static final int     PREF_HEIGHT     = 720;
+    /** On slower end hardware this timeout may be increased. */
+    public static final int     MAIN_MENU_REROUTING_DELAY   = 200;
 
-    public static final String  MAIN_MENU_ID    = "main-menu";
-    public static final String  LOBBY_ID        = "lobby";
-    public static final String  GAME_ID         = "game";
-    public static final String  END_SCENE_ID    = "end-scene";
+    public static final String  WIN_TITLE                   = "CLIENT";
+    public static final int     PREF_WIDTH                  = 1_280;
+    public static final int     PREF_HEIGHT                 = 720;
 
-    public static final String  PATH_TO_MAIN_MENU   = "main-menu.fxml";
+    public static final String  MAIN_MENU_ID                = "main-menu";
+    public static final String  LOBBY_ID                    = "lobby";
+    public static final String  GAME_ID                     = "game";
+    public static final String  END_SCENE_ID                = "end-scene";
+
+    public static final String  PATH_TO_MAIN_MENU           = "main-menu.fxml";
     /** @deprecated */
-    public static final String  PATH_TO_LOBBY       = "lobby.fxml";
-    public static final String  PATH_TO_LOBBY_V2    = "lobby_v2.fxml";
-    public static final String  PATH_TO_GAME        = "game.fxml";
-    public static final String  PATH_TO_END_SCENE   = "end-scene.fxml";
+    public static final String  PATH_TO_LOBBY               = "lobby.fxml";
+    public static final String  PATH_TO_LOBBY_V2            = "lobby_v2.fxml";
+    public static final String  PATH_TO_GAME                = "game.fxml";
+    public static final String  PATH_TO_END_SCENE           = "end-scene.fxml";
 
     /** The scene where we apply different screens (panes in our case) to. */
     private final Scene                     masterScene;
@@ -67,18 +70,18 @@ public final class SceneController
         return;
     }
 
-    private void activateScreen(final String ID)
+    private void activateScreen(final String id)
     {
         for (final RGameScene<?> s : this.screens)
         {
-            if (!s.ID().equals(ID))
+            if (!s.id().equals(id))
             {
                 continue;
             }
 
             final RGameScene<?> oldScreen = this.screens.size() > 1 ? this.getCurrentScreen() : null;
 
-            this.currentScreen = ID;
+            this.currentScreen = id;
             this.masterScene.setRoot(s.screen());
 
             if (oldScreen != null && oldScreen.hasFallback())
@@ -89,7 +92,7 @@ public final class SceneController
             return;
         }
 
-        l.fatal("Failed to activate screen with ID {}.", ID);
+        l.fatal("Failed to activate screen with ID {}.", id);
         GameInstance.kill();
 
         return;
@@ -254,9 +257,9 @@ public final class SceneController
         return;
     }
 
-    public void renderExistingScreen(final String ID)
+    public void renderExistingScreen(final String id)
     {
-        this.activateScreen(ID);
+        this.activateScreen(id);
         return;
     }
 
@@ -281,7 +284,7 @@ public final class SceneController
         return this.masterScene;
     }
 
-    public RGameScene<?> getScreenByID(final String ID)
+    public RGameScene<?> getScreenByID(final String id)
     {
         if (this.screens.isEmpty())
         {
@@ -292,13 +295,13 @@ public final class SceneController
 
         for (final RGameScene<?> s : this.screens)
         {
-            if (s.ID().equals(ID))
+            if (s.id().equals(id))
             {
                 return s;
             }
         }
 
-        l.fatal("No screen with ID {} found.", ID);
+        l.fatal("No screen with ID {} found.", id);
         GameInstance.kill();
 
         return null;
