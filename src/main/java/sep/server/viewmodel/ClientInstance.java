@@ -2,6 +2,7 @@ package sep.server.viewmodel;
 
 import sep.server.json.common.      ChatMsgModel;
 import sep.server.json.common.      KeepAliveModel;
+import sep.server.json.common.      ErrorMsgModel;
 import sep.server.json.             RDefaultClientRequestParser;
 import sep.server.json.mainmenu.    InitialClientConnectionModel_v2;
 import sep.server.model.            EServerInformation;
@@ -154,12 +155,20 @@ public final class ClientInstance implements Runnable
         boolean isValid = icc.isClientProtocolVersionValid();
         if (!isValid)
         {
+            l.error("Client {} protocol version mismatch. Disconnecting them.", this.getAddr());
             return false;
         }
+        l.debug("Confirmed Client {}'s protocol version.", this.getAddr());
 
         /* TODO Check if session id is valid. */
         this.bIsRemoteAgent     = icc.isRemoteAgent();
         final Session s         = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
+        if (s.isFull())
+        {
+            new ErrorMsgModel(this, "Session is full.").send();
+            l.warn("Client {} tried to join a full session. Disconnecting them.", this.getAddr());
+            return false;
+        }
         this.playerController   = EServerInstance.createNewPlayerController(this, s);
         icc.sendWelcome(this.playerController.getPlayerID());
         this.playerController.getSession().joinSession(this.playerController);
