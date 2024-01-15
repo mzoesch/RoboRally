@@ -314,6 +314,24 @@ public enum EGameState
 
         this.clearRCardsFromRemotes();
 
+        if (EClientInformation.INSTANCE.isAgent())
+        {
+            this.currentPhase = phase;
+
+            if (this.currentPhase != EGamePhase.PROGRAMMING && this.currentPhase != EGamePhase.ACTIVATION)
+            {
+                this.clearAllRegisters();
+            }
+
+            if (this.currentPhase == EGamePhase.ACTIVATION)
+            {
+                this.resetPlayersForActivation();
+                this.currentRegister = 1;
+            }
+
+            return;
+        }
+
         // TODO
         //      We exited the registration phase, and there will be no more clickable actions on the course view,
         //      therefore, we re-render the course view to remove the hover effect. Note, this is not efficient, we
