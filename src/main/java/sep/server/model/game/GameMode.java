@@ -124,12 +124,13 @@ public class GameMode {
                     for(Player player : players) {
                         if (player.getPlayerRobot().getCurrentTile() == null) {
                             curPlayerInRegistration = player;
-                            l.info("Now Player with ID: " + player.getController().getPlayerID() + "has to set StartingPoint");
+                            l.info("Now Player with ID: " + player.getController().getPlayerID() + " has to set StartingPoint");
                             ctrl.getAuthGameMode().getSession().broadcastCurrentPlayer(player.getController().getPlayerID());
                             if (player.getController() instanceof final Agent a)
                             {
                                 a.evaluateStartingPoint();
                             }
+                            return;
                         }
                     }
                 }
