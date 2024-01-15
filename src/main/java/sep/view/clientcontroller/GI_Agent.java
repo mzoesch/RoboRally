@@ -39,15 +39,15 @@ public final class GI_Agent extends GameInstance
                     break;
                 }
 
-                l.info("Retrying in 5 seconds. Failed {} times. Quitting after {} tries.", tries + 1, GI_Agent.MAX_CONNECTION_TRIES);
+                l.info("Retrying in five seconds. Failed {} times. Quitting after {} tries.", tries + 1, GI_Agent.MAX_CONNECTION_TRIES);
                 try
                 {
-                    Thread.sleep(5_000);
+                    Thread.sleep(GI_Agent.RETRY_TIMEOUT);
                 }
                 catch (final InterruptedException e)
                 {
-                    l.error("Interrupted while waiting to retry.");
-                    l.error(e.getMessage());
+                    l.fatal("Interrupted while waiting to retry.");
+                    l.fatal(e.getMessage());
                     return;
                 }
 
@@ -59,16 +59,17 @@ public final class GI_Agent extends GameInstance
             {
                 l.error("Interrupted while waiting to retry.");
                 l.error(e.getMessage());
-                l.info("Retrying in 5 seconds. Failed {} times. Quitting after {} tries.", tries + 1, GI_Agent.MAX_CONNECTION_TRIES);
+
+                l.info("Retrying in five seconds. Failed {} times. Quitting after {} tries.", tries + 1, GI_Agent.MAX_CONNECTION_TRIES);
 
                 try
                 {
                     Thread.sleep(GI_Agent.RETRY_TIMEOUT);
                 }
-                catch (final InterruptedException e1)
+                catch (final InterruptedException ie)
                 {
-                    l.error("Failed to sleep.");
-                    l.error(e1.getMessage());
+                    l.fatal("Interrupted while waiting to connect to server.");
+                    l.fatal(ie.getMessage());
                     return;
                 }
 
