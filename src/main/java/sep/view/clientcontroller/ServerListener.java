@@ -158,6 +158,14 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
             }
 
             GameInstance.handleServerDisconnect();
+
+            if (EClientInformation.INSTANCE.isAgent())
+            {
+                l.fatal("Shutting down agent.");
+                GameInstance.kill();
+                return;
+            }
+
             ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
             ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
 
