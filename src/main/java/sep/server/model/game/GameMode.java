@@ -652,29 +652,6 @@ public class GameMode {
                 }
             }
 
-            /*for (FieldType fieldType : tile.getFieldTypes()) {
-                if (fieldType instanceof Wall wall) {
-                    String[] orientations = wall.getOrientations();
-
-                    for (String wallOrientation : orientations) {
-                        if(((laserOrientation.equals("top") || laserOrientation.equals("bottom")) &&
-                                (wallOrientation.equals("bottom") || wallOrientation.equals("top")) &&
-                                (y != tile.getCoordinate().getY())) ||
-                                ((laserOrientation.equals("left") || laserOrientation.equals("right")) &&
-                                        (wallOrientation.equals("left") || wallOrientation.equals("right")) &&
-                                        (x != tile.getCoordinate().getX()))) {
-                            laserGoing = false;
-                            break;
-                        }
-                    }
-                }
-
-                if (fieldType instanceof Antenna) {
-                    laserGoing = false;
-                    break;
-                }
-            }*/
-
             for (FieldType fieldType : tile.getFieldTypes()) {
                 if (fieldType instanceof Wall wall) {
                     String[] orientations = wall.getOrientations();
