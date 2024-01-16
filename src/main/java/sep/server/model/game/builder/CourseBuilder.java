@@ -1,5 +1,7 @@
 package sep.server.model.game.builder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.model.game.Tile;
 import sep.server.model.game.tiles.*;
 
@@ -9,6 +11,8 @@ import java.util.ArrayList;
  * Class creating the corresponding course
  */
 public class CourseBuilder {
+
+    private static final Logger l = LogManager.getLogger(CourseBuilder.class);
 
     public CourseBuilder() {
     }
@@ -185,7 +189,7 @@ public class CourseBuilder {
             fieldTypes.add(newFieldType);
             tile.setFieldTypes(fieldTypes);
         } else {
-            System.out.println("Invalid Coordinates");
+            l.error("Invalid Coordinates");
         }
     }
 
