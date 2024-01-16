@@ -2643,4 +2643,14 @@ public class CourseBuilder {
         return board;
     }
 
+
+    /**
+     * Builds board 6B (part of Twister)
+     * @return board 6B as ArrayList
+     */
+    public ArrayList<ArrayList<Tile>> build6B() {
+
+        return null;
+    }
+
 }
