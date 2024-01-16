@@ -9,6 +9,11 @@ import sep.server.model.game.cards.damage.TrojanHorseDamage;
 import sep.server.model.game.cards.damage.VirusDamage;
 import sep.server.model.game.cards.damage.WormDamage;
 import sep.server.model.game.cards.programming.*;
+import sep.server.model.game.cards.upgrade.AUpgradeCard;
+import sep.server.model.game.cards.upgrade.PermanentUpgrade.AdminPrivilege;
+import sep.server.model.game.cards.upgrade.PermanentUpgrade.RearLaser;
+import sep.server.model.game.cards.upgrade.TemporaryUpgrade.MemorySwap;
+import sep.server.model.game.cards.upgrade.TemporaryUpgrade.SpamBlocker;
 
 import java.util.ArrayList;
 
@@ -81,5 +86,16 @@ public class DeckBuilder {
             spamDeck.add(new WormDamage("WormDamage"));
         }
         return spamDeck;
+    }
+
+    public ArrayList<AUpgradeCard> buildUpgradeDeck(){
+        ArrayList<AUpgradeCard> upgradeDeck = new ArrayList<>();
+        for(int i = 0; i < 10; i++){
+            upgradeDeck.add(new AdminPrivilege("AdminPrivilege", 3));
+            upgradeDeck.add(new RearLaser("RearLaser", 2));
+            upgradeDeck.add(new MemorySwap("MemorySwap", 1));
+            upgradeDeck.add(new SpamBlocker("SpamBlocker", 3));
+        }
+        return upgradeDeck;
     }
 }
