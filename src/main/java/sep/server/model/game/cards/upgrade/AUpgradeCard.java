@@ -4,7 +4,7 @@ import sep.server.model.game.Player;
 import sep.server.model.game.cards.Card;
 
 public abstract class AUpgradeCard extends Card {
-  int cost;
+  protected int cost;
 
   public AUpgradeCard(String cardType, int cost) {
     super(cardType);
