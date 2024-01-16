@@ -4,6 +4,7 @@ import sep.Types;
 import sep.server.json.common.ErrorMsgModel;
 import sep.server.json.game.damage.DrawDamageModel;
 import sep.server.model.game.cards.Card;
+import sep.server.model.game.cards.upgrade.AUpgradeCard;
 import sep.server.model.game.tiles.*;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.cards.IPlayableCard;
@@ -42,6 +43,7 @@ public class GameMode {
     private final ArrayList<TrojanHorseDamage> trojanCardDeck;
     private final ArrayList<VirusDamage> virusCardDeck;
     private final ArrayList<WormDamage> wormDamageDeck;
+    private final ArrayList<AUpgradeCard> upgradeDeck;
 
     private final ArrayList<Player> players;
     private Player curPlayerInRegistration;
@@ -68,6 +70,7 @@ public class GameMode {
         this.trojanCardDeck = deckBuilder.buildTrojanDeck();
         this.virusCardDeck = deckBuilder.buildVirusDeck();
         this.wormDamageDeck = deckBuilder.buildWormDeck();
+        this.upgradeDeck = deckBuilder.buildUpgradeDeck();
 
         this.energyBank = 48;
 
