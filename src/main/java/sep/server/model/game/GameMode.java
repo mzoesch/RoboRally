@@ -200,7 +200,28 @@ public class GameMode {
 
     //region Upgrade Phase helpers
 
-    private void refillShop() {
+    private void setupUpgradeShop() {
+        if(upgradeShopIsEmpty()) {
+            refillUpgradeShop();
+        } else {
+            exchangeUpgradeSlots();
+        }
+    }
+
+    private boolean upgradeShopIsEmpty() {
+        for (AUpgradeCard upgradeCard : upgradeShop) {
+            if (upgradeCard != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void refillUpgradeShop() {
+        //TODO
+    }
+
+    private void exchangeUpgradeSlots() {
         //TODO
     }
 
@@ -215,6 +236,9 @@ public class GameMode {
      */
     private void triggerUpgradePhase() {
         //TODO
+        /*
+        this.setupUpgradeShop();
+         */
         l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
         this.handleNewPhase(EGamePhase.PROGRAMMING);
     }
