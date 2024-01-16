@@ -204,10 +204,6 @@ public class GameMode {
         //TODO
     }
 
-    private void exchangeShop() {
-        //TODO
-    }
-
     private void handleUpgradePurchase() {
         //TODO
     }
