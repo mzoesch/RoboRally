@@ -572,6 +572,15 @@ public class GameMode {
                 case "bottom" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate + 1  , 0, 1);
                 case "left" -> handleLaserShooting("left", 1, robotTileXCoordinate - 1 , robotTileYCoordinate, -1, 0);
             }
+
+            if (playerRobot.getCanShootBackward()) {
+                switch (robotDirection) {
+                    case "top" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate - 1, 0, -1);
+                    case "right" -> handleLaserShooting("left", 1, robotTileXCoordinate + 1, robotTileYCoordinate, 1, 0);
+                    case "bottom" -> handleLaserShooting("top", 1, robotTileXCoordinate, robotTileYCoordinate + 1, 0, 1);
+                    case "left" -> handleLaserShooting("right", 1, robotTileXCoordinate - 1, robotTileYCoordinate, -1, 0);
+                }
+            }
         }
     }
 
