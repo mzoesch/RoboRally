@@ -198,10 +198,27 @@ public class GameMode {
         l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
     }
 
+    //region Upgrade Phase helpers
+
+    private void refillShop() {
+        //TODO
+    }
+
+    private void exchangeShop() {
+        //TODO
+    }
+
+    private void handleUpgradePurchase() {
+        //TODO
+    }
+
+    //endregion Upgrade Phase helpers
+
     /**
      * The following method triggers the upgrade phase.
      */
     private void triggerUpgradePhase() {
+        //TODO
         l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
         this.handleNewPhase(EGamePhase.PROGRAMMING);
     }
