@@ -1,5 +1,7 @@
 package sep.server.model.game.cards.upgrade;
 
+import sep.server.model.game.Player;
+
 public class TemporaryUpgrade extends AUpgradeCard {
 
   public TemporaryUpgrade(String cardType, int cost) {
@@ -7,5 +9,5 @@ public class TemporaryUpgrade extends AUpgradeCard {
   }
 
   @Override
-  public void activateUpgrade() {}
+  public void activateUpgrade(Player player) {}
 }
