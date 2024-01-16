@@ -1,6 +1,8 @@
 package sep.view.clientcontroller;
 
 import sep.view.lib.                EGamePhase;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
@@ -134,7 +136,7 @@ public final class HumanSL extends ServerListener
     protected boolean onErrorMsg() throws JSONException
     {
         l.debug("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
-        /* TODO Print err msg to UI Msg Scroll Pane. */
+        ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, this.dsrp.getErrorMessage()));
         return true;
     }
 
@@ -150,6 +152,20 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onStartingPointTaken() throws JSONException
     {
+        /* Very sketchy, but we get somehow a race condition even though we use the run later methods of the Platform.  */
+        try
+        {
+            // Get random number between 200 and 500
+            final int sleepTime = (int) (Math.random() * 300) + 200;
+            l.warn("Waiting {} ms for game to load scene.", sleepTime);
+            Thread.sleep(sleepTime);
+        }
+        catch (final InterruptedException e)
+        {
+            l.fatal("Failed to wait for game to load scene.");
+            throw new RuntimeException(e);
+        }
+
         l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
         ViewSupervisor.handleChatInfo(String.format("Player %s has selected a starting Point.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));

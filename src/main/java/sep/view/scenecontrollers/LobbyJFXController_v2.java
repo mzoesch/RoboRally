@@ -4,11 +4,14 @@ import sep.view.json.lobby.         PlayerValuesModel;
 import sep.view.json.lobby.         SetStatusModel;
 import sep.view.json.lobby.         CourseSelectedModel;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                OutErr;
+import sep.view.lib.                EPopUp;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.json.               ChatMsgModel;
+import sep.view.lib.RPopUpMask;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
@@ -93,11 +96,26 @@ public final class LobbyJFXController_v2
         new ChangeListener<Number>()
         {
             @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            public void changed(final ObservableValue<? extends Number> observableValue, final Number number, final Number t1)
             {
                 if (t1.intValue() > EGameState.MAX_CHAT_MESSAGE_LENGTH)
                 {
                     lobbyMsgInputTextField.setText(lobbyMsgInputTextField.getText().substring(0, EGameState.MAX_CHAT_MESSAGE_LENGTH));
+                }
+
+                return;
+            }
+        });
+
+        this.playerNameField.lengthProperty().addListener(
+        new ChangeListener<Number>()
+        {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1)
+            {
+                if (t1.intValue() > GameInstance.MAX_PLAYER_NAME_LENGTH)
+                {
+                    playerNameField.setText(playerNameField.getText().substring(0, GameInstance.MAX_PLAYER_NAME_LENGTH));
                 }
 
                 return;
@@ -129,10 +147,11 @@ public final class LobbyJFXController_v2
 
         this.onAvailableCourseUpdate();
 
+        final OutErr outErr = new OutErr();
         final boolean bSuccess;
         try
         {
-            bSuccess = GameInstance.connectToSessionPostLogin();
+            bSuccess = GameInstance.connectToSessionPostLogin(outErr);
         }
         catch (final IOException e)
         {
@@ -149,7 +168,36 @@ public final class LobbyJFXController_v2
 
         if (!bSuccess)
         {
+            EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
+
             ViewSupervisor.getSceneController().killCurrentScreen();
+
+            if (outErr.isSet())
+            {
+                new Thread(() ->
+                {
+                    try
+                    {
+                        Thread.sleep(SceneController.MAIN_MENU_REROUTING_DELAY + 100);
+                    }
+                    catch (final InterruptedException e)
+                    {
+                        l.fatal("Interrupted while waiting to show error message.");
+                        l.fatal(e.getMessage());
+                        GameInstance.kill();
+                        return;
+                    }
+
+
+                    ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, outErr.get()));
+
+                    return;
+                })
+                .start();
+
+                return;
+            }
+
             return;
         }
 
@@ -647,6 +695,7 @@ public final class LobbyJFXController_v2
     private void onLeaveBtn(final ActionEvent actionEvent)
     {
         l.debug("Player clicked leave button.");
+        EClientInformation.INSTANCE.setDisconnectHandled(true);
         GameInstance.handleServerDisconnect();
         ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
 

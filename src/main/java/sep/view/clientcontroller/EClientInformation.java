@@ -5,6 +5,7 @@ import sep.view.json.common.        IdentificationModel;
 import sep.view.json.               ChatMsgModel;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
+import sep.view.lib.                EFigure;
 
 import org.json.                    JSONObject;
 import java.util.concurrent.        ExecutorService;
@@ -19,7 +20,7 @@ import org.apache.logging.log4j.    Logger;
 import java.net.                    ConnectException;
 import java.net.                    UnknownHostException;
 import java.net.                    Socket;
-import sep.view.lib.                EFigure;
+import java.util.concurrent.atomic. AtomicBoolean;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -34,6 +35,8 @@ public enum EClientInformation
 
     public static final String AGENT_PREFIX = "[BOT]";
 
+    private static final int DISCONNECT_ATOMIC_RESET_DELAY = 500;
+
     private String                  serverIP;
     private int                     serverPort;
 
@@ -47,6 +50,7 @@ public enum EClientInformation
     private final StringBuilder     stdServerErrPipeline;
     private ServerListener          serverListener;
     private ExecutorService         executorService;
+    private final AtomicBoolean     bDisconnectHandled      = new AtomicBoolean(false);
 
     /** The main thread. */
     private GameInstance            JFXInstance;
@@ -312,8 +316,14 @@ public enum EClientInformation
     {
         if (this.socket == null)
         {
+            if (EClientInformation.INSTANCE.isAgent())
+            {
+                l.warn("Tried to close socket, but socket was not initialized.");
+                return;
+            }
+
             /* We are never connected to a server in the lobby scene. */
-            if (ViewSupervisor.getSceneController().getCurrentScreen().ID().equals(SceneController.MAIN_MENU_ID))
+            if (ViewSupervisor.getSceneController().getCurrentScreen().id().equals(SceneController.MAIN_MENU_ID))
             {
                 return;
             }
@@ -378,6 +388,44 @@ public enum EClientInformation
     public EFigure getPrefAgentRobot()
     {
         return EFigure.SPIN;
+    }
+
+    public void setDisconnectHandled(final boolean bHandled)
+    {
+        l.debug(String.format("Setting disconnect atomic flag to %b.", bHandled));
+        this.bDisconnectHandled.set(bHandled);
+
+        if (!bHandled)
+        {
+            return;
+        }
+
+        /* Kinda sketchy but works for now. */
+        new Thread(() ->
+        {
+            try
+            {
+                Thread.sleep(EClientInformation.DISCONNECT_ATOMIC_RESET_DELAY);
+            }
+            catch (final InterruptedException e)
+            {
+                l.fatal("Failed to reset disconnect atomic flag.");
+                l.fatal(e.getMessage());
+                GameInstance.kill();
+                return;
+            }
+
+            l.debug("Resetting disconnect atomic flag.");
+            this.bDisconnectHandled.set(false);
+        })
+        .start();
+
+        return;
+    }
+
+    public boolean getDisconnectHandled()
+    {
+        return this.bDisconnectHandled.get();
     }
 
     // endregion Getters and Setters

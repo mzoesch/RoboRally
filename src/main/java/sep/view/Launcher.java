@@ -148,6 +148,25 @@ public final class Launcher
                 if (Arrays.asList(args).indexOf("--name") + 1 < args.length)
                 {
                     l.info("Setting agent name to {}.", args[Arrays.asList(args).indexOf("--name") + 1]);
+
+                    if (args[Arrays.asList(args).indexOf("--name") + 1].isEmpty() || args[Arrays.asList(args).indexOf("--name") + 1].isBlank())
+                    {
+                        l.fatal("Invalid agent name. Must not be empty.");
+                        l.info("Type --help for more information.");
+                        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(sep.EArgs.ERR);
+                        return;
+                    }
+
+                    if (args[Arrays.asList(args).indexOf("--name") + 1].length() > GameInstance.MAX_PLAYER_NAME_LENGTH)
+                    {
+                        l.fatal("Invalid agent name. Must be less than {} characters.", GameInstance.MAX_PLAYER_NAME_LENGTH);
+                        l.info("Type --help for more information.");
+                        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(sep.EArgs.ERR);
+                        return;
+                    }
+
                     EClientInformation.INSTANCE.setPrefAgentName(args[Arrays.asList(args).indexOf("--name") + 1]);
                 }
                 else
@@ -189,7 +208,7 @@ public final class Launcher
 
         try
         {
-            GameInstance.run();
+            GameInstance.createGameInstance().run();
         }
         catch (final Exception e)
         {

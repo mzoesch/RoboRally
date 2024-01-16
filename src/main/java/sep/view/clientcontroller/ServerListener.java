@@ -15,7 +15,7 @@ import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
 
-/** Default way to handle server requests. */
+/** Default way to handle server requests after the initial client registration handshake. */
 public sealed abstract class ServerListener implements Runnable permits AgentSL, HumanSL, AgentSL_v2
 {
     private static final Logger l = LogManager.getLogger(ServerListener.class);
@@ -66,9 +66,9 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
     }}
     ;
 
-    private final BufferedReader br;
+    private final BufferedReader            br;
 
-    protected RDefaultServerRequestParser dsrp;
+    protected RDefaultServerRequestParser   dsrp;
 
     public ServerListener(final BufferedReader br)
     {
@@ -85,8 +85,14 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         EClientInformation.INSTANCE.closeSocket();
         EClientInformation.INSTANCE.resetServerConnectionAfterDisconnect();
 
+        if (EClientInformation.INSTANCE.isAgent())
+        {
+            l.info("Agent disconnected from server.");
+            return;
+        }
+
         /* We are never connected to a server in the lobby scene. */
-        if (ViewSupervisor.getSceneController().getCurrentScreen().ID().equals(SceneController.MAIN_MENU_ID))
+        if (ViewSupervisor.getSceneController().getCurrentScreen().id().equals(SceneController.MAIN_MENU_ID))
         {
             return;
         }
@@ -107,9 +113,17 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
                 if (escapeCharacter == ServerListener.ORDERLY_CLOSE)
                 {
                     l.debug("Server request to close the server connection in an orderly way.");
+
+                    if (EClientInformation.INSTANCE.getDisconnectHandled())
+                    {
+                        l.debug("Disconnect already handled by other thread. Ignoring.");
+                        return;
+                    }
+
                     GameInstance.handleServerDisconnect();
                     ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
                     ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
+
                     return;
                 }
 
@@ -134,9 +148,24 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         }
         catch (final IOException e)
         {
-            l.fatal("Failed to read from server.");
-            l.fatal(e.getMessage());
+            l.error("Failed to read from server.");
+            l.error(e.getMessage());
+
+            if (EClientInformation.INSTANCE.getDisconnectHandled())
+            {
+                l.debug("Disconnect already handled by other thread. Ignoring.");
+                return;
+            }
+
             GameInstance.handleServerDisconnect();
+
+            if (EClientInformation.INSTANCE.isAgent())
+            {
+                l.fatal("Shutting down agent.");
+                GameInstance.kill();
+                return;
+            }
+
             ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
             ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
 
@@ -209,7 +238,6 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
 
         if (this.serverReq.containsKey(this.dsrp.getType_v2()))
         {
-
             if (this.serverReq.get(this.dsrp.getType_v2()).get())
             {
                 this.dsrp = null;

@@ -28,6 +28,10 @@ public class Player {
     private final ArrayList<IPlayableCard> playerHand;
     private int energyCollected;
     private int checkpointsCollected;
+    private Boolean hasAdminPrivilegeUpgrade;
+
+    private Boolean hasUsedAdminPrivilegeThisRound;
+
 
     public Player(final IOwnershipable ctrl, final Course currentCourse) {
         this.ctrl = ctrl;
@@ -298,6 +302,20 @@ public class Player {
         this.energyCollected = energyCollected;
     }
 
+    public Boolean getHasAdminPrivilegeUpgrade() {
+        return hasAdminPrivilegeUpgrade;
+    }
+    public void setHasAdminPrivilegeUpgrade(Boolean hasAdminPrivilegeUpgrade) {
+        this.hasAdminPrivilegeUpgrade = hasAdminPrivilegeUpgrade;
+    }
+
+    public Boolean getHasUsedAdminPrivilegeThisRound() {
+        return hasUsedAdminPrivilegeThisRound;
+    }
+
+    public void setHasUsedAdminPrivilegeThisRound(Boolean hasUsedAdminPrivilegeThisRound) {
+        this.hasUsedAdminPrivilegeThisRound = hasUsedAdminPrivilegeThisRound;
+    }
     public ArrayList<AUpgradeCard> getUpgradeCards()
     {
         return upgradeCards;

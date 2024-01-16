@@ -2,6 +2,7 @@ package sep.server.viewmodel;
 
 import sep.server.json.common.      ChatMsgModel;
 import sep.server.json.common.      KeepAliveModel;
+import sep.server.json.common.      ErrorMsgModel;
 import sep.server.json.             RDefaultClientRequestParser;
 import sep.server.json.mainmenu.    InitialClientConnectionModel_v2;
 import sep.server.model.            EServerInformation;
@@ -154,13 +155,21 @@ public final class ClientInstance implements Runnable
         boolean isValid = icc.isClientProtocolVersionValid();
         if (!isValid)
         {
+            l.error("Client {} protocol version mismatch. Disconnecting them.", this.getAddr());
             return false;
         }
+        l.debug("Confirmed Client {}'s protocol version.", this.getAddr());
 
         /* TODO Check if session id is valid. */
         this.bIsRemoteAgent     = icc.isRemoteAgent();
         final Session s         = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
-        this.playerController   = ServerInstance.createNewPlayerController(this, s);
+        if (s.isFull())
+        {
+            new ErrorMsgModel(this, "Session is full.").send();
+            l.warn("Client {} tried to join a full session. Disconnecting them.", this.getAddr());
+            return false;
+        }
+        this.playerController   = EServerInstance.createNewPlayerController(this, s);
         icc.sendWelcome(this.playerController.getPlayerID());
         this.playerController.getSession().joinSession(this.playerController);
         this.bIsRegistered      = true;
@@ -428,15 +437,15 @@ public final class ClientInstance implements Runnable
         }
         catch (final SocketTimeoutException e)
         {
-            if (ServerInstance.INSTANCE.getKeepAliveThread() == null)
+            if (EServerInstance.INSTANCE.getKeepAliveThread() == null)
             {
                 l.fatal("Server failed. It was not notified about the keep-alive thread failure.");
-                ServerInstance.INSTANCE.kill(ServerInstance.EServerCodes.FATAL);
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
                 return;
             }
 
             l.fatal("Client {} exceeded a connection timeout even though the keep-alive was successful.", this.getAddr());
-            ServerInstance.INSTANCE.kill(ServerInstance.EServerCodes.FATAL);
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
 
             return;
         }
@@ -471,7 +480,7 @@ public final class ClientInstance implements Runnable
 
     public String getAddr()
     {
-        return this.socket.getRemoteSocketAddress().toString();
+        return String.format("[%s]", this.socket.getRemoteSocketAddress().toString());
     }
 
     public boolean isRemoteAgent()

@@ -1042,7 +1042,7 @@ public final class Session
             return;
         }
 
-        final Agent a = ServerInstance.createNewAgent(this);
+        final Agent a = EServerInstance.createNewAgent(this);
         this.joinSession(a);
         this.onPostJoin(a);
 
@@ -1118,6 +1118,11 @@ public final class Session
         }
 
         return Session.PROD_SESSION_GAME_START_DELAY;
+    }
+
+    public boolean isFull()
+    {
+        return this.ctrls.size() >= GameState.MAX_CONTROLLERS_ALLOWED;
     }
 
     // endregion Getters and Setters

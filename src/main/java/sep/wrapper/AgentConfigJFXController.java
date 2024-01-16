@@ -1,6 +1,6 @@
 package sep.wrapper;
 
-import sep.server.viewmodel.        ServerInstance;
+import sep.server.viewmodel.        EServerInstance;
 import sep.view.clientcontroller.   GameInstance;
 import sep.                         Types;
 import sep.                         EArgs;
@@ -63,10 +63,10 @@ public final class AgentConfigJFXController
         h.setStyle("-fx-alignment: center;");
         final AnchorPane ap = new AnchorPane(h);
 
-        AnchorPane.setTopAnchor(        h, 0.0     );
-        AnchorPane.setBottomAnchor(     h, 0.0     );
-        AnchorPane.setLeftAnchor(       h, 0.0     );
-        AnchorPane.setRightAnchor(      h, 0.0     );
+        AnchorPane.setTopAnchor(        h,  0.0     );
+        AnchorPane.setBottomAnchor(     h,  0.0     );
+        AnchorPane.setLeftAnchor(       h,  0.0     );
+        AnchorPane.setRightAnchor(      h,  0.0     );
 
         AnchorPane.setTopAnchor(        ap, 0.0     );
         AnchorPane.setBottomAnchor(     ap, 0.0     );
@@ -202,7 +202,7 @@ public final class AgentConfigJFXController
         final TextField tf = new TextField();
         tf.getStyleClass().add("text-field-agent-name");
         tf.setPromptText("Agent Name");
-        tf.setText(ServerInstance.createRandomAgentName());
+        tf.setText(EServerInstance.createRandomAgentName());
 
         HBox.setHgrow(tf, Priority.ALWAYS);
 
