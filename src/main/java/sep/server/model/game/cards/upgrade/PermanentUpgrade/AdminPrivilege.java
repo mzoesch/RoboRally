@@ -13,5 +13,7 @@ public class AdminPrivilege extends APermanentUpgrade{
     @Override
     public void activateUpgrade(Player player) {
 
+
+
     }
 }
