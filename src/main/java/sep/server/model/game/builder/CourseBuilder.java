@@ -58,6 +58,15 @@ public class CourseBuilder {
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
+            case("Twister") -> {
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> board6B = buildBoard("6B");
+                changeFieldType(boardStartA, 0, 7, new RestartPoint("left"));
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board6B);
+                settingCoordinates(entireCourse);
+                return entireCourse;
+            }
+
             case("Test") -> {
                 return buildBoard("Test");
             }
