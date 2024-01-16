@@ -11,6 +11,6 @@ public class RearLaser extends APermanentUpgrade{
     }
 
     public void activateUpgrade(Player player) {
-
+        player.getPlayerRobot().setCanShootBackward(true);
     }
 }
