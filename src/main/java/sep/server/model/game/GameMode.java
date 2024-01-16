@@ -14,10 +14,8 @@ import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Objects;
+import java.util.*;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
@@ -52,6 +50,7 @@ public class GameMode {
     private int currentRegisterIndex;
 
     private int energyBank;
+    private AUpgradeCard[] upgradeShop;
 
     private Thread activationPhaseThread;
 
@@ -70,7 +69,10 @@ public class GameMode {
         this.trojanCardDeck = deckBuilder.buildTrojanDeck();
         this.virusCardDeck = deckBuilder.buildVirusDeck();
         this.wormDamageDeck = deckBuilder.buildWormDeck();
+
         this.upgradeDeck = deckBuilder.buildUpgradeDeck();
+        Collections.shuffle(this.upgradeDeck);
+        this.upgradeShop = new AUpgradeCard[3];
 
         this.energyBank = 48;
 
