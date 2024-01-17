@@ -22,6 +22,7 @@ import java.net.                    SocketTimeoutException;
 import java.util.function.          Supplier;
 import org.json.                    JSONObject;
 import org.json.                    JSONException;
+import java.util.concurrent.atomic. AtomicBoolean;
 
 /**
  * High-level manager object for a client connection to the server. A Client Instance is spawned at connection
@@ -55,7 +56,7 @@ public final class ClientInstance implements Runnable
         put(    "MapSelected",          ClientInstance.this::onCourseSelect                 );
         put(    "PlayCard",             ClientInstance.this::onCardPlay                     );
         put(    "SelectedCard",         ClientInstance.this::onRegisterSlotUpdate           );
-        put(    "SetStartingPoint",     ClientInstance.this::onStartingPointSet             );
+        put(    "SetStartingPoint",     ClientInstance.this::onStartPointSet);
         put(    "PickDamage",           ClientInstance.this::onDamageCardSelect             );
         put(    "HelloServer",          ClientInstance.this::onAddAgentRequest              );
         put(    "RebootDirection",      ClientInstance.this::onRebootDirection              );
@@ -76,9 +77,9 @@ public final class ClientInstance implements Runnable
     /** If the client is registered in a session. */
     private boolean                     bIsRegistered;
     /** Used to keep track if a client responded to the keep-alive request form the server. */
-    private boolean                     bIsAlive;
+    private final AtomicBoolean         bIsAlive            = new AtomicBoolean(false);
     /** If a client disconnects unexpectedly, we may try to disconnect them multiple times. This variable is used to keep track of that. */
-    private boolean                     bDisconnecting;
+    private final AtomicBoolean         bDisconnecting      = new AtomicBoolean(false);
 
     private RDefaultClientRequestParser dcrp;
 
@@ -88,32 +89,30 @@ public final class ClientInstance implements Runnable
 
         this.thread             = null;
         this.socket             = socket;
-        this.socket.setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMEOUT_INIT);
+        this.socket               .setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMEOUT_INIT);
 
-        this.in                 = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-        this.out                = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+        this.in                 = new BufferedReader(new InputStreamReader(     this.socket.getInputStream()    ));
+        this.out                = new BufferedWriter(new OutputStreamWriter(    this.socket.getOutputStream()   ));
 
         this.bIsRemoteAgent     = false;
         this.playerController   = null;
 
         this.bIsRegistered      = false;
-        this.bIsAlive           = true;
-        this.bDisconnecting     = false;
+        this.bIsAlive            .set( true    );
+        this.bDisconnecting      .set( false   );
 
         this.dcrp               = null;
 
         return;
     }
 
-
     public void disconnect()
     {
-        /* Because this method may be called multiple times if the connection did not close in an orderly way. */
-        if (this.bDisconnecting)
+        if (this.bDisconnecting.get())
         {
             return;
         }
-        this.bDisconnecting = true;
+        this.bDisconnecting.set(true);
 
         l.debug("Client {} is disconnecting.", this.getAddr());
 
@@ -152,7 +151,7 @@ public final class ClientInstance implements Runnable
         icc.sendProtocolVersion();
 
         icc.waitForProtocolVersionConfirmation();
-        boolean isValid = icc.isClientProtocolVersionValid();
+        final boolean isValid = icc.isClientProtocolVersionValid();
         if (!isValid)
         {
             l.error("Client {} protocol version mismatch. Disconnecting them.", this.getAddr());
@@ -212,7 +211,7 @@ public final class ClientInstance implements Runnable
 
     // region Client Request Handlers
 
-    private boolean onAlive()
+    private synchronized boolean onAlive()
     {
         l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
         this.setAlive(true);
@@ -319,7 +318,7 @@ public final class ClientInstance implements Runnable
 
     // endregion Client Request Handlers
 
-    private void parseRequest(RDefaultClientRequestParser dcrp) throws JSONException
+    private void parseRequest(final RDefaultClientRequestParser dcrp) throws JSONException
     {
         this.dcrp = dcrp;
 
@@ -376,7 +375,7 @@ public final class ClientInstance implements Runnable
             {
                 this.parseRequest(new RDefaultClientRequestParser(new JSONObject(r)));
             }
-            catch (JSONException e)
+            catch (final JSONException e)
             {
                 l.warn("Received invalid JSON from client {}. Ignoring.", this.getAddr());
                 l.warn(e.getMessage());
@@ -390,7 +389,7 @@ public final class ClientInstance implements Runnable
 
     public void sendKeepAlive()
     {
-        this.bIsAlive = false;
+        this.bIsAlive.set(false);
         new KeepAliveModel(this).send();
         return;
     }
@@ -421,7 +420,7 @@ public final class ClientInstance implements Runnable
     {
         try
         {
-            boolean bSuccess = this.registerClient();
+            final boolean bSuccess = this.registerClient();
 
             if (!bSuccess)
             {
@@ -460,16 +459,14 @@ public final class ClientInstance implements Runnable
 
     // region Getters and Setters
 
-    // TODO Do we have to synchronize this? Because of multithreading?
     public boolean isAlive()
     {
-        return this.bIsAlive;
+        return this.bIsAlive.get();
     }
 
-    // TODO Do we have to synchronize this? Because of multithreading?
-    public void setAlive(boolean bIsAlive)
+    public void setAlive(final boolean bIsAlive)
     {
-        this.bIsAlive = bIsAlive;
+        this.bIsAlive.set(bIsAlive);
         return;
     }
 
