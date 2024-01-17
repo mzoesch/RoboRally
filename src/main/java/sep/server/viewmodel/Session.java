@@ -268,7 +268,7 @@ public final class Session
     }
 
     /** @param cCtrl The controller that changed in any way. */
-    public void sendPlayerValuesToAllClients(final IOwnershipable cCtrl)
+    public void broadcastCorePlayerAttributes(final IOwnershipable cCtrl)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
@@ -279,7 +279,7 @@ public final class Session
         return;
     }
 
-    public void handleChatMessage(final PlayerController callingPC, final String msg, final int receiverID)
+    public void parseAndExecuteChatMessage(final PlayerController callingPC, final String msg, final int receiverID)
     {
         if (Session.isChatMsgARemoteCommand(msg))
         {
@@ -393,7 +393,7 @@ public final class Session
         return;
     }
 
-    public void handlePlayerReadyStatus(final PlayerController pc, final boolean bIsReady)
+    public synchronized void onPlayerReadyStatusUpdate(final PlayerController pc, final boolean bIsReady)
     {
         pc.setReady(bIsReady);
 
@@ -455,7 +455,7 @@ public final class Session
         return;
     }
 
-    public void handleSelectCourseName(final PlayerController pc, final String courseName)
+    public void onCourseSelect(final PlayerController pc, final String courseName)
     {
         this.gameState.setCourseName(courseName);
         this.broadcastCourseSelected(pc);
