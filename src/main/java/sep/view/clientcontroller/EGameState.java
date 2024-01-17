@@ -1,17 +1,17 @@
 package sep.view.clientcontroller;
 
-import sep.view.json.RDefaultServerRequestParser;
-import sep.view.lib.EShopState;
-import sep.view.lib.RRegisterCard;
-import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.lib.EGamePhase;
-import sep.view.lib.EFigure;
+import sep.view.json.               RDefaultServerRequestParser;
+import sep.view.lib.                EShopState;
+import sep.view.lib.                RRegisterCard;
+import sep.view.lib.                EGamePhase;
+import sep.view.lib.                EFigure;
+import sep.view.viewcontroller.     ViewSupervisor;
 
-import java.util.ArrayList;
-import java.util.Objects;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.json.JSONArray;
+import java.util.                   ArrayList;
+import java.util.                   Objects;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import org.json.                    JSONArray;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
@@ -24,118 +24,132 @@ public enum EGameState
 
     private static final Logger l = LogManager.getLogger(EGameState.class);
 
-    public static final int MAX_CHAT_MESSAGE_LENGTH = 64;
+    public static final int         MAX_CHAT_MESSAGE_LENGTH     = 64;
 
-    public static final String[] PHASE_NAMES = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
-    private EGamePhase currentPhase;
-
-    private int currentRegister;
+    public static final String[]    PHASE_NAMES                 = new String[] {"Registration Phase", "Upgrade Phase", "Programming Phase", "Activation Phase"};
+    private EGamePhase              currentPhase;
+    private int                     currentRegister;
 
     /**
      * Stores information that is shared for all players. The player cards for one client are unique to them and must
      * be stored here in the Game State. Information that is not unique for one player like their selected robot or
      * their name is stored in the {@link RemotePlayer} object.
      */
-    private final ArrayList<RemotePlayer> remotePlayers;
-    private RemotePlayer currentPlayer;
+    private final ArrayList<RemotePlayer>   remotePlayers;
+    private RemotePlayer                    currentPlayer;
 
-    private String[] serverCourses;
-    private String currentServerCourse;
-    private JSONArray currentServerCourseJSON;
+    private String[]                        serverCourses;
+    private String                          currentServerCourse;
+    private JSONArray                       currentServerCourseJSON;
 
-    private final String[] registers;
-    private final ArrayList<String> gotRegisters;
+    private final String[]                  registers;
+    private final ArrayList<String>         gotRegisters;
 
-    public static final String[] SHOP_STATES = new String[] {"Upgrade", "Damage", "Reboot"};
-    private EShopState shopState;
-    private ArrayList<String> temporayUpgradeCards;
-    private ArrayList<String> permanentUpgradeCards;
-    private String[] shopSlots;
+    public static final String[]            SHOP_STATES         = new String[] {"Upgrade", "Damage", "Reboot"};
+    private EShopState                      shopState;
+    private ArrayList<String>               temporayUpgradeCards;
+    private ArrayList<String>               permanentUpgradeCards;
+    private String[]                        shopSlots;
 
-    private int damageCardsCountToDraw;
-    private ArrayList<String> selectedDamageCards;
+    private int                             damageCardsCountToDraw;
+    private ArrayList<String>               selectedDamageCards;
 
-    private boolean shopActive;
-    private RemotePlayer winningPlayer;
+    private boolean                         shopActive;
+    private RemotePlayer                    winner;
 
     private EGameState()
     {
-        this.currentPhase = EGamePhase.INVALID;
-        this.shopState = EShopState.DEACTIVATED;
+        this.currentPhase               = EGamePhase.INVALID;
+        this.currentRegister            = 0;
 
-        this.remotePlayers = new ArrayList<RemotePlayer>();
-        this.currentPlayer = null;
+        this.remotePlayers              = new ArrayList<RemotePlayer>();
+        this.currentPlayer              = null;
 
-        this.serverCourses = new String[0];
-        this.currentServerCourse = "";
-        this.currentServerCourseJSON = null;
+        this.serverCourses              = new String[0];
+        this.currentServerCourse        = "";
+        this.currentServerCourseJSON    = null;
 
-        this.registers = new String[5];
-        this.gotRegisters = new ArrayList<String>();
-        this.winningPlayer = null;
+        this.registers                  = new String[5];
+        this.gotRegisters               = new ArrayList<String>();
 
-        this.selectedDamageCards = new ArrayList<>();
-        this.permanentUpgradeCards = new ArrayList<>();
-        this.temporayUpgradeCards = new ArrayList<>();
-        this.shopSlots = new String[5];
-        this. shopActive = false;
+        this.shopState                  = EShopState.DEACTIVATED;
+        this.temporayUpgradeCards       = new ArrayList<String>();
+        this.permanentUpgradeCards      = new ArrayList<String>();
+        this.shopSlots                  = new String[5];
+
+        this.damageCardsCountToDraw     = 0;
+        this.selectedDamageCards        = new ArrayList<String>();
+
+        this.shopActive                = false;
+        this.winner                     = null;
 
         return;
     }
 
     public static void reset()
     {
-        EGameState.INSTANCE.currentPhase = EGamePhase.INVALID;
+        EGameState.INSTANCE.currentPhase                = EGamePhase.INVALID;
+        EGameState.INSTANCE.currentRegister             = 0;
 
-        EGameState.INSTANCE.remotePlayers.clear();
-        EGameState.INSTANCE.currentPlayer = null;
+        EGameState.INSTANCE.remotePlayers                .clear();
+        EGameState.INSTANCE.currentPlayer               = null;
 
-        EGameState.INSTANCE.serverCourses = new String[0];
-        EGameState.INSTANCE.currentServerCourse = "";
-        EGameState.INSTANCE.currentServerCourseJSON = null;
+        EGameState.INSTANCE.serverCourses               = new String[0];
+        EGameState.INSTANCE.currentServerCourse         = "";
+        EGameState.INSTANCE.currentServerCourseJSON     = null;
 
-        EGameState.INSTANCE.registers[0] = null;
-        EGameState.INSTANCE.registers[1] = null;
-        EGameState.INSTANCE.registers[2] = null;
-        EGameState.INSTANCE.registers[3] = null;
-        EGameState.INSTANCE.registers[4] = null;
-        EGameState.INSTANCE.gotRegisters.clear();
-        EGameState.INSTANCE.winningPlayer = null;
+        EGameState.INSTANCE.registers[0]                = null;
+        EGameState.INSTANCE.registers[1]                = null;
+        EGameState.INSTANCE.registers[2]                = null;
+        EGameState.INSTANCE.registers[3]                = null;
+        EGameState.INSTANCE.registers[4]                = null;
+        EGameState.INSTANCE.gotRegisters                 .clear();
 
-        EGameState.INSTANCE.permanentUpgradeCards.clear();
-        EGameState.INSTANCE.temporayUpgradeCards.clear();
-        EGameState.INSTANCE.shopSlots[0] = null;
-        EGameState.INSTANCE.shopSlots[1] = null;
-        EGameState.INSTANCE.shopSlots[2] = null;
-        EGameState.INSTANCE.shopSlots[3] = null;
-        EGameState.INSTANCE.shopSlots[4] = null;
+        EGameState.INSTANCE.shopState                   = EShopState.DEACTIVATED;
+        EGameState.INSTANCE.temporayUpgradeCards         .clear();
+        EGameState.INSTANCE.permanentUpgradeCards        .clear();
+        EGameState.INSTANCE.shopSlots[0]                = null;
+        EGameState.INSTANCE.shopSlots[1]                = null;
+        EGameState.INSTANCE.shopSlots[2]                = null;
+        EGameState.INSTANCE.shopSlots[3]                = null;
+        EGameState.INSTANCE.shopSlots[4]                = null;
+
+        EGameState.INSTANCE.damageCardsCountToDraw      = 0;
+        EGameState.INSTANCE.selectedDamageCards         .clear();
+
+        EGameState.INSTANCE.shopActive                  = false;
+        EGameState.INSTANCE.winner                      = null;
 
         return;
     }
 
     // region Getters and Setters
 
-    private RemotePlayer getRemotePlayer(int playerID)
+    private RemotePlayer getRemotePlayer(final int id)
     {
-        for (RemotePlayer rp : EGameState.INSTANCE.remotePlayers)
+        for (final RemotePlayer rp : EGameState.INSTANCE.remotePlayers)
         {
-            if (rp.getPlayerID() == playerID)
+            if (rp.getPlayerID() == id)
             {
                 return rp;
             }
+
+            continue;
         }
 
         return null;
     }
 
-    private boolean isRemotePlayerAlreadyAdded(int playerID)
+    private boolean isRemotePlayerAlreadyAdded(final int playerID)
     {
-        for (RemotePlayer rp : EGameState.INSTANCE.remotePlayers)
+        for (final RemotePlayer rp : EGameState.INSTANCE.remotePlayers)
         {
             if (rp.getPlayerID() == playerID)
             {
                 return true;
             }
+
+            continue;
         }
 
         return false;
@@ -154,80 +168,95 @@ public enum EGameState
             return;
         }
 
-        EGameState.INSTANCE.remotePlayers.add(new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigure(), false));
+        EGameState.INSTANCE.remotePlayers.add(EClientInformation.INSTANCE.isAgent() ? new AgentRemotePlayerData(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigure(), false) : new RemotePlayer(dsrp.getPlayerID(), dsrp.getPlayerName(), dsrp.getFigure(), false));
 
         return;
     }
 
-    public void removeRemotePlayer(int playerID)
+    public void removeRemotePlayer(final int id)
     {
-        this.remotePlayers.removeIf(rp -> rp.getPlayerID() == playerID);
-        ViewSupervisor.onPlayerRemoved();
-        return;
-    }
+        this.remotePlayers.removeIf(rp -> rp.getPlayerID() == id);
 
-    /** If the robot at a specific index is already selected by a player. */
-    public boolean isPlayerRobotUnavailable(final EFigure f)
-    {
-        for (RemotePlayer rp : this.remotePlayers)
+        if (EClientInformation.INSTANCE.isAgent())
         {
-            if (rp.getFigure() == f)
+            return;
+        }
+
+        ViewSupervisor.onPlayerRemoved();
+
+        return;
+    }
+
+    public boolean isPlayerRobotUnavailable(final EFigure figure)
+    {
+        for (final RemotePlayer rp : this.remotePlayers)
+        {
+            if (rp.getFigure() == figure)
             {
                 return true;
             }
+
+            continue;
         }
 
         return false;
     }
 
-    /** If this client has already selected a robot. */
     public boolean hasClientSelectedARobot()
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
             if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID() && rp.getFigure() != EFigure.INVALID)
             {
                 return true;
             }
+
+            continue;
         }
 
         return false;
     }
 
-    public RemotePlayer getRemotePlayerByFigureID(final EFigure f)
+    public RemotePlayer getRemotePlayerByFigureID(final EFigure figure)
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
-            if (rp.getFigure() == f)
+            if (rp.getFigure() == figure)
             {
                 return rp;
             }
+
+            continue;
         }
 
         return null;
     }
 
-    public RemotePlayer getRemotePlayerByPlayerID(int caller)
+    public RemotePlayer getRemotePlayerByPlayerID(final int id)
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
-            if (rp.getPlayerID() == caller)
+            if (rp.getPlayerID() == id)
             {
                 return rp;
             }
+
+            continue;
         }
 
         return null;
     }
 
-    public RemotePlayer getRemotePlayerByPlayerName(String targetPlayer)
+    public RemotePlayer getRemotePlayerByPlayerName(final String name)
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
-            if (rp.getPlayerName().equals(targetPlayer))
+            if (rp.getPlayerName().equals(name))
             {
                 return rp;
             }
+
+            continue;
         }
 
         return null;
@@ -235,12 +264,14 @@ public enum EGameState
 
     public EFigure getClientSelectedFigure()
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
             if (rp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
             {
                 return rp.getFigure();
             }
+
+            continue;
         }
 
         return EFigure.INVALID;
@@ -259,6 +290,8 @@ public enum EGameState
             {
                 return rp;
             }
+
+            continue;
         }
 
         l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored.");
@@ -271,9 +304,9 @@ public enum EGameState
         return this.serverCourses;
     }
 
-    public void setServerCourses(String[] serverCourses)
+    public void setServerCourses(final String[] courses)
     {
-        this.serverCourses = serverCourses;
+        this.serverCourses = courses;
         return;
     }
 
@@ -282,9 +315,9 @@ public enum EGameState
         return this.currentServerCourse;
     }
 
-    public void setCurrentServerCourse(final String currentServerCourse)
+    public void setCurrentServerCourse(final String course)
     {
-        this.currentServerCourse = currentServerCourse;
+        this.currentServerCourse = course;
         return;
     }
 
@@ -363,9 +396,10 @@ public enum EGameState
 
     private void resetPlayersForActivation()
     {
-        for (RemotePlayer rp : this.remotePlayers)
+        for (final RemotePlayer rp : this.remotePlayers)
         {
             rp.setSelectionFinished(false);
+            continue;
         }
 
         return;
@@ -390,7 +424,7 @@ public enum EGameState
         return this.currentPlayer;
     }
 
-    public String getRegister(int idx)
+    public String getRegister(final int idx)
     {
         if (idx < 0 || idx >= this.registers.length)
         {
@@ -401,7 +435,7 @@ public enum EGameState
         return this.registers[idx];
     }
 
-    public String getGotRegister(int idx)
+    public String getGotRegister(final int idx)
     {
         if (idx < 0 || idx >= this.gotRegisters.size())
         {
@@ -421,7 +455,6 @@ public enum EGameState
         return this.gotRegisters;
     }
 
-    /** Will not re-render the player head up display. */
     public void clearAllRegisters()
     {
         this.registers[0] = null;
@@ -429,24 +462,30 @@ public enum EGameState
         this.registers[2] = null;
         this.registers[3] = null;
         this.registers[4] = null;
+
         this.gotRegisters.clear();
+
         return;
     }
 
-    /** Will not re-render the player head up display. */
     public void clearGotRegisters()
     {
         this.gotRegisters.clear();
         return;
     }
 
-    /** Will not re-render the player head up display. */
-    public void clearShopSlots(){
-        for(int i = 0; i < shopSlots.length; i++){
-            shopSlots[i] = null;
+    public void clearShopSlots()
+    {
+        for (int i = 0; i < this.shopSlots.length; ++i)
+        {
+            this.shopSlots[i] = null;
+
+            continue;
         }
+
+        return;
     }
-    public void addRegister(int idx, String register)
+    public void addRegister(final int idx, final String register)
     {
         if (idx < 0 || idx >= this.registers.length)
         {
@@ -458,7 +497,7 @@ public enum EGameState
         return;
     }
 
-    public void addGotRegister(String register)
+    public void addGotRegister(final String register)
     {
         this.gotRegisters.add(register);
         return;
@@ -471,7 +510,7 @@ public enum EGameState
      * @param tIdx Target index
      * @param oIdx Origin index
      */
-    public void setRegister(int tIdx, int oIdx)
+    public void setRegister(final int tIdx, final int oIdx)
     {
         if (tIdx < 0 || tIdx >= this.registers.length)
         {
@@ -526,77 +565,86 @@ public enum EGameState
 
     public boolean areRegistersFull()
     {
-        for (String s : this.registers)
+        for (final String s : this.registers)
         {
             if (s == null)
             {
                 return false;
             }
+
+            continue;
         }
 
         return true;
     }
 
-    public void setSelectionFinished(final int playerID)
+    public void setSelectionFinished(final int id)
     {
-        Objects.requireNonNull(this.getRemotePlayer(playerID)).setSelectionFinished(true);
+        Objects.requireNonNull(this.getRemotePlayer(id)).setSelectionFinished(true);
         // TODO Also not efficient here. We must not update the whole HUD, but only the player view and if not already
         //      existing, the new timer view.
         ViewSupervisor.updatePlayerView();
         return;
     }
 
-    public RemotePlayer getWinningPlayer() {
-        return winningPlayer;
+    public RemotePlayer getWinner()
+    {
+        return winner;
     }
 
-    public void determineWinningPlayer(int playerID) {
-        this.winningPlayer = getRemotePlayerByPlayerID(playerID);
+    public void setWinner(final int id)
+    {
+        this.winner = this.getRemotePlayerByPlayerID(id);
+        return;
     }
 
-    public int getCurrentRegister() {
-        return currentRegister;
+    public int getCurrentRegister()
+    {
+        return this.currentRegister;
     }
 
-    public void setCurrentRegister(int currentRegister) {
-        this.currentRegister = currentRegister;
+    public void setCurrentRegister(final int register)
+    {
+        this.currentRegister = register;
+        return;
     }
 
-    public String getTemporaryUpgradeCard(int idx)
+    public String getTemporaryUpgradeCard(final int idx)
     {
         if (idx < 0 || idx >= this.temporayUpgradeCards.size())
         {
-            //l.debug("Tried getting temporaryUpgradeCard from an emptySlot");
             return null;
         }
 
         return this.temporayUpgradeCards.get(idx);
     }
 
-    public String getPermanentUpgradeCard(int idx)
+    public String getPermanentUpgradeCard(final int idx)
     {
         if (idx < 0 || idx >= this.permanentUpgradeCards.size())
         {
-            //l.debug("Tried getting permanentUpgradeCard from an emptySlot");
             return null;
         }
 
         return this.permanentUpgradeCards.get(idx);
     }
 
-    public String getShopSlot(int idx){
-        if(idx < 0 || idx > shopSlots.length){
+    public String getShopSlot(final int idx)
+    {
+        if (idx < 0 || idx > shopSlots.length)
+        {
             l.debug("Tried getting content of shopSlot outside of range of Slots");
             return null;
         }
+
         return this.shopSlots[idx];
     }
 
-    public void addTemporaryUpgradeCards(String temporaryUpgradeCard)
+    public void addTemporaryUpgradeCards(final String temporaryUpgradeCard)
     {
         if (this.temporayUpgradeCards.size() >= 3)
         {
-            l.warn(String.format("Tried adding temporaryUpgradeCard in Slot whilst filled"));
+            l.warn("Tried adding temporaryUpgradeCard in Slot whilst filled");
             return;
         }
 
@@ -605,11 +653,11 @@ public enum EGameState
         return;
     }
 
-    public void addPermanentUpgradeCard(String permanentUpgradeCard)
+    public void addPermanentUpgradeCard(final String permanentUpgradeCard)
     {
         if (this.permanentUpgradeCards.size() <= 3)
         {
-            l.warn(String.format("Tried adding permanentUpgradeCard in Slot whilst filled"));
+            l.warn("Tried adding permanentUpgradeCard in Slot whilst filled");
             return;
         }
 
@@ -618,71 +666,95 @@ public enum EGameState
         return;
     }
 
-    public void addShopSlot(int idx, String elementName){
+    public void addShopSlot(final int idx, final String elementName)
+    {
         if (idx < 0 || idx >= this.shopSlots.length)
         {
-            l.debug(String.format("Tried adding %s outside of shopSlotRange on Position %s"), elementName, idx);
+            l.debug("Tried adding {} outside of shopSlotRange on Position {}.", elementName, idx);
             return;
         }
 
-        if(shopSlots[idx] != null) {
-            l.debug(String.format("Tried adding %s on filled shopSlot %s", elementName, idx));
+        if (this.shopSlots[idx] != null)
+        {
+            l.debug("Tried adding {} on filled shopSlot {}", elementName, idx);
             return;
         }
-        shopSlots[idx] = elementName;
+
+        this.shopSlots[idx] = elementName;
+
         return;
     }
 
-    public boolean isShopFull(){
-        for(String s : shopSlots){
-            if(s == null){
+    public boolean isShopFull()
+    {
+        for (final String s : this.shopSlots)
+        {
+            if (s == null)
+            {
                 return false;
             }
+
+            continue;
         }
+
         return true;
     }
 
-    public boolean isShopActive() {
-        return shopActive;
+    public boolean isShopActive()
+    {
+        return this.shopActive;
     }
 
-    public void setShopActive(boolean shopActive) {
-        this.shopActive = shopActive;
+    public void setShopActive(final boolean bActive)
+    {
+        this.shopActive = bActive;
+        return;
     }
 
-    public void setShopState(EShopState state){
+    public void setShopState(final EShopState state)
+    {
         this.shopState = state;
+        return;
     }
 
-    public EShopState getShopState(){
+    public EShopState getShopState()
+    {
         return this.shopState;
     }
-    // endregion Getters and Setters
 
-
-    public int getDamageCardsCountToDraw() {
-        return damageCardsCountToDraw;
+    public int getDamageCardsCountToDraw()
+    {
+        return this.damageCardsCountToDraw;
     }
 
-    public void setDamageCardsCountToDraw(int damageCardsCountToDraw) {
-        this.damageCardsCountToDraw = damageCardsCountToDraw;
+    public void setDamageCardsCountToDraw(final int count)
+    {
+        this.damageCardsCountToDraw = count;
+        return;
     }
 
-    public void subtractDamageCardsCountsToDrawByOne(){
+    public void subtractDamageCardsCountsToDrawByOne()
+    {
         this.damageCardsCountToDraw = this.damageCardsCountToDraw - 1;
+        return;
     }
 
-    public ArrayList<String> getSelectedDamageCards() {
-        return selectedDamageCards;
+    public ArrayList<String> getSelectedDamageCards()
+    {
+        return this.selectedDamageCards;
     }
 
-    public void addSelectedDamageCards(int idx, String damageCard) {
+    public void addSelectedDamageCards(final int idx, final String damageCard)
+    {
         this.selectedDamageCards.add(damageCard);
-        l.debug("Added " + damageCard + "to selected damageCards");
+        l.debug("Added {} to selected damageCards", damageCard);
+        return;
     }
 
-    public void clearSelectedDamageCards(){
+    public void clearSelectedDamageCards()
+    {
         this.selectedDamageCards.clear();
+        return;
     }
 
     private void clearRCardsFromRemotes()
@@ -706,5 +778,7 @@ public enum EGameState
 
         return;
     }
+
+    // endregion Getters and Setters
 
 }
