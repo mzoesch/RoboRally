@@ -730,10 +730,7 @@ public final class Session
                 break;
             }
 
-            continue;
-        }
-
-        if (bIsLegacySession)
+        if (this.isLegacy())
         {
             l.warn("The session [{}] is a legacy session. And contains agents that should only be used for development purposes.", this.sessionID);
 
@@ -1123,6 +1120,21 @@ public final class Session
     public boolean isFull()
     {
         return this.ctrls.size() >= GameState.MAX_CONTROLLERS_ALLOWED;
+    }
+
+    private boolean isLegacy()
+    {
+        for (final IOwnershipable ctrl : this.getControllers())
+        {
+            if (ctrl instanceof Agent)
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
     }
 
     // endregion Getters and Setters
