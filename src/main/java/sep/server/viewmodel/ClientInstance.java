@@ -212,7 +212,7 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-    private boolean onCorePlayerAttributesChanged()
+    private synchronized boolean onCorePlayerAttributesChanged()
     {
         final String old = this.playerController.getName();
 
@@ -233,79 +233,82 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-    private boolean onChatMsg()
+    private synchronized boolean onChatMsg()
     {
-        l.debug("Client {} wants to send chat message [{}] to lobby {}.", this.getAddr(), dcrp.getChatMessage_v2(), this.getPlayerController().getSession().getSessionID());
+        l.debug("Client {} wants to send chat message [{}] to lobby {}.", this.getAddr(), this.dcrp.getChatMessage_v2(), this.getPlayerController().getSession().getSessionID());
 
-        // TODO Validate chat message.
+        /* TODO Validate chat message. */
 
-        this.playerController.getSession().handleChatMessage(this.playerController, dcrp.getChatMessage_v2(), dcrp.getReceiverID());
+        this.playerController.getSession().parseAndExecuteChatMessage(this.playerController, this.dcrp.getChatMessage_v2(), this.dcrp.getReceiverID());
 
         return true;
     }
 
-    private boolean onLobbyStatus()
+    private synchronized boolean onLobbyStatus()
     {
         l.debug("Client {} set ready status to {}.", this.getAddr(), this.dcrp.getIsReadyInLobby());
-        this.playerController.getSession().handlePlayerReadyStatus(this.playerController, this.dcrp.getIsReadyInLobby());
+        this.playerController.getSession().onPlayerReadyStatusUpdate(this.playerController, this.dcrp.getIsReadyInLobby());
         return true;
     }
 
-    private boolean onCourseSelect()
+    private synchronized boolean onCourseSelect()
     {
         l.debug("Client {} selected course {}.", this.getAddr(), this.dcrp.getCourseName());
-        this.playerController.getSession().handleSelectCourseName(this.playerController, this.dcrp.getCourseName());
+        this.playerController.getSession().onCourseSelect(this.playerController, this.dcrp.getCourseName());
         return true;
     }
 
     /** TODO What is the purpose of this req? */
-    private boolean onCardPlay()
+    private synchronized boolean onCardPlay()
     {
         l.debug("Received play Card from client.");
         return true;
     }
 
-    private boolean onRegisterSlotUpdate()
+    private synchronized boolean onRegisterSlotUpdate()
     {
         l.debug("Client {} selected card [{}] to register {}.", this.getAddr(), this.dcrp.getBody().isNull("card") ? null : this.dcrp.getSelectedCardAsString(), this.dcrp.getSelectedCardRegister());
         this.playerController.setSelectedCardInRegister(this.dcrp.getBody().isNull("card") ? null : this.dcrp.getSelectedCardAsString(), this.dcrp.getSelectedCardRegister());
         return true;
     }
 
-    private boolean onStartingPointSet()
+    private synchronized boolean onStartPointSet()
     {
-        l.debug("Client {} set their starting point to ({},{})", this.getAddr(), this.dcrp.getXCoordinate(), this.dcrp.getYCoordinate());
-        this.playerController.getSession().getGameState().setStartingPoint(playerController, this.dcrp.getXCoordinate(), this.dcrp.getYCoordinate());
+        l.debug("Client {} set their starting point to {}", this.getAddr(), this.dcrp.getCoordinate().toString());
+        this.playerController.getSession().getGameState().setStartPoint(this.playerController, this.dcrp.getCoordinate());
         return true;
     }
 
-    private boolean onDamageCardSelect()
+    private synchronized boolean onDamageCardSelect()
     {
         l.debug("Received a picked damage card from client.");
         return true;
     }
 
-    public boolean onAddAgentRequest()
+    public synchronized boolean onAddAgentRequest()
     {
         // We may ignore all body arguments because we do not need them.
         // If there is something fishy going on, the initial client connection already would have failed.
-        l.debug("Client {} wants to add an agent to lobby {}.", this.getAddr(), this.getPlayerController().getSession().getSessionID());
+        l.debug("Client {} wants to add an agent to lobby [{}].", this.getAddr(), this.getPlayerController().getSession().getSessionID());
         this.getPlayerController().getSession().addAgent();
         return true;
     }
 
-    private boolean onRebootDirection() {
+    private synchronized boolean onRebootDirection()
+    {
         l.debug("Client {} set their reboot direction to {}", this.getAddr(), this.dcrp.getDirection());
         this.playerController.getSession().getGameState().setRebootDirection(playerController, this.dcrp.getDirection());
         return true;
     }
 
-    private boolean onBuyUpgrade() {
+    private synchronized boolean onBuyUpgrade()
+    {
         l.debug("Received buy upgrade from client.");
         return true;
     }
 
-    private boolean onChooseRegister() {
+    private synchronized boolean onChooseRegister()
+    {
         l.debug("Received choose register from client.");
         return true;
     }
