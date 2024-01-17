@@ -412,7 +412,6 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-    /** Life-cycle of a client connection. */
     @Override
     public void run()
     {
