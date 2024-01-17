@@ -1,17 +1,11 @@
 package sep.view.scenecontrollers;
 
-import sep.EArgs;
 import sep.view.clientcontroller.EGameState;
 import sep.view.clientcontroller.GameInstance;
-import sep.view.viewcontroller.ViewSupervisor;
-import sep.view.viewcontroller.SceneController;
-import sep.view.clientcontroller.EClientInformation;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
-import java.io.IOException;
 
 /** JavaFX controller for the main menu screen. Handles winner announcement and return to MainMenu/ Exit. */
 public class EndSceneJFXController{
