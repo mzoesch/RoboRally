@@ -220,6 +220,9 @@ public class CourseBuilder {
             case("4A") -> {
                 return build4A();
             }
+            case("6B") -> {
+                return build6B();
+            }
         }
         return null;
     }
