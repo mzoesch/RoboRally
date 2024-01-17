@@ -1,7 +1,9 @@
 package sep.server.json;
 
-import org.json.JSONObject;
-import org.json.JSONException;
+import sep.server.model.game.tiles. Coordinate;
+
+import org.json.                    JSONObject;
+import org.json.                    JSONException;
 
 /**
  * For easier access to the JSON object received from the client. Does not contain actual logic.
@@ -50,24 +52,21 @@ public record RDefaultClientRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getString("map");
     }
 
-    public Object getPosX() throws JSONException
-    {
-        return this.request.getJSONObject("messageBody").get("x");
-    }
-
-    public Object getPosY() throws JSONException
-    {
-        return this.request.getJSONObject("messageBody").get("y");
-    }
-
+    /** @deprecated  */
     public int getXCoordinate() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("x");
     }
 
+    /** @deprecated  */
     public int getYCoordinate() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("y");
+    }
+
+    public Coordinate getCoordinate() throws JSONException
+    {
+        return new Coordinate(this.request.getJSONObject("messageBody").getInt("x"), this.request.getJSONObject("messageBody").getInt("y"));
     }
 
     public String getSelectedCardAsString() throws JSONException
