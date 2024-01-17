@@ -26,6 +26,7 @@ import javafx.scene.layout.         Priority;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         VBox;
 import javafx.scene.layout.         Region;
+import javafx.scene.layout.         AnchorPane;
 import javafx.scene.layout.         Pane;
 import java.io.                     IOException;
 import javafx.scene.input.          KeyCode;
@@ -59,6 +60,7 @@ public final class LobbyJFXController_v2
         return;
     }
 
+    @FXML private AnchorPane    masterContainer;
     @FXML private Button        addBotBtn;
     @FXML private VBox          playersInSessionLabelContainer;
     @FXML private Label         serverCourseLabel;
@@ -133,6 +135,17 @@ public final class LobbyJFXController_v2
             return;
         }
         ));
+
+        this.masterContainer.heightProperty().addListener(
+        new ChangeListener<Number>()
+        {
+            @Override
+            public void changed(final ObservableValue<? extends Number> observableValue, final Number number, final Number t1)
+            {
+                formScrollPane.setStyle("-fx-min-height: " + ( t1.doubleValue() - 470 ) + "px; -fx-max-height: " + ( t1.doubleValue() - 470 ) + "px;");
+                return;
+            }
+        });
 
         this.updateView();
 

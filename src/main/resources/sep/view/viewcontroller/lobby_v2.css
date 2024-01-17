@@ -13,8 +13,6 @@
     -fx-border-color: #ffffffff;
 
     -fx-max-width: 700px;
-    -fx-min-height: 300px;
-    -fx-max-height: 300px;
 }
 
 #form-area {
@@ -117,9 +115,9 @@
 
 #lobby-msg-container {
     -fx-min-width: 350px;
-    -fx-min-height: 220px;
+    -fx-min-height: 280px;
     -fx-max-width: 350px;
-    -fx-max-height: 220px;
+    -fx-max-height: 280px;
     -fx-spacing: 8px;
     -fx-background-color: transparent;
 }
