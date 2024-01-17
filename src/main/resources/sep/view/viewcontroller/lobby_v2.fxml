@@ -82,6 +82,9 @@
                                 fx:id="playerRobotSelectorArea"
                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
                             />
+                            <Region
+                                    style="-fx-min-height: 20px; -fx-max-height: 20px;"
+                            />
                             <Label
                                 text="Select Server Course:"
                                 styleClass="text-xl" alignment="CENTER"
