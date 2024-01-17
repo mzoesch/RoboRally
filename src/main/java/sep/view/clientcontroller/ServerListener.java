@@ -61,7 +61,6 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
         put(    "RefillShop",           ServerListener.this::onRefillShop                       );
         put(    "UpgradeBought",        ServerListener.this::onUpgradeBought                    );
         put(    "CheckpointMoved",      ServerListener.this::onCheckpointMoved                  );
-        put(    "DiscardSome",          ServerListener.this::onDiscardSome                      );
         put(    "RegisterChosen",       ServerListener.this::onRegisterChosen                   );
     }}
     ;
@@ -227,7 +226,6 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
     protected abstract boolean      onRefillShop()                           throws JSONException;
     protected abstract boolean      onUpgradeBought()                        throws JSONException;
     protected abstract boolean      onCheckpointMoved()                      throws JSONException;
-    protected abstract boolean      onDiscardSome()                          throws JSONException;
     protected abstract boolean      onRegisterChosen()                       throws JSONException;
 
     // endregion Server request handlers
