@@ -1,10 +1,11 @@
 package sep.server.model.game;
 
-import sep.server.viewmodel.    PlayerController;
-import sep.server.viewmodel.    Session;
-import sep.server.model.        IOwnershipable;
-import sep.server.model.        Agent;
-import sep.server.model.        EServerInformation;
+import sep.server.viewmodel.        PlayerController;
+import sep.server.viewmodel.        Session;
+import sep.server.model.            IOwnershipable;
+import sep.server.model.            Agent;
+import sep.server.model.            EServerInformation;
+import sep.server.model.game.tiles. Coordinate;
 
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -13,7 +14,7 @@ import org.apache.logging.log4j.    Logger;
  * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
  * Game Modes. It is persistent throughout the life-time of a session.
  */
-public class GameState
+public final class GameState
 {
     private static final Logger l = LogManager.getLogger(GameState.class);
 
@@ -122,8 +123,10 @@ public class GameState
         session.sendTimerEnded(playerIDS);
     }
 
-    public void setStartingPoint(PlayerController playerController, int x, int y){
-        this.gameMode.setStartingPoint(playerController, x,y);
+    public synchronized void setStartPoint(final PlayerController playerController, final Coordinate coordinate)
+    {
+        this.gameMode.setStartingPoint(playerController, coordinate.getX(), coordinate.getY());
+        return;
     }
 
     public void setRebootDirection(PlayerController playerController, String direction) {

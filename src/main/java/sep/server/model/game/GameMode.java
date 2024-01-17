@@ -103,7 +103,7 @@ public class GameMode {
      * @param x x coordinate of the starting point
      * @param y y coordinate of the starting point
      */
-    public void setStartingPoint(IOwnershipable ctrl, int x, int y) {
+    public synchronized void setStartingPoint(IOwnershipable ctrl, int x, int y) {
         if (ableToSetStartPoint(ctrl)) {
 
             int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
