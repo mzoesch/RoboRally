@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Agent (5)" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="sep.view.Launcher" />
+    <module name="sep" />
+    <option name="PROGRAM_PARAMETERS" value="--isAgent --name &quot;[Bot] DevAgent&quot; --sid A" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

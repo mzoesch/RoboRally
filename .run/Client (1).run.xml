@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Client (1)" type="Application" factoryName="Application" singleton="false">
+    <option name="MAIN_CLASS_NAME" value="sep.view.Launcher" />
+    <module name="sep" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
