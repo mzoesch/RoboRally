@@ -320,10 +320,27 @@ public class GameMode {
                 }
             }
 
-            if (minIndex != -1) {
+            //Stehen lassen bis der neue Code getestet wurde.
+            /*if (minIndex != -1) {
                 this.players.get(minIndex).setPriority(currentPriority);
                 currentPriority--;
                 distances[minIndex] = Integer.MAX_VALUE;
+            }*/
+
+
+            //Inkludiert nun die Funktion der AdminPriviledgeKarte. Muss aber noch getestet werden (sobald Shop verfügbar). Bis dahin die alte Methode dalassen.
+            if (minIndex != -1) {
+                Player currentPlayer = this.players.get(minIndex);
+
+                if (currentPlayer.getHasAdminPrivilegeUpgrade() && currentPlayer.getChosenRegisterAdminPrivilegeUpgrade() == currentRegisterIndex) {
+                    currentPlayer.setPriority(currentPriority);
+                    currentPriority--;
+                    distances[minIndex] = Integer.MAX_VALUE;
+                } else {
+                    currentPlayer.setPriority(currentPriority);
+                    currentPriority--;
+                    distances[minIndex] = Integer.MAX_VALUE;
+                }
             }
         }
     }
