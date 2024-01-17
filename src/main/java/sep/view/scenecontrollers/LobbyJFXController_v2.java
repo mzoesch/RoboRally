@@ -377,7 +377,7 @@ public final class LobbyJFXController_v2
 
         for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
-            if (rp.getPlayerName().startsWith(EClientInformation.AGENT_PREFIX))
+            if (EClientInformation.INSTANCE.getAllowLegacyAgents() && rp.getPlayerName().startsWith(EClientInformation.AGENT_PREFIX))
             {
                 final Label l = new Label(rp.getPlayerName());
                 l.getStyleClass().clear();
