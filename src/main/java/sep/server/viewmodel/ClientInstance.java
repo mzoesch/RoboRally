@@ -394,7 +394,7 @@ public final class ClientInstance implements Runnable
 
     public boolean sendRemoteRequest(final JSONObject j)
     {
-        l.trace("Sending remote request to client {}. {}", this.getAddr(), j.toString(0));
+        l.trace("Sending remote request to client {}: {}", this.getAddr(), j.toString(0));
 
         try
         {
