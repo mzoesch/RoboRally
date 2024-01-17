@@ -251,7 +251,7 @@ public final class RobotView
                 break;
             }
 
-            if (!RCoordinate.exists(toCheck, tiles))
+            if (RCoordinate.isOutOfBounds(toCheck, tiles))
             {
                 break;
             }
