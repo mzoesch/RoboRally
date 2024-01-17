@@ -373,7 +373,7 @@ public final class AgentSL_v2 extends ServerListener
                     return false;
                 }
 
-                /* We do this because else the server will get into a lot of race conditions. Pretty fishy. But there is no time to fix this.*/
+                /* We do this because else the server will get into a lot of race conditions. Pretty fishy. But there is no time to fix this. */
                 try
                 {
                     Thread.sleep(200);
