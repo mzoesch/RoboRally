@@ -1,5 +1,6 @@
 package sep.view.viewcontroller;
 
+import sep.view.json.game.ChooseRegisterModel;
 import sep.view.json.game.          SelectedDamageModel;
 import sep.view.json.game.          RebootDirectionModel;
 import sep.                         Types;
@@ -479,6 +480,52 @@ public final class ViewSupervisor extends Application
             l.error(e.getMessage());
             return;
         }
+    }
+
+
+    public static void createRegisterDialog(int selectedRegister) {
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Label header = new Label("Select a register (1-5):");
+        header.getStyleClass().add("text-xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(header, 0.0);
+        AnchorPane.setRightAnchor(header, 0.0);
+        AnchorPane.setTopAnchor(header, 50.0);
+
+        final HBox form = new HBox();
+        form.setId("register-dialog-body");
+
+        AnchorPane.setLeftAnchor(form, 0.0);
+        AnchorPane.setRightAnchor(form, 0.0);
+        AnchorPane.setBottomAnchor(form, 50.0);
+
+        for (int i = 1; i <= 5; i++) {
+            final Button registerButton = new Button(Integer.toString(i));
+            registerButton.getStyleClass().add("secondary-btn");
+            registerButton.getStyleClass().add("register-btn");
+            form.getChildren().add(registerButton);
+
+            final int selected = i;
+            registerButton.setOnAction(e -> {
+                new ChooseRegisterModel(selected).send();
+                ViewSupervisor.getSceneController().destroyPopUp(h, false);
+            });
+        }
+
+        final AnchorPane p = new AnchorPane(header, form);
+        p.setId("register-dialog-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(h, 0.0);
+        AnchorPane.setRightAnchor(h, 0.0);
+        AnchorPane.setTopAnchor(h, 0.0);
+        AnchorPane.setBottomAnchor(h, 0.0);
+
+        ViewSupervisor.createPopUp(h);
     }
 
     public static void createRebootDialog()
