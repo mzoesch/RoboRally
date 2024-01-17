@@ -222,7 +222,7 @@ public final class Launcher
         finally
         {
             l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
-            System.exit(sep.EArgs.OK);
+            System.exit(EClientInformation.INSTANCE.getExitCode());
         }
 
         return;

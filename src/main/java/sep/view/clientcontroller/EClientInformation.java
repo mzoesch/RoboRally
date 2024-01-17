@@ -65,6 +65,9 @@ public enum EClientInformation
 
     private final AtomicBoolean     bQuickTipCreated    = new AtomicBoolean(false);
 
+    private static final int        PREF_EXIT_CODE      = GameInstance.EXIT_OK;
+    private int                     exitCode;
+
     private EClientInformation()
     {
         this.JFXInstance = null;
@@ -91,6 +94,8 @@ public enum EClientInformation
         this.bAllowLegacyAgents     = false;
 
         this.bQuickTipCreated        .set(false);
+
+        this.exitCode               = EClientInformation.PREF_EXIT_CODE;
 
         return;
     }
@@ -441,6 +446,17 @@ public enum EClientInformation
     public boolean getQuickTipCreated()
     {
         return this.bQuickTipCreated.get();
+    }
+
+    public int getExitCode()
+    {
+        return this.exitCode;
+    }
+
+    public void setExitCode(final int exitCode)
+    {
+        this.exitCode = exitCode;
+        return;
     }
 
     // endregion Getters and Setters

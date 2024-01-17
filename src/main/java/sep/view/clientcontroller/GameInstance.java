@@ -21,6 +21,9 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
 
     public static final int MAX_PLAYER_NAME_LENGTH = 16;
 
+    public static final int     EXIT_OK         = 0;
+    public static final int     EXIT_FATAL      = 1;
+
     protected GameInstance()
     {
         super();
@@ -41,17 +44,23 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
 
     public static void kill()
     {
+        GameInstance.kill(GameInstance.EXIT_OK);
+        return;
+    }
+
+    public static void kill(final int exitCode)
+    {
         GameInstance.handleServerDisconnect();
         l.info("Game Instance killed.");
 
         if (EClientInformation.INSTANCE.isAgent())
         {
             l.info("Shutting down agent.");
-            /* TODO Exit code. */
-            System.exit(0);
+            System.exit(exitCode);
             return;
         }
 
+        EClientInformation.INSTANCE.setExitCode(exitCode);
         Platform.exit();
 
         return;
