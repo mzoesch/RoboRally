@@ -15,8 +15,8 @@ import org.json.JSONArray;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
- * Does not contain actual game logic. If the view needs to know something about the game, it will be stored here. This
- * object is shared across all threads and is automatically updated by the server listener.
+ * Does not contain actual game logic. If the view or agent needs to know something about the game, it will be
+ * stored here. This object is shared across all threads and is automatically updated by the server listener.
  */
 public enum EGameState
 {
