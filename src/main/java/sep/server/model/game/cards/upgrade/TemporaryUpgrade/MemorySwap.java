@@ -1,11 +1,15 @@
 package sep.server.model.game.cards.upgrade.TemporaryUpgrade;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 
 import java.util.ArrayList;
 
 public class MemorySwap extends ATemporaryUpgrade{
+
+    private static final Logger l = LogManager.getLogger(MemorySwap.class);
 
     public MemorySwap(String cardType, int cost) {
         super(cardType, cost);
@@ -33,6 +37,9 @@ public class MemorySwap extends ATemporaryUpgrade{
             int handIndex = player.getPlayerHand().indexOf(drawnCardsFromHand.get(i));
             player.getPlayerHand().set(handIndex, drawnCardsFromDeck.get(i));
         }
+
+        l.debug("Upgrade (MemorySwap) activated for player '{}'.  Player's updated hand: {}",
+                player.getController().getName(), player.getPlayerHand());
 
     }
 }
