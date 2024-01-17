@@ -6,12 +6,12 @@ import sep.view.viewcontroller.     SceneController;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EPopUp;
 
+import java.util.                   HashMap;
+import java.util.function.          Supplier;
 import java.io.                     IOException;
 import java.io.                     BufferedReader;
-import java.util.                   HashMap;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
-import java.util.function.          Supplier;
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
 
