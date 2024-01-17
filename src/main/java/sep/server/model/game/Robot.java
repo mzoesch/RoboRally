@@ -24,12 +24,15 @@ public class Robot {
 
     private final Player possessor;
 
+    private Boolean canShootBackward;
+
     public Robot(boolean rebootTriggered, Player possessor, Course course) {
         this.course = course;
         startingPoint = null;
         this.rebootTriggered = rebootTriggered;
         currentTile = null;
         this.possessor = possessor;
+        this.canShootBackward = false;
     }
 
     public String getDirection()
@@ -376,6 +379,14 @@ public class Robot {
     public Player getPossessor()
     {
         return possessor;
+    }
+
+    public void setCanShootBackward(Boolean canShootBackward) {
+        this.canShootBackward = canShootBackward;
+    }
+
+    public Boolean getCanShootBackward() {
+        return canShootBackward;
     }
 
     public boolean isRebootTriggered() {

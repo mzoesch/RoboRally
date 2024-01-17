@@ -1,5 +1,7 @@
 package sep.server.model.game.builder;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.model.game.Tile;
 import sep.server.model.game.tiles.*;
 
@@ -9,6 +11,8 @@ import java.util.ArrayList;
  * Class creating the corresponding course
  */
 public class CourseBuilder {
+
+    private static final Logger l = LogManager.getLogger(CourseBuilder.class);
 
     public CourseBuilder() {
     }
@@ -58,6 +62,15 @@ public class CourseBuilder {
                 settingCoordinates(entireCourse);
                 return entireCourse;
             }
+            case("Twister") -> {
+                ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
+                ArrayList<ArrayList<Tile>> board6B = buildBoard("6B");
+                changeFieldType(boardStartA, 0, 7, new RestartPoint("left"));
+                ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board6B);
+                settingCoordinates(entireCourse);
+                return entireCourse;
+            }
+
             case("Test") -> {
                 return buildBoard("Test");
             }
@@ -176,7 +189,7 @@ public class CourseBuilder {
             fieldTypes.add(newFieldType);
             tile.setFieldTypes(fieldTypes);
         } else {
-            System.out.println("Invalid Coordinates");
+            l.error("Invalid Coordinates");
         }
     }
 
@@ -206,6 +219,9 @@ public class CourseBuilder {
             }
             case("4A") -> {
                 return build4A();
+            }
+            case("6B") -> {
+                return build6B();
             }
         }
         return null;
@@ -252,7 +268,7 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board StartA (part of DizzyHighway, Lost Bearings)
+     * Builds board StartA (part of DizzyHighway, Lost Bearings, Extra Crispy, Death Trap and Twister))
      * @return StartA as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildStartA()
@@ -1512,8 +1528,6 @@ public class CourseBuilder {
     }
 
 
-    // TODO Pushpanel: ein andere Bild finden, wo zahlen erkennbar sind oder Spiel ausleihen
-
     /**
      * Builds board 2A (part of Death Trap)
      * @return board 2A as ArrayList
@@ -2202,7 +2216,7 @@ public class CourseBuilder {
         // (2,2)
         fieldtypes.add(new CheckPoint(4));
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new Laser("bottom", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
+        fieldtypes.add(new Laser("bottom", 2));
         arrayListY.add(new Tile("4A",new Coordinate(2,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -2229,7 +2243,7 @@ public class CourseBuilder {
         // (2,7)
         fieldtypes.add(new CheckPoint(2));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new Laser("top", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
+        fieldtypes.add(new Laser("top", 2));
         fieldtypes = new ArrayList<>();
 
         // (2,8)
@@ -2476,7 +2490,7 @@ public class CourseBuilder {
         // (7,2)
         fieldtypes.add(new CheckPoint(1));
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new Laser("bottom", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
+        fieldtypes.add(new Laser("bottom", 2));
         arrayListY.add(new Tile("4A",new Coordinate(7,2), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -2503,7 +2517,7 @@ public class CourseBuilder {
         // (7,7)
         fieldtypes.add(new CheckPoint(3));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
-        fieldtypes.add(new Laser("top", 2)); // TODO nach einer anderen abbildung suchen, auf meiner sieht man nicht ob es 2 oder 1 ist
+        fieldtypes.add(new Laser("top", 2));
         arrayListY.add(new Tile("4A",new Coordinate(7,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
@@ -2628,6 +2642,16 @@ public class CourseBuilder {
         arrayListY = new ArrayList<>();
 
         return board;
+    }
+
+
+    /**
+     * Builds board 6B (part of Twister)
+     * @return board 6B as ArrayList
+     */
+    public ArrayList<ArrayList<Tile>> build6B() {
+
+        return null;
     }
 
 }
