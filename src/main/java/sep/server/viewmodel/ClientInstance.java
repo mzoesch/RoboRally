@@ -285,6 +285,7 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
+    /** @deprecated  */
     public synchronized boolean onAddAgentRequest()
     {
         // We may ignore all body arguments because we do not need them.
