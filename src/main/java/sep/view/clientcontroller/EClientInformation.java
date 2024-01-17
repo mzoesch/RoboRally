@@ -63,6 +63,8 @@ public enum EClientInformation
     private String                  prefAgentName;
     private boolean                 bAllowLegacyAgents;
 
+    private final AtomicBoolean     bQuickTipCreated    = new AtomicBoolean(false);
+
     private EClientInformation()
     {
         this.JFXInstance = null;
@@ -87,6 +89,8 @@ public enum EClientInformation
         this.bIsAgent               = false;
         this.prefAgentName          = "";
         this.bAllowLegacyAgents     = false;
+
+        this.bQuickTipCreated        .set(false);
 
         return;
     }
@@ -426,6 +430,17 @@ public enum EClientInformation
     public boolean getDisconnectHandled()
     {
         return this.bDisconnectHandled.get();
+    }
+
+    public void setQuickTipCreated(final boolean bCreated)
+    {
+        this.bQuickTipCreated.set(bCreated);
+        return;
+    }
+
+    public boolean getQuickTipCreated()
+    {
+        return this.bQuickTipCreated.get();
     }
 
     // endregion Getters and Setters

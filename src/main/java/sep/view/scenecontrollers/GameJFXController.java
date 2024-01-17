@@ -194,6 +194,12 @@ public final class GameJFXController
 
     private void createQuickTip()
     {
+        if (EClientInformation.INSTANCE.getQuickTipCreated())
+        {
+            return;
+        }
+        EClientInformation.INSTANCE.setQuickTipCreated(true);
+
         final Label     l       = new Label("Quick Tips:");
         final Label     lQKey   = new Label("Q:");
         final Label     lQDesc  = new Label("To toggle the footer.");
