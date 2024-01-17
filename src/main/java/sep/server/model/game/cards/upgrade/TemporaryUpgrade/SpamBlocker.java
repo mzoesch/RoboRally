@@ -37,5 +37,9 @@ public class SpamBlocker extends ATemporaryUpgrade{
                 i--;
             }
         }
+
+        player.getAuthGameMode().getSession().sendUsingSpamBlockerNotification(player.getController().getPlayerID(), new String[]{"SpamBlocker"});
+
+
     }
 }
