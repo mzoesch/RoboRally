@@ -268,7 +268,7 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board StartA (part of DizzyHighway, Lost Bearings)
+     * Builds board StartA (part of DizzyHighway, Lost Bearings, Extra Crispy, Death Trap and Twister))
      * @return StartA as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildStartA()
@@ -1527,8 +1527,6 @@ public class CourseBuilder {
         return board;
     }
 
-
-    // TODO Pushpanel: ein andere Bild finden, wo zahlen erkennbar sind oder Spiel ausleihen
 
     /**
      * Builds board 2A (part of Death Trap)
