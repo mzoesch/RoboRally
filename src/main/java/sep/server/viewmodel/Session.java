@@ -830,6 +830,21 @@ public final class Session
     }
 
     /**
+     * Notifies all players about the activation of the UpgradeCard SpamBlocker.
+     *
+     * @param playerID The ID of the player who activated the UpgradeCard SpamBlocker.
+     */
+    public void sendUsingSpamBlockerNotification (final int playerID, final String[] upgradeCard) {
+        for (PlayerController pc : this.getRemotePlayers()) {
+            YourCardsModel yourCardsModel = new YourCardsModel(pc.getClientInstance(), upgradeCard);
+            yourCardsModel.send();
+         }
+    }
+
+
+
+
+    /**
      * Sends a shuffle notification to all remote players.
      *
      * @param playerID The ID of the player who shuffled.
