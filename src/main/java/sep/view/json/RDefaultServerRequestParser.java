@@ -161,7 +161,7 @@ public record RDefaultServerRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getString("newCard");
     }
 
-    public int getNumber() throws JSONException
+    public int getCheckpointNumber() throws JSONException
     {
         return this.request.getJSONObject("messageBody").getInt("number");
     }
