@@ -18,7 +18,7 @@ public class SpamBlocker extends ATemporaryUpgrade{
 
     public void activateUpgrade(Player player) {
 
-        logger.info("SpamBlocker activated for player '{}'. Removing SpamDamage card from hand.",
+        logger.info("UpgradeCard (SpamBlocker) activated for player '{}'. Removing SpamDamage card from hand.",
                 player.getController().getName());
 
         for (int i = 0; i < player.getPlayerHand().size(); i++) {
