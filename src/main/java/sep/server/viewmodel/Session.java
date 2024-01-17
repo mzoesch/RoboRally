@@ -489,10 +489,13 @@ public final class Session
             {
                 l.info("Aborting game start.");
                 l.debug(e.getMessage());
+                this.awaitGameStartThread = null; /* Just for safety reasons, but the caller should always be responsible for setting this var to a nullptr again. */
                 return;
             }
 
             this.gameState.startGame();
+
+            this.awaitGameStartThread = null; /* Just for safety reasons, but the caller should always be responsible for setting this var to a nullptr again. */
 
             return;
         });
