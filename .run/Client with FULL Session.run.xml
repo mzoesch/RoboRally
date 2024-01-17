@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Client with FULL Session" type="CompoundRunConfigurationType">
+    <toRun name="Agent (1)" type="Application" />
+    <toRun name="Agent (2)" type="Application" />
+    <toRun name="Agent (3)" type="Application" />
+    <toRun name="Agent (4)" type="Application" />
+    <toRun name="Agent (5)" type="Application" />
+    <toRun name="Client (1)" type="Application" />
+    <toRun name="Server" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>
