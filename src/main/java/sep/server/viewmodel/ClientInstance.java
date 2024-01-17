@@ -359,7 +359,7 @@ public final class ClientInstance implements Runnable
                 return;
             }
 
-            if (escapeCharacter == -1)
+            if (escapeCharacter == ClientInstance.ORDERLY_CLOSE)
             {
                 l.debug("Client {} requested to close the server connection in an orderly way.", this.getAddr());
                 this.disconnect();
