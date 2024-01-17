@@ -1,4 +1,4 @@
-package sep.server.json.game.effects;
+package sep.view.json.game;
 
 import org.json.JSONObject;
 import sep.server.json.AModel;

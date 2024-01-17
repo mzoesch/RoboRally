@@ -1,6 +1,5 @@
 package sep.view.viewcontroller;
 
-import sep.server.json.game.effects.DiscardSomeModel;
 import sep.view.json.game.ChooseRegisterModel;
 import sep.view.json.game.          SelectedDamageModel;
 import sep.view.json.game.          RebootDirectionModel;
@@ -32,7 +31,6 @@ import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
 import java.util.                   ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic. AtomicReference;
 
