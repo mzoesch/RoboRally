@@ -715,7 +715,7 @@ public final class Session
         return this.gameState;
     }
 
-    private boolean isReadyToStartGame()
+    private synchronized boolean isReadyToStartGame()
     {
         if (this.awaitGameStartThread != null)
         {
