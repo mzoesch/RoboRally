@@ -214,20 +214,20 @@ public final class ClientInstance implements Runnable
 
     private boolean onCorePlayerAttributesChanged()
     {
-        final String oName = this.playerController.getName();
+        final String old = this.playerController.getName();
 
         /* TODO We have to do some validation here. */
         /* TODO Check if the client name is valid. It must not start with "[BOT]" or be empty etc. */
 
-        this.playerController.setPlayerName(this.dcrp.getPlayerName());
-        this.playerController.setFigure(this.dcrp.getFigureID());
+        this.playerController.setPlayerName(    this.dcrp.getPlayerName()   );
+        this.playerController.setFigure(        this.dcrp.getFigureID()     );
         l.debug("Client {} selected figure {}.", this.getAddr(), this.playerController.getFigure());
 
-        this.playerController.getSession().sendPlayerValuesToAllClients(this.playerController);
-        if (!Objects.equals(oName, this.playerController.getName()))
+        this.playerController.getSession().broadcastCorePlayerAttributes(this.playerController);
+        if (!Objects.equals(old, this.playerController.getName()))
         {
-            this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", oName, this.playerController.getName()));
-            l.debug("Client {} changed their name from {} to {}.", this.getAddr(), oName, this.playerController.getName());
+            this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", old, this.playerController.getName()));
+            l.debug("Client {} changed their name from {} to {}.", this.getAddr(), old, this.playerController.getName());
         }
 
         return true;
