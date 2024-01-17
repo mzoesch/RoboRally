@@ -220,7 +220,7 @@ public final class Tile
                 break;
             }
 
-            if (!RCoordinate.exists(toCheck, tiles))
+            if (RCoordinate.isOutOfBounds(toCheck, tiles))
             {
                 break;
             }

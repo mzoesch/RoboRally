@@ -4,30 +4,30 @@ import sep.view.viewcontroller.     Tile;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 
-public record RCoordinate(int x, int y)
+public final record RCoordinate(int x, int y)
 {
     public RCoordinate(final int x, final int y)
     {
-        this.x = x;
-        this.y = y;
+        this.x  = x;
+        this.y  = y;
 
         return;
     }
 
     @Override
-    public boolean equals(final Object o)
+    public boolean equals(final Object obj)
     {
-        if (o == this)
+        if (obj == this)
         {
             return true;
         }
 
-        if (!(o instanceof final RCoordinate c))
+        if (!(obj instanceof final RCoordinate location))
         {
             return false;
         }
 
-        return (this.x == c.x) && (this.y == c.y);
+        return (this.x == location.x) && (this.y == location.y);
     }
 
     @Override
@@ -36,11 +36,11 @@ public record RCoordinate(int x, int y)
         return String.format("(%d, %d)", this.x, this.y);
     }
 
-    public static boolean isOccupied(final RCoordinate c)
+    public static boolean isOccupied(final RCoordinate location)
     {
         for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
         {
-            if (rp.getFigureLocation().equals(c))
+            if (rp.getFigureLocation().equals(location))
             {
                 return true;
             }
@@ -49,31 +49,26 @@ public record RCoordinate(int x, int y)
         return false;
     }
 
-    public RCoordinate getNeighbour(final ERotation rot)
+    public RCoordinate getNeighbour(final ERotation rotation)
     {
-        switch (rot)
+        return switch (rotation)
         {
-        case NORTH:
-            return new RCoordinate(this.x, this.y - 1);
-        case EAST:
-            return new RCoordinate(this.x + 1, this.y);
-        case SOUTH:
-            return new RCoordinate(this.x, this.y + 1);
-        case WEST:
-            return new RCoordinate(this.x - 1, this.y);
-        default:
-            return null;
-        }
+            case NORTH  ->  new RCoordinate(    this.x,         this.y - 1  );
+            case EAST   ->  new RCoordinate(    this.x + 1,     this.y      );
+            case SOUTH  ->  new RCoordinate(    this.x,         this.y + 1  );
+            case WEST   ->  new RCoordinate(    this.x - 1,     this.y      );
+            default     ->  null;
+        };
     }
 
-    public static boolean exists(final RCoordinate c, final Tile[][] tiles)
+    public static boolean isOutOfBounds(final RCoordinate location, final Tile[][] tiles)
     {
         if (tiles == null)
         {
-            return false;
+            return true;
         }
 
-        return (c.x >= 0) && (c.x < tiles.length) && (c.y >= 0) && (c.y < tiles[0].length);
+        return (location.x < 0) || (location.x >= tiles.length) || (location.y < 0) || (location.y >= tiles[0].length);
     }
 
 }
