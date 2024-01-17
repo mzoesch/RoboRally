@@ -3,6 +3,7 @@ package sep.view.scenecontrollers;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 import sep.view.clientcontroller.   EClientInformation;
+import sep.view.clientcontroller.   GameInstance;
 import sep.view.json.game.          SelectedCardModel;
 import sep.view.json.game.          SetStartingPointModel;
 import sep.view.json.               ChatMsgModel;
@@ -225,13 +226,13 @@ public final class GameJFXController
         lCKey   .getStyleClass().add(   "text-base" );
         lCDesc  .getStyleClass().add(   "text-base" );
 
-        final VBox hKey     = new VBox( lQKey, lZKey, lVKey, lHKey, lCKey       );
-        final VBox hDesc    = new VBox( lQDesc, lZDesc, lVDesc, lHDesc, lCDesc  );
-        final HBox list     = new HBox( hKey, hDesc                             );
-        final VBox labels   = new VBox( l, list                                 );
+        final VBox      hKey        = new VBox( lQKey, lZKey, lVKey, lHKey, lCKey       );
+        final VBox      hDesc       = new VBox( lQDesc, lZDesc, lVDesc, lHDesc, lCDesc  );
+        final HBox      list        = new HBox( hKey, hDesc                             );
+        final VBox      labels      = new VBox( l, list                                 );
 
-        final Button b      = new Button("X");
-        final AnchorPane p  = new AnchorPane(labels, b);
+        final Button        b       = new Button("X");
+        final AnchorPane    p       = new AnchorPane(labels, b);
 
         list.setSpacing(20.0);
         b.getStyleClass().add("danger-btn-tiny");
@@ -261,7 +262,8 @@ public final class GameJFXController
                 return;
             }
 
-            GameJFXController.l.error("Tried to interrupt quick tip thread but something went wrong. The thread reference was null.");
+            GameJFXController.l.fatal("Tried to interrupt quick tip thread but something went wrong. The thread reference was null.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
 
             return;
         });
