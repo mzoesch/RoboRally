@@ -716,19 +716,17 @@ public final class Session
     {
         if (this.awaitGameStartThread != null)
         {
-            l.debug("Tried to start gam but the session is already awaiting game start.");
+            l.fatal("Tried to start gam but the session is already awaiting a game start.");
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
             return false;
         }
 
-        /* This only exists for legacy reasons. */
-        boolean bIsLegacySession = false;
-        for (final IOwnershipable ctrl : this.getControllers())
+        if (this.gameState.hasGameStarted())
         {
-            if (ctrl instanceof Agent)
-            {
-                bIsLegacySession = true;
-                break;
-            }
+            l.fatal("Tried to start game but the game has already started.");
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return false;
+        }
 
         if (this.isLegacy())
         {
