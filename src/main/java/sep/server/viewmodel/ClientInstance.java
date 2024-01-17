@@ -261,7 +261,7 @@ public final class ClientInstance implements Runnable
     /** TODO What is the purpose of this req? */
     private synchronized boolean onCardPlay()
     {
-        l.debug("Received play Card from client.");
+        l.error("Received play Card from client: {}", this.dcrp.request().toString(0));
         return true;
     }
 
@@ -281,7 +281,7 @@ public final class ClientInstance implements Runnable
 
     private synchronized boolean onDamageCardSelect()
     {
-        l.debug("Received a picked damage card from client.");
+        l.error("Received a picked damage card from client.");
         return true;
     }
 
