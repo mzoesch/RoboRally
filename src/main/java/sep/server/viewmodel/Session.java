@@ -4,17 +4,11 @@ import sep.server.json.game.activatingphase.    ActivePhaseModel;
 import sep.server.json.game.activatingphase.    ReplaceCardModel;
 import sep.server.json.game.activatingphase.    CardInfo;
 import sep.server.json.game.activatingphase.    CurrentCardsModel;
+import sep.server.json.game.effects.*;
 import sep.server.json.lobby.                   PlayerAddedModel;
 import sep.server.json.lobby.                   PlayerStatusModel;
 import sep.server.json.lobby.                   SelectMapModel;
 import sep.server.json.lobby.                   MapSelectedModel;
-import sep.server.json.game.effects.            GameFinishedModel;
-import sep.server.json.game.effects.            MovementModel;
-import sep.server.json.game.effects.            PlayerTurningModel;
-import sep.server.json.game.effects.            CheckPointReachedModel;
-import sep.server.json.game.effects.            EnergyModel;
-import sep.server.json.game.effects.            RebootModel;
-import sep.server.json.game.effects.            AnimationModel;
 import sep.server.model.game.                   GameState;
 import sep.server.model.game.                   EGamePhase;
 import sep.server.model.game.                   Tile;
@@ -840,6 +834,18 @@ public final class Session
             yourCardsModel.send();
          }
     }
+
+    /**
+     * Sends a notification to all  players to inform about the selection of a register because of the AdminPriviledge Card.
+     */
+    public void sendRegisterChosenNotification(final int playerID, int register) {
+        for (PlayerController playerController : getRemotePlayers()) {
+            RegisterChosenModel registerChosenModel = new RegisterChosenModel(playerController.getClientInstance(), playerID, register);
+            registerChosenModel.send();
+        }
+    }
+
+
 
 
 
