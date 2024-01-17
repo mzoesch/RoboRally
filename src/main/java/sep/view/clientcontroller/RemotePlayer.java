@@ -1,55 +1,59 @@
 package sep.view.clientcontroller;
 
-import sep.view.viewcontroller.RobotView;
-import sep.view.lib.RCoordinate;
-import sep.view.lib.EFigure;
+import sep.view.viewcontroller.     RobotView;
+import sep.view.lib.                RCoordinate;
+import sep.view.lib.                EFigure;
 
-import java.util.ArrayList;
+import java.util.                   ArrayList;
 
 /**
  * Represents a player in a session. Not just remote players but also the client player.
  * We may store information of the remote player state here that is unique to a player and not to the game. This
  * class should not contain any kind of logic it is just the long-term storage solution from the {@link ServerListener}.
  */
-public final class RemotePlayer
+public sealed class RemotePlayer permits AgentRemotePlayerData
 {
-    private final int playerID;
-    private String playerName;
-    private EFigure figure;
-    private boolean bReady;
+    private final int                   playerID;
+    private String                      playerName;
+    private EFigure                     figure;
+    private boolean                     bReady;
 
-    private RCoordinate startPos;
-    private RobotView possessing;
+    protected RCoordinate               startPos;
+    /** Only updates by Human Server Listeners. */
+    private final RobotView             possessing;
 
-    private static final int REGISTER_SLOTS = 5;
-    private String[] registerSlots;
+    private static final int            REGISTER_SLOTS      = 5;
+    @SuppressWarnings("MismatchedReadAndWriteOfArray")
+    private final String[]              registerSlots;
 
-    private int energyCubes = 5;
+    private int                         energyCubes         = 5;
 
-    private boolean bSelectionFinished;
-    private int checkPointsReached;
+    private boolean                     bSelectionFinished;
+    private int                         checkPointsReached;
 
-    private final ArrayList<String> playedRCards;
+    private final ArrayList<String>     playedRCards;
 
     public RemotePlayer(final int playerID, final String playerName, final EFigure figure, final boolean bReady)
     {
-        this.playerID = playerID;
-        this.playerName = playerName;
-        this.figure = figure;
-        this.bReady = bReady;
+        this.playerID               = playerID;
+        this.playerName             = playerName;
+        this.figure                 = figure;
+        this.bReady                 = bReady;
 
-        this.startPos = null;
-        this.possessing = new RobotView(this);
+        this.startPos               = null;
+        this.possessing             = new RobotView(this);
 
-        this.registerSlots = new String[REGISTER_SLOTS];
+        this.registerSlots          = new String[REGISTER_SLOTS];
 
-        this.bSelectionFinished = false;
-        this.checkPointsReached = 0;
+        this.bSelectionFinished     = false;
+        this.checkPointsReached     = 0;
 
-        this.playedRCards = new ArrayList<String>();
+        this.playedRCards           = new ArrayList<String>();
 
         return;
     }
+
+    // region Getters and Setters
 
     public int getPlayerID()
     {
@@ -66,9 +70,9 @@ public final class RemotePlayer
         return this.figure;
     }
 
-    public void setPlayerName(String playerName)
+    public void setPlayerName(final String name)
     {
-        this.playerName = playerName;
+        this.playerName = name;
         return;
     }
 
@@ -83,7 +87,7 @@ public final class RemotePlayer
         return this.bReady;
     }
 
-    public void setReady(boolean bReady)
+    public void setReady(final boolean bReady)
     {
         this.bReady = bReady;
         return;
@@ -99,9 +103,9 @@ public final class RemotePlayer
         return this.startPos;
     }
 
-    public void setStartingPosition(RCoordinate startPos)
+    public void setStartingPosition(final RCoordinate location)
     {
-        this.startPos = startPos;
+        this.startPos = location;
         return;
     }
 
@@ -110,9 +114,9 @@ public final class RemotePlayer
         return this.possessing;
     }
 
-    public String getRegisterSlot(int i)
+    public String getRegisterSlot(final int idx)
     {
-        return this.registerSlots[i];
+        return this.registerSlots[idx];
     }
 
     public boolean hasSelectionFinished()
@@ -120,21 +124,28 @@ public final class RemotePlayer
         return this.bSelectionFinished;
     }
 
-    public void setSelectionFinished(final boolean b)
+    public void setSelectionFinished(final boolean bFinished)
     {
-        this.bSelectionFinished = b;
+        this.bSelectionFinished = bFinished;
         return;
     }
 
-    public int getEnergyCubes() {
-        return energyCubes;
+    public int getEnergyCubes()
+    {
+        return this.energyCubes;
     }
 
-    public void setEnergy(int number){
-        energyCubes = number;
+    public void setEnergy(final int number)
+    {
+        this.energyCubes = number;
+        return;
     }
 
-    public void setCheckPointsReached(int number){ checkPointsReached = number;}
+    public void setCheckPointsReached(final int count)
+    {
+        this.checkPointsReached = count;
+        return;
+    }
 
     public void clearPlayedRCards()
     {
@@ -157,5 +168,7 @@ public final class RemotePlayer
     {
         return this.possessing.getPosition();
     }
+
+    // endregion Getters and Setters
 
 }
