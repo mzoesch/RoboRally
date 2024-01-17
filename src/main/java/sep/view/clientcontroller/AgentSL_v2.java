@@ -638,12 +638,6 @@ public final class AgentSL_v2 extends ServerListener
     }
 
     @Override
-    protected boolean onDiscardSome() throws JSONException
-    {
-        return false;
-    }
-
-    @Override
     protected boolean onRegisterChosen() throws JSONException
     {
         return false;
