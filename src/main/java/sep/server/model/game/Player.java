@@ -30,7 +30,9 @@ public class Player {
     private int checkpointsCollected;
     private Boolean hasAdminPrivilegeUpgrade;
 
-    private Boolean hasUsedAdminPrivilegeThisRound;
+    private Integer chosenRegisterAdminPrivilegeUpgrade;
+
+
 
 
     public Player(final IOwnershipable ctrl, final Course currentCourse) {
@@ -43,6 +45,8 @@ public class Player {
         this.upgradeCards = new ArrayList<>();
         this.registers = new IPlayableCard[5];
         this.playerHand = new ArrayList<>();
+        this.hasAdminPrivilegeUpgrade = false;
+        this.chosenRegisterAdminPrivilegeUpgrade = null;
 
         this.energyCollected = GameMode.STARTING_ENERGY;
         //TODO: Make this work: this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
@@ -309,12 +313,12 @@ public class Player {
         this.hasAdminPrivilegeUpgrade = hasAdminPrivilegeUpgrade;
     }
 
-    public Boolean getHasUsedAdminPrivilegeThisRound() {
-        return hasUsedAdminPrivilegeThisRound;
+    public Integer getChosenRegisterAdminPrivilegeUpgrade() {
+        return chosenRegisterAdminPrivilegeUpgrade;
     }
 
-    public void setHasUsedAdminPrivilegeThisRound(Boolean hasUsedAdminPrivilegeThisRound) {
-        this.hasUsedAdminPrivilegeThisRound = hasUsedAdminPrivilegeThisRound;
+    public void setChosenRegisterAdminPrivilegeUpgrade(Integer chosenRegisterAdminPrivilegeUpgrade) {
+        this.chosenRegisterAdminPrivilegeUpgrade = chosenRegisterAdminPrivilegeUpgrade;
     }
     public ArrayList<AUpgradeCard> getUpgradeCards()
     {

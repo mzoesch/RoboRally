@@ -791,11 +791,20 @@ public class GameMode {
             for(Player player : players) {
                 player.getDiscardPile().add(player.getRegisters()[i]);
                 player.getRegisters()[i] = null;
+                l.debug("Resetting register {} for player {}.", i + 1, player.getController().getName());
             }
         }
 
         for(Player player : players) {
             player.shuffleAndRefillDeck();
+            l.debug("Shuffling and refilling deck for player {}.", player.getController().getName());
+        }
+
+        for (Player player : players) {
+            if (player.getHasAdminPrivilegeUpgrade()) {
+                player.setChosenRegisterAdminPrivilegeUpgrade(null);
+                l.debug("Player {} reset chosenRegisterAdminPrivilegeUpgrade to null.", player.getController().getName());
+            }
         }
     }
 
@@ -809,6 +818,7 @@ public class GameMode {
     private boolean runActivationPhase() throws InterruptedException
     {
         l.debug("Starting register phase {}.", this.currentRegisterIndex + 1);
+
 
         this.determinePriorities();
         this.sortPlayersByPriorityInDesc();
