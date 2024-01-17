@@ -13,6 +13,7 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import java.io.                     BufferedReader;
 import java.util.                   Objects;
+import java.util.                   Arrays;
 
 class TileModifier
 {
@@ -82,7 +83,7 @@ interface ICourse
     public abstract     int             getFiles();
     public abstract     int             getRanks();
 
-    public abstract     RCoordinate getNextFreeStartPoint();
+    public abstract     RCoordinate     getNextFreeStartPoint();
 }
 
 enum ECourse implements ICourse
@@ -287,6 +288,47 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
+    private void evaluateProgrammingPhase()
+    {
+        l.warn(Arrays.toString(EGameState.INSTANCE.getRegisters()));
+        l.warn(EGameState.INSTANCE.getGotRegisters().toString());
+
+        /* Very, very primitive. Just a framework for now. Open for later construction. */
+        int j = 0;
+        for (int i = 0; i < 5; ++i)
+        {
+            while (true)
+            {
+                if (i == 0 && Objects.equals(EGameState.INSTANCE.getGotRegister(j), "Again"))
+                {
+                    ++j;
+                    continue;
+                }
+
+                break;
+            }
+
+            l.warn("Setting register {}, from {}", i, j);
+            EGameState.INSTANCE.setRegister(i, j);
+
+            ++j;
+            continue;
+        }
+
+        for (int i = 0; i < 5; ++i)
+        {
+            new SelectedCardModel(i, EGameState.INSTANCE.getRegister(i)).send();
+            continue;
+        }
+
+        l.warn(Arrays.toString(EGameState.INSTANCE.getRegisters()));
+        l.warn(EGameState.INSTANCE.getGotRegisters().toString());
+
+        l.debug("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+
+        return;
+    }
+
     // region Server request handlers
 
     @Override
@@ -467,7 +509,18 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onProgrammingCardsReceived() throws JSONException
     {
-        return false;
+        l.debug("Received nine new programming cards from server: {}", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+
+        EGameState.INSTANCE.clearAllRegisters();
+        for (final String c : this.dsrp.getCardsInHand())
+        {
+            EGameState.INSTANCE.addGotRegister(c);
+            continue;
+        }
+
+        this.evaluateProgrammingPhase();
+
+        return true;
     }
 
     @Override
