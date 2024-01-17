@@ -5,6 +5,7 @@ import sep.view.json.lobby.         SetStatusModel;
 import sep.view.json.game.          SetStartingPointModel;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                RCoordinate;
+import sep.view.json.game.          SelectedCardModel;
 
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
@@ -360,7 +361,7 @@ public final class AgentSL_v2 extends ServerListener
     }
 
     @Override
-    protected boolean onMapSelected() throws RuntimeException
+    protected boolean onMapSelected() throws RuntimeException, JSONException
     {
         if (this.dsrp.getCourseName() == null || this.dsrp.getCourseName().isEmpty())
         {
@@ -393,7 +394,7 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPhaseChange() throws JSONException
     {
-        l.debug("Game phase has changed. New phase: {}", EGamePhase.fromInt(this.dsrp.getPhase()));
+        l.debug("Game phase has changed to: {}", EGamePhase.fromInt(this.dsrp.getPhase()));
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
         return true;
     }
@@ -440,13 +441,17 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onErrorMsg() throws JSONException
     {
-        l.error("Server sent an error message. Message: {}", this.dsrp.getErrorMessage());
+        l.fatal("Server sent an error message. Message: {}", this.dsrp.getErrorMessage());
+        GameInstance.kill();
         return false;
     }
 
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
+        /* We still need to figure out what this does. */
+        l.fatal("Server triggered onCardPlayedEvent. {}.", this.dsrp.request().toString(0));
+        GameInstance.kill(GameInstance.EXIT_FATAL);
         return false;
     }
 
@@ -461,49 +466,59 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onRobotRotationUpdate() throws JSONException
     {
-        return false;
+        l.debug("Player {} has rotated {}.", this.dsrp.getPlayerID(), this.dsrp.getRotation());
+        ( (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID()))).addRotation(this.dsrp.getRotation());
+        return true;
     }
 
     @Override
-    protected boolean onRegisterSlotUpdate() throws JSONException
+    protected boolean onRegisterSlotUpdate()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
-    protected boolean onPlayerFinishedProgramming() throws JSONException
+    protected boolean onPlayerFinishedProgramming()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
     protected boolean onForcedFinishProgramming() throws JSONException
     {
+        l.fatal("Server forced agent {} to finish programming.", this.dsrp.getPlayerID());
+        GameInstance.kill(GameInstance.EXIT_FATAL);
         return false;
     }
 
     @Override
-    protected boolean onPlayerProgrammingCardsReceived() throws JSONException
+    protected boolean onPlayerProgrammingCardsReceived()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
-    protected boolean onProgrammingDeckShuffled() throws JSONException
+    protected boolean onProgrammingDeckShuffled()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
-    protected boolean onProgrammingTimerStart() throws JSONException
+    protected boolean onProgrammingTimerStart()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
-    protected boolean onProgrammingTimerEnd() throws JSONException
+    protected boolean onProgrammingTimerEnd()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
@@ -524,39 +539,46 @@ public final class AgentSL_v2 extends ServerListener
     }
 
     @Override
-    protected boolean onCurrentRegisterCards() throws JSONException
+    protected boolean onCurrentRegisterCards()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
-    protected boolean onCurrentRegisterCardReplacement() throws JSONException
+    protected boolean onCurrentRegisterCardReplacement()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
-    protected boolean onAnimationPlay() throws JSONException
+    protected boolean onAnimationPlay()
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
     protected boolean onCheckpointReached() throws JSONException
     {
-        return false;
+        l.debug("Player {} reached checkpoint {}.", this.dsrp.getPlayerID(), this.dsrp.getCheckpointNumber());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getCheckpointNumber());
+        return true;
     }
 
     @Override
     protected boolean onEnergyTokenChanged() throws JSONException
     {
-        return false;
+        l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
+        return true;
     }
 
     @Override
     protected boolean onGameEnd() throws JSONException
     {
-        l.info("Game ended. Killing the game instance.");
+        l.info("Game ended. Killing the game instance. Winner: {}.", this.dsrp.getWinningPlayer());
         GameInstance.kill();
         return true;
     }
@@ -564,7 +586,9 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPlayerPositionUpdate() throws JSONException
     {
-        return false;
+        l.debug("Player {} has moved to {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
+        ( (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID()))).setLocation(this.dsrp.getCoordinate());
+        return true;
     }
 
     @Override
@@ -576,6 +600,14 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onClientConnectionUpdate() throws JSONException
     {
+        l.debug("Client {}'s net connection status was updated. Client is connected: {}; Taking action: {}.", this.dsrp.getPlayerID(), this.dsrp.getIsConnected(), this.dsrp.getNetAction().toString());
+        if (Objects.requireNonNull(this.dsrp.getNetAction()) == EConnectionLoss.REMOVE)
+        {
+            EGameState.INSTANCE.removeRemotePlayer(this.dsrp.getPlayerID());
+            return true;
+        }
+
+        l.error("Received net action {}, but the agent could not understand it. Ignoring.", this.dsrp.getNetAction().toString());
         return false;
     }
 
