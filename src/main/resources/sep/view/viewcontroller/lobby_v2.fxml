@@ -8,6 +8,7 @@
 
 <AnchorPane
     id="master-container" stylesheets="@globals.css"
+    fx:id="masterContainer"
     fx:controller="sep.view.scenecontrollers.LobbyJFXController_v2"
     xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
 >
