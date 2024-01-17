@@ -797,6 +797,12 @@ public class GameMode {
 
     public void endGame(Player winner) {
         getSession().handleGameFinished(winner.getController().getPlayerID());
+        if (this.activationPhaseThread != null)
+        {
+            this.activationPhaseThread.interrupt();
+            this.activationPhaseThread = null;
+        }
+        return;
     }
 
     /**
