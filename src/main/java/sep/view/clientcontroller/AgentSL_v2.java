@@ -16,7 +16,7 @@ import java.io.                     BufferedReader;
 import java.util.                   Objects;
 import java.util.                   Arrays;
 
-class TileModifier
+final class TileModifier
 {
     private final JSONObject modifier;
 
@@ -33,7 +33,7 @@ class TileModifier
 
 }
 
-class Tile
+final class Tile
 {
     private final JSONArray     tile;
     private final RCoordinate   location;
@@ -87,7 +87,7 @@ interface ICourse
     public abstract     RCoordinate     getNextFreeStartPoint();
 }
 
-enum ECourse implements ICourse
+enum EEnvironment implements ICourse
 {
     INSTANCE;
 
@@ -203,9 +203,9 @@ enum ECourse implements ICourse
 
     }
 
-    private static final Logger l = LogManager.getLogger(ECourse.class);
+    private static final Logger l = LogManager.getLogger(EEnvironment.class);
 
-    private ECourse()
+    private EEnvironment()
     {
         return;
     }
@@ -387,7 +387,7 @@ public final class AgentSL_v2 extends ServerListener
     protected boolean onGameStart() throws JSONException
     {
         l.debug("Game start received.");
-        ECourse.INSTANCE.setCourse(this.dsrp.request());
+        EEnvironment.INSTANCE.setCourse(this.dsrp.request());
         return true;
     }
 
@@ -408,7 +408,7 @@ public final class AgentSL_v2 extends ServerListener
         {
             if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
             {
-                final RCoordinate location = ECourse.INSTANCE.getNextFreeStartPoint();
+                final RCoordinate location = EEnvironment.INSTANCE.getNextFreeStartPoint();
                 if (location == null)
                 {
                     l.fatal("Failed to get free starting point.");
