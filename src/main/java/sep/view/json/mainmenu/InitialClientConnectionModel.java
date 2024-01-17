@@ -5,7 +5,7 @@ import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
 
 import java.util.                   Objects;
-import java.util.                   UUID;
+// import java.util.                   UUID;
 import org.json.                    JSONObject;
 import org.json.                    JSONException;
 import org.apache.logging.log4j.    LogManager;
@@ -40,15 +40,16 @@ public final class InitialClientConnectionModel
         /* TODO Validate group. */
         if (EClientInformation.INSTANCE.getPreferredSessionID().isEmpty() || EClientInformation.INSTANCE.getPreferredSessionID().isBlank())
         {
-            EClientInformation.INSTANCE.setPreferredSessionID(Types.EConfigurations.isDev() ? UUID.randomUUID().toString().substring(0, 5) : Types.EProps.DESCRIPTION.toString());
+            /* UUID.randomUUID().toString().substring(0, 5) */ // Legacy. We may want to reuse this later on.
+            EClientInformation.INSTANCE.setPreferredSessionID(Types.EConfigurations.isDev() ? "A" : Types.EProps.DESCRIPTION.toString());
         }
 
-        final JSONObject b = new JSONObject();
+        final JSONObject b      = new JSONObject();
         b.put(  "group",        EClientInformation.INSTANCE.getPreferredSessionID()             );
         b.put(  "isAI",         EClientInformation.INSTANCE.isAgent()                           );
         b.put(  "protocol",     String.format("Version %s", Types.EProps.VERSION.toString())    );
 
-        final JSONObject j = new JSONObject();
+        final JSONObject j      = new JSONObject();
         j.put(  "messageType",  "HelloServer"   );
         j.put(  "messageBody",  b               );
 

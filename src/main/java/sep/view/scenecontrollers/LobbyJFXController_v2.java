@@ -188,7 +188,6 @@ public final class LobbyJFXController_v2
                         return;
                     }
 
-
                     ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, outErr.get()));
 
                     return;
