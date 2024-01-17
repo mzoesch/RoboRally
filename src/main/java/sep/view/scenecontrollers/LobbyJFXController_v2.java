@@ -30,6 +30,7 @@ import javafx.scene.layout.         AnchorPane;
 import javafx.scene.layout.         Pane;
 import java.io.                     IOException;
 import javafx.scene.input.          KeyCode;
+import java.util.concurrent.atomic. AtomicBoolean;
 import javafx.beans.binding.        Bindings;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
@@ -47,15 +48,15 @@ public final class LobbyJFXController_v2
 
     private static final int SCROLL_TO_END_DELAY = 15;
 
-    private boolean     bReadyBtnClicked;
-    private boolean     bSelectBtnClicked;
+    private final AtomicBoolean     bReadyBtnClicked    = new AtomicBoolean(false);
+    private final AtomicBoolean     bSelectBtnClicked   = new AtomicBoolean(false);
 
     public LobbyJFXController_v2()
     {
         super();
 
-        this.bReadyBtnClicked   = false;
-        this.bSelectBtnClicked  = false;
+        this.bReadyBtnClicked   .set(false);
+        this.bSelectBtnClicked  .set(false);
 
         return;
     }
@@ -80,7 +81,7 @@ public final class LobbyJFXController_v2
     @FXML private VBox          playerRobotSelectorArea;
     @FXML private HBox          readyLabelContainer;
 
-    private VBox lobbyMsgContainer;
+    private VBox                lobbyMsgContainer;
 
     @FXML
     private void initialize()
@@ -435,7 +436,7 @@ public final class LobbyJFXController_v2
             }
         }
 
-        this.bReadyBtnClicked = false;
+        this.bReadyBtnClicked.set(false);
 
         return;
     }
@@ -521,7 +522,7 @@ public final class LobbyJFXController_v2
 
     public void onAvailableCourseUpdate(final boolean bScrollToEnd)
     {
-        this.bSelectBtnClicked = false;
+        this.bSelectBtnClicked.set(false);
 
         Platform.runLater(() ->
         {
@@ -559,16 +560,16 @@ public final class LobbyJFXController_v2
                 b.setOnAction(actionEvent ->
                 {
                     l.debug("Player clicked course selection button.");
-                    if (this.bSelectBtnClicked)
+                    if (this.bSelectBtnClicked.get()) /* Kinda sketchy here witch the atomic in an runLater anonymous function. */
                     {
                         return;
                     }
-                    this.bSelectBtnClicked = true;
+                    this.bSelectBtnClicked.set(true);
 
                     if (Objects.equals(EGameState.INSTANCE.getCurrentServerCourse(), EGameState.INSTANCE.getServerCourses()[finalI]))
                     {
                         LobbyJFXController_v2.l.debug("Player selected course {}, but this course is already the server course. Ignoring.", EGameState.INSTANCE.getServerCourses()[finalI]);
-                        this.bSelectBtnClicked = false;
+                        this.bSelectBtnClicked.set(false);
                         return;
                     }
                     l.debug("Player selected course {}.", EGameState.INSTANCE.getServerCourses()[finalI]);
@@ -718,11 +719,11 @@ public final class LobbyJFXController_v2
     private void onReadyBtn(final ActionEvent actionEvent)
     {
         l.debug("Player clicked ready button.");
-        if (this.bReadyBtnClicked)
+        if (this.bReadyBtnClicked.get())
         {
             return;
         }
-        this.bReadyBtnClicked = true;
+        this.bReadyBtnClicked.set(true);
 
         /* TODO Some input validation needed. */
         l.debug("Player wants to be {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "not ready" : "ready");
