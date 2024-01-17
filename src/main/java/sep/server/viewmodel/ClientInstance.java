@@ -201,12 +201,6 @@ public final class ClientInstance implements Runnable
             l.error(e.getMessage());
             return null;
         }
-        catch (final JSONException e)
-        {
-            l.error("Received invalid JSON from client {}. Disconnecting them.", this.getAddr());
-            l.error(e.getMessage());
-            return null;
-        }
     }
 
     // region Client Request Handlers
