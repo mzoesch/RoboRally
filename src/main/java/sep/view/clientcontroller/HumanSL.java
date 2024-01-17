@@ -88,7 +88,7 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onPhaseChange() throws JSONException
     {
-        l.debug("Game phase has changed. New phase: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
+        l.debug("Game phase has changed to: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
 
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
 
@@ -140,30 +140,31 @@ public final class HumanSL extends ServerListener
         return true;
     }
 
-    /** TODO For what reason does this exists in the protocol??? */
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
-        l.debug("Player {} has played {}.", this.dsrp.getPlayerID(), this.dsrp.getCardName());
-        ViewSupervisor.handleChatInfo(String.format("Player %s has played %s.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCardName()));
-        return true;
+        /* We still need to figure out what this does. */
+        l.fatal("Server triggered onCardPlayedEvent. {}.", this.dsrp.request().toString(0));
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+        return false;
     }
 
     @Override
     protected boolean onStartingPointTaken() throws JSONException
     {
-        /* Very sketchy, but we get somehow a race condition even though we use the run later methods of the Platform.  */
+        // Very sketchy, but we get somehow a race condition even though we use the run later methods of the Platform.
+        // We should probably implement a custom event here that is being triggered by postGameLoad.
+        final int t = (int) (Math.random() * 300) + 200;
+        l.warn("Waiting {} ms for game to load scene.", t);
         try
         {
-            // Get random number between 200 and 500
-            final int sleepTime = (int) (Math.random() * 300) + 200;
-            l.warn("Waiting {} ms for game to load scene.", sleepTime);
-            Thread.sleep(sleepTime);
+            Thread.sleep(t);
         }
         catch (final InterruptedException e)
         {
             l.fatal("Failed to wait for game to load scene.");
-            throw new RuntimeException(e);
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return false;
         }
 
         l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
@@ -212,12 +213,14 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onForcedFinishProgramming() throws JSONException
     {
-        l.debug("Player {} has been forced to finish programming because they did not submit their selection in time. New cards: {}", this.dsrp.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
-        EGameState.INSTANCE.setSelectionFinished(this.dsrp.getPlayerID());
+        l.debug("Player {} has been forced to finish programming because they did not submit their selection in time. Filling cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
+
+        EGameState.INSTANCE.setSelectionFinished(EClientInformation.INSTANCE.getPlayerID());
         EGameState.INSTANCE.clearGotRegisters();
+
         for (String c : this.dsrp.getForcedCards())
         {
-            for (int i = 0; i < EGameState.INSTANCE.getRegisters().length; i++)
+            for (int i = 0; i < EGameState.INSTANCE.getRegisters().length; ++i)
             {
                 if (EGameState.INSTANCE.getRegisters()[i] == null)
                 {
@@ -230,15 +233,18 @@ public final class HumanSL extends ServerListener
 
             continue;
         }
+
         ViewSupervisor.updateFooter();
         ViewSupervisor.handleChatInfo("You did not submit your cards in time. Empty registers are being filled up.");
+
         return true;
     }
 
     @Override
     protected boolean onPlayerProgrammingCardsReceived() throws JSONException
     {
-        l.debug("Player {} has received their programming cards ({}).", this.dsrp.getPlayerID(), this.dsrp.getCardsInHandCountNYC());
+        /* TODO What should we do with this information? */
+        l.trace("Player {} has received their programming cards ({}).", this.dsrp.getPlayerID(), this.dsrp.getCardsInHandCountNYC());
         ViewSupervisor.handleChatInfo(String.format("Player %s has received %s cards in his hand.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCardsInHandCountNYC()));
         return true;
     }
@@ -246,7 +252,7 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onProgrammingDeckShuffled() throws JSONException
     {
-        l.debug("The programming deck of player {} has been shuffled.", this.dsrp.getPlayerID());
+        l.trace("The programming deck of player {} has been shuffled.", this.dsrp.getPlayerID());
         ViewSupervisor.handleChatInfo(String.format("The deck of player %s has been shuffled.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
         return true;
     }
@@ -255,7 +261,7 @@ public final class HumanSL extends ServerListener
     protected boolean onProgrammingTimerStart() throws JSONException
     {
         /* TODO Implement timer. */
-        l.debug("Programming phase timer has started.");
+        l.error("Programming phase timer has started.");
         ViewSupervisor.handleChatInfo("The programming phase timer has started. Submit your cards in time!");
         return true;
     }
@@ -273,13 +279,16 @@ public final class HumanSL extends ServerListener
     protected boolean onProgrammingCardsReceived() throws JSONException
     {
         l.debug("Received nine new programming cards from server: {}", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+
         EGameState.INSTANCE.clearAllRegisters();
-        for (String c : this.dsrp.getCardsInHand())
+        for (final String c : this.dsrp.getCardsInHand())
         {
             EGameState.INSTANCE.addGotRegister(c);
             continue;
         }
+
         ViewSupervisor.updateFooter();
+
         return true;
     }
 
@@ -334,9 +343,9 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onCheckpointReached() throws JSONException
     {
-        l.debug("Player {} has reached {} checkpoints.", this.dsrp.getPlayerID(), this.dsrp.getNumber());
-        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getNumber());
-        ViewSupervisor.handleChatInfo(String.format("Player %s has reached %s checkpoints.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getNumber()));
+        l.debug("Player {} has reached {} checkpoints.", this.dsrp.getPlayerID(), this.dsrp.getCheckpointNumber());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getCheckpointNumber());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has reached %s checkpoints.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCheckpointNumber()));
         return true;
     }
 
@@ -353,7 +362,7 @@ public final class HumanSL extends ServerListener
     protected boolean onGameEnd() throws JSONException
     {
         l.debug("Game has ended. The winner is player {}.", this.dsrp.getWinningPlayer());
-        EGameState.INSTANCE.determineWinningPlayer(this.dsrp.getWinningPlayer());
+        EGameState.INSTANCE.setWinner(this.dsrp.getWinningPlayer());
         ViewSupervisor.getSceneController().renderNewScreen(SceneController.END_SCENE_ID, SceneController.PATH_TO_END_SCENE, true);
         return true;
     }
