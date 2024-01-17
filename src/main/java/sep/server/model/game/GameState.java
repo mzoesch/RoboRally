@@ -60,7 +60,7 @@ public final class GameState
             if (a.getFigure() == IOwnershipable.INVALID_FIGURE)
             {
                 a.setFigure(this.getNextAvailableFigure());
-                this.session.sendPlayerValuesToAllClients(a);
+                this.session.broadcastCorePlayerAttributes(a);
             }
 
             continue;
