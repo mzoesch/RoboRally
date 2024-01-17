@@ -165,10 +165,22 @@ public final class RobotView
         {
             this.generateIMG();
         }
+        else
+        {
+            this.updateFits();
+        }
 
         this.rotateIV();
 
         ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).renderOnPosition(this.ap, this.position);
+
+        return;
+    }
+
+    private void updateFits()
+    {
+        this.iv.setFitHeight(   ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions()   );
+        this.iv.setFitWidth(    ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions()   );
 
         return;
     }
@@ -178,8 +190,8 @@ public final class RobotView
     private void generateIMG()
     {
         this.iv = new ImageView();
-        this.iv.setFitHeight(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
-        this.iv.setFitWidth(( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions());
+        this.iv.setFitHeight(   ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions()   );
+        this.iv.setFitWidth(    ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getCurrentTileDimensions()   );
         this.iv.setPreserveRatio(true);
         this.iv.setSmooth(true);
         this.iv.setCache(true);
