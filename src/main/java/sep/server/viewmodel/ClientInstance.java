@@ -62,6 +62,7 @@ public final class ClientInstance implements Runnable
         put(    "RebootDirection",      ClientInstance.this::onRebootDirection              );
         put(    "BuyUpgrade",           ClientInstance.this::onBuyUpgrade                   );
         put(    "ChooseRegister",       ClientInstance.this::onChooseRegister               );
+        put(     "DiscardSome",         ClientInstance.this::onDiscardSome                  );
     }}
     ;
 
@@ -311,6 +312,12 @@ public final class ClientInstance implements Runnable
     private synchronized boolean onChooseRegister()
     {
         l.debug("Received choose register from client.");
+        return true;
+    }
+
+    private synchronized boolean onDiscardSome()
+    {
+        l.debug("Received discard some crads from client.");
         return true;
     }
 
