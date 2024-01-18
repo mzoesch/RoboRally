@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Client with 1 Agents" type="CompoundRunConfigurationType">
+    <toRun name="Agent (1)" type="Application" />
+    <toRun name="Client (1)" type="Application" />
+    <toRun name="Server" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>
