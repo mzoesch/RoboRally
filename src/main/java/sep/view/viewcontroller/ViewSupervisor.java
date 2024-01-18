@@ -535,6 +535,7 @@ public final class ViewSupervisor extends Application
     //Pop-Up für Kartenauswahl bei MemorySwap UgradeCard
     //TO-DO: Die Karten-Platzhalter durch die Karten auf Hand austauschen
     public static void createCardSelectionDialog() {
+
         final HBox h = new HBox();
         h.setAlignment(Pos.CENTER);
 
@@ -542,16 +543,8 @@ public final class ViewSupervisor extends Application
         header.getStyleClass().add("text-xl");
         header.setStyle("-fx-alignment: center;");
 
-        AnchorPane.setLeftAnchor(header, 0.0);
-        AnchorPane.setRightAnchor(header, 0.0);
-        AnchorPane.setTopAnchor(header, 50.0);
-
         final HBox form = new HBox();
         form.setId("card-selection-dialog-body");
-
-        AnchorPane.setLeftAnchor(form, 0.0);
-        AnchorPane.setRightAnchor(form, 0.0);
-        AnchorPane.setBottomAnchor(form, 50.0);
 
         List<String> availableCards = Arrays.asList("Card1", "Card2", "Card3", "Card4", "Card5", "Card6", "Card7", "Card8", "Card9");
         ArrayList<String> selectedCards = new ArrayList<>();
@@ -584,13 +577,22 @@ public final class ViewSupervisor extends Application
                 String[] cardsArray = selectedCards.toArray(new String[0]);
                 new DiscardSomeModel(cardsArray).send();
 
+
                 ViewSupervisor.getSceneController().destroyPopUp(h, false);
             } else {
                 header.setText("Please select exactly 3 cards!");
             }
         });
-    }
 
+        h.getChildren().addAll(header, form, submitButton);
+
+        AnchorPane.setLeftAnchor(h, 0.0);
+        AnchorPane.setRightAnchor(h, 0.0);
+        AnchorPane.setTopAnchor(h, 0.0);
+        AnchorPane.setBottomAnchor(h, 0.0);
+
+        ViewSupervisor.createPopUp(h);
+    }
 
     public static void createRebootDialog()
     {
