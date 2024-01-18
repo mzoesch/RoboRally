@@ -274,7 +274,6 @@ enum EEnvironment implements ICourse
 
 }
 
-
 /**
  * The master class of an agent. An object of this class must always run on the main thread.
  * {@inheritDoc}
@@ -282,6 +281,18 @@ enum EEnvironment implements ICourse
 public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
+
+    /** Learning rate. */
+    private static final double     ALPHA   = 0.9;
+    /* Discount factor.*/
+    private static final double     GAMMA   = 0.9;
+    /* The percentage of time when the best action should be used. Eagerness? */
+    private static final double     EPSILON = 0.9;
+
+    private static final float      INIT_Q  = 0.0f;
+    private static final float      INIT_R  = -100.0f;
+    private float[][][]             Q       = null;
+    private float[][]               R       = null;
 
     public AgentSL_v2(final BufferedReader br)
     {
@@ -291,6 +302,25 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhase()
     {
+        //
+        // Q Learning
+        //
+
+        /* Initialize Arrays. */
+        this.Q = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()][4];
+        this.R = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()];
+        Arrays.stream(this.Q).forEach(files -> Arrays.stream(files).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_Q)));
+        Arrays.stream(this.R).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_R));
+
+        /* Define Rewards. */
+
+
+
+
+        //
+        // End Q Learning
+        //
+
         /* Very, very primitive. Just a framework for now. Open for later construction. */
         int j = 0;
         for (int i = 0; i < 5; ++i)
