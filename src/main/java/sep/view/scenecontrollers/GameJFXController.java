@@ -1239,8 +1239,8 @@ public final class GameJFXController
     /** @param idx Index of the register slot. */
     private void addRegisterSlot(final int idx, final boolean bIsGotRegister, final Pane p, final int w, final int h)
     {
-        final ImageView iv = this.getCardRegisterSlot(w, h, bIsGotRegister ? EGameState.INSTANCE.getGotRegister(idx) : EGameState.INSTANCE.getRegister(idx));
-        final AnchorPane ap = new AnchorPane();
+        final ImageView     iv  = this.getCardRegisterSlot(w, h, bIsGotRegister ? EGameState.INSTANCE.getGotRegister(idx) : EGameState.INSTANCE.getRegister(idx));
+        final AnchorPane    ap  = new AnchorPane();
 
         if (bIsGotRegister)
         {
@@ -1273,6 +1273,13 @@ public final class GameJFXController
             :  "register-slot-disabled"
             )
             ;
+
+            /* We may not place an Again card in the first register. */
+            if (this.gotRegisterSlotClicked != GameJFXController.INVALID_GOT_REGISTER_SLOT && idx == 0 && Objects.equals(EGameState.INSTANCE.getGotRegister(this.gotRegisterSlotClicked), "Again"))
+            {
+                ap.getStyleClass().clear();
+                ap.getStyleClass().add("register-slot-disabled");
+            }
         }
 
         ap.setOnMouseClicked(e

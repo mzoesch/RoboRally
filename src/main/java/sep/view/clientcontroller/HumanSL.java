@@ -457,13 +457,6 @@ public final class HumanSL extends ServerListener
     }
 
     @Override
-    protected boolean onDiscardSome() throws JSONException
-    {
-        l.debug("Received discard some cards from server.");
-        return true;
-    }
-
-    @Override
     protected boolean onRegisterChosen() throws JSONException
     {
         l.debug("Received register chosen from server.");

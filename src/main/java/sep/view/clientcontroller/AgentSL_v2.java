@@ -291,9 +291,6 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhase()
     {
-        l.warn(Arrays.toString(EGameState.INSTANCE.getRegisters()));
-        l.warn(EGameState.INSTANCE.getGotRegisters().toString());
-
         /* Very, very primitive. Just a framework for now. Open for later construction. */
         int j = 0;
         for (int i = 0; i < 5; ++i)
@@ -309,7 +306,6 @@ public final class AgentSL_v2 extends ServerListener
                 break;
             }
 
-            l.warn("Setting register {}, from {}", i, j);
             EGameState.INSTANCE.setRegister(i, j);
 
             ++j;
@@ -321,9 +317,6 @@ public final class AgentSL_v2 extends ServerListener
             new SelectedCardModel(i, EGameState.INSTANCE.getRegister(i)).send();
             continue;
         }
-
-        l.warn(Arrays.toString(EGameState.INSTANCE.getRegisters()));
-        l.warn(EGameState.INSTANCE.getGotRegisters().toString());
 
         l.debug("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
 
