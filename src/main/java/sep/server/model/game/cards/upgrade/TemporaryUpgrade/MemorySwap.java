@@ -19,6 +19,7 @@ public class MemorySwap extends ATemporaryUpgrade{
 
     public void activateUpgrade(Player player) {
 
+        //Liste DrawnCardsFromDeck
         ArrayList<IPlayableCard> drawnCardsFromDeck = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             if (player.getPlayerDeck().isEmpty()) {
@@ -28,8 +29,19 @@ public class MemorySwap extends ATemporaryUpgrade{
             drawnCardsFromDeck.add(drawnCard);
         }
 
-        //TO-DO: Auswahl auf Clientseite
+        //Liste DrawnCardsFromHand
         ArrayList<IPlayableCard> drawnCardsFromHand = new ArrayList<>();
+        String[] memorySwapCards = player.getMemorySwapCards();
+        for (IPlayableCard card : player.getPlayerHand()) {
+            String cardName = card.getCardType();
+            for (String memorySwapCardName : memorySwapCards) {
+                if (cardName.equals(memorySwapCardName)) {
+                    drawnCardsFromHand.add(card);
+                    break;
+                }
+            }
+        }
+
 
         player.getPlayerDeck().addAll(0, drawnCardsFromHand);
 
