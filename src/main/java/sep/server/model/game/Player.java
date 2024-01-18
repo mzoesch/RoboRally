@@ -32,6 +32,8 @@ public class Player {
 
     private Integer chosenRegisterAdminPrivilegeUpgrade;
 
+    private String[] memorySwapCards;
+
 
 
 
@@ -319,6 +321,13 @@ public class Player {
 
     public void setChosenRegisterAdminPrivilegeUpgrade(Integer chosenRegisterAdminPrivilegeUpgrade) {
         this.chosenRegisterAdminPrivilegeUpgrade = chosenRegisterAdminPrivilegeUpgrade;
+    }
+    public void setMemorySwapCards(String[] memorySwapCards) {
+        this.memorySwapCards = memorySwapCards;
+    }
+
+    public String[] getMemorySwapCards() {
+        return memorySwapCards;
     }
     public ArrayList<AUpgradeCard> getUpgradeCards()
     {
