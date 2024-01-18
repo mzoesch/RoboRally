@@ -142,6 +142,10 @@ public final class GameState
         }
     }
 
+    public void setMemorySwapCards (PlayerController playerController, String[] cards) {
+        playerController.getPlayer().setMemorySwapCards(cards);
+    }
+
     public Session getSession()
     {
         return session;
