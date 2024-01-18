@@ -32,102 +32,101 @@ import java.util.concurrent.atomic. AtomicBoolean;
  * <p> It implements high-level methods as, for example, sending and receiving messages from the client. It will
  * also handle the initial connection handshake to register a client in a session.
  */
-public final class ClientInstance implements Runnable {
+public final class ClientInstance implements Runnable
+{
     private static final Logger l = LogManager.getLogger(ClientInstance.class);
 
-    private static final int ORDERLY_CLOSE = -1;
-    private static final int SOCKET_OPERATION_TIMEOUT_INIT = 1_000;
+    private static final int ORDERLY_CLOSE                      = -1;
+    private static final int SOCKET_OPERATION_TIMEOUT_INIT      = 1_000;
     /**
      * This is an additional timeout for socket operations. This is used to prevent the server from hanging
      * indefinitely if a client does not respond to a request. This is an additional hard timeout on top of the
      * keep-alive interval to prevent fishy behavior. If the keep-alive fails for whatever reason and the server
      * does not know about this, the server should always crash intentionally.
      */
-    private static final int SOCKET_OPERATION_TIMOUT = 15_000;
+    private static final int SOCKET_OPERATION_TIMOUT            = 15_000;
 
     private final HashMap<String, Supplier<Boolean>> clientReq =
-            new HashMap<String, Supplier<Boolean>>() {{
-                put("Alive", ClientInstance.this::onAlive);
-                put("PlayerValues", ClientInstance.this::onCorePlayerAttributesChanged);
-                put("SendChat", ClientInstance.this::onChatMsg);
-                put("SetStatus", ClientInstance.this::onLobbyStatus);
-                put("MapSelected", ClientInstance.this::onCourseSelect);
-                put("PlayCard", ClientInstance.this::onCardPlay);
-                put("SelectedCard", ClientInstance.this::onRegisterSlotUpdate);
-                put("SetStartingPoint", ClientInstance.this::onStartPointSet);
-                put("PickDamage", ClientInstance.this::onDamageCardSelect);
-                put("HelloServer", ClientInstance.this::onAddAgentRequest);
-                put("RebootDirection", ClientInstance.this::onRebootDirection);
-                put("BuyUpgrade", ClientInstance.this::onBuyUpgrade);
-                put("ChooseRegister", ClientInstance.this::onChooseRegister);
-                put("DiscardSome", ClientInstance.this::onDiscardSome);
-            }};
+    new HashMap<String, Supplier<Boolean>>() {{
+        put(    "Alive",                ClientInstance.this::onAlive                        );
+        put(    "PlayerValues",         ClientInstance.this::onCorePlayerAttributesChanged  );
+        put(    "SendChat",             ClientInstance.this::onChatMsg                      );
+        put(    "SetStatus",            ClientInstance.this::onLobbyStatus                  );
+        put(    "MapSelected",          ClientInstance.this::onCourseSelect                 );
+        put(    "PlayCard",             ClientInstance.this::onCardPlay                     );
+        put(    "SelectedCard",         ClientInstance.this::onRegisterSlotUpdate           );
+        put(    "SetStartingPoint",     ClientInstance.this::onStartPointSet                );
+        put(    "PickDamage",           ClientInstance.this::onDamageCardSelect             );
+        put(    "HelloServer",          ClientInstance.this::onAddAgentRequest              );
+        put(    "RebootDirection",      ClientInstance.this::onRebootDirection              );
+        put(    "BuyUpgrade",           ClientInstance.this::onBuyUpgrade                   );
+        put(    "ChooseRegister",       ClientInstance.this::onChooseRegister               );
+        put(    "DiscardSome",          ClientInstance.this::onDiscardSome                  );
+    }};
 
-    private Thread thread;
-    private final Socket socket;
-    private final BufferedReader in;
-    private final BufferedWriter out;
+    private Thread                          thread;
+    private final Socket                    socket;
+    private final BufferedReader            in;
+    private final BufferedWriter            out;
 
-    private boolean bIsRemoteAgent;
-    /**
-     * Must be created to join a given session.
-     */
-    private PlayerController playerController;
+    private boolean                         bRemoteAgent;
+    /** Must be created to join a given session. */
+    private PlayerController                playerController;
+    /** If the client is registered in a session. */
+    private boolean                         bRegistered;
+    /** Used to keep track if a client responded to the keep-alive request form the server. */
+    private final AtomicBoolean             bAlive              = new AtomicBoolean(false);
+    /** If a client disconnects unexpectedly, we may try to disconnect them multiple times. This variable is used to keep track of that. */
+    private final AtomicBoolean             bDisconnecting      = new AtomicBoolean(false);
 
-    /**
-     * If the client is registered in a session.
-     */
-    private boolean bIsRegistered;
-    /**
-     * Used to keep track if a client responded to the keep-alive request form the server.
-     */
-    private final AtomicBoolean bIsAlive = new AtomicBoolean(false);
-    /**
-     * If a client disconnects unexpectedly, we may try to disconnect them multiple times. This variable is used to keep track of that.
-     */
-    private final AtomicBoolean bDisconnecting = new AtomicBoolean(false);
+    private RDefaultClientRequestParser     dcrp;
 
-    private RDefaultClientRequestParser dcrp;
-
-    public ClientInstance(final Socket socket) throws IOException {
+    public ClientInstance(final Socket socket) throws IOException
+    {
         super();
 
-        this.thread = null;
-        this.socket = socket;
-        this.socket.setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMEOUT_INIT);
+        this.thread                 = null;
+        this.socket                 = socket;
+        this.socket                  .setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMEOUT_INIT);
 
-        this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-        this.out = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
+        this.in                     = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+        this.out                    = new BufferedWriter(new OutputStreamWriter(this.socket.getOutputStream()));
 
-        this.bIsRemoteAgent = false;
-        this.playerController = null;
+        this.bRemoteAgent           = false;
+        this.playerController       = null;
 
-        this.bIsRegistered = false;
-        this.bIsAlive.set(true);
-        this.bDisconnecting.set(false);
+        this.bRegistered            = false;
+        this.bAlive                  .set(true);
+        this.bDisconnecting          .set(false);
 
-        this.dcrp = null;
+        this.dcrp                   = null;
 
         return;
     }
 
-    public void disconnect() {
-        if (this.bDisconnecting.get()) {
+    public void disconnect()
+    {
+        if (this.bDisconnecting.get())
+        {
             return;
         }
         this.bDisconnecting.set(true);
 
         l.debug("Client {} is disconnecting.", this.getAddr());
 
-        if (this.bIsRegistered) {
+        if (this.bRegistered)
+        {
             this.playerController.getSession().leaveSession(this.playerController);
         }
 
         this.thread.interrupt();
 
-        try {
+        try
+        {
             this.socket.close();
-        } catch (final IOException e) {
+        }
+        catch (final IOException e)
+        {
             l.warn("Could not close client {} socket connection in an orderly way.", this.getAddr());
             l.warn(e.getMessage());
             return;
@@ -141,33 +140,36 @@ public final class ClientInstance implements Runnable {
     /**
      * Will try to register a client to a new or already existing session.
      *
-     * @return True if the client was successfully registered in a session, false otherwise.
-     * @throws IOException If the client connection was closed unexpectedly.
+     * @return              True if the client was successfully registered in a session, false otherwise.
+     * @throws IOException  If the client connection was closed unexpectedly.
      */
-    private boolean registerClient() throws IOException {
+    private boolean registerClient() throws IOException
+    {
         final InitialClientConnectionModel_v2 icc = new InitialClientConnectionModel_v2(this);
         icc.sendProtocolVersion();
 
         icc.waitForProtocolVersionConfirmation();
-        final boolean isValid = icc.isClientProtocolVersionValid();
-        if (!isValid) {
+        final boolean isValid   = icc.isClientProtocolVersionValid();
+        if (!isValid)
+        {
             l.error("Client {} protocol version mismatch. Disconnecting them.", this.getAddr());
             return false;
         }
         l.debug("Confirmed Client {}'s protocol version.", this.getAddr());
 
         /* TODO Check if session id is valid. */
-        this.bIsRemoteAgent = icc.isRemoteAgent();
-        final Session s = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
-        if (s.isFull()) {
+        this.bRemoteAgent       = icc.isRemoteAgent();
+        final Session s         = EServerInformation.INSTANCE.getNewOrExistingSessionID(icc.getSessionID());
+        if (s.isFull())
+        {
             new ErrorMsgModel(this, "Session is full.").send();
             l.warn("Client {} tried to join a full session. Disconnecting them.", this.getAddr());
             return false;
         }
-        this.playerController = EServerInstance.createNewPlayerController(this, s);
+        this.playerController   = EServerInstance.createNewPlayerController(this, s);
         icc.sendWelcome(this.playerController.getPlayerID());
         this.playerController.getSession().joinSession(this.playerController);
-        this.bIsRegistered = true;
+        this.bRegistered        = true;
 
         l.info("Client {} registered successfully in session [{}].", this.getAddr(), this.playerController.getSession().getSessionID());
 
@@ -178,16 +180,21 @@ public final class ClientInstance implements Runnable {
      * Only used for the initial client registration as it block the calling thread.
      * The {@link #defaultClientListener()} method is used for receiving information from the client after that.
      */
-    public String waitForResponse() {
-        try {
+    public String waitForResponse()
+    {
+        try
+        {
             final int escapeCharacter = this.in.read();
-            if (escapeCharacter == ClientInstance.ORDERLY_CLOSE) {
+            if (escapeCharacter == ClientInstance.ORDERLY_CLOSE)
+            {
                 this.disconnect();
                 return null;
             }
 
             return String.format("%s%s", (char) escapeCharacter, this.in.readLine());
-        } catch (final IOException e) {
+        }
+        catch (final IOException e)
+        {
             l.error("Failed to read from client {}. Disconnecting them.", this.getAddr());
             l.error(e.getMessage());
             return null;
@@ -196,13 +203,15 @@ public final class ClientInstance implements Runnable {
 
     // region Client Request Handlers
 
-    private synchronized boolean onAlive() {
+    private synchronized boolean onAlive()
+    {
         l.trace("Received keep-alive from client {}. Ok.", this.getAddr());
         this.setAlive(true);
         return true;
     }
 
-    private synchronized boolean onCorePlayerAttributesChanged() {
+    private synchronized boolean onCorePlayerAttributesChanged()
+    {
         final String old = this.playerController.getName();
 
         /* TODO We have to do some validation here. */
@@ -213,7 +222,8 @@ public final class ClientInstance implements Runnable {
         l.debug("Client {} selected figure {}.", this.getAddr(), this.playerController.getFigure());
 
         this.playerController.getSession().broadcastCorePlayerAttributes(this.playerController);
-        if (!Objects.equals(old, this.playerController.getName())) {
+        if (!Objects.equals(old, this.playerController.getName()))
+        {
             this.playerController.getSession().broadcastChatMessage(ChatMsgModel.SERVER_ID, String.format("%s changed their name to %s.", old, this.playerController.getName()));
             l.debug("Client {} changed their name from {} to {}.", this.getAddr(), old, this.playerController.getName());
         }
@@ -221,7 +231,8 @@ public final class ClientInstance implements Runnable {
         return true;
     }
 
-    private synchronized boolean onChatMsg() {
+    private synchronized boolean onChatMsg()
+    {
         l.debug("Client {} wants to send chat message [{}] to lobby {}.", this.getAddr(), this.dcrp.getChatMessage_v2(), this.getPlayerController().getSession().getSessionID());
 
         /* TODO Validate chat message. */
@@ -231,47 +242,50 @@ public final class ClientInstance implements Runnable {
         return true;
     }
 
-    private synchronized boolean onLobbyStatus() {
+    private synchronized boolean onLobbyStatus()
+    {
         l.debug("Client {} set ready status to {}.", this.getAddr(), this.dcrp.getIsReadyInLobby());
         this.playerController.getSession().onPlayerReadyStatusUpdate(this.playerController, this.dcrp.getIsReadyInLobby());
         return true;
     }
 
-    private synchronized boolean onCourseSelect() {
+    private synchronized boolean onCourseSelect()
+    {
         l.debug("Client {} selected course {}.", this.getAddr(), this.dcrp.getCourseName());
         this.playerController.getSession().onCourseSelect(this.playerController, this.dcrp.getCourseName());
         return true;
     }
 
-    /**
-     * TODO What is the purpose of this req?
-     */
-    private synchronized boolean onCardPlay() {
+    /** TODO What is the purpose of this req? */
+    private synchronized boolean onCardPlay()
+    {
         l.error("Received play Card from client: {}", this.dcrp.request().toString(0));
         return true;
     }
 
-    private synchronized boolean onRegisterSlotUpdate() {
+    private synchronized boolean onRegisterSlotUpdate()
+    {
         l.debug("Client {} selected card [{}] to register {}.", this.getAddr(), this.dcrp.getBody().isNull("card") ? null : this.dcrp.getSelectedCardAsString(), this.dcrp.getSelectedCardRegister());
         this.playerController.setSelectedCardInRegister(this.dcrp.getBody().isNull("card") ? null : this.dcrp.getSelectedCardAsString(), this.dcrp.getSelectedCardRegister());
         return true;
     }
 
-    private synchronized boolean onStartPointSet() {
+    private synchronized boolean onStartPointSet()
+    {
         l.debug("Client {} set their starting point to {}", this.getAddr(), this.dcrp.getCoordinate().toString());
         this.playerController.getSession().getGameState().setStartPoint(this.playerController, this.dcrp.getCoordinate());
         return true;
     }
 
-    private synchronized boolean onDamageCardSelect() {
+    private synchronized boolean onDamageCardSelect()
+    {
         l.error("Received a picked damage card from client.");
         return true;
     }
 
-    /**
-     * @deprecated
-     */
-    public synchronized boolean onAddAgentRequest() {
+    /** @deprecated */
+    public synchronized boolean onAddAgentRequest()
+    {
         // We may ignore all body arguments because we do not need them.
         // If there is something fishy going on, the initial client connection already would have failed.
         l.debug("Client {} wants to add an agent to lobby [{}].", this.getAddr(), this.getPlayerController().getSession().getSessionID());
@@ -279,26 +293,30 @@ public final class ClientInstance implements Runnable {
         return true;
     }
 
-    private synchronized boolean onRebootDirection() {
+    private synchronized boolean onRebootDirection()
+    {
         l.debug("Client {} set their reboot direction to {}", this.getAddr(), this.dcrp.getDirection());
         this.playerController.getSession().getGameState().setRebootDirection(playerController, this.dcrp.getDirection());
         return true;
     }
 
-    private synchronized boolean onBuyUpgrade() {
+    private synchronized boolean onBuyUpgrade()
+    {
         l.debug("Received buy upgrade from client.");
         return true;
     }
 
     /*For the UpgradeCard AdminPriviledge*/
-    private synchronized boolean onChooseRegister() {
+    private synchronized boolean onChooseRegister()
+    {
         l.debug("Client {} choose the following Register {}", this.getPlayerController().getName(), this.dcrp.getChosenRegister());
         this.playerController.getSession().getGameState().setRegisterForAdminPriviledge(playerController, this.dcrp.getChosenRegister());
         return true;
     }
 
     /* For the UpgradeCard MemorySwap*/
-    private synchronized boolean onDiscardSome() {
+    private synchronized boolean onDiscardSome()
+    {
         l.debug("Client {} discard the following three Cards {}", this.getPlayerController().getName(), this.dcrp.getMemorySwapCard());
         this.playerController.getSession().getGameState().setMemorySwapCards(playerController, this.dcrp.getMemorySwapCard());
         return true;
@@ -306,11 +324,14 @@ public final class ClientInstance implements Runnable {
 
     // endregion Client Request Handlers
 
-    private void parseRequest(final RDefaultClientRequestParser dcrp) throws JSONException {
+    private void parseRequest(final RDefaultClientRequestParser dcrp) throws JSONException
+    {
         this.dcrp = dcrp;
 
-        if (this.clientReq.containsKey(this.dcrp.getType_v2())) {
-            if (this.clientReq.get(this.dcrp.getType_v2()).get()) {
+        if (this.clientReq.containsKey(this.dcrp.getType_v2()))
+        {
+            if (this.clientReq.get(this.dcrp.getType_v2()).get())
+            {
                 this.dcrp = null;
                 return;
             }
@@ -327,21 +348,27 @@ public final class ClientInstance implements Runnable {
         return;
     }
 
-    private void defaultClientListener() throws IOException {
+    private void defaultClientListener() throws IOException
+    {
         this.socket.setSoTimeout(ClientInstance.SOCKET_OPERATION_TIMOUT);
 
-        while (true) {
+        while (true)
+        {
             final int escapeCharacter;
-            try {
+            try
+            {
                 // If the client closed the connection in an orderly way, the server will receive -1.
                 escapeCharacter = this.in.read();
-            } catch (final SocketException e) {
+            }
+            catch (final SocketException e)
+            {
                 l.warn("Client {}'s socket connection was closed unexpectedly.", this.getAddr());
                 this.disconnect();
                 return;
             }
 
-            if (escapeCharacter == ClientInstance.ORDERLY_CLOSE) {
+            if (escapeCharacter == ClientInstance.ORDERLY_CLOSE)
+            {
                 l.debug("Client {} requested to close the server connection in an orderly way.", this.getAddr());
                 this.disconnect();
                 return;
@@ -350,9 +377,12 @@ public final class ClientInstance implements Runnable {
             final String r = String.format("%s%s", (char) escapeCharacter, this.in.readLine());
             l.trace("Received request from client {}. Parsing: {}", this.getAddr(), r);
 
-            try {
+            try
+            {
                 this.parseRequest(new RDefaultClientRequestParser(new JSONObject(r)));
-            } catch (final JSONException e) {
+            }
+            catch (final JSONException e)
+            {
                 l.warn("Received invalid JSON from client {}. Ignoring.", this.getAddr());
                 l.warn(e.getMessage());
                 l.warn(r);
@@ -363,20 +393,25 @@ public final class ClientInstance implements Runnable {
         }
     }
 
-    public void sendKeepAlive() {
-        this.bIsAlive.set(false);
+    public void sendKeepAlive()
+    {
+        this.bAlive.set(false);
         new KeepAliveModel(this).send();
         return;
     }
 
-    public boolean sendRemoteRequest(final JSONObject j) {
+    public boolean sendRemoteRequest(final JSONObject j)
+    {
         l.trace("Sending remote request to client {}: {}", this.getAddr(), j.toString(0));
 
-        try {
+        try
+        {
             this.out.write(j.toString());
             this.out.newLine();
             this.out.flush();
-        } catch (final IOException e) {
+        }
+        catch (final IOException e)
+        {
             l.error("Failed to send remote request to client {}.", this.getAddr());
             l.error(e.getMessage());
             return false;
@@ -386,11 +421,14 @@ public final class ClientInstance implements Runnable {
     }
 
     @Override
-    public void run() {
-        try {
+    public void run()
+    {
+        try
+        {
             final boolean bSuccess = this.registerClient();
 
-            if (!bSuccess) {
+            if (!bSuccess)
+            {
                 this.disconnect();
                 return;
             }
@@ -400,8 +438,11 @@ public final class ClientInstance implements Runnable {
             this.defaultClientListener();
 
             return;
-        } catch (final SocketTimeoutException e) {
-            if (EServerInstance.INSTANCE.getKeepAliveThread() == null) {
+        }
+        catch (final SocketTimeoutException e)
+        {
+            if (EServerInstance.INSTANCE.getKeepAliveThread() == null)
+            {
                 l.fatal("Server failed. It was not notified about the keep-alive thread failure.");
                 EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
                 return;
@@ -411,7 +452,9 @@ public final class ClientInstance implements Runnable {
             EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
 
             return;
-        } catch (final IOException e) {
+        }
+        catch (final IOException e)
+        {
             l.error("Client {}'s socket connection was closed unexpectedly. Executing post disconnect logic.", this.getAddr());
             l.error(e.getMessage());
             this.disconnect();
@@ -421,32 +464,37 @@ public final class ClientInstance implements Runnable {
 
     // region Getters and Setters
 
-    public boolean isAlive() {
-        return this.bIsAlive.get();
+    public boolean isAlive()
+    {
+        return this.bAlive.get();
     }
 
-    public void setAlive(final boolean bIsAlive) {
-        this.bIsAlive.set(bIsAlive);
+    public void setAlive(final boolean bIsAlive)
+    {
+        this.bAlive.set(bIsAlive);
         return;
     }
 
-    public PlayerController getPlayerController() {
+    public PlayerController getPlayerController()
+    {
         return this.playerController;
     }
 
-    public String getAddr() {
+    public String getAddr()
+    {
         return String.format("[%s]", this.socket.getRemoteSocketAddress().toString());
     }
 
-    public boolean isRemoteAgent() {
-        return this.bIsRemoteAgent;
+    public boolean isRemoteAgent()
+    {
+        return this.bRemoteAgent;
     }
 
-    public void setThread(final Thread thread) {
+    public void setThread(final Thread thread)
+    {
         this.thread = thread;
         return;
     }
-
 
     // endregion Getters and Setters
 
