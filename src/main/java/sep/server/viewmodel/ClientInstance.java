@@ -290,8 +290,10 @@ public final class ClientInstance implements Runnable {
         return true;
     }
 
+    /*For the UpgradeCard AdminPriviledge*/
     private synchronized boolean onChooseRegister() {
-        l.debug("Received choose register from client.");
+        l.debug("Client {} choose the following Register {}", this.getPlayerController().getName(), this.dcrp.getChosenRegister());
+        this.playerController.getSession().getGameState().setRegisterForAdminPriviledge(playerController, this.dcrp.getChosenRegister());
         return true;
     }
 
