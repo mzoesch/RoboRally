@@ -582,8 +582,6 @@ public final class ViewSupervisor extends Application
         submitButton.setOnAction(e -> {
             if (selectedCards.size() == 3) {
                 String[] cardsArray = selectedCards.toArray(new String[0]);
-                String[] selectedCardsArray = Arrays.copyOf(cardsArray, 3);
-                String cards = Arrays.toString(selectedCardsArray);
                 new DiscardSomeModel(cardsArray).send();
 
                 ViewSupervisor.getSceneController().destroyPopUp(h, false);
