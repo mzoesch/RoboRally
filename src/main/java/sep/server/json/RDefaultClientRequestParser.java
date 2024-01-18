@@ -100,4 +100,11 @@ public record RDefaultClientRequestParser(JSONObject request)
 
         return memorySwapCards;
     }
+
+    public int getChosenRegister() throws JSONException {
+        return this.request.getJSONObject("messageBody").getInt("register");
+    }
+
+
+
 }
