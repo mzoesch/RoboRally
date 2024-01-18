@@ -1,23 +1,31 @@
 package sep.view.json.game;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
-import sep.server.json.AModel;
-import sep.server.viewmodel.ClientInstance;
+import sep.view.json.AServerRequestModel;
 
-public class DiscardSomeModel extends AModel {
+public class DiscardSomeModel extends AServerRequestModel {
 
-    private final String cards;
+    private final String[] cards;
 
-    public DiscardSomeModel(ClientInstance ci, String cards) {
-        super(ci);
+    public DiscardSomeModel(String[] cards) {
         this.cards = cards;
     }
 
     @Override
     public JSONObject toJSON() {
+        JSONObject body = new JSONObject();
+
+        JSONArray cardsArray = new JSONArray();
+        for (String card : cards) {
+            cardsArray.put(card);
+        }
+
+        body.put("cards", cardsArray);
+
         JSONObject j = new JSONObject();
         j.put("messageType", "DiscardSome");
-        j.put("messageBody", new JSONObject().put("cards", this.cards));
+        j.put("messageBody", body);
 
         return j;
     }
