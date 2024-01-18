@@ -2677,7 +2677,7 @@ public class CourseBuilder {
 
         // (0,4)
         fieldtypes.add(new Wall(new String[] {"top"}));
-        fieldtypes.add(new Laser("btootm", 1));
+        fieldtypes.add(new Laser("bottom", 1));
         arrayListY.add(new Tile("6B",new Coordinate(0,4), fieldtypes));
         fieldtypes = new ArrayList<>();
 
