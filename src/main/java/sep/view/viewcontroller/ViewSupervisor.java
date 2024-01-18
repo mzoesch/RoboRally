@@ -1,6 +1,7 @@
 package sep.view.viewcontroller;
 
 import sep.view.json.game.ChooseRegisterModel;
+import sep.view.json.game.DiscardSomeModel;
 import sep.view.json.game.          SelectedDamageModel;
 import sep.view.json.game.          RebootDirectionModel;
 import sep.                         Types;
@@ -31,6 +32,8 @@ import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
 import java.util.                   ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic. AtomicReference;
 
@@ -529,9 +532,9 @@ public final class ViewSupervisor extends Application
         ViewSupervisor.createPopUp(h);
     }
 
-    //pop-Up für Kartenauswahl bei MemorySwap UgradeCard
-    //T0-DO: Funktioniert noch nicht, da DiscardSomeModel noch auf ClientSeite verschoben werden muss
-    /*public static void createCardSelectionDialog() {
+    //Pop-Up für Kartenauswahl bei MemorySwap UgradeCard
+    //TO-DO: Die Karten-Platzhalter durch die Karten auf Hand austauschen
+    public static void createCardSelectionDialog() {
         final HBox h = new HBox();
         h.setAlignment(Pos.CENTER);
 
@@ -550,56 +553,45 @@ public final class ViewSupervisor extends Application
         AnchorPane.setRightAnchor(form, 0.0);
         AnchorPane.setBottomAnchor(form, 50.0);
 
-        ArrayList<Integer> selectedNumbers = new ArrayList<>();
+        List<String> availableCards = Arrays.asList("Card1", "Card2", "Card3", "Card4", "Card5", "Card6", "Card7", "Card8", "Card9");
+        ArrayList<String> selectedCards = new ArrayList<>();
 
-        for (int i = 1; i <= 9; i++) {
-            final Button numberButton = new Button(Integer.toString(i));
-            numberButton.getStyleClass().add("secondary-btn");
-            numberButton.getStyleClass().add("number-btn");
+        for (String card : availableCards) {
+            final Button cardButton = new Button(card);
+            cardButton.getStyleClass().add("secondary-btn");
+            cardButton.getStyleClass().add("card-btn");
 
-            numberButton.setOnAction(e -> {
-                if (selectedNumbers.contains(i)) {
-                    selectedNumbers.remove(Integer.valueOf(i));
-                    numberButton.getStyleClass().remove("selected-btn");
+            cardButton.setOnAction(e -> {
+                if (selectedCards.contains(card)) {
+                    selectedCards.remove(card);
+                    cardButton.getStyleClass().remove("selected-btn");
                 } else {
-                    if (selectedNumbers.size() < 3) {
-                        selectedNumbers.add(i);
-                        numberButton.getStyleClass().add("selected-btn");
+                    if (selectedCards.size() < 3) {
+                        selectedCards.add(card);
+                        cardButton.getStyleClass().add("selected-btn");
                     }
                 }
             });
 
-            form.getChildren().add(numberButton);
+            form.getChildren().add(cardButton);
         }
 
         final Button submitButton = new Button("Submit");
         submitButton.getStyleClass().add("primary-btn");
 
         submitButton.setOnAction(e -> {
-            if (selectedNumbers.size() == 3) {
-                String cards = selectedNumbers.toString();
-                new DiscardSomeModel(cards).send();
+            if (selectedCards.size() == 3) {
+                String[] cardsArray = selectedCards.toArray(new String[0]);
+                String[] selectedCardsArray = Arrays.copyOf(cardsArray, 3);
+                String cards = Arrays.toString(selectedCardsArray);
+                new DiscardSomeModel(cardsArray).send();
 
                 ViewSupervisor.getSceneController().destroyPopUp(h, false);
             } else {
                 header.setText("Please select exactly 3 cards!");
             }
         });
-
-        form.getChildren().add(submitButton);
-
-        final AnchorPane p = new AnchorPane(header, form);
-        p.setId("card-selection-dialog-container");
-
-        h.getChildren().add(p);
-
-        AnchorPane.setLeftAnchor(h, 0.0);
-        AnchorPane.setRightAnchor(h, 0.0);
-        AnchorPane.setTopAnchor(h, 0.0);
-        AnchorPane.setBottomAnchor(h, 0.0);
-
-        ViewSupervisor.createPopUp(h);
-    }*/
+    }
 
 
     public static void createRebootDialog()
