@@ -18,7 +18,7 @@ public final class GameState
 {
     private static final Logger l = LogManager.getLogger(GameState.class);
 
-    private static final String[]   AVAILABLE_COURSES                           = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap" };
+    private static final String[]   AVAILABLE_COURSES                           = new String[] { "Dizzy Highway", "Lost Bearings", "Extra Crispy", "Death Trap", "Twister"};
 
     public static final int         MIN_CONTROLLERS_ALLOWED                     = 2;
     public static final int         MAX_CONTROLLERS_ALLOWED                     = 6;
