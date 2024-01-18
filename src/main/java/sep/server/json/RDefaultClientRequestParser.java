@@ -1,5 +1,6 @@
 package sep.server.json;
 
+import org.json.JSONArray;
 import sep.server.model.game.tiles. Coordinate;
 
 import org.json.                    JSONObject;
@@ -11,6 +12,7 @@ import org.json.                    JSONException;
  */
 public record RDefaultClientRequestParser(JSONObject request)
 {
+
     public RDefaultClientRequestParser(final JSONObject request)
     {
         this.request = request;
@@ -88,4 +90,14 @@ public record RDefaultClientRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getString("direction");
     }
 
+    public String[] getMemorySwapCard() throws JSONException {
+        JSONArray cardsArray = this.request.getJSONObject("messageBody").getJSONArray("cards");
+
+        String[] memorySwapCards = new String[cardsArray.length()];
+        for (int i = 0; i < cardsArray.length(); i++) {
+            memorySwapCards[i] = cardsArray.getString(i);
+        }
+
+        return memorySwapCards;
+    }
 }
