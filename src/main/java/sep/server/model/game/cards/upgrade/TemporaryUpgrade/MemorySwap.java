@@ -53,5 +53,7 @@ public class MemorySwap extends ATemporaryUpgrade{
         l.debug("Upgrade (MemorySwap) activated for player '{}'.  Player's updated hand: {}",
                 player.getController().getName(), player.getPlayerHand());
 
+        player.setMemorySwapCards(null);
+
     }
 }
