@@ -1280,7 +1280,6 @@ public final class GameJFXController
                 ap.getStyleClass().clear();
                 ap.getStyleClass().add("register-slot-disabled");
             }
-
         }
 
         ap.setOnMouseClicked(e
