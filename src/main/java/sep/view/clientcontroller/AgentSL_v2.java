@@ -391,6 +391,8 @@ public final class AgentSL_v2 extends ServerListener
      * @return reward value based on different criteria
      */
     private float calculateReward(Tile currentTile, Tile targetTile) {
+        // TODO checkpoint: 100
+
         int distanceX = Math.abs(currentTile.getCoordinate().x() - targetTile.getCoordinate().x());
         int distanceY = Math.abs(currentTile.getCoordinate().y() - targetTile.getCoordinate().y());
         int distance = distanceX + distanceY;
@@ -399,24 +401,34 @@ public final class AgentSL_v2 extends ServerListener
             return -1;
         } else if (currentTile == targetTile) {
             return -1;
-        } else if (targetTile.isAntenna()) {
-            return -1;
         } else if(targetTile.hasWall()) {
-
-        } else if(targetTile.isLaser()) {
-            return -10;
-        } else if(targetTile.isPit()) {
-            return -10;
+            if ((currentTile.getCoordinate().y() < targetTile.getCoordinate().y())
+                    && (targetTile.getWallOrientation() == "top")) {
+                return -1;
+            } else if ((currentTile.getCoordinate().x() > targetTile.getCoordinate().x())
+                    && (targetTile.getWallOrientation() == "right")) {
+                return -1;
+            } else if ((currentTile.getCoordinate().y() > targetTile.getCoordinate().y())
+                    && (targetTile.getWallOrientation() == "bottom")) {
+                return -1;
+            } else if ((currentTile.getCoordinate().x() < targetTile.getCoordinate().x())
+                    && (targetTile.getWallOrientation() == "left")) {
+                return -1;
+            }
         } else if(targetTile.isConveyorBelt()) {
             //TODO: we should change this as sometimes there is no other
             // possibility than crossing a belt (e.g. Dizzy Highway)
             return -10;
+        } else if(targetTile.isLaser()) {
+            return -10;
+        } else if(targetTile.isPit()) {
+            return -10;
+        } else if (targetTile.isAntenna()) {
+            return -1;
         } else {
             return 0;
         }
-
-        //TODO wall: -1
-        // checkpoint: 100
+        return 0;
     }
 
     private void evaluateProgrammingPhase()
