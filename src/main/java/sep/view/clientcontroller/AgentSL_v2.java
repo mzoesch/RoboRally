@@ -370,11 +370,12 @@ public final class AgentSL_v2 extends ServerListener
             return -1;
         } else if(targetTile.isLaser()) {
             return -10;
+        } else if(targetTile.isPit()) {
+            return -10;
         }
 
         //TODO wall: -1
         // checkpoint: 100
-        // pit: - 10
         // belt: - 10
         // valid: 0
         return 0;
