@@ -381,6 +381,8 @@ public final class AgentSL_v2 extends ServerListener
             return -10;
         } else if(targetTile.isPit()) {
             return -10;
+        } if(targetTile.isConveyorBelt()) {
+            return -10;
         } else {
             return 0;
         }
