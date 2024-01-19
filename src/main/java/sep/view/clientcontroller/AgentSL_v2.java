@@ -462,10 +462,9 @@ public final class AgentSL_v2 extends ServerListener
         //
 
         /* Initialize Arrays. */
+        fillRewardMatrix();
         this.quantityMatrix = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()][4];
-        this.rewardMatrix = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()];
         Arrays.stream(this.quantityMatrix).forEach(files -> Arrays.stream(files).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_Q)));
-        Arrays.stream(this.rewardMatrix).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_R));
 
         /* Define Rewards. */
 
