@@ -325,7 +325,21 @@ public final class AgentSL_v2 extends ServerListener
         }
     }
 
+    /**
+     * @param currentTile tile (state) the agent is sitting on
+     * @param targetTile tile (state) the agent wants to transition
+     * @return reward value based on different criteria
+     */
     private float calculateReward(Tile currentTile, Tile targetTile) {
+        //TODO same tile: -1
+        // tile more than 1 step away: -1
+        // antenna: -1
+        // wall: -1
+        // checkpoint: 100
+        // laser: -10
+        // pit: - 10
+        // belt: - 10
+        // valid: 0
         return 0;
     }
 
