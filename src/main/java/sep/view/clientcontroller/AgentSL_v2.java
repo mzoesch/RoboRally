@@ -372,13 +372,13 @@ public final class AgentSL_v2 extends ServerListener
             return -10;
         } else if(targetTile.isPit()) {
             return -10;
+        } else {
+            return 0;
         }
 
         //TODO wall: -1
         // checkpoint: 100
         // belt: - 10
-        // valid: 0
-        return 0;
     }
 
     private void evaluateProgrammingPhase()
