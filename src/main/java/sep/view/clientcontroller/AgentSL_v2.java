@@ -80,6 +80,15 @@ final class Tile
         return false;
     }
 
+    public boolean isLaser() {
+        for (int i = 0; i < this.tile.length(); ++i) {
+            if (Objects.equals(this.getModifier(i).getType(), "Laser")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public JSONArray getJSON()
     {
         return this.tile;
