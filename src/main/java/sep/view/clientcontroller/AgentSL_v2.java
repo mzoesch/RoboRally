@@ -35,6 +35,10 @@ final class TileModifier
         return this.modifier.getString("orientations");
     }
 
+    public String getCheckpointCount() {
+        return this.modifier.getString("count");
+    }
+
 }
 
 final class Tile
@@ -138,6 +142,17 @@ final class Tile
             }
         }
         return false;
+    }
+
+    public String getCheckpointNum() {
+        if(this.hasWall()) {
+            for (int i = 0; i < this.tile.length(); ++i) {
+                if(this.getModifier(i).getCheckpointCount() != null) {
+                    return this.getModifier(i).getCheckpointCount();
+                }
+            }
+        }
+        return null;
     }
 
     public JSONArray getJSON()
@@ -432,7 +447,9 @@ public final class AgentSL_v2 extends ServerListener
             return -10;
         } else if(targetTile.isPit()) {
             return -10;
-        } else if (targetTile.isAntenna()) {
+        } else if(targetTile.isCheckpoint()) {
+
+        }else if (targetTile.isAntenna()) {
             return -1;
         } else {
             return 0;
