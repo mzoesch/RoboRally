@@ -382,6 +382,7 @@ public final class AgentSL_v2 extends ServerListener
         } else if(targetTile.isPit()) {
             return -10;
         } if(targetTile.isConveyorBelt()) {
+            //TODO: we should change this as sometimes there is no other possibility than crossing a belt (e.g. Dizzy Highway)
             return -10;
         } else {
             return 0;
