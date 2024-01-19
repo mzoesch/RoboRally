@@ -71,4 +71,13 @@ public final record RCoordinate(int x, int y)
         return (location.x < 0) || (location.x >= tiles.length) || (location.y < 0) || (location.y >= tiles[0].length);
     }
 
+    @Override
+    public int x() {
+        return x;
+    }
+
+    @Override
+    public int y() {
+        return y;
+    }
 }
