@@ -31,6 +31,10 @@ final class TileModifier
         return this.modifier.getString("type");
     }
 
+    public String getWallOrientation() {
+        return this.modifier.getString("orientations");
+    }
+
 }
 
 final class Tile
@@ -114,6 +118,17 @@ final class Tile
             }
         }
         return false;
+    }
+
+    public String getWallOrientation() {
+        if(this.hasWall()) {
+            for (int i = 0; i < this.tile.length(); ++i) {
+                if(this.getModifier(i).getWallOrientation() != null) {
+                    return this.getModifier(i).getWallOrientation();
+                }
+            }
+        }
+        return null;
     }
 
     public JSONArray getJSON()
