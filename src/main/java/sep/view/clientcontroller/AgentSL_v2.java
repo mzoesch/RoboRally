@@ -131,6 +131,15 @@ final class Tile
         return null;
     }
 
+    public boolean isCheckpoint() {
+        for (int i = 0; i < this.tile.length(); ++i) {
+            if (Objects.equals(this.getModifier(i).getType(), "CheckPoint")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public JSONArray getJSON()
     {
         return this.tile;
