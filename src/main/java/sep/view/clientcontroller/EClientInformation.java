@@ -21,6 +21,7 @@ import java.net.                    ConnectException;
 import java.net.                    UnknownHostException;
 import java.net.                    Socket;
 import java.util.concurrent.atomic. AtomicBoolean;
+import java.util.                   Objects;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -394,9 +395,32 @@ public enum EClientInformation
         return this.bAllowLegacyAgents;
     }
 
-    public EFigure getPrefAgentRobot()
+    private EFigure getNextFreeFigure()
     {
-        return EFigure.SPIN;
+        for (int i = 0; i < EFigure.NUM.i; ++i)
+        {
+            if (EGameState.INSTANCE.getRemotePlayerByFigureID(EFigure.fromInt(i)) == null)
+            {
+                return EFigure.fromInt(i);
+            }
+
+            continue;
+        }
+
+        l.fatal("Failed to find a free figure.");
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
+        return null;
+    }
+
+    public EFigure getPrefAgentFigure()
+    {
+        if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getFigure() != EFigure.INVALID)
+        {
+            return EGameState.INSTANCE.getClientRemotePlayer().getFigure();
+        }
+
+        return this.getNextFreeFigure();
     }
 
     public void setDisconnectHandled(final boolean bHandled)
