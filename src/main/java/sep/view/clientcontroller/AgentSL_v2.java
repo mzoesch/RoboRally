@@ -300,6 +300,35 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
+    /**
+     * Each reward matrix cell represents the transition from one state (tile) to another.
+     */
+    private void fillRewardMatrix() {
+        try {
+            Tile[][] tiles = EEnvironment.INSTANCE.getTiles();
+            int numTiles = EEnvironment.INSTANCE.getFiles() * EEnvironment.INSTANCE.getRanks();
+            rewardMatrix = new float[numTiles][numTiles];
+
+            for (int currentTile = 0; currentTile < numTiles; ++currentTile) {
+                for (int targetTile = 0; targetTile < numTiles; ++targetTile) {
+                    int currentFile = currentTile / EEnvironment.INSTANCE.getRanks();
+                    int currentRank = currentTile % EEnvironment.INSTANCE.getRanks();
+
+                    int targetFile = targetTile / EEnvironment.INSTANCE.getRanks();
+                    int targetRank = targetTile % EEnvironment.INSTANCE.getRanks();
+
+                    rewardMatrix[currentTile][targetTile] = calculateReward(tiles[currentFile][currentRank], tiles[targetFile][targetRank]);
+                }
+            }
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private float calculateReward(Tile currentTile, Tile targetTile) {
+        return 0;
+    }
+
     private void evaluateProgrammingPhase()
     {
         //
