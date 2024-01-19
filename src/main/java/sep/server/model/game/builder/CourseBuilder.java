@@ -65,7 +65,7 @@ public class CourseBuilder {
             case("Twister") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board6B = buildBoard("6B");
-                changeFieldType(boardStartA, 0, 7, new RestartPoint("left"));
+                changeFieldType(boardStartA, 0, 7, new RestartPoint("top"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board6B);
                 settingCoordinates(entireCourse);
                 return entireCourse;
