@@ -89,6 +89,15 @@ final class Tile
         return false;
     }
 
+    public boolean isPit() {
+        for (int i = 0; i < this.tile.length(); ++i) {
+            if (Objects.equals(this.getModifier(i).getType(), "Pit")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public JSONArray getJSON()
     {
         return this.tile;
