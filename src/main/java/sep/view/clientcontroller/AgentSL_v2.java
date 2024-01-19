@@ -456,19 +456,12 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhase()
     {
+        //Q LEARNING:
         setupRewardMatrix();
         this.quantityMatrix = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()][4];
         Arrays.stream(this.quantityMatrix).forEach(files -> Arrays.stream(files).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_Q)));
 
-
-
-
-
-        //
-        // End Q Learning
-        //
-
-        /* Very, very primitive. Just a framework for now. Open for later construction. */
+        //RANDOM:
         int j = 0;
         for (int i = 0; i < 5; ++i)
         {
