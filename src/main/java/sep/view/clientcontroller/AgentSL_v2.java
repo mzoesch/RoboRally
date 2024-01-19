@@ -348,10 +348,11 @@ public final class AgentSL_v2 extends ServerListener
             return -1;
         } else if(currentTile == targetTile) {
             return -1;
+        } else if(targetTile.isAntenna()) {
+            return -1;
         }
 
-        //TODO antenna: -1
-        // wall: -1
+        //TODO wall: -1
         // checkpoint: 100
         // laser: -10
         // pit: - 10
