@@ -107,6 +107,15 @@ final class Tile
         return false;
     }
 
+    public boolean hasWall() {
+        for (int i = 0; i < this.tile.length(); ++i) {
+            if (Objects.equals(this.getModifier(i).getType(), "Wall")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public JSONArray getJSON()
     {
         return this.tile;
@@ -382,7 +391,8 @@ public final class AgentSL_v2 extends ServerListener
         } else if(targetTile.isPit()) {
             return -10;
         } if(targetTile.isConveyorBelt()) {
-            //TODO: we should change this as sometimes there is no other possibility than crossing a belt (e.g. Dizzy Highway)
+            //TODO: we should change this as sometimes there is no other
+            // possibility than crossing a belt (e.g. Dizzy Highway)
             return -10;
         } else {
             return 0;
@@ -390,7 +400,6 @@ public final class AgentSL_v2 extends ServerListener
 
         //TODO wall: -1
         // checkpoint: 100
-        // belt: - 10
     }
 
     private void evaluateProgrammingPhase()
