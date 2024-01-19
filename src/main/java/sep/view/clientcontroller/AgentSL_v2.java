@@ -415,8 +415,6 @@ public final class AgentSL_v2 extends ServerListener
      * @return reward value based on different criteria
      */
     private float calculateReward(Tile currentTile, Tile targetTile) {
-        // TODO checkpoint: 100
-
         int distanceX = Math.abs(currentTile.getCoordinate().x() - targetTile.getCoordinate().x());
         int distanceY = Math.abs(currentTile.getCoordinate().y() - targetTile.getCoordinate().y());
         int distance = distanceX + distanceY;
@@ -448,7 +446,7 @@ public final class AgentSL_v2 extends ServerListener
         } else if(targetTile.isPit()) {
             return -10;
         } else if(targetTile.isCheckpoint()) {
-
+            //TODO
         }else if (targetTile.isAntenna()) {
             return -1;
         } else {
