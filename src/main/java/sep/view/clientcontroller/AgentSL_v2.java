@@ -36,19 +36,19 @@ final class TileModifier
 final class Tile
 {
     private final JSONArray     tile;
-    private final RCoordinate   location;
+    private final RCoordinate coordinate;
 
     public Tile (final JSONArray tile, final RCoordinate location)
     {
         this.tile       = tile;
-        this.location   = location;
+        this.coordinate = location;
 
         return;
     }
 
-    public RCoordinate getLocation()
+    public RCoordinate getCoordinate()
     {
-        return location;
+        return coordinate;
     }
 
     public TileModifier getModifier(final int idx)
@@ -167,7 +167,7 @@ enum EEnvironment implements ICourse
                                 continue;
                             }
 
-                            if (Objects.equals(EGameState.INSTANCE.getRemotePlayers()[i].getStartingPosition(), tiles[file][rank].getLocation()))
+                            if (Objects.equals(EGameState.INSTANCE.getRemotePlayers()[i].getStartingPosition(), tiles[file][rank].getCoordinate()))
                             {
                                 bFree = false;
                                 break;
@@ -178,7 +178,7 @@ enum EEnvironment implements ICourse
 
                         if (bFree)
                         {
-                            return tiles[file][rank].getLocation();
+                            return tiles[file][rank].getCoordinate();
                         }
 
                         continue;
