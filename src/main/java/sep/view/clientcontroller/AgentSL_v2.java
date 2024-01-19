@@ -331,6 +331,14 @@ public final class AgentSL_v2 extends ServerListener
      * @return reward value based on different criteria
      */
     private float calculateReward(Tile currentTile, Tile targetTile) {
+        int distanceX = Math.abs(currentTile.getX() - targetTile.getX());
+        int distanceY = Math.abs(currentTile.getY() - targetTile.getY());
+        int distance = distanceX + distanceY;
+
+        if(distance > 1) {
+            return -1;
+        }
+
         if(currentTile == targetTile) {
             return -1;
         }
