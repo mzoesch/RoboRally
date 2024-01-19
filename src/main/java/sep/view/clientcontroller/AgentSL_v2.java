@@ -387,7 +387,7 @@ public final class AgentSL_v2 extends ServerListener
     /**
      * Each reward matrix cell represents the transition from one state (tile) to another.
      */
-    private void fillRewardMatrix() {
+    private void setupRewardMatrix() {
         try {
             Tile[][] tiles = EEnvironment.INSTANCE.getTiles();
             int numTiles = EEnvironment.INSTANCE.getFiles() * EEnvironment.INSTANCE.getRanks();
@@ -457,16 +457,10 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhase()
     {
-        //
-        // Q Learning
-        //
-
-        /* Initialize Arrays. */
-        fillRewardMatrix();
+        setupRewardMatrix();
         this.quantityMatrix = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()][4];
         Arrays.stream(this.quantityMatrix).forEach(files -> Arrays.stream(files).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_Q)));
 
-        /* Define Rewards. */
 
 
 
