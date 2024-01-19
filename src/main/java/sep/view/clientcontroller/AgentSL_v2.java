@@ -395,17 +395,19 @@ public final class AgentSL_v2 extends ServerListener
         int distanceY = Math.abs(currentTile.getCoordinate().y() - targetTile.getCoordinate().y());
         int distance = distanceX + distanceY;
 
-        if(distance > 1) {
+        if (distance > 1) {
             return -1;
-        } else if(currentTile == targetTile) {
+        } else if (currentTile == targetTile) {
             return -1;
-        } else if(targetTile.isAntenna()) {
+        } else if (targetTile.isAntenna()) {
             return -1;
+        } else if(targetTile.hasWall()) {
+
         } else if(targetTile.isLaser()) {
             return -10;
         } else if(targetTile.isPit()) {
             return -10;
-        } if(targetTile.isConveyorBelt()) {
+        } else if(targetTile.isConveyorBelt()) {
             //TODO: we should change this as sometimes there is no other
             // possibility than crossing a belt (e.g. Dizzy Highway)
             return -10;
