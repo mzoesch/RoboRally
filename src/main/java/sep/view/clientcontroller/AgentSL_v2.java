@@ -374,7 +374,6 @@ public final class AgentSL_v2 extends ServerListener
     private static final double     EPSILON = 0.9;
 
     private static final float      INIT_Q  = 0.0f;
-    private static final float      INIT_R  = -100.0f;
     private float[][][]             quantityMatrix = null;
     private float[][]               rewardMatrix = null;
 
