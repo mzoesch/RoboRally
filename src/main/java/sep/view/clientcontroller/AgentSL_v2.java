@@ -337,14 +337,11 @@ public final class AgentSL_v2 extends ServerListener
 
         if(distance > 1) {
             return -1;
-        }
-
-        if(currentTile == targetTile) {
+        } else if(currentTile == targetTile) {
             return -1;
         }
 
-        //TODO tile more than 1 step away: -1
-        // antenna: -1
+        //TODO antenna: -1
         // wall: -1
         // checkpoint: 100
         // laser: -10
