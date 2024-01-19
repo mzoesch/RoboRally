@@ -15,6 +15,7 @@ import org.apache.logging.log4j.    Logger;
 import java.io.                     BufferedReader;
 import java.util.                   Objects;
 import java.util.                   Arrays;
+import java.util.                   Random;
 
 final class TileModifier
 {
@@ -533,15 +534,34 @@ public final class AgentSL_v2 extends ServerListener
 
         l.info("Current session course updated to {}. Sending name and robot to server.", this.dsrp.getCourseName());
         EGameState.INSTANCE.setCurrentServerCourse(this.dsrp.getCourseName());
-        new PlayerValuesModel(EClientInformation.INSTANCE.getPrefAgentName(), EClientInformation.INSTANCE.getPrefAgentRobot()).send();
 
-        if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady())
+        new Thread(() ->
         {
-            return true;
-        }
+            final int t = (int) (new Random(System.currentTimeMillis() + ProcessHandle.current().pid()).nextDouble() * 300) + 200;
+            l.warn("Waiting {} ms before confirming agent name and figure.", t);
+            try
+            {
+                Thread.sleep(t);
+            }
+            catch (final InterruptedException e)
+            {
+                l.fatal("Failed to wait before confirming agent name and figure.");
+                GameInstance.kill(GameInstance.EXIT_FATAL);
+                return;
+            }
 
-        l.info("Sending Agent ready request to server.");
-        new SetStatusModel(true).send();
+            new PlayerValuesModel(EClientInformation.INSTANCE.getPrefAgentName(), EClientInformation.INSTANCE.getPrefAgentFigure()).send();
+
+            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady())
+            {
+                return;
+            }
+
+            l.info("Sending Agent ready request to server.");
+            new SetStatusModel(true).send();
+
+            return;
+        }).start();
 
         return true;
     }
