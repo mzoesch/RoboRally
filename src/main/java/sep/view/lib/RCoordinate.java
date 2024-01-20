@@ -14,6 +14,18 @@ public final record RCoordinate(int x, int y)
         return;
     }
 
+    public static RCoordinate fromIndex(final int idx, final int files)
+    {
+        return new RCoordinate(idx % files, idx / files);
+    }
+
+    /** @deprecated  */
+    public RCoordinate(final int idx, final int files, final int ranks)
+    {
+        this(idx % files, idx / files);
+        return;
+    }
+
     @Override
     public boolean equals(final Object obj)
     {
