@@ -981,7 +981,22 @@ public final class AgentSL_v2 extends ServerListener
             continue;
         }
 
-        l.debug("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+        return;
+    }
+
+    private void evaluateProgrammingPhase()
+    {
+        if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
+        {
+            this.evaluateProgrammingPhaseWithRandom();
+        }
+
+        if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
+        {
+            this.evaluateProgrammingPhaseWithQLearning();
+        }
+
+        l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
 
         return;
     }
