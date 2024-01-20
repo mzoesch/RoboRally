@@ -108,7 +108,6 @@ public final class GI_Agent extends GameInstance
         return;
     }
 
-
     @Override
     public void run()
     {
