@@ -88,8 +88,4 @@ public final record RCoordinate(int x, int y)
         return x;
     }
 
-    @Override
-    public int y() {
-        return y;
-    }
 }
