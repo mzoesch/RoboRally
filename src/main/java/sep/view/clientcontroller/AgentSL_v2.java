@@ -352,6 +352,7 @@ enum EEnvironment implements ICourse
     private static final int    GOAL_REWARD                     = 1_000;
 
     private static final int    EPISODES                        = 1_000;
+    private static final int    CALCULATE_AVERAGE_ITERATIONS    = 100;
     private static final int    MAX_EPISODE_ITERATIONS          = 2_000;
 
     private static final float  EPSILON                         = 0.9f;
@@ -622,14 +623,15 @@ enum EEnvironment implements ICourse
         }
     }
 
-    private void evaluateAnEpisode(final RCoordinate start)
+    /** @return The amount of iterations the agent required to get to any terminal state. */
+    private int evaluateAnEpisode(final RCoordinate start)
     {
         int             iterations  = 0;
         RCoordinate     cursor      = start;
 
         while (true)
         {
-            if (iterations > EEnvironment.MAX_EPISODE_ITERATIONS)
+            if (iterations >= EEnvironment.MAX_EPISODE_ITERATIONS)
             {
                 break;
             }
@@ -657,9 +659,12 @@ enum EEnvironment implements ICourse
             continue;
         }
 
-        l.debug("Agent {} evaluated an episode. Start: {} - {} i.", EClientInformation.INSTANCE.getPlayerID(), start.toString(), iterations);
+        if (iterations >= EEnvironment.MAX_EPISODE_ITERATIONS)
+        {
+            l.warn("Agent {} exceeded the maximum amount of iterations per episode and did not reach a terminal state.", EClientInformation.INSTANCE.getPlayerID());
+        }
 
-        return;
+        return iterations;
     }
 
     // endregion Helper methods
@@ -698,10 +703,18 @@ enum EEnvironment implements ICourse
 
     public void evaluateQualityMatrix()
     {
+        int sum = 0;
 
         for (int i = 0; i < EEnvironment.EPISODES; ++i)
         {
-            this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
+            sum += this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
+
+            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ITERATIONS == 0)
+            {
+                l.debug("Agent {} has evaluated {} episodes. Average iterations per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ITERATIONS, sum / EEnvironment.CALCULATE_AVERAGE_ITERATIONS);
+                sum = 0;
+            }
+
             continue;
         }
 
