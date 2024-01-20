@@ -6,6 +6,7 @@ import sep.view.json.               ChatMsgModel;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                EAgentDifficulty;
 
 import org.json.                    JSONObject;
 import java.util.concurrent.        ExecutorService;
@@ -63,6 +64,7 @@ public enum EClientInformation
     private boolean                 bIsAgent;
     private String                  prefAgentName;
     private boolean                 bAllowLegacyAgents;
+    private EAgentDifficulty        agentDifficulty;
 
     private final AtomicBoolean     bQuickTipCreated    = new AtomicBoolean(false);
 
@@ -93,6 +95,7 @@ public enum EClientInformation
         this.bIsAgent               = false;
         this.prefAgentName          = "";
         this.bAllowLegacyAgents     = false;
+        this.agentDifficulty        = EAgentDifficulty.QLEARNING;
 
         this.bQuickTipCreated        .set(false);
 
@@ -481,6 +484,17 @@ public enum EClientInformation
     {
         this.exitCode = exitCode;
         return;
+    }
+
+    public void setAgentDifficulty(final EAgentDifficulty difficulty)
+    {
+        this.agentDifficulty = difficulty;
+        return;
+    }
+
+    public EAgentDifficulty getAgentDifficulty()
+    {
+        return this.agentDifficulty;
     }
 
     // endregion Getters and Setters
