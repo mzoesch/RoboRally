@@ -71,7 +71,7 @@ public enum EClientInformation
 
     private EClientInformation()
     {
-        this.JFXInstance = null;
+        this.JFXInstance            = null;
 
         this.serverIP               = EArgs.PREF_SERVER_IP;
         this.serverPort             = sep.Types.EPort.DEFAULT.i;
