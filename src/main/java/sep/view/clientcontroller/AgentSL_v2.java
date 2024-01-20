@@ -195,10 +195,10 @@ final class Tile
 
 interface ICourse
 {
-    public abstract     Tile[][]        getTiles();
+    public abstract     void            setCourse(final JSONObject course);
     public abstract     int             getFiles();
     public abstract     int             getRanks();
-
+    public abstract     Tile[][]        getTiles();
     public abstract     RCoordinate     getNextFreeStartPoint();
 }
 
