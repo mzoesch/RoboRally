@@ -49,12 +49,12 @@ final class TileModifier
 final class Tile
 {
     private final JSONArray     tile;
-    private final RCoordinate coordinate;
+    private final RCoordinate   coordinate;
 
-    public Tile (final JSONArray tile, final RCoordinate location)
+    public Tile(final JSONArray tile, final RCoordinate location)
     {
-        this.tile       = tile;
-        this.coordinate = location;
+        this.tile           = tile;
+        this.coordinate     = location;
 
         return;
     }
@@ -165,6 +165,21 @@ final class Tile
         return this.tile;
     }
 
+    @Override
+    public boolean equals(final Object obj)
+    {
+        if (obj == this)
+        {
+            return true;
+        }
+
+        if (!(obj instanceof final Tile otherTile))
+        {
+            return false;
+        }
+
+        return Objects.equals(this.coordinate, otherTile.coordinate);
+    }
 }
 
 interface ICourse
