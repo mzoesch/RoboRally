@@ -369,9 +369,7 @@ enum EEnvironment implements ICourse
 
     // endregion Cached members
 
-    /**
-     * Each matrix cell represents the travel from one state to another.
-     */
+    /** Each matrix cell represents the travel from one state to another. */
     private float[][]       rewards;
     private float[][][]     qualities;
 
