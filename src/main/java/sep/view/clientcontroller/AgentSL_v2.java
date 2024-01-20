@@ -355,22 +355,22 @@ enum EEnvironment implements ICourse
     private static final int    CALCULATE_AVERAGE_ITERATIONS    = 100;
     private static final int    MAX_EPISODE_ITERATIONS          = 2_000;
 
-    private static final float  EPSILON                         = 0.9f;
-    private static final float  DISCOUNT_FACTOR                 = 0.9f;
-    private static final float  LEARNING_RATE                   = 0.9f;
     /**
      * Hyperparameter for the learning rate. High values will yield a fast learning process but also an increased
      * risk of instability and wrong decisions.
      */
+    private static final float  ALPHA                           = 0.1f;
     /**
      * Eagerness threshold. AKA Exploration and Exploitation Trade-Off parameter. High values will yield in an eminent
      * exploitation of the learned knowledge. Low values will let the agent forget their life goals and explore the
      * environment.
      */
+    private static final float  EPSILON                         = 0.7f;
     /**
      * Discount factor. High values will yield in a long-term thinking agent while low values will yield in a
      * myopic agent. It reflects the agent's preference for immediate rewards over delayed ones.
      */
+    private static final float  GAMMA                           = 0.9f;
 
     // region Cached members
 
@@ -659,8 +659,8 @@ enum EEnvironment implements ICourse
 
             final float reward              = this.rewards[cursor.x() + cursor.y() * this.getFiles()][next.x() + next.y() * this.getFiles()];
             final float deprecatedQuality   = this.qualities[cursor.x()][cursor.y()][action.ordinal()];
-            final float temporalDifference  = reward + (EEnvironment.DISCOUNT_FACTOR * this.qualities[next.x()][next.y()][Objects.requireNonNull(this.getNextAction(next, 1.0f)).ordinal()]) - deprecatedQuality;
-            final float updatedQuality      = deprecatedQuality + (EEnvironment.LEARNING_RATE * temporalDifference);
+            final float temporalDifference  = reward + (EEnvironment.GAMMA * this.qualities[next.x()][next.y()][Objects.requireNonNull(this.getNextAction(next, 1.0f)).ordinal()]) - deprecatedQuality;
+            final float updatedQuality      = deprecatedQuality + (EEnvironment.ALPHA * temporalDifference);
 
             this.qualities[cursor.x()][cursor.y()][action.ordinal()] = updatedQuality;
 
