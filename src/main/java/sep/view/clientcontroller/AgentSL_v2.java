@@ -893,12 +893,12 @@ enum EEnvironment implements ICourse
 
     public void outputRewards()
     {
-        l.info("Rewards (all impossible transitions are hidden):");
+        l.debug("Rewards (all impossible transitions are hidden):");
 
         for (int i = 0; i < this.getRewards().length; ++i)
         {
-            l.info(this.getRewardStateAsString(i));
-            continue;
+            l.debug(this.getRewardStateAsString(i));
+            describeConstable();
         }
 
         return;
