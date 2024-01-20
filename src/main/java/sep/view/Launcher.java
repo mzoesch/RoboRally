@@ -24,7 +24,7 @@ public final class Launcher
      *
      * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
      *             <ul>
-     *              <li>[--dev]                 - Start mock game view (if also started with [--isAgent] flag, the
+     *              <li>[--dev]                 - Start mock game view (if also started with the [--isAgent] flag, the
      *                                            agent mock view will be called instead).
      *              <li>[--isAgent]             - Start agent view.
      *              <li>[--addr ADDR]           - The address to auto connect to (if isAgent flag is set). Default is
