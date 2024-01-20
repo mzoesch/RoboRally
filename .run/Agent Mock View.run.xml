@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Agent Mock View" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="sep.view.Launcher" />
+    <module name="sep" />
+    <option name="PROGRAM_PARAMETERS" value="--dev --isAgent" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
