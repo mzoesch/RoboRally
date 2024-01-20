@@ -12,7 +12,7 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 
 /** Mocking Game View with no server connection required. */
-public final class MockViewLauncher
+public final class MockViewLauncher implements IMockView
 {
     private static final Logger l = LogManager.getLogger(MockViewLauncher.class);
 
@@ -20,14 +20,13 @@ public final class MockViewLauncher
     private static final int    INIT_TIMEOUT_OSX       = 7_000;
     private static final int    INIT_TIMEOUT_OTHER     = 1_000;
 
-    private MockViewLauncher() throws RuntimeException
+    public MockViewLauncher()
     {
         super();
-        l.error("This class cannot be instantiated.");
-        throw new RuntimeException("This class cannot be instantiated.");
+        return;
     }
 
-    public static void run()
+    public void run()
     {
         EClientInformation.INSTANCE.setMockView(true);
         Thread t = new Thread(() ->
