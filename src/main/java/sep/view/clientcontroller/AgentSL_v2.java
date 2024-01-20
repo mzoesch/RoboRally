@@ -199,6 +199,21 @@ enum EEnvironment implements ICourse
     {
     }
 
+    enum EAction
+    {
+        NORTH,
+        EAST,
+        SOUTH,
+        WEST,
+        NUM;
+
+        public static EAction fromInt(final int i)
+        {
+            return EAction.values()[i];
+        }
+
+    }
+
     private enum ECourseImpl implements ICourse
     {
         INSTANCE;
