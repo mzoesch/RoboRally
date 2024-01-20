@@ -195,6 +195,10 @@ enum EEnvironment implements ICourse
 {
     INSTANCE;
 
+    private final record RGoalMask(int count, RCoordinate location)
+    {
+    }
+
     private enum ECourseImpl implements ICourse
     {
         INSTANCE;
