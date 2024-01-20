@@ -290,32 +290,32 @@ enum EEnvironment implements ICourse
             {
                 for (int rank = 0; rank < this.getRanks(); ++rank)
                 {
-                    if (tiles[file][rank].isStartPoint())
+                    if (!tiles[file][rank].isStartPoint())
                     {
-                        boolean bFree = true;
+                        continue;
+                    }
 
-                        for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; ++i)
+                    boolean bFree = true;
+
+                    for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; ++i)
+                    {
+                        if (EGameState.INSTANCE.getRemotePlayers()[i].getStartingPosition() == null)
                         {
-                            if (EGameState.INSTANCE.getRemotePlayers()[i].getStartingPosition() == null)
-                            {
-                                continue;
-                            }
-
-                            if (Objects.equals(EGameState.INSTANCE.getRemotePlayers()[i].getStartingPosition(), tiles[file][rank].getCoordinate()))
-                            {
-                                bFree = false;
-                                break;
-                            }
-
                             continue;
                         }
 
-                        if (bFree)
+                        if (Objects.equals(EGameState.INSTANCE.getRemotePlayers()[i].getStartingPosition(), tiles[file][rank].getCoordinate()))
                         {
-                            return tiles[file][rank].getCoordinate();
+                            bFree = false;
+                            break;
                         }
 
                         continue;
+                    }
+
+                    if (bFree)
+                    {
+                        return tiles[file][rank].getCoordinate();
                     }
 
                     continue;
