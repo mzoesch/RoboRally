@@ -344,15 +344,381 @@ enum EEnvironment implements ICourse
 
     private static final Logger l = LogManager.getLogger(EEnvironment.class);
 
+    private static final int    IMPOSSIBLE_TRANSITION_PENALTY   = -10_000;
+    private static final int    MATCHING_TILE_PENALTY           = -10_000;
+    /** TODO This is a temporal solution as it should be decreased later. */
+    private static final int    EFFECTS_PENALTY                 = -1;
+    private static final int    EMPTY_TILE_PENALTY              = -1;
+    private static final int    GOAL_REWARD                     = 1_000;
+
+    private static final int    EPISODES                        = 1_000;
+    private static final int    MAX_EPISODE_ITERATIONS          = 2_000;
+
+    private static final float  EPSILON                         = 0.9f;
+    private static final float  DISCOUNT_FACTOR                 = 0.9f;
+    private static final float  LEARNING_RATE                   = 0.9f;
+
+    // region Cached members
+
+    /**
+     * This variable has to be manually set to nullptr if the goal location changed or a new goal has to be hunted.
+     */
+    private RGoalMask       cachedGoal;
+    private Tile[][]        cachedTiles;
+
+    // endregion Cached members
+
+    /**
+     * Each matrix cell represents the travel from one state to another.
+     */
+    private float[][]       rewards;
+    private float[][][]     qualities;
+
     private EEnvironment()
     {
+        this.cachedGoal     = null;
+        this.cachedTiles    = null;
+
         return;
     }
 
-    public void setCourse(final JSONObject course)
+    // region Quality learning
+
+    // region Helper methods
+
+    private float calculateReward(final Tile current, final Tile target)
     {
-        ECourseImpl.INSTANCE.setCourse(course);
+        final int distanceX     = Math.abs(current.getCoordinate().x() - target.getCoordinate().x());
+        final int distanceY     = Math.abs(current.getCoordinate().y() - target.getCoordinate().y());
+        final int distance      = distanceX + distanceY;
+
+        if (distance > 1)
+        {
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+        }
+
+        if (Objects.equals(current, target))
+        {
+            return EEnvironment.MATCHING_TILE_PENALTY;
+        }
+
+        if (target.hasWall() || current.hasWall())
+        {
+            if ((current.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "top")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "right")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "bottom")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "left")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(current.getWallOrientation(), "bottom")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(current.getWallOrientation(), "left")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(current.getWallOrientation(), "top")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+
+            if ((current.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(current.getWallOrientation(), "right")))
+            {
+                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+            }
+        }
+
+        if (target.isConveyorBelt())
+        {
+            // TODO:    We should change this as sometimes there is no other
+            //          possibility than crossing a belt (e.g. Dizzy Highway).
+            return EEnvironment.EFFECTS_PENALTY;
+        }
+
+        if (target.isLaser())
+        {
+            return EEnvironment.EFFECTS_PENALTY;
+        }
+
+        if (target.isPit())
+        {
+            return EEnvironment.EFFECTS_PENALTY;
+        }
+
+        if (target.isCheckpoint())
+        {
+            /* TODO Check if it is the right checkpoint. */
+            return EEnvironment.GOAL_REWARD;
+        }
+
+        if (target.isAntenna())
+        {
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+        }
+
+        return EEnvironment.EMPTY_TILE_PENALTY;
+    }
+
+    /**
+     * @param iteration Only used for pseudorandom seed generation.
+     */
+    public RCoordinate getPseudorandomQualityStart(final int iteration)
+    {
+        final Tile t = this.getTile(new RCoordinate((int) (this.getTrulyRandomDouble(iteration) * this.getFiles()), (int) (this.getTrulyRandomDouble(iteration) * this.getRanks())));
+
+        assert t != null;
+
+        if (t.isTerminalState())
+        {
+            return this.getPseudorandomQualityStart(iteration);
+        }
+
+        return t.getLocation();
+    }
+
+    public RCoordinate getQualityGoal()
+    {
+        /* TODO Here we have to check if we collected another checkpoint and now our target goal has changed. */
+
+        if (this.cachedGoal != null)
+        {
+            return this.cachedGoal.location;
+        }
+
+        for (int file = 0; file < this.getFiles(); ++file)
+        {
+            for (int rank = 0; rank < this.getRanks(); ++rank)
+            {
+                final Tile t = this.getTile(new RCoordinate(file, rank));
+
+                assert t != null;
+
+                if (t.isCheckpoint())
+                {
+                    this.cachedGoal = new RGoalMask(0, t.getLocation());
+                    return this.getQualityGoal();
+                }
+
+                continue;
+            }
+
+            continue;
+        }
+
+        l.fatal("Failed to find a checkpoint.");
+        GameInstance.kill();
+
+        return null;
+    }
+
+    /**
+     * @param epsilon The higher the epsilon threshold is, the more likely it is that the agent will choose the best
+     *                action currently known for him. A threshold of one means that the agent will always choose the
+     *                best action.
+     */
+    private EEnvironment.EAction getNextAction(final RCoordinate location, final float epsilon)
+    {
+        if (epsilon < 0.0f || epsilon > 1.0f)
+        {
+            l.fatal("Epsilon threshold must be between 0.0 and 1.0. Current value: {}.", epsilon);
+            GameInstance.kill();
+            return null;
+        }
+
+        final double randomness = this.getTrulyRandomDouble();
+
+        if (randomness <= epsilon)
+        {
+            int maxIdx = 0;
+            for (int i = 1; i < this.qualities[location.x()][location.y()].length; ++i)
+            {
+                if (this.qualities[location.x()][location.y()][i] > this.qualities[location.x()][location.y()][maxIdx])
+                {
+                    maxIdx = i;
+                }
+
+                continue;
+            }
+
+            return EEnvironment.EAction.fromInt(maxIdx);
+        }
+
+        return EEnvironment.EAction.fromInt( (int) (randomness * EEnvironment.EAction.NUM.ordinal()) );
+    }
+
+    private EEnvironment.EAction getNextAction(final RCoordinate location)
+    {
+        return this.getNextAction(location, EEnvironment.EPSILON);
+    }
+
+    private static RCoordinate getNextState(final RCoordinate location, final EEnvironment.EAction action)
+    {
+        switch (action)
+        {
+        case NORTH:
+        {
+            if (location.y() - 1 < 0)
+            {
+                return location;
+            }
+
+            return new RCoordinate(location.x(), location.y() - 1);
+        }
+
+        case EAST:
+        {
+            if (location.x() + 1 >= EEnvironment.INSTANCE.getFiles())
+            {
+                return location;
+            }
+
+            return new RCoordinate(location.x() + 1, location.y());
+        }
+
+        case SOUTH:
+        {
+            if (location.y() + 1 >= EEnvironment.INSTANCE.getRanks())
+            {
+                return location;
+            }
+
+            return new RCoordinate(location.x(), location.y() + 1);
+        }
+
+        case WEST:
+        {
+            if (location.x() - 1 < 0)
+            {
+                return location;
+            }
+
+            return new RCoordinate(location.x() - 1, location.y());
+        }
+
+        default:
+        {
+
+            l.fatal("Failed to get next state. Action {} is not supported.", action.toString());
+            GameInstance.kill();
+            return null;
+        }
+        }
+    }
+
+    private void evaluateAnEpisode(final RCoordinate start)
+    {
+        int             iterations  = 0;
+        RCoordinate     cursor      = start;
+
+        while (true)
+        {
+            if (iterations > EEnvironment.MAX_EPISODE_ITERATIONS)
+            {
+                break;
+            }
+
+            if (Objects.requireNonNull(this.getTile(cursor)).isTerminalState())
+            {
+                break;
+            }
+
+            final EEnvironment.EAction  action      = this.getNextAction(cursor);
+            final RCoordinate           next        = EEnvironment.getNextState(cursor, action);
+
+            assert next != null;
+
+            final float reward              = this.rewards[cursor.x() + cursor.y() * this.getFiles()][next.x() + next.y() * this.getFiles()];
+            final float deprecatedQuality   = this.qualities[cursor.x()][cursor.y()][action.ordinal()];
+            final float temporalDifference  = reward + (EEnvironment.DISCOUNT_FACTOR * this.qualities[next.x()][next.y()][Objects.requireNonNull(this.getNextAction(next, 1.0f)).ordinal()]) - deprecatedQuality;
+            final float updatedQuality      = deprecatedQuality + (EEnvironment.LEARNING_RATE * temporalDifference);
+
+            this.qualities[cursor.x()][cursor.y()][action.ordinal()] = updatedQuality;
+
+            ++iterations;
+            cursor = next;
+
+            continue;
+        }
+
+        l.debug("Agent {} evaluated an episode. Start: {} - {} i.", EClientInformation.INSTANCE.getPlayerID(), start.toString(), iterations);
+
         return;
+    }
+
+    // endregion Helper methods
+
+    public void initRewardMatrix()
+    {
+        this.rewards = new float[this.getTileCount()][this.getTileCount()];
+
+        for (int currentState = 0; currentState < this.getTileCount(); ++currentState)
+        {
+            for (int targetState = 0; targetState < this.getTileCount(); ++targetState)
+            {
+                final int currentFile = RCoordinate.fromIndex(currentState, this.getFiles()).x();
+                final int currentRank = RCoordinate.fromIndex(currentState, this.getFiles()).y();
+
+                final int targetFile = RCoordinate.fromIndex(targetState, this.getFiles()).x();
+                final int targetRank = RCoordinate.fromIndex(targetState, this.getFiles()).y();
+
+                this.rewards[currentState][targetState] = this.calculateReward(Objects.requireNonNull(this.getTiles())[currentFile][currentRank], Objects.requireNonNull(this.getTiles())[targetFile][targetRank]);
+
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
+    public void initQualityMatrix()
+    {
+        this.qualities = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()][EEnvironment.EAction.NUM.ordinal()];
+        Arrays.stream(this.qualities).forEach(files -> Arrays.stream(files).forEach(ranks -> Arrays.fill(ranks, 0)));
+        return;
+    }
+
+    public void evaluateQualityMatrix()
+    {
+
+        for (int i = 0; i < EEnvironment.EPISODES; ++i)
+        {
+            this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
+            continue;
+        }
+
+    }
+
+    // endregion Quality learning
+
+    // region Getters and Setters
+
+    public double getTrulyRandomDouble(final int iteration)
+    {
+        return new Random(( (long) iteration << 8 ) + System.nanoTime()).nextDouble();
+    }
+
+    public double getTrulyRandomDouble()
+    {
+        return this.getTrulyRandomDouble( (int) System.currentTimeMillis() << 4 );
     }
 
     private boolean isCourseMissing()
@@ -368,14 +734,10 @@ enum EEnvironment implements ICourse
     }
 
     @Override
-    public Tile[][] getTiles() throws JSONException
+    public void setCourse(final JSONObject course)
     {
-        if (this.isCourseMissing())
-        {
-            return null;
-        }
-
-        return ECourseImpl.INSTANCE.getTiles();
+        ECourseImpl.INSTANCE.setCourse(course);
+        return;
     }
 
     @Override
@@ -400,6 +762,35 @@ enum EEnvironment implements ICourse
         return ECourseImpl.INSTANCE.getRanks();
     }
 
+
+    public Tile getTile(final RCoordinate location) throws JSONException
+    {
+        if (this.isCourseMissing())
+        {
+            return null;
+        }
+
+        return ECourseImpl.INSTANCE.getTiles()[location.x()][location.y()];
+    }
+
+    @Override
+    public Tile[][] getTiles() throws JSONException
+    {
+        if (this.isCourseMissing())
+        {
+            return null;
+        }
+
+        if (this.cachedTiles != null)
+        {
+            return this.cachedTiles;
+        }
+
+        this.cachedTiles = ECourseImpl.INSTANCE.getTiles();
+
+        return this.getTiles();
+    }
+
     @Override
     public RCoordinate getNextFreeStartPoint() throws JSONException
     {
@@ -411,6 +802,115 @@ enum EEnvironment implements ICourse
         return ECourseImpl.INSTANCE.getNextFreeStartPoint();
     }
 
+    private int getTileCount()
+    {
+        return this.getFiles() * this.getRanks();
+    }
+
+    public float[][] getRewards()
+    {
+        return this.rewards;
+    }
+
+    private String getRewardStateAsString(final int originalState)
+    {
+        final RCoordinate       state   = RCoordinate.fromIndex(originalState, this.getFiles());
+        final StringBuilder     sb      = new StringBuilder();
+
+        sb.append(String.format("%d. Reward State: %s -> [", originalState, state.toString()));
+
+        for (int targetState = 0; targetState < this.getFiles() * this.getRanks(); ++targetState)
+        {
+            if (this.rewards[originalState][targetState] == EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY)
+            {
+                continue;
+            }
+
+            final String        direction;
+            final RCoordinate   actionState = RCoordinate.fromIndex(targetState, this.getFiles());
+
+            if (state.x() == actionState.x() && state.y() == actionState.y() - 1)
+            {
+                direction = "S";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() + 1)
+            {
+                direction = "N";
+            }
+            else if (state.x() == actionState.x() - 1 && state.y() == actionState.y())
+            {
+                direction = "E";
+            }
+            else if (state.x() == actionState.x() + 1 && state.y() == actionState.y())
+            {
+                direction = "W";
+            }
+            else
+            {
+                direction = "XXXXX";
+            }
+
+            final String s = String.format(Locale.US, "{%s, %.2f},", direction, this.rewards[originalState][targetState]);
+
+            sb.append(s);
+
+            continue;
+        }
+
+        sb.append("]");
+
+        return sb.toString();
+    }
+
+    private String getQualityStateAsString(final RCoordinate state)
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%d. Quality State: %s -> [", state.toIndex(this.getFiles()), state.toString()));
+
+        for (int i = 0; i < EEnvironment.EAction.NUM.ordinal(); ++i)
+        {
+            sb.append(String.format(Locale.US, "{%s, %.2f}, ", EEnvironment.EAction.fromInt(i).toString(), this.qualities[state.x()][state.y()][i]));
+            continue;
+        }
+
+        sb.append("]");
+
+        return sb.toString();
+    }
+
+    public void outputRewards()
+    {
+        l.info("Rewards (all impossible transitions are hidden):");
+
+        for (int i = 0; i < this.getRewards().length; ++i)
+        {
+            l.info(this.getRewardStateAsString(i));
+            continue;
+        }
+
+        return;
+    }
+
+    public void outputQualities()
+    {
+        l.info("Qualities:");
+
+        for (int file = 0; file < this.qualities.length; ++file)
+        {
+            for (int rank = 0; rank < this.qualities[file].length; ++rank)
+            {
+                l.info(this.getQualityStateAsString(new RCoordinate(file, rank)));
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
+    // endregion Getters and Setters
+
 }
 
 /**
@@ -421,16 +921,15 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
-    /** Learning rate. */
-    private static final double     ALPHA   = 0.9;
+    /**
+     * Learning rate.
+     */
+    private static final double ALPHA = 0.9;
     /* Discount factor.*/
-    private static final double     GAMMA   = 0.9;
+    private static final double GAMMA = 0.9;
     /* The percentage of time when the best action should be used. Eagerness? */
-    private static final double     EPSILON = 0.9;
+    private static final double EPSILON = 0.9;
 
-    private static final float      INIT_Q  = 0.0f;
-    private float[][][]             quantityMatrix = null;
-    private float[][]               rewardMatrix = null;
 
     public AgentSL_v2(final BufferedReader br)
     {
@@ -438,85 +937,24 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    /**
-     * Each reward matrix cell represents the transition from one state (tile) to another.
-     */
-    private void setupRewardMatrix() {
-        try {
-            Tile[][] tiles = EEnvironment.INSTANCE.getTiles();
-            int numTiles = EEnvironment.INSTANCE.getFiles() * EEnvironment.INSTANCE.getRanks();
-            rewardMatrix = new float[numTiles][numTiles];
-
-            for (int currentTile = 0; currentTile < numTiles; ++currentTile) {
-                for (int targetTile = 0; targetTile < numTiles; ++targetTile) {
-                    int currentFile = currentTile / EEnvironment.INSTANCE.getRanks();
-                    int currentRank = currentTile % EEnvironment.INSTANCE.getRanks();
-
-                    int targetFile = targetTile / EEnvironment.INSTANCE.getRanks();
-                    int targetRank = targetTile % EEnvironment.INSTANCE.getRanks();
-
-                    rewardMatrix[currentTile][targetTile] = calculateReward(tiles[currentFile][currentRank], tiles[targetFile][targetRank]);
-                }
-            }
-        } catch(JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @param currentTile tile (state) the agent is sitting on
-     * @param targetTile tile (state) the agent wants to transition
-     * @return reward value based on different criteria
-     */
-    private float calculateReward(Tile currentTile, Tile targetTile) {
-        int distanceX = Math.abs(currentTile.getCoordinate().x() - targetTile.getCoordinate().x());
-        int distanceY = Math.abs(currentTile.getCoordinate().y() - targetTile.getCoordinate().y());
-        int distance = distanceX + distanceY;
-
-        if (distance > 1) {
-            return -1;
-        } else if (currentTile == targetTile) {
-            return -1;
-        } else if(targetTile.hasWall()) {
-            if ((currentTile.getCoordinate().y() < targetTile.getCoordinate().y())
-                    && (targetTile.getWallOrientation() == "top")) {
-                return -1;
-            } else if ((currentTile.getCoordinate().x() > targetTile.getCoordinate().x())
-                    && (targetTile.getWallOrientation() == "right")) {
-                return -1;
-            } else if ((currentTile.getCoordinate().y() > targetTile.getCoordinate().y())
-                    && (targetTile.getWallOrientation() == "bottom")) {
-                return -1;
-            } else if ((currentTile.getCoordinate().x() < targetTile.getCoordinate().x())
-                    && (targetTile.getWallOrientation() == "left")) {
-                return -1;
-            }
-        } else if(targetTile.isConveyorBelt()) {
-            //TODO: we should change this as sometimes there is no other
-            // possibility than crossing a belt (e.g. Dizzy Highway)
-            return -10;
-        } else if(targetTile.isLaser()) {
-            return -10;
-        } else if(targetTile.isPit()) {
-            return -10;
-        } else if(targetTile.isCheckpoint()) {
-            //TODO
-        }else if (targetTile.isAntenna()) {
-            return -1;
-        } else {
-            return 0;
-        }
-        return 0;
-    }
-
-    private void evaluateProgrammingPhase()
+    private void evaluateProgrammingPhaseWithQLearning()
     {
-        //Q LEARNING:
-        setupRewardMatrix();
-        this.quantityMatrix = new float[EEnvironment.INSTANCE.getFiles()][EEnvironment.INSTANCE.getRanks()][4];
-        Arrays.stream(this.quantityMatrix).forEach(files -> Arrays.stream(files).forEach(ranks -> Arrays.fill(ranks, AgentSL_v2.INIT_Q)));
+        EEnvironment.INSTANCE.initRewardMatrix();
 
-        //RANDOM:
+        l.info(String.format("Current Course: Files: %d, Ranks: %d, Goal: %s", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+
+        EEnvironment.INSTANCE.outputRewards();
+
+        EEnvironment.INSTANCE.initQualityMatrix();
+        EEnvironment.INSTANCE.evaluateQualityMatrix();
+
+        EEnvironment.INSTANCE.outputQualities();
+
+        return;
+    }
+
+    private void evaluateProgrammingPhaseWithRandom()
+    {
         int j = 0;
         for (int i = 0; i < 5; ++i)
         {
