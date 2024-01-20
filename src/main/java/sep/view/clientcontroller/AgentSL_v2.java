@@ -239,10 +239,30 @@ enum EEnvironment implements ICourse
             return;
         }
 
+        // region Getters and Setters
+
+        public JSONObject getCourse()
+        {
+            return this.course;
+        }
+
+        @Override
         public void setCourse(final JSONObject course)
         {
             this.course = course;
             return;
+        }
+
+        @Override
+        public int getFiles() throws JSONException
+        {
+            return this.getTilesAsJSON().toList().size();
+        }
+
+        @Override
+        public int getRanks() throws JSONException
+        {
+            return this.getTilesAsJSON().getJSONArray(0).toList().size();
         }
 
         private JSONArray getTilesAsJSON() throws JSONException
@@ -267,18 +287,6 @@ enum EEnvironment implements ICourse
             }
 
             return course;
-        }
-
-        @Override
-        public int getFiles() throws JSONException
-        {
-            return this.getTilesAsJSON().toList().size();
-        }
-
-        @Override
-        public int getRanks() throws JSONException
-        {
-            return this.getTilesAsJSON().getJSONArray(0).toList().size();
         }
 
         @Override
@@ -330,10 +338,7 @@ enum EEnvironment implements ICourse
             return null;
         }
 
-        public JSONObject getCourse()
-        {
-            return course;
-        }
+        // endregion Getters and Setters
 
     }
 
