@@ -132,8 +132,8 @@ final class Tile
     public String getWallOrientation() {
         if(this.hasWall()) {
             for (int i = 0; i < this.tile.length(); ++i) {
-                if(this.getModifier(i).getWallOrientation() != null) {
-                    return this.getModifier(i).getWallOrientation();
+                if(this.getModifier(i).getFirstWallOrientation() != null) {
+                    return this.getModifier(i).getFirstWallOrientation();
                 }
             }
         }
