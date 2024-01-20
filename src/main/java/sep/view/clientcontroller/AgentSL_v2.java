@@ -165,6 +165,17 @@ final class Tile
         return this.tile;
     }
 
+    public boolean isTerminalState()
+    {
+        /* TODO We have to check if it is the right checkpoint. */
+        return this.isAntenna() || this.isPit() || this.isCheckpoint();
+    }
+
+    public RCoordinate getLocation()
+    {
+        return this.coordinate;
+    }
+
     @Override
     public boolean equals(final Object obj)
     {
