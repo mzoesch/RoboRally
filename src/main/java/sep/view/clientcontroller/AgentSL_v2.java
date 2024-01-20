@@ -457,7 +457,7 @@ enum EEnvironment implements ICourse
 
         if (target.isConveyorBelt())
         {
-            // TODO:    We should change this as sometimes there is no other
+            // TODO     We should change this as sometimes there is no other
             //          possibility than crossing a belt (e.g. Dizzy Highway).
             return EEnvironment.EFFECTS_PENALTY;
         }
@@ -486,9 +486,7 @@ enum EEnvironment implements ICourse
         return EEnvironment.EMPTY_TILE_PENALTY;
     }
 
-    /**
-     * @param iteration Only used for pseudorandom seed generation.
-     */
+    /** @param iteration Only used for pseudorandom seed generation. */
     public RCoordinate getPseudorandomQualityStart(final int iteration)
     {
         final Tile t = this.getTile(new RCoordinate((int) (this.getTrulyRandomDouble(iteration) * this.getFiles()), (int) (this.getTrulyRandomDouble(iteration) * this.getRanks())));
@@ -538,11 +536,7 @@ enum EEnvironment implements ICourse
         return null;
     }
 
-    /**
-     * @param epsilon The higher the epsilon threshold is, the more likely it is that the agent will choose the best
-     *                action currently known for him. A threshold of one means that the agent will always choose the
-     *                best action.
-     */
+    /** @see EEnvironment#EPSILON */
     private EEnvironment.EAction getNextAction(final RCoordinate location, final float epsilon)
     {
         if (epsilon < 0.0f || epsilon > 1.0f)
