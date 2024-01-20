@@ -198,7 +198,13 @@ public enum EClientInformation
     {
         if (this.bufferedWriter == null)
         {
-            l.error("Socket not initialized.");
+            if (EClientInformation.INSTANCE.isMockView())
+            {
+                l.trace("Tried to send request to server while in mock view. Send request ignored: {}.", j.toString(0));
+                return;
+            }
+
+            l.error("Tried to send request to server, but socket was not initialized.");
             return;
         }
 
