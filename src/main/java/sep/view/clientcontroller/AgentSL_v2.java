@@ -2,9 +2,10 @@ package sep.view.clientcontroller;
 
 import sep.view.json.lobby.         PlayerValuesModel;
 import sep.view.json.lobby.         SetStatusModel;
-import sep.view.json.game.          SetStartingPointModel;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                RCoordinate;
+import sep.view.lib.                EAgentDifficulty;
+import sep.view.json.game.          SetStartingPointModel;
 import sep.view.json.game.          SelectedCardModel;
 
 import org.json.                    JSONException;
@@ -16,6 +17,7 @@ import java.io.                     BufferedReader;
 import java.util.                   Objects;
 import java.util.                   Arrays;
 import java.util.                   Random;
+import java.util.                   Locale;
 
 final class TileModifier
 {
@@ -32,11 +34,13 @@ final class TileModifier
         return this.modifier.getString("type");
     }
 
-    public String getWallOrientation() {
-        return this.modifier.getString("orientations");
+    public String getFirstWallOrientation()
+    {
+        return this.modifier.getJSONArray("orientations").getString(0);
     }
 
-    public String getCheckpointCount() {
+    public String getCheckpointCount()
+    {
         return this.modifier.getString("count");
     }
 
