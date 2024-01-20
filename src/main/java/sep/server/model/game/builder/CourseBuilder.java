@@ -2244,6 +2244,7 @@ public class CourseBuilder {
         fieldtypes.add(new CheckPoint(2));
         fieldtypes.add(new Wall(new String[] {"bottom"}));
         fieldtypes.add(new Laser("top", 2));
+        arrayListY.add(new Tile("4A",new Coordinate(2,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
         // (2,8)
