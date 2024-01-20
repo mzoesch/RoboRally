@@ -934,16 +934,6 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
-    /**
-     * Learning rate.
-     */
-    private static final double ALPHA = 0.9;
-    /* Discount factor.*/
-    private static final double GAMMA = 0.9;
-    /* The percentage of time when the best action should be used. Eagerness? */
-    private static final double EPSILON = 0.9;
-
-
     public AgentSL_v2(final BufferedReader br)
     {
         super(br);
