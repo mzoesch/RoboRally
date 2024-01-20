@@ -494,6 +494,13 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
+    public void onDevelopmentEvaluation()
+    {
+        EEnvironment.INSTANCE.setCourse(EGameState.INSTANCE.getAssumedServerCourseRawJSON());
+        this.evaluateProgrammingPhase();
+        return;
+    }
+
     // region Server request handlers
 
     @Override
