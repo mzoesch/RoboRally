@@ -374,9 +374,7 @@ enum EEnvironment implements ICourse
 
     // region Cached members
 
-    /**
-     * This variable has to be manually set to nullptr if the goal location changed or a new goal has to be hunted.
-     */
+    /** This variable has to be manually set to nullptr if the goal location changed or a new goal has to be hunted. */
     private RGoalMask       cachedGoal;
     private Tile[][]        cachedTiles;
 
