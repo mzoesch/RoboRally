@@ -369,7 +369,7 @@ enum EEnvironment implements ICourse
      * Hyperparameter for the learning rate. High values will yield a fast learning process but also an increased
      * risk of instability and wrong decisions.
      */
-    private static final float  ALPHA                           = 0.2f;
+    private static final float  ALPHA                           = 0.3f;
     /**
      * Eagerness threshold. AKA Exploration and Exploitation Trade-Off parameter. High values will yield in an eminent
      * exploitation of the learned knowledge. Low values will let the agent forget their life goals and explore the
