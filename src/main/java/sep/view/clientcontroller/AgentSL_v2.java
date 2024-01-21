@@ -1124,7 +1124,7 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    private void evaluateProgrammingPhaseWithQLearning()
+    private synchronized void evaluateProgrammingPhaseWithQLearning()
     {
         l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
 
@@ -1140,7 +1140,7 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    private void evaluateProgrammingPhaseWithRandom()
+    private synchronized void evaluateProgrammingPhaseWithRandom()
     {
         int j = 0;
         for (int i = 0; i < 5; ++i)
