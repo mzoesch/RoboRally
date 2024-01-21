@@ -889,6 +889,642 @@ enum EEnvironment implements ICourse
         }
 
         l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
+
+        return;
+    }
+
+    public void setRegisterCardsBasedOnExploredKnowledge()
+    {
+        final AgentRemotePlayerData agent = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
+        RCoordinate predictedState = agent.getLocation();
+
+        int oldIterationI = -1;
+
+        for (int i = 0; i < 5; ++i)
+        {
+            if (oldIterationI != -1)
+            {
+                for (int j = oldIterationI; j < i; ++j)
+                {
+                    l.info("Agent {} has chosen for register {}: {}.", EClientInformation.INSTANCE.getPlayerID(), j, EGameState.INSTANCE.getRegister(j));
+                    continue;
+                }
+            }
+
+            oldIterationI = i;
+
+            final ArrayList<RQualityStateAction> actions = this.getQualityActionsInDescendingOrder(predictedState);
+
+            assert predictedState != null;
+
+            l.debug("Agent {} has the following actions in descending order of quality for state {}: {}.", EClientInformation.INSTANCE.getPlayerID(), predictedState.toString(), actions);
+
+            nextActionLoop: while (true)
+            {
+                if (actions.isEmpty())
+                {
+                    /* TODO We might want to implement a search tree here instead of playing random cards. */
+                    l.warn("Agent {} has no more actions to explore. Selecting {} random elements.", EClientInformation.INSTANCE.getPlayerID(), 5 - i);
+
+                    for (int j = i; j < 5; ++j)
+                    {
+                        int gotRegister = 0;
+                        for (int k = 0; k < EGameState.INSTANCE.getGotRegisters().size(); ++k)
+                        {
+                            if (EGameState.INSTANCE.getGotRegister(k) == null)
+                            {
+                                continue ;
+                            }
+
+                            gotRegister = k;
+                            break ;
+                        }
+
+                        EGameState.INSTANCE.setRegister(j, gotRegister);
+                        l.warn("Agent {} has chosen randomly for register {}: {}.", EClientInformation.INSTANCE.getPlayerID(), j, EGameState.INSTANCE.getRegister(j));
+
+                        continue;
+                    }
+
+                    return;
+                }
+
+                final RQualityStateAction action = actions.remove(0);
+
+                switch (action.action)
+                {
+                case NORTH_SINGLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveI"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedNorth())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveI towards north. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case NORTH_DOUBLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedNorth())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveII towards north. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case NORTH_TRIPLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveIII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedNorth())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveIII towards north. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case EAST_SINGLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveI"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedEast())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveI towards east. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case EAST_DOUBLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedEast())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveII towards east. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case EAST_TRIPLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveIII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedEast())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveIII towards east. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case SOUTH_SINGLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveI"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedSouth())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveI towards south. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case SOUTH_DOUBLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedSouth())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveII towards south. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case SOUTH_TRIPLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveIII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedSouth())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveIII towards south. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 270 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case WEST_SINGLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveI"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedWest())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveI towards west. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveI"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case WEST_DOUBLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedWest())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveII towards west. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                case WEST_TRIPLE:
+                {
+                    if (!EGameState.INSTANCE.getGotRegisters().contains("MoveIII"))
+                    {
+                        continue nextActionLoop;
+                    }
+
+                    if (agent.isRotatedWest())
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    l.debug("Agent {} has chosen MoveIII towards west. But he is rotated {} deg. Trying to update rotation.", EClientInformation.INSTANCE.getPlayerID(), agent.getRotation());
+
+                    if (agent.getRotation() == 0 && EGameState.INSTANCE.getGotRegisters().contains("TurnLeft"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnLeft"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 180 && EGameState.INSTANCE.getGotRegisters().contains("TurnRight"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("TurnRight"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    if (agent.getRotation() == 90 && EGameState.INSTANCE.getGotRegisters().contains("UTurn"))
+                    {
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("UTurn"));
+                        ++i;
+                        EGameState.INSTANCE.setRegister(i, EGameState.INSTANCE.getGotRegisters().indexOf("MoveIII"));
+                        predictedState = EEnvironment.getNextState(predictedState, action.action);
+                        break nextActionLoop;
+                    }
+
+                    continue nextActionLoop;
+                }
+
+                default:
+                {
+                    l.fatal("Agent could not understand action: {}.", action.action.toString());
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return;
+                }
+                }
+            }
+
+            continue;
+        }
+
+        if (oldIterationI != -1)
+        {
+            for (int j = oldIterationI; j < 5; ++j)
+            {
+                l.info("Agent {} has chosen for register {}: {}.", EClientInformation.INSTANCE.getPlayerID(), j, EGameState.INSTANCE.getRegister(j));
+                continue;
+            }
+        }
+
         return;
     }
 
