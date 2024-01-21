@@ -1126,9 +1126,9 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhaseWithQLearning()
     {
-        EEnvironment.INSTANCE.initRewardMatrix();
+        l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
 
-        l.info(String.format("Current Course: Files: %d, Ranks: %d, Goal: %s", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+        EEnvironment.INSTANCE.initRewardMatrix();
 
         EEnvironment.INSTANCE.outputRewards();
 
