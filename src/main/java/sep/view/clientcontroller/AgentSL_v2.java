@@ -1804,6 +1804,10 @@ public final class AgentSL_v2 extends ServerListener
 
         EEnvironment.INSTANCE.outputQualities();
 
+        EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+
+        this.sendSelectedCards();
+
         return;
     }
 
