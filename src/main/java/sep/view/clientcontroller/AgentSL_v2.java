@@ -212,10 +212,18 @@ enum EEnvironment implements ICourse
 
     enum EAction
     {
-        NORTH,
-        EAST,
-        SOUTH,
-        WEST,
+        NORTH_SINGLE,
+        NORTH_DOUBLE,
+        NORTH_TRIPLE,
+        EAST_SINGLE,
+        EAST_DOUBLE,
+        EAST_TRIPLE,
+        SOUTH_SINGLE,
+        SOUTH_DOUBLE,
+        SOUTH_TRIPLE,
+        WEST_SINGLE,
+        WEST_DOUBLE,
+        WEST_TRIPLE,
         NUM;
 
         public static EAction fromInt(final int i)
