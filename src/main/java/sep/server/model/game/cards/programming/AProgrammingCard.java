@@ -4,7 +4,11 @@ import sep.server.model.game.Player;
 import sep.server.model.game.cards.Card;
 import sep.server.model.game.cards.IPlayableCard;
 
+/**
+ * Abstract class representing a programming card.
+ */
 public abstract class AProgrammingCard extends Card implements IPlayableCard {
+
     public AProgrammingCard(String cardType) {
         super(cardType);
     }
