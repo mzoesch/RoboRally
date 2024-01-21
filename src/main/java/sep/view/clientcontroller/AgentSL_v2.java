@@ -772,12 +772,12 @@ enum EEnvironment implements ICourse
     /** @return The amount of iterations the agent required to get to any terminal state. */
     private int evaluateAnEpisode(final RCoordinate start)
     {
-        int             iterations  = 0;
+        int             actions     = 0;
         RCoordinate     cursor      = start;
 
         while (true)
         {
-            if (iterations >= EEnvironment.MAX_EPISODE_ITERATIONS)
+            if (actions >= EEnvironment.MAX_EPISODE_ACTIONS)
             {
                 break;
             }
@@ -799,18 +799,18 @@ enum EEnvironment implements ICourse
 
             this.qualities[cursor.x()][cursor.y()][action.ordinal()] = updatedQuality;
 
-            ++iterations;
+            ++actions;
             cursor = next;
 
             continue;
         }
 
-        if (iterations >= EEnvironment.MAX_EPISODE_ITERATIONS)
+        if (actions >= EEnvironment.MAX_EPISODE_ACTIONS)
         {
-            l.warn("Agent {} exceeded the maximum amount of iterations per episode and did not reach a terminal state.", EClientInformation.INSTANCE.getPlayerID());
+            l.warn("Agent {} exceeded the maximum amount of actions per episode and did not reach a terminal state.", EClientInformation.INSTANCE.getPlayerID());
         }
 
-        return iterations;
+        return actions;
     }
 
     // endregion Helper methods
@@ -849,21 +849,27 @@ enum EEnvironment implements ICourse
 
     public void evaluateQualityMatrix()
     {
-        int sum = 0;
+        int totalActionCount    = 0;
+        int latestActionSum     = 0;
 
         for (int i = 0; i < EEnvironment.EPISODES; ++i)
         {
-            sum += this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
+            final int actions = this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
 
-            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ITERATIONS == 0)
+            latestActionSum     += actions;
+            totalActionCount    += actions;
+
+            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ACTIONS == 0)
             {
-                l.debug("Agent {} has evaluated {} episodes. Average iterations per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ITERATIONS, sum / EEnvironment.CALCULATE_AVERAGE_ITERATIONS);
-                sum = 0;
+                l.debug("Agent {} has evaluated {} episodes. Average actions per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ACTIONS, latestActionSum / EEnvironment.CALCULATE_AVERAGE_ACTIONS);
+                latestActionSum = 0;
             }
 
             continue;
         }
 
+        l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
+        return;
     }
 
     // endregion Quality learning
