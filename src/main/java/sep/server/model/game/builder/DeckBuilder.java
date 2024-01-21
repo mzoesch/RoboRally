@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class DeckBuilder {
     private static final Logger l = LogManager.getLogger(GameState.class);
-    public void DeckBuilder(){}
+    public DeckBuilder(){}
 
     /**
      * Builds a programming deck containing move and turn cards.
