@@ -18,7 +18,8 @@ public class CourseBuilder {
     }
 
     /**
-     * Builds the corresponding course from the individual boards
+     * Builds the corresponding course from the individual boards.
+     *
      * @param courseName name of the course
      * @return complete course as ArrayList<ArrayList<Tile>>
      */
@@ -76,7 +77,7 @@ public class CourseBuilder {
             }
         }
 
-        //TODO Notlösung, falls CourseName nicht richtig übergeben wird
+        //Emergency solution in case course name is passed wrongly
         ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
         ArrayList<ArrayList<Tile>> board5B = buildBoard("5B");
         ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board5B);
@@ -85,12 +86,12 @@ public class CourseBuilder {
     }
 
     /**
-     * Is passed a course and sets the neighbour coordinates for all tiles
-     * @param course passed course
+     * Sets the neighbor coordinates for all tiles in a given course.
+     *
+     * @param course course to set neighbor coordinates for
      */
     public  void settingCoordinates(ArrayList<ArrayList<Tile>> course){
         for(int i = 0; i <  course.size(); i++){
-
             ArrayList<Tile> courseYRow = course.get(i);
             for(int a = 0; a < courseYRow.size(); a++){
                 Tile tile = courseYRow.get(a);
@@ -126,7 +127,7 @@ public class CourseBuilder {
                     tile.getCoordinate().setBottomNeighbor(null);
                 }
 
-                //rightNeighbor
+                //leftNeighbor
                 try{
                     Coordinate leftNeighbor = course.get(xCoordinate-1).get(yCoordinate).getCoordinate();
                     tile.getCoordinate().setLeftNeighbor(leftNeighbor);
@@ -138,10 +139,17 @@ public class CourseBuilder {
         }
     }
 
+    /**
+     * Gets the starting turning direction for a given course.
+     *
+     * @param courseName name of the course
+     * @return starting turning direction
+     */
     public String getStartingTurningDirection(String courseName){
         switch(courseName){
             case("Dizzy Highway") -> {
                 return "clockwise";}
+            //TODO add other courses
         }
         return "clockwise";
     }
@@ -149,12 +157,12 @@ public class CourseBuilder {
 
     /**
      * Appends a board to the right of another board. Only works for boards of the same length.
+     *
      * @param leftBoard left board
      * @param rightBoard right board (is appended)
      * @return ArrayList that represents the entire board
      */
     public  ArrayList<ArrayList<Tile>> appendRight(ArrayList<ArrayList<Tile>> leftBoard, ArrayList<ArrayList<Tile>> rightBoard){
-
         leftBoard.addAll(rightBoard);
         return leftBoard;
     }
@@ -162,6 +170,7 @@ public class CourseBuilder {
 
     /**
      * Rotates a board 180 degrees.
+     *
      * @param board board to be rotated
      * @return rotated board
      */
@@ -176,6 +185,7 @@ public class CourseBuilder {
 
     /**
      * Changes the FieldType of a Tile at the specified coordinates in the given game board.
+     *
      * @param board game board represented as a ArrayList of Tiles
      * @param x x-coordinate of the Tile to be modified
      * @param y y-coordinate of the Tile to be modified
@@ -195,7 +205,8 @@ public class CourseBuilder {
 
 
     /**
-     * Builds a board depending on board name
+     * Builds a board depending on board name.
+     *
      * @param boardName name of the board to be created
      * @return created board
      */
@@ -228,7 +239,8 @@ public class CourseBuilder {
     }
 
     /**
-     * Builds the test board from protocol v0.1
+     * Builds the test board from protocol v0.1.
+     *
      * @return test board as ArrayList
      */
     public ArrayList<ArrayList<Tile>> buildTestA(){
@@ -263,16 +275,15 @@ public class CourseBuilder {
         board.add(arrayListY);
 
         return board;
-
     }
 
 
     /**
-     * Builds board StartA (part of DizzyHighway, Lost Bearings, Extra Crispy, Death Trap and Twister))
+     * Builds board StartA (part of DizzyHighway, Lost Bearings, Extra Crispy, Death Trap and Twister)).
+     *
      * @return StartA as ArrayList
      */
-    public ArrayList<ArrayList<Tile>> buildStartA()
-    {
+    public ArrayList<ArrayList<Tile>> buildStartA() {
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
         ArrayList<FieldType> fieldtypes = new ArrayList<>();
@@ -439,11 +450,11 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board 5B (part of DizzyHighway)
+     * Builds board 5B (part of DizzyHighway).
+     *
      * @return board 5B as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build5B(){
-
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
         ArrayList<FieldType> fieldtypes = new ArrayList<>();
@@ -985,11 +996,11 @@ public class CourseBuilder {
     }
 
     /**
-     * Builds board 1A (part of Lost Bearings)
+     * Builds board 1A (part of Lost Bearings).
+     *
      * @return board 1A as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build1A() {
-
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
         ArrayList<FieldType> fieldtypes = new ArrayList<>();
@@ -1529,11 +1540,11 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board 2A (part of Death Trap)
+     * Builds board 2A (part of Death Trap).
+     *
      * @return board 2A as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build2A() {
-
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
         ArrayList<FieldType> fieldtypes = new ArrayList<>();
@@ -2086,11 +2097,11 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board 4A (part of Extra Crispy)
+     * Builds board 4A (part of Extra Crispy).
+     *
      * @return board 4A as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build4A() {
-
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
         ArrayList<FieldType> fieldtypes = new ArrayList<>();
@@ -2647,11 +2658,11 @@ public class CourseBuilder {
 
 
     /**
-     * Builds board 6B (part of Twister)
+     * Builds board 6B (part of Twister).
+     *
      * @return board 6B as ArrayList
      */
     public ArrayList<ArrayList<Tile>> build6B() {
-
         ArrayList<ArrayList<Tile>> board = new ArrayList<>();
         ArrayList<Tile> arrayListY = new ArrayList<>();
         ArrayList<FieldType> fieldtypes = new ArrayList<>();
@@ -3192,8 +3203,6 @@ public class CourseBuilder {
         fieldtypes.add(new Empty());
         arrayListY.add(new Tile("6B",new Coordinate(9,9), fieldtypes));
         fieldtypes = new ArrayList<>();
-
         return board;
     }
-
 }
