@@ -2,8 +2,8 @@ package sep.server.model.game.cards.special;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
-import sep.server.model.game.builder.CourseBuilder;
 import sep.server.model.game.cards.IPlayableCard;
 
 /**
@@ -12,7 +12,7 @@ import sep.server.model.game.cards.IPlayableCard;
  */
 public class SpeedRoutine extends ASpecialProgrammingCard implements IPlayableCard {
 
-    private static final Logger l = LogManager.getLogger(CourseBuilder.class);
+    private static final Logger l = LogManager.getLogger(GameState.class);
 
     public SpeedRoutine(String cardType) {
         super(cardType);

@@ -2,8 +2,8 @@ package sep.server.model.game.cards.special;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
-import sep.server.model.game.builder.CourseBuilder;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.damage.ADamageCard;
 import sep.server.model.game.cards.upgrade.AUpgradeCard;
@@ -15,7 +15,7 @@ import sep.server.model.game.cards.upgrade.AUpgradeCard;
 public class RepeatRoutine extends ASpecialProgrammingCard implements IPlayableCard {
     //TODO remove redundant code.. exactly the same as Again.java
 
-    private static final Logger l = LogManager.getLogger(CourseBuilder.class);
+    private static final Logger l = LogManager.getLogger(GameState.class);
 
     public RepeatRoutine(String cardType) {
         super(cardType);
