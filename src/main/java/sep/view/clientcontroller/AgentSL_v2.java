@@ -1173,17 +1173,24 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhase()
     {
-        if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
+        final Thread eval = new Thread(() ->
         {
-            this.evaluateProgrammingPhaseWithRandom();
-        }
+            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
+            {
+                this.evaluateProgrammingPhaseWithRandom();
+            }
 
-        if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
-        {
-            this.evaluateProgrammingPhaseWithQLearning();
-        }
+            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
+            {
+                this.evaluateProgrammingPhaseWithQLearning();
+            }
 
-        l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+            l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+
+            return;
+        });
+
+        eval.start();
 
         return;
     }
