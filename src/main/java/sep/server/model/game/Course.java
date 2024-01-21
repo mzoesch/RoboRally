@@ -115,6 +115,18 @@ public class Course {
         return null;
     }
 
+    public ArrayList<Coordinate> getCheckpointCoordinates(){
+        ArrayList<Coordinate> c = new ArrayList<>();
+        for (ArrayList<Tile> ts : this.course) {
+            for (Tile t : ts) {
+                if (t.getFieldTypes().stream().anyMatch(elem -> elem instanceof CheckPoint)) {
+                    c.add(t.getCoordinate());
+                }
+            }
+        }
+        return c;
+    }
+
     public Tile getNextFreeStartingPoint()
     {
         for (ArrayList<Tile> ts : this.course) {
