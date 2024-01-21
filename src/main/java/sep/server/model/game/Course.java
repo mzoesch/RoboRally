@@ -134,7 +134,7 @@ public class Course {
         return c;
     }
 
-    public boolean checkForMovingCheckpoints() {
+    private boolean checkForMovingCheckpoints() {
         ArrayList<Coordinate> oldCheckpointCoordinates = getCheckpointCoordinates();
         for (Coordinate c : oldCheckpointCoordinates) {
             Tile currentTile = getTileByCoordinate(c);
@@ -152,6 +152,10 @@ public class Course {
         }
         l.info("There are no moving checkpoints in the course");
         return false;
+    }
+
+    public boolean getMovingCheckpoints(){
+        return movingCheckpoints;
     }
 
     public Tile getNextFreeStartingPoint()
