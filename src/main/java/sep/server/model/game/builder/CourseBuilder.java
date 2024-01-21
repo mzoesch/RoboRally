@@ -3125,7 +3125,7 @@ public class CourseBuilder {
         fieldtypes = new ArrayList<>();
 
         // (8,7)
-        fieldtypes.add(new ConveyorBelt(2, "botoom", new String[] {"top"}));
+        fieldtypes.add(new ConveyorBelt(2, "bottom", new String[] {"top"}));
         arrayListY.add(new Tile("6B",new Coordinate(8,7), fieldtypes));
         fieldtypes = new ArrayList<>();
 
