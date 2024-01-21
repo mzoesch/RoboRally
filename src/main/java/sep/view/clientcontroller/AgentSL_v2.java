@@ -352,6 +352,8 @@ enum EEnvironment implements ICourse
 
     private static final Logger l = LogManager.getLogger(EEnvironment.class);
 
+    private static final int    MAX_REACHABLE_DISTANCE          = 3;
+
     private static final float  IMPOSSIBLE_TRANSITION_PENALTY   = -10_000.0f;
     private static final float  MATCHING_TILE_PENALTY           = -10_000.0f;
     /** TODO This is a temporal solution as it should be decreased later. */
@@ -359,9 +361,9 @@ enum EEnvironment implements ICourse
     private static final float  EMPTY_TILE_PENALTY              = -1.0f;
     private static final float  GOAL_REWARD                     = 1_000.0f;
 
-    private static final int    EPISODES                        = 1_000;
-    private static final int    CALCULATE_AVERAGE_ITERATIONS    = 100;
-    private static final int    MAX_EPISODE_ITERATIONS          = 2_000;
+    private static final int    EPISODES                        = 2_000;
+    private static final int    CALCULATE_AVERAGE_ACTIONS       = 100;
+    private static final int    MAX_EPISODE_ACTIONS             = 2_000;
 
     /**
      * Hyperparameter for the learning rate. High values will yield a fast learning process but also an increased
@@ -404,13 +406,104 @@ enum EEnvironment implements ICourse
 
     // region Helper methods
 
+    /** If a pawn cannot traverse from one state to another (e.g., there is no wall or pit between them). */
+    private boolean isBlocked(final Tile origin, final Tile target)
+    {
+        final int distanceX     = Math.abs(origin.getCoordinate().x() - target.getCoordinate().x());
+        final int distanceY     = Math.abs(origin.getCoordinate().y() - target.getCoordinate().y());
+        final int distance      = distanceX + distanceY;
+
+        if (origin.getLocation().x() != target.getLocation().x() && origin.getLocation().y() != target.getLocation().y())
+        {
+            return true;
+        }
+
+        if (distance > 1)
+        {
+            final boolean areHorizontalAligned = origin.getLocation().y() == target.getLocation().y();
+
+            final Tile newOrigin = this.getTile(
+                new RCoordinate(
+                    areHorizontalAligned
+                    ? origin.getLocation().x() > target.getLocation().x()
+                        ? origin.getLocation().x() - 1
+                        : origin.getLocation().x() + 1
+                    : origin.getLocation().x()
+                    ,
+                    areHorizontalAligned
+                    ? origin.getLocation().y()
+                    : origin.getLocation().y() > target.getLocation().y()
+                        ? origin.getLocation().y() - 1
+                        : origin.getLocation().y() + 1
+                )
+            );
+
+            assert newOrigin != null;
+
+            if (this.isBlocked(newOrigin, target))
+            {
+                return true;
+            }
+        }
+
+        if (origin.hasWall() || target.hasWall())
+        {
+            if ((origin.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "top")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "right")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "bottom")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "left")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(origin.getWallOrientation(), "bottom")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(origin.getWallOrientation(), "left")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(origin.getWallOrientation(), "top")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(origin.getWallOrientation(), "right")))
+            {
+                return true;
+            }
+        }
+
+        if (origin.isPit() || target.isPit()) /* can we remove target? */
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private float calculateReward(final Tile current, final Tile target)
     {
         final int distanceX     = Math.abs(current.getCoordinate().x() - target.getCoordinate().x());
         final int distanceY     = Math.abs(current.getCoordinate().y() - target.getCoordinate().y());
         final int distance      = distanceX + distanceY;
 
-        if (distance > 1)
+        if (distance > EEnvironment.MAX_REACHABLE_DISTANCE)
         {
             return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
@@ -420,47 +513,9 @@ enum EEnvironment implements ICourse
             return EEnvironment.MATCHING_TILE_PENALTY;
         }
 
-        if (target.hasWall() || current.hasWall())
+        if (this.isBlocked(current, target))
         {
-            if ((current.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "top")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "right")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "bottom")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "left")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(current.getWallOrientation(), "bottom")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(current.getWallOrientation(), "left")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(current.getWallOrientation(), "top")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(current.getWallOrientation(), "right")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
         if (target.isConveyorBelt())
@@ -477,18 +532,18 @@ enum EEnvironment implements ICourse
 
         if (target.isPit())
         {
-            return EEnvironment.EFFECTS_PENALTY;
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+        }
+
+        if (target.isAntenna())
+        {
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
         if (target.isCheckpoint())
         {
             /* TODO Check if it is the right checkpoint. */
             return EEnvironment.GOAL_REWARD;
-        }
-
-        if (target.isAntenna())
-        {
-            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
         return EEnvironment.EMPTY_TILE_PENALTY;
