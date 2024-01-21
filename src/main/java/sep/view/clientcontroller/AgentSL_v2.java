@@ -943,6 +943,17 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
+    public int getAvailableCheckpointNum() {
+        switch(this.dsrp.getCourseName()) {
+            case "DizzyHighway" : return 1;
+            case "ExtraCrispy" :
+            case "Twister" :
+            case "LostBearings" : return 4;
+            case "DeathTrap" : return 5;
+        }
+        return 1;
+    }
+
     private void evaluateProgrammingPhaseWithQLearning()
     {
         EEnvironment.INSTANCE.initRewardMatrix();
