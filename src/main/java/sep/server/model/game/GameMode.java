@@ -14,7 +14,6 @@ import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -91,6 +90,7 @@ public class GameMode {
 
     /**
      * The following method checks if the starting point selection has been finished.
+     *
      * @return true if finished, false if not finished
      */
     private boolean startingPointSelectionFinished() {
@@ -105,9 +105,10 @@ public class GameMode {
     /**
      * The following method is used to set a starting point (as long it is a valid one).
      * Afterward, next player for choosing a starting point is chosen or, if not possible, the phase is ended.
+     *
      * @param ctrl player that wants to set a starting point
-     * @param x x coordinate of the starting point
-     * @param y y coordinate of the starting point
+     * @param x    x coordinate of the starting point
+     * @param y    y coordinate of the starting point
      */
     public synchronized void setStartingPoint(IOwnershipable ctrl, int x, int y) {
         if (ableToSetStartPoint(ctrl)) {
@@ -121,19 +122,16 @@ public class GameMode {
                 ctrl.getAuthGameMode().getSession().broadcastRotationUpdate(ctrl.getPlayerID(), course.getStartingTurningDirection());
 
                 if(startingPointSelectionFinished()) {
-                    //Once all players have set their starting points, the programming phase starts
                     l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
                     this.handleNewPhase(EGamePhase.UPGRADE);
 
                 } else {
-                    //Otherwise, the next player that hasn't set their robot yet is chosen
                     for(Player player : players) {
                         if (player.getPlayerRobot().getCurrentTile() == null) {
                             curPlayerInRegistration = player;
                             l.info("Now Player with ID: " + player.getController().getPlayerID() + " has to set StartingPoint");
                             ctrl.getAuthGameMode().getSession().broadcastCurrentPlayer(player.getController().getPlayerID());
-                            if (player.getController() instanceof final Agent a)
-                            {
+                            if (player.getController() instanceof final Agent a) {
                                 a.evaluateStartingPoint();
                             }
                             return;
@@ -143,8 +141,7 @@ public class GameMode {
             }
             else {
                 l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
-                if (ctrl instanceof PlayerController pc)
-                {
+                if (ctrl instanceof PlayerController pc) {
                     new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
                 }
                 else {l.error("The agent {} tried to do something illegal. Starting point selection failed.", ctrl.getPlayerID());}
@@ -153,10 +150,10 @@ public class GameMode {
     }
 
     /**
-     * Checks if setting a starting point is possible.
-     * Prints corresponding error messages
+     * Checks if setting a starting point is possibl and prints corresponding error messages.
+     *
      * @param ctrl Player that wants to set a starting point
-     * @return true if possible, false if not possible
+     * @return     true if possible, false if not possible
      */
     public boolean ableToSetStartPoint(IOwnershipable ctrl) {
         if (gamePhase != EGamePhase.REGISTRATION) {
@@ -191,8 +188,7 @@ public class GameMode {
         /* The current player is the first player that joined the game. */
         this.getSession().broadcastCurrentPlayer(this.curPlayerInRegistration.getController().getPlayerID());
 
-        if (this.curPlayerInRegistration.getController() instanceof final Agent a)
-        {
+        if (this.curPlayerInRegistration.getController() instanceof final Agent a) {
             l.error("An agent must never be the first current player in a game. Fault agent ID: {}.", a.getPlayerID());
         }
 
@@ -201,6 +197,9 @@ public class GameMode {
 
     //region Upgrade Phase helpers
 
+    /**
+     * Sets up the upgrade shop by either refilling it or exchanging upgrade slots.
+     */
     private void setupUpgradeShop() {
         if(upgradeShopIsEmpty()) {
             refillUpgradeShop();
@@ -209,6 +208,12 @@ public class GameMode {
         }
     }
 
+
+    /**
+     * Checks if the upgrade shop is empty.
+     *
+     * @return True if empty, false otherwise.
+     */
     private boolean upgradeShopIsEmpty() {
         for (AUpgradeCard upgradeCard : upgradeShop) {
             if (upgradeCard != null) {
@@ -218,14 +223,23 @@ public class GameMode {
         return true;
     }
 
+    /**
+     * Refills the upgrade shop with new upgrade cards.
+     */
     private void refillUpgradeShop() {
         //TODO
     }
 
+    /**
+     * Exchanges upgrade slots in the upgrade shop.
+     */
     private void exchangeUpgradeSlots() {
         //TODO
     }
 
+    /**
+     * Handles the purchase of upgrades during the upgrade phase.
+     */
     private void handleUpgradePurchase() {
         //TODO
     }
@@ -258,7 +272,6 @@ public class GameMode {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-
             p.shuffleAndRefillDeck();
             l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
             this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
@@ -268,25 +281,21 @@ public class GameMode {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-
             l.debug("P {} - Has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
-            if (p.getController() instanceof PlayerController pc)
-            {
+            if (p.getController() instanceof PlayerController pc) {
                 pc.getSession().sendHandCardsToPlayer(pc, p.getPlayerHandAsStringArray());
                 continue;
             }
 
-            /* TODO Here call method on agent and let them decide how they want to play this programming phase. */
+            // TODO: Call a method on the agent and let them decide how they want to play this programming phase.
 
-            if (p.getController() instanceof final Agent a)
-            {
+            if (p.getController() instanceof final Agent a) {
                 a.evaluateProgrammingPhase();
                 continue;
             }
 
             l.error("No matching instance found for handling the programming phase for player {}.", p.getController().getPlayerID());
-
             continue;
         }
 
@@ -321,15 +330,14 @@ public class GameMode {
                 }
             }
 
-            //Stehen lassen bis der neue Code getestet wurde.
+            //Leave until new code was tested
             /*if (minIndex != -1) {
                 this.players.get(minIndex).setPriority(currentPriority);
                 currentPriority--;
                 distances[minIndex] = Integer.MAX_VALUE;
             }*/
 
-
-            //Inkludiert nun die Funktion der AdminPriviledgeKarte. Muss aber noch getestet werden (sobald Shop verfügbar). Bis dahin die alte Methode dalassen.
+            //Now, includes AdminPrivilege logic. Still needs to be tested once shop is available.
             if (minIndex != -1) {
                 Player currentPlayer = this.players.get(minIndex);
 
