@@ -1192,6 +1192,20 @@ public final class AgentSL_v2 extends ServerListener
 
         eval.start();
 
+        if (EClientInformation.INSTANCE.isMockView())
+        {
+            try
+            {
+                eval.join();
+            }
+            catch (final InterruptedException e)
+            {
+                l.fatal("Failed to join evaluation thread.");
+                GameInstance.kill(GameInstance.EXIT_FATAL);
+                return;
+            }
+        }
+
         return;
     }
 
