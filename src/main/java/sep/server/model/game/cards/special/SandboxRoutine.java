@@ -1,24 +1,37 @@
 package sep.server.model.game.cards.special;
 
-import sep.server.json.game.effects.MovementModel;
-import sep.server.json.game.effects.PlayerTurningModel;
-import sep.server.model.game.GameState;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sep.server.model.game.Player;
+import sep.server.model.game.builder.CourseBuilder;
 import sep.server.model.game.cards.IPlayableCard;
 
+/**
+ * Represents a special programming card with a sandbox routine effect.
+ * The SandboxRoutine card allows the player to choose a movement or rotation action.
+ */
 public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayableCard {
+
+    private static final Logger l = LogManager.getLogger(CourseBuilder.class);
+
     public SandboxRoutine(String cardType) {
         super(cardType);
         this.cardType = "SandboxRoutine";
     }
+
+    /**
+     * Plays the SandboxRoutine card, allowing the player to choose a movement or rotation action.
+     *
+     * @param player             the player playing the card
+     * @param currentRoundNumber the current round number
+     */
     @Override
     public void playCard(Player player, int currentRoundNumber)  {
 
-        //TODO Abfrage machen
-        String auswahl = null;
+        //TODO implement logic to obtain user's choice
+        String userSelection = null; //placeholder for user's choice
 
-
-        switch (auswahl) {
+        switch (userSelection) {
 
             case "Move1":
                 player.getPlayerRobot().moveRobotOneTileForwards();
@@ -29,7 +42,6 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
-
                 break;
 
             case "Move3":
@@ -37,19 +49,16 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getPlayerRobot().moveRobotOneTileForwards();
                 player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
-
                 break;
 
             case "BackUp":
                 player.getPlayerRobot().moveRobotOneTileBackwards();
                 player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
-
                 break;
 
             case "TurnLeft":
                 player.getPlayerRobot().rotateRobotOnTileToTheLeft();
                 player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
-
                 break;
 
             case "TurnRight":
@@ -63,10 +72,9 @@ public class SandboxRoutine extends ASpecialProgrammingCard implements IPlayable
                 player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
                 player.getAuthGameMode().getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
                 break;
+
             default:
-               return;
+                l.warn("Invalid choice for SandboxRoutine card: {}", userSelection);
         }
-
-
     }
 }
