@@ -415,6 +415,7 @@ public class GameMode {
         }
     }
 
+    //TODO add JavaDoc
     public void moveCheckpoints(){
         if(course.getMovingCheckpoints()){
             ArrayList<Coordinate> oldCheckpointCoordinates = course.getCheckpointCoordinates();
@@ -424,6 +425,7 @@ public class GameMode {
                 Tile oldTile = course.getTileByCoordinate(oldCoordinate);
                 CheckPoint checkpoint = oldTile.removeCheckpoint();
 
+                //get the new Coordinate for the CheckPoint
                 ConveyorBelt conveyorBelt = oldTile.getConveyorBelt();
                 String outDirection = conveyorBelt.getOutcomingFlowDirection();
                 Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
@@ -433,8 +435,11 @@ public class GameMode {
                     targetCoordinate = calculateNewCoordinate(nextConveyorBelt.getOutcomingFlowDirection(), targetCoordinate);
                 }
 
+                //add the Checkpoint to the new Tile
                 Tile newTile = course.getTileByCoordinate(targetCoordinate);
                 newTile.addCheckPoint(checkpoint);
+
+                this.getSession().broadcastCheckPointMoved(checkpoint.getCheckpointNumber(), targetCoordinate.getX(), targetCoordinate.getX());
             }
         }
     }
