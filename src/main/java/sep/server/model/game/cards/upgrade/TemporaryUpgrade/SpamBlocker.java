@@ -6,6 +6,10 @@ import sep.server.model.game.Player;
 import sep.server.model.game.cards.IPlayableCard;
 import sep.server.model.game.cards.damage.SpamDamage;
 
+/**
+ * Represents the SpamBlocker upgrade card.
+ * This card allows a player to remove spam damage cards from their hand.
+ */
 public class SpamBlocker extends ATemporaryUpgrade{
 
     private static final Logger logger = LogManager.getLogger(SpamBlocker.class);
@@ -16,8 +20,13 @@ public class SpamBlocker extends ATemporaryUpgrade{
         this.cost = 3;
     }
 
+    /**
+     * Activates the SpamBlocker upgrade for a player.
+     * Removes SpamDamage cards from the player's hand and adds them to the SpamDeck.
+     *
+     * @param player The player for whom the SpamBlocker upgrade is activated.
+     */
     public void activateUpgrade(Player player) {
-
         logger.info("UpgradeCard (SpamBlocker) activated for player '{}'. Removing SpamDamage card from hand.",
                 player.getController().getName());
 
@@ -25,7 +34,6 @@ public class SpamBlocker extends ATemporaryUpgrade{
             IPlayableCard currentCard = player.getPlayerHand().get(i);
 
             if (currentCard instanceof SpamDamage) {
-
                 player.getPlayerHand().remove(i);
                 player.getAuthGameMode().getSpamDeck().add((SpamDamage) currentCard);
 
@@ -39,7 +47,5 @@ public class SpamBlocker extends ATemporaryUpgrade{
         }
 
         player.getAuthGameMode().getSession().sendUsingSpamBlockerNotification(player.getController().getPlayerID(), new String[]{"SpamBlocker"});
-
-
     }
 }
