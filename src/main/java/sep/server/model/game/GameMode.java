@@ -886,14 +886,13 @@ public class GameMode {
         addDelay(2000);
         this.activateConveyorBelts(2);
         this.activateConveyorBelts(1);
-        this.moveCheckpoints();
         this.activatePushPanels();
         this.activateGears();
         this.findLasers();
         this.shootRobotLasers();
         this.checkEnergySpaces();
         this.checkCheckpoints();
-
+        this.moveCheckpoints();
         this.currentRegisterIndex++;
 
         return this.currentRegisterIndex < GameMode.REGISTER_PHASE_COUNT;
