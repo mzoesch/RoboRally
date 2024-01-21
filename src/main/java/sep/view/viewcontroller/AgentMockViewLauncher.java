@@ -1,14 +1,17 @@
 package sep.view.viewcontroller;
 
+import sep.view.json.               RDefaultServerRequestParser;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   AgentSL_v2;
-import sep.view.json.               RDefaultServerRequestParser;
+import sep.view.clientcontroller.   AgentRemotePlayerData;
 import sep.view.lib.                EGamePhase;
+import sep.view.lib.                RCoordinate;
 
 import org.json.                    JSONObject;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import java.util.                   Objects;
 
 public final class AgentMockViewLauncher implements IMockView
 {
@@ -44,6 +47,9 @@ public final class AgentMockViewLauncher implements IMockView
         {
             EGameState.INSTANCE.addGotRegister(s);
         }
+
+        Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).setStartingPosition(new RCoordinate(0, 3));
+        ( (AgentRemotePlayerData) EGameState.INSTANCE.getClientRemotePlayer() ).setRotation(90);
 
         new AgentSL_v2(null).onDevelopmentEvaluation();
 
