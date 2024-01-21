@@ -240,7 +240,15 @@ public class GameMode {
      * Exchanges upgrade slots in the upgrade shop.
      */
     private void exchangeUpgradeSlots() {
-        //TODO
+        for(int i = 0; i<upgradeShop.length; i++) {
+            if(upgradeShop[i] != null) {
+                upgradeDeck.add(upgradeShop[i]);
+                upgradeShop[i] = null;
+            }
+            upgradeShop[i] = upgradeDeck.get(0);
+            l.info("Refilled upgrade shop at index " + i);
+        }
+        l.info("Cards in upgrade shop slots exchanged.");
     }
 
     /**
