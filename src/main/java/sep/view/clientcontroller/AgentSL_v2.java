@@ -211,6 +211,10 @@ enum EEnvironment implements ICourse
     {
     }
 
+    private final record RQualityStateAction(EAction action, float quality)
+    {
+    }
+
     enum EAction
     {
         NORTH_SINGLE,
