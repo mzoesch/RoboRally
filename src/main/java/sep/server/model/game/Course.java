@@ -16,6 +16,8 @@ public class Course {
 
     private final String startingTurningDirection;
 
+    private final boolean movingCheckpoints;
+
     /**
      * Creates course depending on course name passed.
      * @param courseName name of corresponding course
@@ -25,6 +27,7 @@ public class Course {
         CourseBuilder courseBuilder = new CourseBuilder();
         course = courseBuilder.buildCourse(courseName);
         startingTurningDirection = courseBuilder.getStartingTurningDirection(courseName);
+        movingCheckpoints = checkForMovingCheckpoints();
     }
 
     /**
@@ -129,6 +132,26 @@ public class Course {
             }
         }
         return c;
+    }
+
+    public boolean checkForMovingCheckpoints() {
+        ArrayList<Coordinate> oldCheckpointCoordinates = getCheckpointCoordinates();
+        for (Coordinate c : oldCheckpointCoordinates) {
+            Tile currentTile = getTileByCoordinate(c);
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                    for (FieldType f : currentTile.getFieldTypes()) {
+                        if (f instanceof CheckPoint checkpoint) {
+                            l.info("There are moving checkpoints in the course");
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        l.info("There are no moving checkpoints in the course");
+        return false;
     }
 
     public Tile getNextFreeStartingPoint()
