@@ -1094,13 +1094,13 @@ enum EEnvironment implements ICourse
 
     public void outputQualities()
     {
-        l.info("Qualities:");
+        l.debug("Qualities:");
 
         for (int file = 0; file < this.qualities.length; ++file)
         {
             for (int rank = 0; rank < this.qualities[file].length; ++rank)
             {
-                l.info(this.getQualityStateAsString(new RCoordinate(file, rank)));
+                l.debug(this.getQualityStateAsString(new RCoordinate(file, rank)));
                 continue;
             }
 
