@@ -817,6 +817,22 @@ enum EEnvironment implements ICourse
         return actions;
     }
 
+    private ArrayList<RQualityStateAction> getQualityActionsInDescendingOrder(final RCoordinate state)
+    {
+        final ArrayList<RQualityStateAction> actions = new ArrayList<RQualityStateAction>();
+
+        for (int i = 0; i < EEnvironment.EAction.NUM.ordinal(); ++i)
+        {
+            actions.add(new RQualityStateAction(EEnvironment.EAction.fromInt(i), this.qualities[state.x()][state.y()][i]));
+            continue;
+        }
+
+        actions.sort((a, b) -> Float.compare(b.quality, a.quality));
+
+        return actions;
+
+    }
+
     // endregion Helper methods
 
     public void initRewardMatrix()
