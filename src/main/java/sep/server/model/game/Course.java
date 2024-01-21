@@ -115,6 +115,10 @@ public class Course {
         return null;
     }
 
+    /**
+     * Method to get an array with the coordinates of the checkpoints on the course
+     * @return ArrayList with the coordinates of the checkpoints
+     */
     public ArrayList<Coordinate> getCheckpointCoordinates(){
         ArrayList<Coordinate> c = new ArrayList<>();
         for (ArrayList<Tile> ts : this.course) {
