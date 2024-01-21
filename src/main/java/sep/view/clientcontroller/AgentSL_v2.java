@@ -18,6 +18,7 @@ import java.util.                   Objects;
 import java.util.                   Arrays;
 import java.util.                   Random;
 import java.util.                   Locale;
+import java.util.                   ArrayList;
 
 final class TileModifier
 {
@@ -1124,6 +1125,17 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
+    private void sendSelectedCards()
+    {
+        for (int i = 0; i < EGameState.INSTANCE.getRegisters().length; ++i)
+        {
+            new SelectedCardModel(i, EGameState.INSTANCE.getRegister(i)).send();
+            continue;
+        }
+
+        return;
+    }
+
     private synchronized void evaluateProgrammingPhaseWithQLearning()
     {
         l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
@@ -1162,11 +1174,7 @@ public final class AgentSL_v2 extends ServerListener
             continue;
         }
 
-        for (int i = 0; i < 5; ++i)
-        {
-            new SelectedCardModel(i, EGameState.INSTANCE.getRegister(i)).send();
-            continue;
-        }
+        this.sendSelectedCards();
 
         return;
     }
