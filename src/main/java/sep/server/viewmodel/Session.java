@@ -586,7 +586,7 @@ public final class Session
 
         for (final PlayerController pc : this.getRemotePlayers())
         {
-            new CheckpointMovedModel(pc.getClientInstance(), checkPointID, x, y);
+            new CheckpointMovedModel(pc.getClientInstance(), checkPointID, x, y).send();
             continue;
         }
 
