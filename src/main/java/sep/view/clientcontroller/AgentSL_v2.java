@@ -996,19 +996,51 @@ enum EEnvironment implements ICourse
 
             if (state.x() == actionState.x() && state.y() == actionState.y() - 1)
             {
-                direction = "S";
+                direction = "SS";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() - 2)
+            {
+                direction = "SD";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() - 3)
+            {
+                direction = "ST";
             }
             else if (state.x() == actionState.x() && state.y() == actionState.y() + 1)
             {
-                direction = "N";
+                direction = "NS";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() + 2)
+            {
+                direction = "ND";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() + 3)
+            {
+                direction = "NT";
             }
             else if (state.x() == actionState.x() - 1 && state.y() == actionState.y())
             {
-                direction = "E";
+                direction = "ES";
+            }
+            else if (state.x() == actionState.x() - 2 && state.y() == actionState.y())
+            {
+                direction = "ED";
+            }
+            else if (state.x() == actionState.x() - 3 && state.y() == actionState.y())
+            {
+                direction = "ET";
             }
             else if (state.x() == actionState.x() + 1 && state.y() == actionState.y())
             {
-                direction = "W";
+                direction = "WS";
+            }
+            else if (state.x() == actionState.x() + 2 && state.y() == actionState.y())
+            {
+                direction = "WD";
+            }
+            else if (state.x() == actionState.x() + 3 && state.y() == actionState.y())
+            {
+                direction = "WT";
             }
             else
             {
