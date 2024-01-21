@@ -7,6 +7,10 @@ import sep.server.model.game.cards.IPlayableCard;
 
 import java.util.ArrayList;
 
+/**
+ * Represents the MemorySwap upgrade card.
+ * This card allows a player to draw three new cards and add three cards from their hand to their deck.
+ */
 public class MemorySwap extends ATemporaryUpgrade{
 
     private static final Logger l = LogManager.getLogger(MemorySwap.class);
@@ -17,10 +21,17 @@ public class MemorySwap extends ATemporaryUpgrade{
         this.cost = 1;
     }
 
+    /**
+     * Activates the MemorySwap upgrade for a player.
+     * Swaps specified cards from the player's hand with cards drawn from their deck.
+     *
+     * @param player The player for whom the MemorySwap upgrade is activated.
+     */
     public void activateUpgrade(Player player) {
-
-        //Liste DrawnCardsFromDeck
         ArrayList<IPlayableCard> drawnCardsFromDeck = new ArrayList<>();
+        ArrayList<IPlayableCard> drawnCardsFromHand = new ArrayList<>();
+        String[] memorySwapCards = player.getMemorySwapCards();
+
         for (int i = 0; i < 3; i++) {
             if (player.getPlayerDeck().isEmpty()) {
                 player.shuffleAndRefillDeck();
@@ -29,9 +40,6 @@ public class MemorySwap extends ATemporaryUpgrade{
             drawnCardsFromDeck.add(drawnCard);
         }
 
-        //Liste DrawnCardsFromHand
-        ArrayList<IPlayableCard> drawnCardsFromHand = new ArrayList<>();
-        String[] memorySwapCards = player.getMemorySwapCards();
         for (IPlayableCard card : player.getPlayerHand()) {
             String cardName = card.getCardType();
             for (String memorySwapCardName : memorySwapCards) {
@@ -41,7 +49,6 @@ public class MemorySwap extends ATemporaryUpgrade{
                 }
             }
         }
-
 
         player.getPlayerDeck().addAll(0, drawnCardsFromHand);
 
@@ -54,6 +61,5 @@ public class MemorySwap extends ATemporaryUpgrade{
                 player.getController().getName(), player.getPlayerHand());
 
         player.setMemorySwapCards(null);
-
     }
 }
