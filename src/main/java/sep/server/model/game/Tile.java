@@ -172,6 +172,16 @@ public class Tile {
         return false;
     }
 
+    public ConveyorBelt getConveyorBelt(){
+        for (FieldType fieldType : fieldTypes) {
+            if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                return conveyorBelt;
+            }
+        }
+        l.warn("Tried to get a conveyorBelt from a tile without one");
+        return null;
+    }
+
     public boolean isStartingPoint(){
         for (FieldType fieldType : fieldTypes) {
             if (fieldType instanceof StartPoint) {
