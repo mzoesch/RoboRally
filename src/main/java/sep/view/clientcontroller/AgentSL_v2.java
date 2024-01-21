@@ -943,27 +943,6 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    public int getAvailableCheckpointNum() {
-        switch(this.dsrp.getCourseName()) {
-            case "DizzyHighway" : return 1;
-            case "ExtraCrispy" :
-            case "Twister" :
-            case "LostBearings" : return 4;
-            case "DeathTrap" : return 5;
-        }
-        return 1;
-    }
-
-    public boolean lastCheckpointReached() {
-        int availableCheckpoints = getAvailableCheckpointNum();
-        int agentCheckPointsReached = Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getCheckPointsReached();
-        if(availableCheckpoints == agentCheckPointsReached) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private void evaluateProgrammingPhaseWithQLearning()
     {
         EEnvironment.INSTANCE.initRewardMatrix();
