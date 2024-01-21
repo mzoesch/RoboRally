@@ -1,6 +1,7 @@
 package sep.server.model.game.cards.damage;
 
 import sep.server.json.game.damage.DrawDamageModel;
+import sep.server.model.game.GameState;
 import sep.server.model.game.Player;
 import sep.server.viewmodel.PlayerController;
 
@@ -12,8 +13,7 @@ import org.apache.logging.log4j.Logger;
  */
 public class TrojanHorseDamage extends ADamageCard {
 
-    private final static Logger l = LogManager.getLogger(TrojanHorseDamage.class);
-
+    private static final Logger l = LogManager.getLogger(GameState.class);
     public TrojanHorseDamage(String cardType) {
         super(cardType);
         this.cardType = "TrojanHorseDamage";
