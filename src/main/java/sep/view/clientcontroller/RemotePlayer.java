@@ -169,6 +169,10 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         return this.possessing.getPosition();
     }
 
+    public int getCheckPointsReached() {
+        return checkPointsReached;
+    }
+
     // endregion Getters and Setters
 
 }

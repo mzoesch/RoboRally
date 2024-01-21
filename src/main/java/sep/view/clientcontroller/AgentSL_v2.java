@@ -954,6 +954,16 @@ public final class AgentSL_v2 extends ServerListener
         return 1;
     }
 
+    public boolean lastCheckpointReached() {
+        int availableCheckpoints = getAvailableCheckpointNum();
+        int agentCheckPointsReached = Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getCheckPointsReached();
+        if(availableCheckpoints == agentCheckPointsReached) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void evaluateProgrammingPhaseWithQLearning()
     {
         EEnvironment.INSTANCE.initRewardMatrix();
