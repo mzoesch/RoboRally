@@ -149,8 +149,10 @@ public enum EClientInformation
     }
 
     /**
-     * Will block the calling thread until a response from the server is received. Only use this method for the
-     * initial connection to the server. After that, use the {@link #listen(boolean)} method.
+     * Will block the calling thread until a response from the server is received.
+     * Only used for the initial connection to the server.
+     *
+     * @see EClientInformation#listen(boolean)
      */
     public String waitForServerResponse() throws IOException
     {
@@ -164,7 +166,8 @@ public enum EClientInformation
     }
 
     /**
-     * Will create a new thread that will listen for server responses to not block the main thread.
+     * @param bBlock If false, a new executor service will be created and the {@link ServerListener} will be
+     *               initialized on it. If true, the {@link ServerListener} will be initialized on the main thread.
      *
      * @see sep.view.clientcontroller.ServerListener
      */
@@ -250,7 +253,7 @@ public enum EClientInformation
 
     public StringBuilder getStdServerErrPipeline()
     {
-        return stdServerErrPipeline;
+        return this.stdServerErrPipeline;
     }
 
     public void setPlayerID(final int playerID)

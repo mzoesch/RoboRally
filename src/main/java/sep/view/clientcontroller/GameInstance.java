@@ -154,8 +154,8 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
     }
 
     /**
-     * Will block the calling thread until a response from the server is received. Only use this method for the
-     * initial connection to the server.
+     * Will block the calling thread until a response from the server is received.
+     * Only used for the initial client connection.
      *
      * @see EClientInformation#waitForServerResponse()
      */

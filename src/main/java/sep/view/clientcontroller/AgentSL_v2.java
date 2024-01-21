@@ -212,10 +212,18 @@ enum EEnvironment implements ICourse
 
     enum EAction
     {
-        NORTH,
-        EAST,
-        SOUTH,
-        WEST,
+        NORTH_SINGLE,
+        NORTH_DOUBLE,
+        NORTH_TRIPLE,
+        EAST_SINGLE,
+        EAST_DOUBLE,
+        EAST_TRIPLE,
+        SOUTH_SINGLE,
+        SOUTH_DOUBLE,
+        SOUTH_TRIPLE,
+        WEST_SINGLE,
+        WEST_DOUBLE,
+        WEST_TRIPLE,
         NUM;
 
         public static EAction fromInt(final int i)
@@ -344,28 +352,30 @@ enum EEnvironment implements ICourse
 
     private static final Logger l = LogManager.getLogger(EEnvironment.class);
 
-    private static final int    IMPOSSIBLE_TRANSITION_PENALTY   = -10_000;
-    private static final int    MATCHING_TILE_PENALTY           = -10_000;
-    /** TODO This is a temporal solution as it should be decreased later. */
-    private static final int    EFFECTS_PENALTY                 = -1;
-    private static final int    EMPTY_TILE_PENALTY              = -1;
-    private static final int    GOAL_REWARD                     = 1_000;
+    private static final int    MAX_REACHABLE_DISTANCE          = 3;
 
-    private static final int    EPISODES                        = 1_000;
-    private static final int    CALCULATE_AVERAGE_ITERATIONS    = 100;
-    private static final int    MAX_EPISODE_ITERATIONS          = 2_000;
+    private static final float  IMPOSSIBLE_TRANSITION_PENALTY   = -10_000.0f;
+    private static final float  MATCHING_TILE_PENALTY           = -10_000.0f;
+    /** TODO This is a temporal solution as it should be decreased later. */
+    private static final float  EFFECTS_PENALTY                 = -50.0f;
+    private static final float  EMPTY_TILE_PENALTY              = -1.0f;
+    private static final float  GOAL_REWARD                     = 1_000.0f;
+
+    private static final int    EPISODES                        = 2_000;
+    private static final int    CALCULATE_AVERAGE_ACTIONS       = 100;
+    private static final int    MAX_EPISODE_ACTIONS             = 2_000;
 
     /**
      * Hyperparameter for the learning rate. High values will yield a fast learning process but also an increased
      * risk of instability and wrong decisions.
      */
-    private static final float  ALPHA                           = 0.2f;
+    private static final float  ALPHA                           = 0.3f;
     /**
      * Eagerness threshold. AKA Exploration and Exploitation Trade-Off parameter. High values will yield in an eminent
      * exploitation of the learned knowledge. Low values will let the agent forget their life goals and explore the
      * environment.
      */
-    private static final float  EPSILON                         = 0.8f;
+    private static final float  EPSILON                         = 0.7f;
     /**
      * Discount factor. High values will yield in a long-term thinking agent while low values will yield in a
      * myopic agent. It reflects the agent's preference for immediate rewards over delayed ones.
@@ -396,13 +406,104 @@ enum EEnvironment implements ICourse
 
     // region Helper methods
 
+    /** If a pawn cannot traverse from one state to another (e.g., there is no wall or pit between them). */
+    private boolean isBlocked(final Tile origin, final Tile target)
+    {
+        final int distanceX     = Math.abs(origin.getCoordinate().x() - target.getCoordinate().x());
+        final int distanceY     = Math.abs(origin.getCoordinate().y() - target.getCoordinate().y());
+        final int distance      = distanceX + distanceY;
+
+        if (origin.getLocation().x() != target.getLocation().x() && origin.getLocation().y() != target.getLocation().y())
+        {
+            return true;
+        }
+
+        if (distance > 1)
+        {
+            final boolean areHorizontalAligned = origin.getLocation().y() == target.getLocation().y();
+
+            final Tile newOrigin = this.getTile(
+                new RCoordinate(
+                    areHorizontalAligned
+                    ? origin.getLocation().x() > target.getLocation().x()
+                        ? origin.getLocation().x() - 1
+                        : origin.getLocation().x() + 1
+                    : origin.getLocation().x()
+                    ,
+                    areHorizontalAligned
+                    ? origin.getLocation().y()
+                    : origin.getLocation().y() > target.getLocation().y()
+                        ? origin.getLocation().y() - 1
+                        : origin.getLocation().y() + 1
+                )
+            );
+
+            assert newOrigin != null;
+
+            if (this.isBlocked(newOrigin, target))
+            {
+                return true;
+            }
+        }
+
+        if (origin.hasWall() || target.hasWall())
+        {
+            if ((origin.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "top")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "right")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "bottom")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "left")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(origin.getWallOrientation(), "bottom")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(origin.getWallOrientation(), "left")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(origin.getWallOrientation(), "top")))
+            {
+                return true;
+            }
+
+            if ((origin.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(origin.getWallOrientation(), "right")))
+            {
+                return true;
+            }
+        }
+
+        if (origin.isPit() || target.isPit()) /* can we remove target? */
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private float calculateReward(final Tile current, final Tile target)
     {
         final int distanceX     = Math.abs(current.getCoordinate().x() - target.getCoordinate().x());
         final int distanceY     = Math.abs(current.getCoordinate().y() - target.getCoordinate().y());
         final int distance      = distanceX + distanceY;
 
-        if (distance > 1)
+        if (distance > EEnvironment.MAX_REACHABLE_DISTANCE)
         {
             return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
@@ -412,47 +513,9 @@ enum EEnvironment implements ICourse
             return EEnvironment.MATCHING_TILE_PENALTY;
         }
 
-        if (target.hasWall() || current.hasWall())
+        if (this.isBlocked(current, target))
         {
-            if ((current.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "top")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "right")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(target.getWallOrientation(), "bottom")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(target.getWallOrientation(), "left")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().y() < target.getCoordinate().y()) && (Objects.equals(current.getWallOrientation(), "bottom")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() > target.getCoordinate().x()) && (Objects.equals(current.getWallOrientation(), "left")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().y() > target.getCoordinate().y()) && (Objects.equals(current.getWallOrientation(), "top")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
-
-            if ((current.getCoordinate().x() < target.getCoordinate().x()) && (Objects.equals(current.getWallOrientation(), "right")))
-            {
-                return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
-            }
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
         if (target.isConveyorBelt())
@@ -469,18 +532,18 @@ enum EEnvironment implements ICourse
 
         if (target.isPit())
         {
-            return EEnvironment.EFFECTS_PENALTY;
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
+        }
+
+        if (target.isAntenna())
+        {
+            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
         if (target.isCheckpoint())
         {
             /* TODO Check if it is the right checkpoint. */
             return EEnvironment.GOAL_REWARD;
-        }
-
-        if (target.isAntenna())
-        {
-            return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
         return EEnvironment.EMPTY_TILE_PENALTY;
@@ -576,7 +639,7 @@ enum EEnvironment implements ICourse
     {
         switch (action)
         {
-        case NORTH:
+        case NORTH_SINGLE:
         {
             if (location.y() - 1 < 0)
             {
@@ -586,7 +649,27 @@ enum EEnvironment implements ICourse
             return new RCoordinate(location.x(), location.y() - 1);
         }
 
-        case EAST:
+        case NORTH_DOUBLE:
+        {
+            if (location.y() - 2 < 0)
+            {
+                return new RCoordinate(location.x(), 0);
+            }
+
+            return new RCoordinate(location.x(), location.y() - 2);
+        }
+
+        case NORTH_TRIPLE:
+        {
+            if (location.y() - 3 < 0)
+            {
+                return new RCoordinate(location.x(), 0);
+            }
+
+            return new RCoordinate(location.x(), location.y() - 3);
+        }
+
+        case EAST_SINGLE:
         {
             if (location.x() + 1 >= EEnvironment.INSTANCE.getFiles())
             {
@@ -596,7 +679,27 @@ enum EEnvironment implements ICourse
             return new RCoordinate(location.x() + 1, location.y());
         }
 
-        case SOUTH:
+        case EAST_DOUBLE:
+        {
+            if (location.x() + 2 >= EEnvironment.INSTANCE.getFiles())
+            {
+                return new RCoordinate(EEnvironment.INSTANCE.getFiles() - 1, location.y());
+            }
+
+            return new RCoordinate(location.x() + 2, location.y());
+        }
+
+        case EAST_TRIPLE:
+        {
+            if (location.x() + 3 >= EEnvironment.INSTANCE.getFiles())
+            {
+                return new RCoordinate(EEnvironment.INSTANCE.getFiles() - 1, location.y());
+            }
+
+            return new RCoordinate(location.x() + 3, location.y());
+        }
+
+        case SOUTH_SINGLE:
         {
             if (location.y() + 1 >= EEnvironment.INSTANCE.getRanks())
             {
@@ -606,7 +709,27 @@ enum EEnvironment implements ICourse
             return new RCoordinate(location.x(), location.y() + 1);
         }
 
-        case WEST:
+        case SOUTH_DOUBLE:
+        {
+            if (location.y() + 2 >= EEnvironment.INSTANCE.getRanks())
+            {
+                return new RCoordinate(location.x(), EEnvironment.INSTANCE.getRanks() - 1);
+            }
+
+            return new RCoordinate(location.x(), location.y() + 2);
+        }
+
+        case SOUTH_TRIPLE:
+        {
+            if (location.y() + 3 >= EEnvironment.INSTANCE.getRanks())
+            {
+                return new RCoordinate(location.x(), EEnvironment.INSTANCE.getRanks() - 1);
+            }
+
+            return new RCoordinate(location.x(), location.y() + 3);
+        }
+
+        case WEST_SINGLE:
         {
             if (location.x() - 1 < 0)
             {
@@ -614,6 +737,26 @@ enum EEnvironment implements ICourse
             }
 
             return new RCoordinate(location.x() - 1, location.y());
+        }
+
+        case WEST_DOUBLE:
+        {
+            if (location.x() - 2 < 0)
+            {
+                return new RCoordinate(0, location.y());
+            }
+
+            return new RCoordinate(location.x() - 2, location.y());
+        }
+
+        case WEST_TRIPLE:
+        {
+            if (location.x() - 3 < 0)
+            {
+                return new RCoordinate(0, location.y());
+            }
+
+            return new RCoordinate(location.x() - 3, location.y());
         }
 
         default:
@@ -629,12 +772,12 @@ enum EEnvironment implements ICourse
     /** @return The amount of iterations the agent required to get to any terminal state. */
     private int evaluateAnEpisode(final RCoordinate start)
     {
-        int             iterations  = 0;
+        int             actions     = 0;
         RCoordinate     cursor      = start;
 
         while (true)
         {
-            if (iterations >= EEnvironment.MAX_EPISODE_ITERATIONS)
+            if (actions >= EEnvironment.MAX_EPISODE_ACTIONS)
             {
                 break;
             }
@@ -656,18 +799,18 @@ enum EEnvironment implements ICourse
 
             this.qualities[cursor.x()][cursor.y()][action.ordinal()] = updatedQuality;
 
-            ++iterations;
+            ++actions;
             cursor = next;
 
             continue;
         }
 
-        if (iterations >= EEnvironment.MAX_EPISODE_ITERATIONS)
+        if (actions >= EEnvironment.MAX_EPISODE_ACTIONS)
         {
-            l.warn("Agent {} exceeded the maximum amount of iterations per episode and did not reach a terminal state.", EClientInformation.INSTANCE.getPlayerID());
+            l.warn("Agent {} exceeded the maximum amount of actions per episode and did not reach a terminal state.", EClientInformation.INSTANCE.getPlayerID());
         }
 
-        return iterations;
+        return actions;
     }
 
     // endregion Helper methods
@@ -706,21 +849,27 @@ enum EEnvironment implements ICourse
 
     public void evaluateQualityMatrix()
     {
-        int sum = 0;
+        int totalActionCount    = 0;
+        int latestActionSum     = 0;
 
         for (int i = 0; i < EEnvironment.EPISODES; ++i)
         {
-            sum += this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
+            final int actions = this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
 
-            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ITERATIONS == 0)
+            latestActionSum     += actions;
+            totalActionCount    += actions;
+
+            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ACTIONS == 0)
             {
-                l.debug("Agent {} has evaluated {} episodes. Average iterations per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ITERATIONS, sum / EEnvironment.CALCULATE_AVERAGE_ITERATIONS);
-                sum = 0;
+                l.debug("Agent {} has evaluated {} episodes. Average actions per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ACTIONS, latestActionSum / EEnvironment.CALCULATE_AVERAGE_ACTIONS);
+                latestActionSum = 0;
             }
 
             continue;
         }
 
+        l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
+        return;
     }
 
     // endregion Quality learning
@@ -847,19 +996,51 @@ enum EEnvironment implements ICourse
 
             if (state.x() == actionState.x() && state.y() == actionState.y() - 1)
             {
-                direction = "S";
+                direction = "SS";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() - 2)
+            {
+                direction = "SD";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() - 3)
+            {
+                direction = "ST";
             }
             else if (state.x() == actionState.x() && state.y() == actionState.y() + 1)
             {
-                direction = "N";
+                direction = "NS";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() + 2)
+            {
+                direction = "ND";
+            }
+            else if (state.x() == actionState.x() && state.y() == actionState.y() + 3)
+            {
+                direction = "NT";
             }
             else if (state.x() == actionState.x() - 1 && state.y() == actionState.y())
             {
-                direction = "E";
+                direction = "ES";
+            }
+            else if (state.x() == actionState.x() - 2 && state.y() == actionState.y())
+            {
+                direction = "ED";
+            }
+            else if (state.x() == actionState.x() - 3 && state.y() == actionState.y())
+            {
+                direction = "ET";
             }
             else if (state.x() == actionState.x() + 1 && state.y() == actionState.y())
             {
-                direction = "W";
+                direction = "WS";
+            }
+            else if (state.x() == actionState.x() + 2 && state.y() == actionState.y())
+            {
+                direction = "WD";
+            }
+            else if (state.x() == actionState.x() + 3 && state.y() == actionState.y())
+            {
+                direction = "WT";
             }
             else
             {
@@ -943,11 +1124,11 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    private void evaluateProgrammingPhaseWithQLearning()
+    private synchronized void evaluateProgrammingPhaseWithQLearning()
     {
-        EEnvironment.INSTANCE.initRewardMatrix();
+        l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
 
-        l.info(String.format("Current Course: Files: %d, Ranks: %d, Goal: %s", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+        EEnvironment.INSTANCE.initRewardMatrix();
 
         EEnvironment.INSTANCE.outputRewards();
 
@@ -959,7 +1140,7 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    private void evaluateProgrammingPhaseWithRandom()
+    private synchronized void evaluateProgrammingPhaseWithRandom()
     {
         int j = 0;
         for (int i = 0; i < 5; ++i)
@@ -992,17 +1173,38 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhase()
     {
-        if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
+        final Thread eval = new Thread(() ->
         {
-            this.evaluateProgrammingPhaseWithRandom();
-        }
+            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
+            {
+                this.evaluateProgrammingPhaseWithRandom();
+            }
 
-        if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
+            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
+            {
+                this.evaluateProgrammingPhaseWithQLearning();
+            }
+
+            l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+
+            return;
+        });
+
+        eval.start();
+
+        if (EClientInformation.INSTANCE.isMockView())
         {
-            this.evaluateProgrammingPhaseWithQLearning();
+            try
+            {
+                eval.join();
+            }
+            catch (final InterruptedException e)
+            {
+                l.fatal("Failed to join evaluation thread.");
+                GameInstance.kill(GameInstance.EXIT_FATAL);
+                return;
+            }
         }
-
-        l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
 
         return;
     }
