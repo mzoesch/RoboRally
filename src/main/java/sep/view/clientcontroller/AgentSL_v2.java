@@ -365,7 +365,7 @@ enum EEnvironment implements ICourse
     private static final float  EMPTY_TILE_PENALTY              = -1.0f;
     private static final float  GOAL_REWARD                     = 1_000.0f;
 
-    private static final int    EPISODES                        = 2_000;
+    private static final int    EPISODES                        = 1_000;
     private static final int    CALCULATE_AVERAGE_ACTIONS       = 100;
     private static final int    MAX_EPISODE_ACTIONS             = 2_000;
 
