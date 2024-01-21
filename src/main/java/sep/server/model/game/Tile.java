@@ -25,6 +25,18 @@ public class Tile {
         this.occupiedBy = null;
     }
 
+    public CheckPoint removeCheckpoint(){
+        for(FieldType f : fieldTypes){
+            if(f instanceof CheckPoint checkpoint){
+                fieldTypes.remove(f);
+                l.info("CheckPoint has been removed on position {} , {}", coordinate.getX(), coordinate.getY());
+                return checkpoint;
+            }
+        }
+        l.warn("Tried to remove CheckPoint from a tile that has no CheckPoint");
+        return null;
+    }
+
     public Robot getRobot() {
         return occupiedBy;
     }
