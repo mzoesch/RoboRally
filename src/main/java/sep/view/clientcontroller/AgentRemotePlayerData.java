@@ -81,6 +81,14 @@ public final class AgentRemotePlayerData extends RemotePlayer
         if (this.location == null)
         {
             l.warn("Agent {} has no location. If this was during the first phase. This can be ignored. Assuming location is the start location.", this.getPlayerID());
+
+            if (this.startPos == null)
+            {
+                l.fatal("Agent {} has no location nor a start location.", this.getPlayerID());
+                GameInstance.kill(GameInstance.EXIT_FATAL);
+                return null;
+            }
+
             this.location = this.startPos;
         }
 
