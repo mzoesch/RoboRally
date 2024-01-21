@@ -415,7 +415,9 @@ public class GameMode {
         }
     }
 
-    //TODO add JavaDoc
+    /**
+     * method for moving checkpoints, if they are placed on conveyorBelts (like in course twister)
+     */
     public void moveCheckpoints(){
         if(course.getMovingCheckpoints()){
             ArrayList<Coordinate> oldCheckpointCoordinates = course.getCheckpointCoordinates();
