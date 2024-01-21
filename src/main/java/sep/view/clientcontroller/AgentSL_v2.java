@@ -352,12 +352,12 @@ enum EEnvironment implements ICourse
 
     private static final Logger l = LogManager.getLogger(EEnvironment.class);
 
-    private static final int    IMPOSSIBLE_TRANSITION_PENALTY   = -10_000;
-    private static final int    MATCHING_TILE_PENALTY           = -10_000;
+    private static final float  IMPOSSIBLE_TRANSITION_PENALTY   = -10_000.0f;
+    private static final float  MATCHING_TILE_PENALTY           = -10_000.0f;
     /** TODO This is a temporal solution as it should be decreased later. */
-    private static final int    EFFECTS_PENALTY                 = -1;
-    private static final int    EMPTY_TILE_PENALTY              = -1;
-    private static final int    GOAL_REWARD                     = 1_000;
+    private static final float  EFFECTS_PENALTY                 = -50.0f;
+    private static final float  EMPTY_TILE_PENALTY              = -1.0f;
+    private static final float  GOAL_REWARD                     = 1_000.0f;
 
     private static final int    EPISODES                        = 1_000;
     private static final int    CALCULATE_AVERAGE_ITERATIONS    = 100;
