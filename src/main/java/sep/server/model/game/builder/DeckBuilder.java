@@ -17,12 +17,18 @@ import sep.server.model.game.cards.upgrade.TemporaryUpgrade.SpamBlocker;
 
 import java.util.ArrayList;
 
+/**
+ * Class responsible for building different types of card decks.
+ */
 public class DeckBuilder {
     private static final Logger l = LogManager.getLogger(GameState.class);
-    public void DeckBuilder(){
+    public void DeckBuilder(){}
 
-    }
-
+    /**
+     * Builds a programming deck containing move and turn cards.
+     *
+     * @return ArrayList of IPlayableCard representing the programming deck
+     */
     public ArrayList<IPlayableCard> buildProgrammingDeck(){
         ArrayList<IPlayableCard> deck = new ArrayList<>();
 
@@ -57,6 +63,11 @@ public class DeckBuilder {
         return deck;
     }
 
+    /**
+     * Builds a deck containing SpamDamage cards.
+     *
+     * @return ArrayList of SpamDamage representing the Spam deck
+     */
     public ArrayList<SpamDamage> buildSpamDeck(){
         ArrayList<SpamDamage> spamDeck = new ArrayList<>();
         for(int i = 0; i < 38; i++){
@@ -65,6 +76,11 @@ public class DeckBuilder {
         return spamDeck;
     }
 
+    /**
+     * Builds a deck containing VirusDamage cards.
+     *
+     * @return ArrayList of VirusDamage representing the Virus deck
+     */
     public ArrayList<VirusDamage> buildVirusDeck(){
         ArrayList<VirusDamage> virusDeck = new ArrayList<>();
         for(int i = 0; i < 18; i++){
@@ -73,6 +89,11 @@ public class DeckBuilder {
         return virusDeck;
     }
 
+    /**
+     * Builds a deck containing TrojanHorseDamage cards.
+     *
+     * @return ArrayList of TrojanHorseDamage representing the Trojan Horse deck
+     */
     public ArrayList<TrojanHorseDamage> buildTrojanDeck(){
         ArrayList<TrojanHorseDamage> trojanDeck = new ArrayList<>();
         for(int i = 0; i < 12; i++){
@@ -80,6 +101,12 @@ public class DeckBuilder {
         }
         return trojanDeck;
     }
+
+    /**
+     * Builds a deck containing WormDamage cards.
+     *
+     * @return ArrayList of WormDamage representing the Worm deck
+     */
     public ArrayList<WormDamage> buildWormDeck(){
         ArrayList<WormDamage> spamDeck = new ArrayList<>();
         for(int i = 0; i < 6; i++){
@@ -88,6 +115,11 @@ public class DeckBuilder {
         return spamDeck;
     }
 
+    /**
+     * Builds a deck containing various upgrade cards.
+     *
+     * @return ArrayList of AUpgradeCard representing the upgrade deck
+     */
     public ArrayList<AUpgradeCard> buildUpgradeDeck(){
         ArrayList<AUpgradeCard> upgradeDeck = new ArrayList<>();
         for(int i = 0; i < 10; i++){
