@@ -227,7 +227,13 @@ public class GameMode {
      * Refills the upgrade shop with new upgrade cards.
      */
     private void refillUpgradeShop() {
-        //TODO
+        for(int i = 0; i<upgradeShop.length; i++) {
+            if(upgradeShop[i] == null) {
+                upgradeShop[i] = upgradeDeck.get(0);
+                l.info("Refilled upgrade shop at index " + i);
+            }
+        }
+        l.info("Upgrade shop refilled.");
     }
 
     /**
