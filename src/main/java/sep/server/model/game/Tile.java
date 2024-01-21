@@ -37,6 +37,11 @@ public class Tile {
         return null;
     }
 
+    public  void addCheckPoint(CheckPoint checkPoint){
+        fieldTypes.add(checkPoint);
+        l.info("Checkpoint has been moved to new Coordinate {} , {}", coordinate.getX(), coordinate.getY());
+    }
+
     public Robot getRobot() {
         return occupiedBy;
     }
