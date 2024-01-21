@@ -14,6 +14,7 @@ import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -410,6 +411,30 @@ public class GameMode {
                         this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), targetCoordinate.getX(), targetCoordinate.getY());
                     }
                 }
+            }
+        }
+    }
+
+    public void moveCheckpoints(){
+        if(course.getMovingCheckpoints()){
+            ArrayList<Coordinate> oldCheckpointCoordinates = course.getCheckpointCoordinates();
+
+            for(Coordinate oldCoordinate : oldCheckpointCoordinates){
+                //removing the checkpoint from his old tile
+                Tile oldTile = course.getTileByCoordinate(oldCoordinate);
+                CheckPoint checkpoint = oldTile.removeCheckpoint();
+
+                ConveyorBelt conveyorBelt = oldTile.getConveyorBelt();
+                String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+
+                if(conveyorBelt.getSpeed()>1) {
+                    ConveyorBelt nextConveyorBelt = course.getTileByCoordinate(targetCoordinate).getConveyorBelt();
+                    targetCoordinate = calculateNewCoordinate(nextConveyorBelt.getOutcomingFlowDirection(), targetCoordinate);
+                }
+
+                Tile newTile = course.getTileByCoordinate(targetCoordinate);
+                newTile.addCheckPoint(checkpoint);
             }
         }
     }
@@ -861,6 +886,7 @@ public class GameMode {
         addDelay(2000);
         this.activateConveyorBelts(2);
         this.activateConveyorBelts(1);
+        this.moveCheckpoints();
         this.activatePushPanels();
         this.activateGears();
         this.findLasers();
