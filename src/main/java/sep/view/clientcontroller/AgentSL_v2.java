@@ -373,7 +373,7 @@ enum EEnvironment implements ICourse
      * exploitation of the learned knowledge. Low values will let the agent forget their life goals and explore the
      * environment.
      */
-    private static final float  EPSILON                         = 0.8f;
+    private static final float  EPSILON                         = 0.7f;
     /**
      * Discount factor. High values will yield in a long-term thinking agent while low values will yield in a
      * myopic agent. It reflects the agent's preference for immediate rewards over delayed ones.
