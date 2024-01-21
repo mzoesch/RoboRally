@@ -35,13 +35,12 @@ public class Again extends AProgrammingCard implements IPlayableCard {
         IPlayableCard[] registers = player.getRegisters();
         IPlayableCard previousRoundCard = registers[currentRoundNumber];
 
-        // Check if the previous card is a Damage Card or an Upgrade Card
         if (previousRoundCard instanceof ADamageCard) {
             handleDamageCard(player, currentRoundNumber);
         } else if (previousRoundCard instanceof AUpgradeCard) {
             handleUpgradeCard(player,  currentRoundNumber);
         } else {
-            previousRoundCard.playCard(player, currentRoundNumber - 1); //If not, play the Card
+            previousRoundCard.playCard(player, currentRoundNumber - 1);
         }
     }
 
@@ -57,9 +56,7 @@ public class Again extends AProgrammingCard implements IPlayableCard {
         }
 
         IPlayableCard drawnCard = player.getPlayerDeck().remove(0);
-
         player.setCardInRegister(currentRoundNumber-1, drawnCard);
-
         drawnCard.playCard(player, currentRoundNumber - 1);
     }
 
@@ -73,9 +70,6 @@ public class Again extends AProgrammingCard implements IPlayableCard {
         //TODO implementation
         l.warn("Handling of Upgrade Cards for Again programming card is incomplete.");
     }
-
-
-
 
 }
 
