@@ -639,7 +639,7 @@ enum EEnvironment implements ICourse
     {
         switch (action)
         {
-        case NORTH:
+        case NORTH_SINGLE:
         {
             if (location.y() - 1 < 0)
             {
@@ -649,7 +649,27 @@ enum EEnvironment implements ICourse
             return new RCoordinate(location.x(), location.y() - 1);
         }
 
-        case EAST:
+        case NORTH_DOUBLE:
+        {
+            if (location.y() - 2 < 0)
+            {
+                return new RCoordinate(location.x(), 0);
+            }
+
+            return new RCoordinate(location.x(), location.y() - 2);
+        }
+
+        case NORTH_TRIPLE:
+        {
+            if (location.y() - 3 < 0)
+            {
+                return new RCoordinate(location.x(), 0);
+            }
+
+            return new RCoordinate(location.x(), location.y() - 3);
+        }
+
+        case EAST_SINGLE:
         {
             if (location.x() + 1 >= EEnvironment.INSTANCE.getFiles())
             {
@@ -659,7 +679,27 @@ enum EEnvironment implements ICourse
             return new RCoordinate(location.x() + 1, location.y());
         }
 
-        case SOUTH:
+        case EAST_DOUBLE:
+        {
+            if (location.x() + 2 >= EEnvironment.INSTANCE.getFiles())
+            {
+                return new RCoordinate(EEnvironment.INSTANCE.getFiles() - 1, location.y());
+            }
+
+            return new RCoordinate(location.x() + 2, location.y());
+        }
+
+        case EAST_TRIPLE:
+        {
+            if (location.x() + 3 >= EEnvironment.INSTANCE.getFiles())
+            {
+                return new RCoordinate(EEnvironment.INSTANCE.getFiles() - 1, location.y());
+            }
+
+            return new RCoordinate(location.x() + 3, location.y());
+        }
+
+        case SOUTH_SINGLE:
         {
             if (location.y() + 1 >= EEnvironment.INSTANCE.getRanks())
             {
@@ -669,7 +709,27 @@ enum EEnvironment implements ICourse
             return new RCoordinate(location.x(), location.y() + 1);
         }
 
-        case WEST:
+        case SOUTH_DOUBLE:
+        {
+            if (location.y() + 2 >= EEnvironment.INSTANCE.getRanks())
+            {
+                return new RCoordinate(location.x(), EEnvironment.INSTANCE.getRanks() - 1);
+            }
+
+            return new RCoordinate(location.x(), location.y() + 2);
+        }
+
+        case SOUTH_TRIPLE:
+        {
+            if (location.y() + 3 >= EEnvironment.INSTANCE.getRanks())
+            {
+                return new RCoordinate(location.x(), EEnvironment.INSTANCE.getRanks() - 1);
+            }
+
+            return new RCoordinate(location.x(), location.y() + 3);
+        }
+
+        case WEST_SINGLE:
         {
             if (location.x() - 1 < 0)
             {
@@ -677,6 +737,26 @@ enum EEnvironment implements ICourse
             }
 
             return new RCoordinate(location.x() - 1, location.y());
+        }
+
+        case WEST_DOUBLE:
+        {
+            if (location.x() - 2 < 0)
+            {
+                return new RCoordinate(0, location.y());
+            }
+
+            return new RCoordinate(location.x() - 2, location.y());
+        }
+
+        case WEST_TRIPLE:
+        {
+            if (location.x() - 3 < 0)
+            {
+                return new RCoordinate(0, location.y());
+            }
+
+            return new RCoordinate(location.x() - 3, location.y());
         }
 
         default:
