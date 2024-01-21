@@ -23,6 +23,26 @@ public final class AgentRemotePlayerData extends RemotePlayer
         return;
     }
 
+    public boolean isRotatedNorth()
+    {
+        return this.rotation == 0;
+    }
+
+    public boolean isRotatedEast()
+    {
+        return this.rotation == 90;
+    }
+
+    public boolean isRotatedSouth()
+    {
+        return this.rotation == 180;
+    }
+
+    public boolean isRotatedWest()
+    {
+        return this.rotation == 270;
+    }
+
     public int getRotation()
     {
         return this.rotation;
