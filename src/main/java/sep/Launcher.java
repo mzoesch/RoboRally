@@ -579,7 +579,7 @@ public final class Launcher
     {
         l.fatal("Unsupported operating system. Shutting down.");
         l.fatal(String.format("Detected operating system: %s", System.getProperty("os.name")));
-        l.info("You may run this application with [--nocmd].");
+        l.info("Type [--help] for more information. You may run the application with the [--nocmd] flag and the [--sv] or [--cl] flag.");
         l.debug("The wrapper application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
 
         return;
