@@ -2286,6 +2286,74 @@ public final class AgentSL_v2 extends ServerListener
 
     // endregion Server request handlers
 
+    // region Getters and Setters
+
+    private Thread createQualityLearningService()
+    {
+        return new Thread(() ->
+        {
+            l.info("Agent {} is evaluating the current programming phase.", EClientInformation.INSTANCE.getPlayerID());
+            l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+
+            EEnvironment.INSTANCE.onCourseChanged();
+
+            EEnvironment.INSTANCE.initRewardMatrix();
+
+            EEnvironment.INSTANCE.outputRewards();
+
+            EEnvironment.INSTANCE.initQualityMatrix();
+
+            synchronized (EEnvironment.INSTANCE.lock)
+            {
+                int totalActionCount    = 0;
+                int latestActionSum     = 0;
+
+                for (int i = 0; i < EEnvironment.EPISODES; ++i)
+                {
+                    final int actions = EEnvironment.INSTANCE.evaluateAnEpisode(EEnvironment.INSTANCE.getPseudorandomQualityStart(i));
+
+                    latestActionSum     += actions;
+                    totalActionCount    += actions;
+
+                    if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ACTIONS == 0)
+                    {
+                        l.debug("Agent {} has evaluated {} episodes. Average actions per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ACTIONS, latestActionSum / EEnvironment.CALCULATE_AVERAGE_ACTIONS);
+                        latestActionSum = 0;
+
+                        if (this.registerCardBroadcastService != null)
+                        {
+                            l.info("Agent {} detected that the register Card Broadcast Service is alive and is interrupting the Quality Learning Service until that service has finished.", EClientInformation.INSTANCE.getPlayerID());
+
+                            /* This code may be critical. */
+                            EEnvironment.INSTANCE.lock.notifyAll();
+                            try
+                            {
+                                EEnvironment.INSTANCE.lock.wait();
+                            }
+                            catch (final InterruptedException e)
+                            {
+                                l.fatal("Failed to wait for register Card Broadcast Service to finish.");
+                                GameInstance.kill(GameInstance.EXIT_FATAL);
+                                return;
+                            }
+                        }
+                    }
+
+                    continue;
+                }
+
+                EEnvironment.INSTANCE.setHasFinishedQualityLearning(true);
+
+                l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
+            }
+
+            EEnvironment.INSTANCE.outputQualities();
+
+            this.qualityLearningService = null;
+
+            return;
+        });
+    }
 
     private Thread createRegisterCardBroadcastService()
     {
