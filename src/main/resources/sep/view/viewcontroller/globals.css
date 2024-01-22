@@ -232,7 +232,7 @@
 /*#region Pop Ups*/
 
 #pop-up-container {
-    -fx-background-color: rgba(23, 23, 23, 0.9);
+    -fx-background-color: rgba(23, 23, 23, 0.95);
     -fx-padding: 24px 24px 24px 24px;
     -fx-min-width: 800px;
     -fx-max-width: 800px;
