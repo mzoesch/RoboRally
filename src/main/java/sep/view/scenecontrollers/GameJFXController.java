@@ -190,6 +190,13 @@ public final class GameJFXController
 
         this.createQuickTip();
 
+        synchronized (ViewSupervisor.getLoadGameSceneLock())
+        {
+            l.info("Finished loading game scene. Notifying post load tasks to continue.");
+            ViewSupervisor.setGameScenePostLoaded();
+            ViewSupervisor.getLoadGameSceneLock().notifyAll();
+        }
+
         return;
     }
 
