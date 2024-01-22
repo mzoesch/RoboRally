@@ -152,19 +152,30 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onStartingPointTaken() throws JSONException
     {
-        // Very sketchy, but we get somehow a race condition even though we use the run later methods of the Platform.
-        // We should probably implement a custom event here that is being triggered by postGameLoad.
-        final int t = (int) (Math.random() * 300) + 200;
-        l.warn("Waiting {} ms for game to load scene.", t);
-        try
+        synchronized (ViewSupervisor.getLoadGameSceneLock())
         {
-            Thread.sleep(t);
-        }
-        catch (final InterruptedException e)
-        {
-            l.fatal("Failed to wait for game to load scene.");
-            GameInstance.kill(GameInstance.EXIT_FATAL);
-            return false;
+            while (!ViewSupervisor.isGameScenePostLoaded())
+            {
+                l.warn("A starting position taken request was issued, but the game scene has not been loaded yet. Thread is waiting to be notified.");
+
+                try
+                {
+                    // Note, that this is the server listener thread. If the game scene is kinda laggy on slower
+                    // end hardware, this might cause a server disconnect forced by the servers keep-alive service.
+                    ViewSupervisor.getLoadGameSceneLock().wait();
+                }
+                catch (final InterruptedException e)
+                {
+                    l.fatal("Failed to wait for game to load scene.");
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return false;
+                }
+
+                continue;
+            }
+
+            /* We can just exit because we are using the thread safe Run Later methods of the Platform. */
+            ViewSupervisor.getLoadGameSceneLock().notifyAll();
         }
 
         l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
