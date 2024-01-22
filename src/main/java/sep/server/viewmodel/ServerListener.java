@@ -34,6 +34,7 @@ public final class ServerListener
             final ClientInstance ci     = new ClientInstance(client);
             final Thread t              = new Thread(ci);
             ci.setThread(t);
+            t.setName(String.format("CI-%s", ci.getAddr()));
             t.start();
 
             continue;
