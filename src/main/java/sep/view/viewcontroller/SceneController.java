@@ -179,6 +179,11 @@ public final class SceneController
         {
             l.fatal("Failed to load FXML file at {}.", path);
             l.fatal(e.getMessage());
+            for (final StackTraceElement ste : e.getStackTrace())
+            {
+                l.fatal(ste.toString());
+                continue;
+            }
             GameInstance.kill();
             return;
         }
