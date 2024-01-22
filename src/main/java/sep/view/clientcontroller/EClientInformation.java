@@ -390,7 +390,9 @@ public enum EClientInformation
     {
         if (this.prefAgentName == null || this.prefAgentName.isEmpty())
         {
-            throw new RuntimeException("Agent name not set.");
+            l.fatal("Agent name not set.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return null;
         }
 
         return this.prefAgentName;
