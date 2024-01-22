@@ -1170,6 +1170,11 @@ public final class Session
         return false;
     }
 
+    public boolean hasStarted()
+    {
+        return this.gameState.hasGameStarted();
+    }
+
     // endregion Getters and Setters
 
 }
