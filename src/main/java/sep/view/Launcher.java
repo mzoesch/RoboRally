@@ -27,16 +27,16 @@ public final class Launcher
      *              <li>[--dev]                 - Start mock game view (if also started with the [--isAgent] flag, the
      *                                            agent mock view will be called instead).
      *              <li>[--isAgent]             - Start agent view.
-     *              <li>[--addr ADDR]           - The address to auto connect to (if isAgent flag is set). Default is
+     *              <li>[--addr ADDR]           - The address to auto connect to (if [--isAgent] flag is set). Default is
      *                                            {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
-     *              <li>[--port PORT]           - The port number to auto connect to (if isAgent flag is set). Default is
+     *              <li>[--port PORT]           - The port number to auto connect to (if [--isAgent] flag is set). Default is
      *                                            {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
-     *              <li>[--sid SID]             - The session ID to auto connect to (if isAgent flag is set). Default is
+     *              <li>[--sid SID]             - The session ID to auto connect to (if [--isAgent] flag is set). Default is
      *                                            {@link sep.Types.EProps#DESCRIPTION EProps.DESCRIPTION}.
-     *              <li>[--name NAME]           - The name of the agent (if isAgent flag is set).
+     *              <li>[--name NAME]           - The name of the agent (if [--isAgent] flag is set).
      *              <li>[--allowLegacyAgents]   - Allow legacy agent logic to be displayed in the client Graphical User
      *                                            Interface (the deprecated server agent logic will be used).
-     *              <li>[--help]                - Print help message.
+     *              <li>[--help]                - Print view help message.
      *             </ul>
      */
     public static void main(String[] args)

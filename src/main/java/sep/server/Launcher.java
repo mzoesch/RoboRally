@@ -26,7 +26,7 @@ public final class Launcher
      * This is the entry point of the server part of the application.
      * The Server Instance is created here.
      *
-     * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
+     * @param args Valid program arguments in descending order of precedence:
      *             <ul>
      *              <li>[--port PORT]                           - The port number to listen on. Default is
      *                                                            {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
@@ -36,7 +36,7 @@ public final class Launcher
      *              <li>[--minHumanPlayers MIN_HUMAN_PLAYERS]   - The minimum number of human players required to
      *                                                            start a game. Default is {@link sep.server.model.game.GameState#DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START
      *                                                            MIN_HUMAN_PLAYERS}.
-     *              <li>[--help]                                - Print help message.
+     *              <li>[--help]                                - Print server help message.
      *             </ul>
      */
     public static void main(final String[] args)
