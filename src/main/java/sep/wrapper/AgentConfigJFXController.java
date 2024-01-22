@@ -192,7 +192,7 @@ public final class AgentConfigJFXController
         this.minHumanPlayersTextField   .setPromptText(String.valueOf(GameState.DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START));
         this.bAllowServerStart          .setSelected(true);
         this.bAllowClientStart          .setSelected(true);
-        this.bNoCloseTerminal           .setSelected(true);
+        this.bNoCloseTerminal           .setSelected(false);
 
         return;
     }
