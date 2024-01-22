@@ -32,9 +32,10 @@ import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         AnchorPane;
 import java.util.                   ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.                   Arrays;
+import java.util.                   List;
+import java.util.                   Objects;
+import java.util.concurrent.atomic. AtomicBoolean;
 import java.util.concurrent.atomic. AtomicReference;
 
 /**
@@ -46,6 +47,10 @@ import java.util.concurrent.atomic. AtomicReference;
 public final class ViewSupervisor extends Application
 {
     private static final Logger l = LogManager.getLogger(ViewSupervisor.class);
+
+    /** Used for transitions between scenes. Issued requests will be notified by the post-load behavior of the scene. */
+    private static final Object         lock                = new Object();
+    private static final AtomicBoolean  bGameSceneLoaded    = new AtomicBoolean(false);
 
     /** This instance is only valid on the JFX thread. */
     private static ViewSupervisor   INSTANCE;
@@ -485,7 +490,6 @@ public final class ViewSupervisor extends Application
         }
     }
 
-
     //Pop-Up für RegisterAuswahl bei AdminPriviledge UpgradeCard
     public static void createRegisterDialog(int selectedRegister) {
         final HBox h = new HBox();
@@ -878,6 +882,22 @@ public final class ViewSupervisor extends Application
     public static boolean hasLoadedGameScene()
     {
         return Objects.equals(ViewSupervisor.getSceneController().getCurrentScreen().id(), SceneController.GAME_ID);
+    }
+
+    public synchronized static void setGameScenePostLoaded()
+    {
+        ViewSupervisor.bGameSceneLoaded.set(true);
+        return;
+    }
+
+    public synchronized static boolean isGameScenePostLoaded()
+    {
+        return ViewSupervisor.bGameSceneLoaded.get();
+    }
+
+    public static Object getLoadGameSceneLock()
+    {
+        return ViewSupervisor.lock;
     }
 
 }
