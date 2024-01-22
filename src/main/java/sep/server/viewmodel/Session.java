@@ -493,7 +493,7 @@ public final class Session
 
             return;
         });
-
+        this.awaitGameStartThread.setName(String.format("AwaitGameStart-%s", this.sessionID));
         this.awaitGameStartThread.start();
 
         return;
