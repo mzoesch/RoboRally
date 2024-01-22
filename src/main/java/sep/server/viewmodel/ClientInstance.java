@@ -163,7 +163,7 @@ public final class ClientInstance implements Runnable
         if (s.isFull())
         {
             new ErrorMsgModel(this, "Session is full.").send();
-            l.warn("Client {} tried to join a full session. Disconnecting them.", this.getAddr());
+            l.warn("Client {} tried to join the full session [{}]. Disconnecting them.", this.getAddr(), s.getSessionID());
             return false;
         }
         if (s.hasStarted())
