@@ -234,8 +234,9 @@
 #pop-up-container {
     -fx-background-color: rgba(23, 23, 23, 0.9);
     -fx-padding: 24px 24px 24px 24px;
-    -fx-max-width: 500px;
-    -fx-max-height: 500px;
+    -fx-min-width: 800px;
+    -fx-max-width: 800px;
+    -fx-max-height: 400px;
     -fx-border-color: white;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
