@@ -582,6 +582,17 @@ public final class Session
         return;
     }
 
+    public void broadcastCheckPointMoved(int checkPointID, int x, int y){
+
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new CheckpointMovedModel(pc.getClientInstance(), checkPointID, x, y).send();
+            continue;
+        }
+
+        return;
+    }
+
     /** @param ctrlID The ID of the controller that won the game. */
     public void broadcastGameFinish(final int ctrlID)
     {

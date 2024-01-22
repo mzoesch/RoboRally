@@ -25,6 +25,23 @@ public class Tile {
         this.occupiedBy = null;
     }
 
+    public CheckPoint removeCheckpoint(){
+        for(FieldType f : fieldTypes){
+            if(f instanceof CheckPoint checkpoint){
+                fieldTypes.remove(f);
+                l.info("CheckPoint has been removed on position {} , {}", coordinate.getX(), coordinate.getY());
+                return checkpoint;
+            }
+        }
+        l.warn("Tried to remove CheckPoint from a tile that has no CheckPoint");
+        return null;
+    }
+
+    public  void addCheckPoint(CheckPoint checkPoint){
+        fieldTypes.add(checkPoint);
+        l.info("Checkpoint has been moved to new Coordinate {} , {}", coordinate.getX(), coordinate.getY());
+    }
+
     public Robot getRobot() {
         return occupiedBy;
     }
@@ -158,6 +175,16 @@ public class Tile {
             }
         }
         return false;
+    }
+
+    public ConveyorBelt getConveyorBelt(){
+        for (FieldType fieldType : fieldTypes) {
+            if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                return conveyorBelt;
+            }
+        }
+        l.warn("Tried to get a conveyorBelt from a tile without one");
+        return null;
     }
 
     public boolean isStartingPoint(){

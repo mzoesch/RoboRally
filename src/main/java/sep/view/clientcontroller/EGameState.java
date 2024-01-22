@@ -12,6 +12,7 @@ import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
+import org.json.                    JSONObject;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
@@ -319,6 +320,12 @@ public enum EGameState
     {
         this.currentServerCourse = course;
         return;
+    }
+
+    /** Only use for development. */
+    public JSONObject getAssumedServerCourseRawJSON()
+    {
+        return new JSONObject(String.format("{\"messageType\":\"GameStarted\",\"messageBody\":{\"gameMap\":%s}}", this.getCurrentServerCourseJSON().toString()));
     }
 
     public JSONArray getCurrentServerCourseJSON()

@@ -16,6 +16,8 @@ public class Course {
 
     private final String startingTurningDirection;
 
+    private final boolean movingCheckpoints;
+
     /**
      * Creates course depending on course name passed.
      * @param courseName name of corresponding course
@@ -25,6 +27,7 @@ public class Course {
         CourseBuilder courseBuilder = new CourseBuilder();
         course = courseBuilder.buildCourse(courseName);
         startingTurningDirection = courseBuilder.getStartingTurningDirection(courseName);
+        movingCheckpoints = checkForMovingCheckpoints();
     }
 
     /**
@@ -113,6 +116,46 @@ public class Course {
             }
         }
         return null;
+    }
+
+    /**
+     * Method to get an array with the coordinates of the checkpoints on the course
+     * @return ArrayList with the coordinates of the checkpoints
+     */
+    public ArrayList<Coordinate> getCheckpointCoordinates(){
+        ArrayList<Coordinate> c = new ArrayList<>();
+        for (ArrayList<Tile> ts : this.course) {
+            for (Tile t : ts) {
+                if (t.getFieldTypes().stream().anyMatch(elem -> elem instanceof CheckPoint)) {
+                    c.add(t.getCoordinate());
+                }
+            }
+        }
+        return c;
+    }
+
+    private boolean checkForMovingCheckpoints() {
+        ArrayList<Coordinate> oldCheckpointCoordinates = getCheckpointCoordinates();
+        for (Coordinate c : oldCheckpointCoordinates) {
+            Tile currentTile = getTileByCoordinate(c);
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                    for (FieldType f : currentTile.getFieldTypes()) {
+                        if (f instanceof CheckPoint checkpoint) {
+                            l.info("There are moving checkpoints in the course");
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        l.info("There are no moving checkpoints in the course");
+        return false;
+    }
+
+    public boolean getMovingCheckpoints(){
+        return movingCheckpoints;
     }
 
     public Tile getNextFreeStartingPoint()

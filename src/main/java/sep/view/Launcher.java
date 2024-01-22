@@ -24,7 +24,8 @@ public final class Launcher
      *
      * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
      *             <ul>
-     *              <li>[--dev]                 - Start mock game view.
+     *              <li>[--dev]                 - Start mock game view (if also started with the [--isAgent] flag, the
+     *                                            agent mock view will be called instead).
      *              <li>[--isAgent]             - Start agent view.
      *              <li>[--addr ADDR]           - The address to auto connect to (if isAgent flag is set). Default is
      *                                            {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
@@ -49,8 +50,21 @@ public final class Launcher
             {
                 l.info("Command line argument [--dev] detected.");
 
+                if (Arrays.asList(args).contains("--isAgent"))
+                {
+                    l.info("Command line argument [--isAgent] detected. Starting in Agent View Mode.");
+
+                    EClientInformation.INSTANCE.setIsAgent(true);
+                    new sep.view.viewcontroller.AgentMockViewLauncher().run();
+
+                    l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(sep.EArgs.OK);
+                    return;
+                }
+
                 l.info("Starting mock game view.");
-                sep.view.viewcontroller.MockViewLauncher.run();
+                new sep.view.viewcontroller.MockViewLauncher().run();
+
                 l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
                 System.exit(sep.EArgs.OK);
                 return;
@@ -191,7 +205,7 @@ public final class Launcher
                 l.info("Valid view program arguments in descending order of precedence. Invalid arguments will be ignored.");
                 l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]");
                 l.info("Valid server program arguments in descending order of precedence.");
-                l.info("  --dev                 Start mock game view.");
+                l.info("  --dev                 Start mock game view (if also started with the [--isAgent] flag, the agent mock view will be called instead).");
                 l.info("  --isAgent             Start agent view.");
                 l.info("  --addr <ADDR>         The address to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_IP);
                 l.info("  --port <PORT>         The port number to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_PORT);

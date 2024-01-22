@@ -14,6 +14,18 @@ public final record RCoordinate(int x, int y)
         return;
     }
 
+    public static RCoordinate fromIndex(final int idx, final int files)
+    {
+        return new RCoordinate(idx % files, idx / files);
+    }
+
+    /** @deprecated  */
+    public RCoordinate(final int idx, final int files, final int ranks)
+    {
+        this(idx % files, idx / files);
+        return;
+    }
+
     @Override
     public boolean equals(final Object obj)
     {
@@ -71,13 +83,9 @@ public final record RCoordinate(int x, int y)
         return (location.x < 0) || (location.x >= tiles.length) || (location.y < 0) || (location.y >= tiles[0].length);
     }
 
-    @Override
-    public int x() {
-        return x;
+    public int toIndex(final int files)
+    {
+        return this.x + (this.y * files);
     }
 
-    @Override
-    public int y() {
-        return y;
-    }
 }

@@ -6,6 +6,7 @@ import sep.view.json.               ChatMsgModel;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                EAgentDifficulty;
 
 import org.json.                    JSONObject;
 import java.util.concurrent.        ExecutorService;
@@ -63,6 +64,7 @@ public enum EClientInformation
     private boolean                 bIsAgent;
     private String                  prefAgentName;
     private boolean                 bAllowLegacyAgents;
+    private EAgentDifficulty        agentDifficulty;
 
     private final AtomicBoolean     bQuickTipCreated    = new AtomicBoolean(false);
 
@@ -71,7 +73,7 @@ public enum EClientInformation
 
     private EClientInformation()
     {
-        this.JFXInstance = null;
+        this.JFXInstance            = null;
 
         this.serverIP               = EArgs.PREF_SERVER_IP;
         this.serverPort             = sep.Types.EPort.DEFAULT.i;
@@ -93,6 +95,7 @@ public enum EClientInformation
         this.bIsAgent               = false;
         this.prefAgentName          = "";
         this.bAllowLegacyAgents     = false;
+        this.agentDifficulty        = EAgentDifficulty.QLEARNING;
 
         this.bQuickTipCreated        .set(false);
 
@@ -146,8 +149,10 @@ public enum EClientInformation
     }
 
     /**
-     * Will block the calling thread until a response from the server is received. Only use this method for the
-     * initial connection to the server. After that, use the {@link #listen(boolean)} method.
+     * Will block the calling thread until a response from the server is received.
+     * Only used for the initial connection to the server.
+     *
+     * @see EClientInformation#listen(boolean)
      */
     public String waitForServerResponse() throws IOException
     {
@@ -161,7 +166,8 @@ public enum EClientInformation
     }
 
     /**
-     * Will create a new thread that will listen for server responses to not block the main thread.
+     * @param bBlock If false, a new executor service will be created and the {@link ServerListener} will be
+     *               initialized on it. If true, the {@link ServerListener} will be initialized on the main thread.
      *
      * @see sep.view.clientcontroller.ServerListener
      */
@@ -195,7 +201,13 @@ public enum EClientInformation
     {
         if (this.bufferedWriter == null)
         {
-            l.error("Socket not initialized.");
+            if (EClientInformation.INSTANCE.isMockView())
+            {
+                l.trace("Tried to send request to server while in mock view. Send request ignored: {}.", j.toString(0));
+                return;
+            }
+
+            l.error("Tried to send request to server, but socket was not initialized.");
             return;
         }
 
@@ -241,7 +253,7 @@ public enum EClientInformation
 
     public StringBuilder getStdServerErrPipeline()
     {
-        return stdServerErrPipeline;
+        return this.stdServerErrPipeline;
     }
 
     public void setPlayerID(final int playerID)
@@ -481,6 +493,17 @@ public enum EClientInformation
     {
         this.exitCode = exitCode;
         return;
+    }
+
+    public void setAgentDifficulty(final EAgentDifficulty difficulty)
+    {
+        this.agentDifficulty = difficulty;
+        return;
+    }
+
+    public EAgentDifficulty getAgentDifficulty()
+    {
+        return this.agentDifficulty;
     }
 
     // endregion Getters and Setters
