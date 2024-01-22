@@ -2323,7 +2323,7 @@ public final class AgentSL_v2 extends ServerListener
 
                         if (this.registerCardBroadcastService != null)
                         {
-                            l.info("Agent {} detected that the register Card Broadcast Service is alive and is interrupting the Quality Learning Service until that service has finished.", EClientInformation.INSTANCE.getPlayerID());
+                            l.info("Agent {} detected that the Register Card Broadcast Service is alive and is interrupting the Quality Learning Service until that service has finished.", EClientInformation.INSTANCE.getPlayerID());
 
                             if (i < EEnvironment.MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION)
                             {
@@ -2339,7 +2339,7 @@ public final class AgentSL_v2 extends ServerListener
                             }
                             catch (final InterruptedException e)
                             {
-                                l.fatal("Failed to wait for register Card Broadcast Service to finish.");
+                                l.fatal("Failed to wait for Register Card Broadcast Service to finish.");
                                 GameInstance.kill(GameInstance.EXIT_FATAL);
                                 return;
                             }
