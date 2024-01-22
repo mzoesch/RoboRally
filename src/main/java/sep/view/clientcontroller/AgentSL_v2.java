@@ -1746,6 +1746,34 @@ enum EEnvironment implements ICourse
         return;
     }
 
+    /** If a checkpoint has moved, for example.  */
+    public void onCourseChanged()
+    {
+        this.cachedTiles = null;
+
+        this.finishedQualityLearning.set(false);
+
+        this.rewards     = null;
+        this.qualities   = null;
+
+        return;
+    }
+
+    public boolean hasToRecalculateQualities()
+    {
+        return this.rewards == null || this.qualities == null;
+    }
+
+    public boolean setHasFinishedQualityLearning(final boolean b)
+    {
+        return this.finishedQualityLearning.compareAndSet(!b, b);
+    }
+
+    public boolean hasFinishedQualityLearning()
+    {
+        return this.finishedQualityLearning.get();
+    }
+
     // endregion Getters and Setters
 
 }
