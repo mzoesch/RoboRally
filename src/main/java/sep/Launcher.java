@@ -97,7 +97,8 @@ public final class Launcher
                         Arrays.asList(args).contains("--noclose") ? "" : " & exit"
                         )
                     )
-                : null
+                :
+                null
                 ;
 
             /* I do not have a linux machine, therefore, I cannot test this. */
@@ -270,7 +271,8 @@ public final class Launcher
                             Arrays.asList(args).contains("--noclose") ? "" : "& exit"
                             )
                         )
-                    : null
+                    :
+                    null
                     ;
 
                 if (pb == null)
@@ -328,8 +330,8 @@ public final class Launcher
         {
             l.info("");
             l.info("#################### WRAPPER HELP #####################");
-            l.info("Valid wrapper program arguments in descending order of precedence. All arguments that are not consumed by the wrapper will be passed down to the follow-up process. Invalid arguments will be ignored (the follow-up process might not ignore invalid arguments and may fail to start):");
-            l.info("Usage: java -jar {jar-name}.jar [--cmd] [--sv] [--cl] [--nocmd] [--noclose] [--help]");
+            l.info("Valid wrapper program arguments in descending order of precedence. All arguments that are not consumed by the wrapper will be passed down to the follow-up process. Invalid arguments will be ignored (the follow-up process might not ignore invalid arguments and may fail to start).");
+            l.info("Usage: java -jar {} [--cmd] [--sv] [--cl] [--nocmd] [--noclose] [--help]", f);
             l.info("  --cmd         Start a new process terminal and run this application in it.");
             l.info("  --sv          Will instantly start a server process.");
             l.info("  --cl          Will instantly start a client process (IO is inherited to calling process).");
@@ -338,21 +340,20 @@ public final class Launcher
             l.info("  --help        Print this help message.");
             l.info("");
             l.info("##################### CLIENT HELP #####################");
-            l.info("Valid view program arguments in descending order of precedence. Invalid arguments will be ignored.");
-            l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]");
-            l.info("Valid server program arguments in descending order of precedence.");
+            l.info("Valid view program arguments in descending order of precedence.");
+            l.info("Usage: java -cp {} sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]", f);
             l.info("  --dev                 Start mock game view (if also started with the [--isAgent] flag, the agent mock view will be called instead).");
             l.info("  --isAgent             Start agent view.");
-            l.info("  --addr <ADDR>         The address to auto connect to (if isAgent flag is set). Default is {}.", Types.EPort.DEFAULT.i);
-            l.info("  --port <PORT>         The port number to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_PORT);
-            l.info("  --sid <SID>           The session ID to auto connect to (if isAgent flag is set). Default is {}.", sep.Types.EProps.DESCRIPTION);
-            l.info("  --name <NAME>         The name of the agent (if isAgent flag is set).");
+            l.info("  --addr <ADDR>         The address to auto connect to (if [--isAgent] flag is set). Default is {}.", Types.EPort.DEFAULT.i);
+            l.info("  --port <PORT>         The port number to auto connect to (if [--isAgent] flag is set). Default is {}.", sep.EArgs.PREF_SERVER_PORT);
+            l.info("  --sid <SID>           The session ID to auto connect to (if [--isAgent] flag is set). Default is {}.", sep.Types.EProps.DESCRIPTION);
+            l.info("  --name <NAME>         The name of the agent (if [--isAgent] flag is set).");
             l.info("  --allowLegacyAgents   Allow legacy agent logic to be displayed in the client Graphical User Interface (the deprecated server agent logic will be used).");
             l.info("  --help                Print view help message.");
             l.info("");
             l.info("##################### SERVER HELP #####################");
-            l.info("Valid server program arguments in descending order of precedence. Invalid arguments will be ignored.");
-            l.info("Usage: java -cp {jar-name}.jar sep.server.Launcher [--port PORT] [--minRemotePlayers MIN_REMOTE_PLAYERS] [--minHumanPlayers MIN_HUMAN_PLAYERS] [--help]");
+            l.info("Valid server program arguments in descending order of precedence.");
+            l.info("Usage: java -cp {} sep.server.Launcher [--port PORT] [--minRemotePlayers MIN_REMOTE_PLAYERS] [--minHumanPlayers MIN_HUMAN_PLAYERS] [--help]", f);
             l.info("  --port <PORT>                             The port number to listen on. Default is {}.", sep.Types.EPort.DEFAULT.i);
             l.info("  --minRemotePlayers <MIN_REMOTE_PLAYERS>   The minimum number of remote clients required to start a game. Default is {}. Only used in legacy games.", GameState.DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START);
             l.info("  --minHumanPlayers <MIN_HUMAN_PLAYERS>     The minimum number of human players required to start a game. Default is {}.", GameState.DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START);
@@ -457,7 +458,8 @@ public final class Launcher
                             EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
                         )
                     )
-                    : null
+                    :
+                    null
                     ;
 
                 if (pb == null)
@@ -514,7 +516,8 @@ public final class Launcher
                             EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
                         )
                     )
-                    : null
+                    :
+                    null
                     ;
 
                 if (pb == null)
