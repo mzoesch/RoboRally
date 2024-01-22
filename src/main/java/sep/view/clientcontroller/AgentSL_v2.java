@@ -1864,6 +1864,11 @@ public final class AgentSL_v2 extends ServerListener
 
     private synchronized void evaluateProgrammingPhaseWithRandom()
     {
+        if (EGameState.INSTANCE.getGotRegisters() == null || EGameState.INSTANCE.getGotRegister(0) == null)
+        {
+            return;
+        }
+
         int j = 0;
         for (int i = 0; i < 5; ++i)
         {
