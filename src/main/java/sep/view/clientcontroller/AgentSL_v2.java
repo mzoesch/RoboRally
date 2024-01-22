@@ -2284,4 +2284,37 @@ public final class AgentSL_v2 extends ServerListener
 
     // endregion Server request handlers
 
+
+    private Thread createRegisterCardBroadcastService()
+    {
+        if (this.registerCardBroadcastService != null && this.registerCardBroadcastService.isAlive())
+        {
+            l.fatal("Agent {} is already broadcasting register cards.", EClientInformation.INSTANCE.getPlayerID());
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return null;
+        }
+
+        return new Thread(() ->
+        {
+            l.info("Agent {} is waiting for Quality Learning Service to reach an usable state to broadcast register cards.", EClientInformation.INSTANCE.getPlayerID());
+
+            synchronized (EEnvironment.INSTANCE.lock)
+            {
+                l.info("Agent {}'s Card Broadcast Service was notified. Sending register cards.", EClientInformation.INSTANCE.getPlayerID());
+
+                EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+                this.sendSelectedCards();
+
+                l.info("Agent {} has sent register cards. If allowed notifying Quality Learning Service.", EClientInformation.INSTANCE.getPlayerID());
+
+                this.registerCardBroadcastService = null;
+                EEnvironment.INSTANCE.lock.notifyAll();
+            }
+
+            return;
+        });
+    }
+
+    // endregion Getters and Setters
+
 }
