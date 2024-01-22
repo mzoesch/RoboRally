@@ -166,6 +166,12 @@ public final class ClientInstance implements Runnable
             l.warn("Client {} tried to join a full session. Disconnecting them.", this.getAddr());
             return false;
         }
+        if (s.hasStarted())
+        {
+            new ErrorMsgModel(this, "Session has already a game in progress.").send();
+            l.warn("Client {} tried to join the session [{}] which has already a game in progress. Disconnecting them.", this.getAddr(), s.getSessionID());
+            return false;
+        }
         this.playerController   = EServerInstance.createNewPlayerController(this, s);
         icc.sendWelcome(this.playerController.getPlayerID());
         this.playerController.getSession().joinSession(this.playerController);
