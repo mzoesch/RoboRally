@@ -2354,6 +2354,8 @@ public final class AgentSL_v2 extends ServerListener
                 l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
             }
 
+            EEnvironment.INSTANCE.lock.notifyAll();
+
             EEnvironment.INSTANCE.outputQualities();
 
             this.qualityLearningService = null;
