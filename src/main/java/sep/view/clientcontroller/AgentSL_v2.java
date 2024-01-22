@@ -2026,7 +2026,9 @@ public final class AgentSL_v2 extends ServerListener
     protected boolean onGameStart() throws JSONException
     {
         l.debug("Game start received.");
+        EEnvironment.INSTANCE.onCourseChanged();
         EEnvironment.INSTANCE.setCourse(this.dsrp.request());
+        this.evaluateProgrammingPhaseAsync(false);
         return true;
     }
 
