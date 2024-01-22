@@ -1151,7 +1151,8 @@ public class GameMode {
 
     private Thread createActivationThread()
     {
-        return new Thread(
+
+        final Thread t = new Thread(
         () ->
         {
             l.debug("Activation Phase started.");
@@ -1188,6 +1189,10 @@ public class GameMode {
 
             return;
         });
+
+        t.setName(String.format("PhaseIIIService-%s", this.getSession().getSessionID()));
+
+        return t;
     }
 
     // endregion Getters and Setters
