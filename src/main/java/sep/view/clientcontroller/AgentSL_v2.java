@@ -877,32 +877,6 @@ enum EEnvironment implements ICourse
         return;
     }
 
-    public void evaluateQualityMatrix()
-    {
-        int totalActionCount    = 0;
-        int latestActionSum     = 0;
-
-        for (int i = 0; i < EEnvironment.EPISODES; ++i)
-        {
-            final int actions = this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
-
-            latestActionSum     += actions;
-            totalActionCount    += actions;
-
-            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ACTIONS == 0)
-            {
-                l.debug("Agent {} has evaluated {} episodes. Average actions per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ACTIONS, latestActionSum / EEnvironment.CALCULATE_AVERAGE_ACTIONS);
-                latestActionSum = 0;
-            }
-
-            continue;
-        }
-
-        l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
-
-        return;
-    }
-
     public void setRegisterCardsBasedOnExploredKnowledge()
     {
         final AgentRemotePlayerData agent   = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
