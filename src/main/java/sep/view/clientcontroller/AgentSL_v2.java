@@ -366,9 +366,10 @@ enum EEnvironment implements ICourse
     private static final float  EMPTY_TILE_PENALTY              = -1.0f;
     private static final float  GOAL_REWARD                     = 1_000.0f;
 
-    public static final int     EPISODES                        = 5_000;
-    public static final int     CALCULATE_AVERAGE_ACTIONS       = 100;
-    private static final int    MAX_EPISODE_ACTIONS             = 2_000;
+    public static final int     EPISODES                                    = 20_000;
+    public static final int     CALCULATE_AVERAGE_ACTIONS                   = 300;
+    public static final int     MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION      = 2_500;
+    private static final int    MAX_EPISODE_ACTIONS                         = 2_000;
 
     /**
      * Hyperparameter for the learning rate. High values will yield a fast learning process but also an increased
@@ -2323,6 +2324,12 @@ public final class AgentSL_v2 extends ServerListener
                         if (this.registerCardBroadcastService != null)
                         {
                             l.info("Agent {} detected that the register Card Broadcast Service is alive and is interrupting the Quality Learning Service until that service has finished.", EClientInformation.INSTANCE.getPlayerID());
+
+                            if (i < EEnvironment.MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION)
+                            {
+                                l.warn("Agent {} has not evaluated enough episodes to allow interruption [{}/{}]. Skipping request.", EClientInformation.INSTANCE.getPlayerID(), i, EEnvironment.MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION);
+                                continue;
+                            }
 
                             /* This code may be critical. */
                             EEnvironment.INSTANCE.lock.notifyAll();
