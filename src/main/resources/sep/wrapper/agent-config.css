@@ -45,6 +45,8 @@
     -fx-pref-width: 200px;
     -fx-min-width: 50px;
     -fx-max-width: 50px;
+
+    -fx-alignment: center-right;
 }
 
 #text-field-host {
@@ -55,6 +57,8 @@
     -fx-background-color: -std-background-color;
 
     -fx-border-color: #ffffff;
+
+    -fx-alignment: center-right;
 }
 
 #text-field-port {
@@ -96,6 +100,8 @@
     -fx-background-color: -std-background-color;
 
     -fx-border-color: #ffffff;
+
+    -fx-alignment: center-right;
 }
 
 .alert {
