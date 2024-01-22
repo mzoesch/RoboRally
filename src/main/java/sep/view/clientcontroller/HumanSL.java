@@ -182,6 +182,12 @@ public final class HumanSL extends ServerListener
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
         ViewSupervisor.handleChatInfo(String.format("Player %s has selected a starting Point.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
 
+        if (EGameState.INSTANCE.getClientRemotePlayer() == null)
+        {
+            l.warn("Tried to update view for starting point, but the local player is not set yet (Player ID: {}).", EClientInformation.INSTANCE.getPlayerID());
+            return false;
+        }
+
         /* We must discard the hover effects. */
         if (this.dsrp.getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
         {
