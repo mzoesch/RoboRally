@@ -54,6 +54,15 @@ public final class Launcher
         final String fp     = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         final String f      = fp.substring(fp.lastIndexOf("/") + 1);
 
+        if (f.isEmpty() || f.isBlank())
+        {
+            l.error("Failed to detect JAR file. If this is not a development build consider running the application with [--nocmd] and the [--sv] or [--cl] flag.");
+        }
+        else
+        {
+            l.debug("Detected JAR file: {}.", f);
+        }
+
         if (args.length == 0)
         {
             l.info("No command line arguments detected. Starting wrapper with default configuration.");
