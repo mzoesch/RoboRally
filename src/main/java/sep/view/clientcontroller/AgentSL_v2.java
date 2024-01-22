@@ -366,8 +366,8 @@ enum EEnvironment implements ICourse
     private static final float  EMPTY_TILE_PENALTY              = -1.0f;
     private static final float  GOAL_REWARD                     = 1_000.0f;
 
-    private static final int    EPISODES                        = 1_000;
-    private static final int    CALCULATE_AVERAGE_ACTIONS       = 100;
+    public static final int     EPISODES                        = 5_000;
+    public static final int     CALCULATE_AVERAGE_ACTIONS       = 100;
     private static final int    MAX_EPISODE_ACTIONS             = 2_000;
 
     /**
@@ -1884,10 +1884,12 @@ public final class AgentSL_v2 extends ServerListener
 
         this.sendSelectedCards();
 
+        l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+
         return;
     }
 
-    private void evaluateProgrammingPhase()
+    private void evaluateProgrammingPhaseAsync(final boolean bSetRegisterCards)
     {
         final Thread eval = new Thread(() ->
         {
@@ -1911,8 +1913,6 @@ public final class AgentSL_v2 extends ServerListener
 
                 return;
             }
-
-            l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
 
             return;
         });
