@@ -19,6 +19,7 @@ import java.util.                   Arrays;
 import java.util.                   Random;
 import java.util.                   Locale;
 import java.util.                   ArrayList;
+import java.util.concurrent.atomic. AtomicBoolean;
 
 final class TileModifier
 {
@@ -394,14 +395,23 @@ enum EEnvironment implements ICourse
 
     // endregion Cached members
 
+    public final Object             lock                        = new Object();
+
+    private final AtomicBoolean     finishedQualityLearning;
+
     /** Each matrix cell represents the travel from one state to another. */
-    private float[][]       rewards;
-    private float[][][]     qualities;
+    private float[][]               rewards;
+    private float[][][]             qualities;
 
     private EEnvironment()
     {
-        this.cachedGoal     = null;
-        this.cachedTiles    = null;
+        this.cachedGoal                 = null;
+        this.cachedTiles                = null;
+
+        this.finishedQualityLearning    = new AtomicBoolean(false);
+
+        this.rewards                    = null;
+        this.qualities                  = null;
 
         return;
     }
@@ -774,7 +784,7 @@ enum EEnvironment implements ICourse
     }
 
     /** @return The amount of iterations the agent required to get to any terminal state. */
-    private int evaluateAnEpisode(final RCoordinate start)
+    public int evaluateAnEpisode(final RCoordinate start)
     {
         int             actions     = 0;
         RCoordinate     cursor      = start;
@@ -895,8 +905,8 @@ enum EEnvironment implements ICourse
 
     public void setRegisterCardsBasedOnExploredKnowledge()
     {
-        final AgentRemotePlayerData agent = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
-        RCoordinate predictedState = agent.getLocation();
+        final AgentRemotePlayerData agent   = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
+        RCoordinate predictedState          = agent.getLocation();
 
         int oldIterationI = -1;
 
@@ -1774,9 +1784,16 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
+    private Thread  qualityLearningService;
+    private Thread  registerCardBroadcastService;
+
     public AgentSL_v2(final BufferedReader br)
     {
         super(br);
+
+        this.qualityLearningService         = null;
+        this.registerCardBroadcastService   = null;
+
         return;
     }
 
@@ -1791,22 +1808,54 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    private synchronized void evaluateProgrammingPhaseWithQLearning()
+    private void evaluateProgrammingPhaseWithQLearning(final boolean bSetRegisterCards)
     {
-        l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+        if (this.qualityLearningService == null || !this.qualityLearningService.isAlive())
+        {
+            if (EEnvironment.INSTANCE.hasFinishedQualityLearning())
+            {
+                if (!bSetRegisterCards)
+                {
+                    l.fatal("Quality learning has finished, but the agent is not allowed to set register cards.");
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return;
+                }
 
-        EEnvironment.INSTANCE.initRewardMatrix();
+                EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+                this.sendSelectedCards();
+                l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
 
-        EEnvironment.INSTANCE.outputRewards();
+                return;
+            }
 
-        EEnvironment.INSTANCE.initQualityMatrix();
-        EEnvironment.INSTANCE.evaluateQualityMatrix();
+            this.qualityLearningService = this.createQualityLearningService();
+            this.qualityLearningService.setName("QualityLearningService");
+            this.qualityLearningService.start();
 
-        EEnvironment.INSTANCE.outputQualities();
+            if (!bSetRegisterCards)
+            {
+                return;
+            }
 
-        EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+            this.registerCardBroadcastService            = this.createRegisterCardBroadcastService();
+            assert this.registerCardBroadcastService    != null;
+            this.registerCardBroadcastService.setName("RegisterCardBroadcastService");
+            this.registerCardBroadcastService.start();
 
-        this.sendSelectedCards();
+            return;
+        }
+
+        if (!bSetRegisterCards)
+        {
+            l.fatal("Already evaluating quality states.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return;
+        }
+
+        this.registerCardBroadcastService            = this.createRegisterCardBroadcastService();
+        assert this.registerCardBroadcastService    != null;
+        this.registerCardBroadcastService.setName("RegisterCardBroadcastService");
+        this.registerCardBroadcastService.start();
 
         return;
     }
@@ -1844,12 +1893,23 @@ public final class AgentSL_v2 extends ServerListener
         {
             if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
             {
+                if (!bSetRegisterCards)
+                {
+                    l.fatal("Agent is not allowed to set register cards, but the agent difficulty is set to RANDOM. There is no need to evaluate the programming phase.");
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return;
+                }
+
                 this.evaluateProgrammingPhaseWithRandom();
+
+                return;
             }
 
             if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
             {
-                this.evaluateProgrammingPhaseWithQLearning();
+                this.evaluateProgrammingPhaseWithQLearning(bSetRegisterCards);
+
+                return;
             }
 
             l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
@@ -1879,7 +1939,7 @@ public final class AgentSL_v2 extends ServerListener
     public void onDevelopmentEvaluation()
     {
         EEnvironment.INSTANCE.setCourse(EGameState.INSTANCE.getAssumedServerCourseRawJSON());
-        this.evaluateProgrammingPhase();
+        this.evaluateProgrammingPhaseAsync(true);
         return;
     }
 
@@ -2095,7 +2155,7 @@ public final class AgentSL_v2 extends ServerListener
             continue;
         }
 
-        this.evaluateProgrammingPhase();
+        this.evaluateProgrammingPhaseAsync(true);
 
         return true;
     }
