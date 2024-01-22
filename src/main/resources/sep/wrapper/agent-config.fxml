@@ -164,8 +164,8 @@
                                 HBox.hgrow="ALWAYS"
                             >
                                 <Label
-                                    styleClass="text-xl"
                                     text="No Auto Terminal Close:"
+                                    id="b-no-close-terminal-text" stylesheets="@agent-config.css"
                                 />
                             </VBox>
                             <CheckBox
