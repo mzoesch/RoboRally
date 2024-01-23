@@ -155,15 +155,19 @@ final class Tile
         return false;
     }
 
-    public String getCheckpointNum() {
-        if(this.hasWall()) {
-            for (int i = 0; i < this.tile.length(); ++i) {
-                if(this.getModifier(i).getCheckpointCount() != null) {
-                    return this.getModifier(i).getCheckpointCount();
-                }
+    public int getCheckpointCount()
+    {
+        for (int i = 0; i < this.tile.length(); ++i)
+        {
+            if (Objects.equals(this.getModifier(i).getType(), "CheckPoint"))
+            {
+                return this.getModifier(i).getCheckpointCount();
             }
+
+            continue;
         }
-        return null;
+
+        return -1;
     }
 
     public JSONArray getJSON()
