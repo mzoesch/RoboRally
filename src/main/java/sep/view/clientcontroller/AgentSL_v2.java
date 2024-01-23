@@ -31,12 +31,12 @@ final class TileModifier
         return;
     }
 
-    public String getType()
+    public String getType() throws JSONException
     {
         return this.modifier.getString("type");
     }
 
-    public String getFirstWallOrientation()
+    public String getFirstWallOrientation() throws JSONException
     {
         return this.modifier.getJSONArray("orientations").getString(0);
     }
