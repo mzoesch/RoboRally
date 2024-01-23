@@ -21,6 +21,10 @@ import java.util.                   Locale;
 import java.util.                   ArrayList;
 import java.util.concurrent.atomic. AtomicBoolean;
 
+final record RCheckpointMask(RCoordinate location, int count)
+{
+}
+
 final class TileModifier
 {
     private final JSONObject modifier;
