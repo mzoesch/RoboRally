@@ -1747,7 +1747,7 @@ enum EEnvironment implements ICourse
         for (int i = 0; i < this.getRewards().length; ++i)
         {
             l.debug(this.getRewardStateAsString(i));
-            describeConstable();
+            continue;
         }
 
         return;
