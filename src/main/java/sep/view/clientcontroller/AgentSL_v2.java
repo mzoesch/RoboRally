@@ -1774,9 +1774,13 @@ enum EEnvironment implements ICourse
     /** If a checkpoint has moved, for example.  */
     public void onCourseChanged()
     {
-        this.cachedTiles = null;
+        this.cachedGoal     = null;
+        this.cachedTiles    = null;
+        this.goals           .clear();
 
         this.finishedQualityLearning.set(false);
+        this.allowPreFinishQualityUse.set(false);
+        this.aboardQualityLearning.set(false);
 
         this.rewards     = null;
         this.qualities   = null;
