@@ -80,6 +80,8 @@ public class Tile {
     public boolean hasUnmovableRobot(String pushingDirection) {
         if(this.isOccupied()) {
             Robot currentOccupier = this.occupiedBy;
+
+            /* TODO This does not make scene. Because this will result in a Stack Overflow error if the robot indeed can not be moved. */
             currentOccupier.moveRobotOneTile(true, pushingDirection);
 
             currentOccupier.getAuthGameMode().getSession().broadcastPositionUpdate(
