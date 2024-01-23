@@ -382,7 +382,7 @@ enum EEnvironment implements ICourse
     private static final float  MATCHING_TILE_PENALTY           = -10_000.0f;
     private static final float  EFFECTS_PENALTY                 = -50.0f;
     private static final float  EMPTY_TILE_PENALTY              = -1.0f;
-    private static final float  GOAL_REWARD                     = 1_000.0f;
+    private static final float  GOAL_REWARD                     =  1_000.0f;
 
     public static final int     EPISODES                                    = 20_000;
     public static final int     CALCULATE_AVERAGE_ACTIONS                   = 300;
