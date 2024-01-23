@@ -534,7 +534,7 @@ public final class TileModifier
         return TileModifier.loadCachedImage("Empty");
     }
 
-    private int getCount()
+    public int getCount()
     {
         return this.tile.getInt("count");
     }
