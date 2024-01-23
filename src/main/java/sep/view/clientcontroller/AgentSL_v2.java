@@ -2428,6 +2428,14 @@ public final class AgentSL_v2 extends ServerListener
                                 return;
                             }
                         }
+
+                        if (EEnvironment.INSTANCE.hasAbortedQualityLearning())
+                        {
+                            l.warn("Agent {} has aborted quality learning. Skipping quality learning for the remaining episodes. Evaluated [{} / {}] episodes.", EClientInformation.INSTANCE.getPlayerID(), i, EEnvironment.EPISODES);
+                            this.qualityLearningService = null;
+                            EEnvironment.INSTANCE.lock.notifyAll();
+                            return;
+                        }
                     }
 
                     continue;
