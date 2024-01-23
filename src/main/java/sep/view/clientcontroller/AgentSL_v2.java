@@ -617,8 +617,11 @@ enum EEnvironment implements ICourse
 
                 if (t.isCheckpoint())
                 {
-                    this.cachedGoal = new RGoalMask(0, t.getLocation());
-                    return this.getQualityGoal();
+                    if (t.getCheckpointCount() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getCheckPointsReached() + 1)
+                    {
+                        this.cachedGoal = new RGoalMask(t.getCheckpointCount(), t.getLocation());
+                        return this.cachedGoal.location;
+                    }
                 }
 
                 continue;
@@ -627,7 +630,7 @@ enum EEnvironment implements ICourse
             continue;
         }
 
-        l.fatal("Failed to find a checkpoint.");
+        l.fatal("Failed to find a quality checkpoint. Searched for checkpoint id: {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getCheckPointsReached() + 1);
         GameInstance.kill();
 
         return null;
