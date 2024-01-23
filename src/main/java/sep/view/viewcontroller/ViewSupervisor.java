@@ -312,6 +312,20 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void updateCheckpoints()
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onCheckpointMoved();
+            return;
+        }
+        catch (final ClassCastException e) {
+            l.error("Could not cast current controller to GameJFXController during checkpoint update. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     public static <T> void onPlayerRemoved()
     {
         final T ctrl = ViewSupervisor.getSceneController().getCurrentController();
