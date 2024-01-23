@@ -1600,7 +1600,7 @@ enum EEnvironment implements ICourse
             return null;
         }
 
-        return ECourseImpl.INSTANCE.getTiles()[location.x()][location.y()];
+        return Objects.requireNonNull(EEnvironment.INSTANCE.getTiles())[location.x()][location.y()];
     }
 
     @Override
