@@ -295,6 +295,8 @@ enum EEnvironment implements ICourse
         @Override
         public Tile[][] getTiles() throws JSONException
         {
+            EEnvironment.INSTANCE.goals.clear();
+
             final Tile[][] course = new Tile[this.getFiles()][this.getRanks()];
 
             for (int file = 0; file < this.getFiles(); ++file)
@@ -302,6 +304,12 @@ enum EEnvironment implements ICourse
                 for (int rank = 0; rank < this.getRanks(); ++rank)
                 {
                     course[file][rank] = new Tile(this.getTilesAsJSON().getJSONArray(file).getJSONArray(rank), new RCoordinate(file, rank));
+                    if (course[file][rank].isCheckpoint())
+                    {
+                        EEnvironment.INSTANCE.goals.add(new RCheckpointMask(course[file][rank].getLocation(), course[file][rank].getCheckpointCount()));
+                        l.info("Found goal {} at state {}.", EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).location(), EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).count());
+                    }
+
                     continue;
                 }
 
@@ -401,8 +409,9 @@ enum EEnvironment implements ICourse
     // region Cached members
 
     /** This variable has to be manually set to nullptr if the goal location changed or a new goal has to be hunted. */
-    private RGoalMask       cachedGoal;
-    private Tile[][]        cachedTiles;
+    private RGoalMask                           cachedGoal;
+    private Tile[][]                            cachedTiles;
+    private final ArrayList<RCheckpointMask>    goals;
 
     // endregion Cached members
 
@@ -418,6 +427,7 @@ enum EEnvironment implements ICourse
     {
         this.cachedGoal                 = null;
         this.cachedTiles                = null;
+        this.goals                      = new ArrayList<RCheckpointMask>();
 
         this.finishedQualityLearning    = new AtomicBoolean(false);
 
