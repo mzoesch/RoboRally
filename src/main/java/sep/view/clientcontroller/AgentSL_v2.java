@@ -314,7 +314,9 @@ enum EEnvironment implements ICourse
         @Override
         public RCoordinate getNextFreeStartPoint() throws JSONException
         {
-            final Tile[][] tiles = this.getTiles();
+            final Tile[][] tiles = EEnvironment.INSTANCE.getTiles();
+
+            assert tiles != null;
 
             for (int file = 0; file < this.getFiles(); ++file)
             {
