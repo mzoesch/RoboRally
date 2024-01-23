@@ -463,7 +463,7 @@ public class GameMode {
                 Tile newTile = course.getTileByCoordinate(targetCoordinate);
                 newTile.addCheckPoint(checkpoint);
 
-                this.getSession().broadcastCheckPointMoved(checkpoint.getCheckpointNumber(), targetCoordinate.getX(), targetCoordinate.getX());
+                this.getSession().broadcastCheckPointMoved(checkpoint.getCheckpointNumber(), targetCoordinate.getX(), targetCoordinate.getY());
             }
         }
     }
