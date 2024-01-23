@@ -1,6 +1,7 @@
 package sep.view.clientcontroller;
 
 import sep.view.lib.                EGamePhase;
+import sep.view.lib.                RCheckpointMask;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EPopUp;
 import sep.view.viewcontroller.     ViewSupervisor;
@@ -469,8 +470,29 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onCheckpointMoved() throws JSONException
     {
-        l.debug("Received checkpoint moved from server.");
-        return true;
+        l.debug("Checkpoint {} has moved to {}.", this.dsrp.getCheckpointMovedID(), this.dsrp.getCoordinate().toString());
+
+        for (int i = 0; i < EGameState.INSTANCE.getCurrentCheckpointLocations().size(); ++i)
+        {
+            if (EGameState.INSTANCE.getCurrentCheckpointLocations().get(i) == null)
+            {
+                continue;
+            }
+
+            if (EGameState.INSTANCE.getCurrentCheckpointLocations().get(i).id() == this.dsrp.getCheckpointMovedID())
+            {
+                EGameState.INSTANCE.getCurrentCheckpointLocations().set(i, new RCheckpointMask(this.dsrp.getCoordinate(), this.dsrp.getCheckpointMovedID()));
+                ViewSupervisor.updateCheckpoints();
+                return true;
+            }
+
+            continue;
+        }
+
+        l.fatal("Could not find checkpoint {} in the current checkpoint list. Ignoring.", this.dsrp.getCheckpointMovedID());
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
+        return false;
     }
 
     @Override
