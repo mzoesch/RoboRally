@@ -1793,9 +1793,10 @@ enum EEnvironment implements ICourse
         return this.rewards == null || this.qualities == null;
     }
 
-    public boolean setHasFinishedQualityLearning(final boolean b)
+    public void setHasFinishedQualityLearning(final boolean b)
     {
-        return this.finishedQualityLearning.compareAndSet(!b, b);
+        this.finishedQualityLearning.compareAndSet(!b, b);
+        return;
     }
 
     public boolean hasFinishedQualityLearning()
