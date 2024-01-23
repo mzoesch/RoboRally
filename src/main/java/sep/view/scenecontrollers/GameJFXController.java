@@ -17,6 +17,7 @@ import sep.view.lib.                EAnimation;
 import sep.view.lib.                RGearMask;
 import sep.view.lib.                EFigure;
 import sep.view.lib.                EModifier;
+import sep.view.lib.                RCheckpointMask;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
@@ -116,6 +117,7 @@ public final class GameJFXController
     private int                         ranks;
     private Tile[][]                    tiles;
     private final ArrayList<RGearMask>  gears;
+    private final ArrayList<AnchorPane> checkpoints;
     private double                      minXTranslation;
     private double                      maxXTranslation;
     private double                      centralXTranslation;
@@ -138,6 +140,7 @@ public final class GameJFXController
         this.ranks                      = 0;
         this.tiles                      = null;
         this.gears                      = new ArrayList<RGearMask>();
+        this.checkpoints                = new ArrayList<AnchorPane>();
         this.minXTranslation            = 0.0;
         this.maxXTranslation            = 0.0;
         this.centralXTranslation        = 0.0;
@@ -1765,6 +1768,36 @@ public final class GameJFXController
             for (int j = 0; j < this.ranks; j++)
             {
                 final Tile t            = this.tiles[i][j];
+
+                /* Check for checkpoints and add them. */
+                if (t.hasModifier(EModifier.CHECK_POINT))
+                {
+                    if (t.getCheckpointID() == -1)
+                    {
+                        l.fatal("Assumed checkpoint on state {}, but the checkpoint was missing.", t.getTileLocation());
+                        GameInstance.kill(GameInstance.EXIT_FATAL);
+                        return;
+                    }
+
+                    boolean bAddToArray = true;
+                    for (final RCheckpointMask mask : Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()))
+                    {
+                        if (Objects.equals(mask.id(), t.getCheckpointID()))
+                        {
+                            bAddToArray = false;
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    if (bAddToArray)
+                    {
+                        l.info("Found checkpoint {} on state {}.", t.getCheckpointID(), t.getTileLocation());
+                        Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).add(new RCheckpointMask(t.getTileLocation(), t.getCheckpointID()));
+                    }
+                }
+
                 final AnchorPane AP     = new AnchorPane();
                 /* Warning: This is not commutative. Do not change the order here. */
                 for (int k = t.getImageViews().length - 1; k >= 0; --k)
@@ -1875,6 +1908,43 @@ public final class GameJFXController
         return;
     }
 
+    private void renderCheckpoints()
+    {
+        if (Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).isEmpty())
+        {
+            l.fatal("No checkpoints found. Every course must have at least one checkpoint.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return;
+        }
+
+        for (final AnchorPane ap : this.checkpoints)
+        {
+            this.courseScrollPaneContent.getChildren().remove(ap);
+            continue;
+        }
+
+        this.checkpoints.clear();
+
+        for (final RCheckpointMask mask : Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()))
+        {
+            l.trace("Rendering checkpoint {} on state {}.", mask.id(), mask.location());
+
+            final ImageView iv = Tile.getFormattedImageView(mask);
+            iv.setFitHeight(    this.tileDimensions );
+            iv.setFitWidth(     this.tileDimensions );
+
+            final AnchorPane ap = new AnchorPane(iv);
+
+            this.renderOnPosition(ap, mask.location());
+
+            this.checkpoints.add(ap);
+
+            continue;
+        }
+
+        return;
+    }
+
     /**
      * Updates player positions on the course view.
      * No re-renders must be done after this method.
@@ -1912,6 +1982,7 @@ public final class GameJFXController
     private void renderCourse()
     {
         this.renderCourseBoard();
+        this.renderCheckpoints();
         this.renderPlayerTransforms();
 
         return;
@@ -2192,6 +2263,17 @@ public final class GameJFXController
         Platform.runLater(() ->
         {
             this.centerCourse();
+            return;
+        });
+
+        return;
+    }
+
+    public void onCheckpointMoved()
+    {
+        Platform.runLater(() ->
+        {
+            this.renderCheckpoints();
             return;
         });
 
