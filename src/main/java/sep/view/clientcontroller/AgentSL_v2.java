@@ -67,7 +67,7 @@ final class Tile
 
     public RCoordinate getCoordinate()
     {
-        return coordinate;
+        return this.coordinate;
     }
 
     public TileModifier getModifier(final int idx)
