@@ -5,6 +5,7 @@ import sep.view.lib.                EShopState;
 import sep.view.lib.                RRegisterCard;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                RCheckpointMask;
 import sep.view.viewcontroller.     ViewSupervisor;
 
 import java.util.                   ArrayList;
@@ -69,6 +70,7 @@ public enum EGameState
         this.serverCourses              = new String[0];
         this.currentServerCourse        = "";
         this.currentServerCourseJSON    = null;
+        this.currentCheckpointLocations = new ArrayList<RCheckpointMask>();
 
         this.registers                  = new String[5];
         this.gotRegisters               = new ArrayList<String>();
@@ -98,6 +100,7 @@ public enum EGameState
         EGameState.INSTANCE.serverCourses               = new String[0];
         EGameState.INSTANCE.currentServerCourse         = "";
         EGameState.INSTANCE.currentServerCourseJSON     = null;
+        EGameState.INSTANCE.currentCheckpointLocations  .clear();
 
         EGameState.INSTANCE.registers[0]                = null;
         EGameState.INSTANCE.registers[1]                = null;
@@ -784,6 +787,11 @@ public enum EGameState
         }
 
         return;
+    }
+
+    public ArrayList<RCheckpointMask> getCurrentCheckpointLocations()
+    {
+        return this.currentCheckpointLocations;
     }
 
     // endregion Getters and Setters
