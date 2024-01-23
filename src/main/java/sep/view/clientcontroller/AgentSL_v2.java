@@ -418,6 +418,8 @@ enum EEnvironment implements ICourse
     public final Object             lock                        = new Object();
 
     private final AtomicBoolean     finishedQualityLearning;
+    private final AtomicBoolean     allowPreFinishQualityUse;
+    private final AtomicBoolean     aboardQualityLearning;
 
     /** Each matrix cell represents the travel from one state to another. */
     private float[][]               rewards;
@@ -430,6 +432,8 @@ enum EEnvironment implements ICourse
         this.goals                      = new ArrayList<RCheckpointMask>();
 
         this.finishedQualityLearning    = new AtomicBoolean(false);
+        this.allowPreFinishQualityUse   = new AtomicBoolean(false);
+        this.aboardQualityLearning      = new AtomicBoolean(false);
 
         this.rewards                    = null;
         this.qualities                  = null;
@@ -1797,6 +1801,28 @@ enum EEnvironment implements ICourse
         return this.finishedQualityLearning.get();
     }
 
+    public void setAllowPreFinishQualityUse(final boolean b)
+    {
+        this.allowPreFinishQualityUse.compareAndSet(!b, b);
+        return;
+    }
+
+    public boolean getAllowPreFinishQualityUse()
+    {
+        return this.allowPreFinishQualityUse.get();
+    }
+
+    public void setAbortedQualityLearning(final boolean b)
+    {
+        this.aboardQualityLearning.compareAndSet(!b, b);
+        return;
+    }
+
+    public boolean hasAbortedQualityLearning()
+    {
+        return this.aboardQualityLearning.get();
+    }
+
     // endregion Getters and Setters
 
 }
@@ -2353,6 +2379,8 @@ public final class AgentSL_v2 extends ServerListener
                                 continue;
                             }
 
+                            EEnvironment.INSTANCE.setAllowPreFinishQualityUse(true);
+
                             /* TODO This code may result in a deadlock. */
                             EEnvironment.INSTANCE.lock.notifyAll();
                             try
@@ -2401,7 +2429,23 @@ public final class AgentSL_v2 extends ServerListener
 
             synchronized (EEnvironment.INSTANCE.lock)
             {
-                l.info("Agent {}'s Card Broadcast Service was notified. Sending register cards.", EClientInformation.INSTANCE.getPlayerID());
+                if (!EEnvironment.INSTANCE.getAllowPreFinishQualityUse())
+                {
+                    l.warn("Quality Learning Service has not finished yet. Waiting for interrupt at an usable state but not finished state.");
+
+                    try
+                    {
+                        EEnvironment.INSTANCE.lock.wait();
+                    }
+                    catch (final InterruptedException e)
+                    {
+                        l.fatal("Failed to wait for Quality Learning Service to finish.");
+                        GameInstance.kill(GameInstance.EXIT_FATAL);
+                        return;
+                    }
+
+                    l.info("Agent {}'s Card Broadcast Service was notified. Sending register cards.", EClientInformation.INSTANCE.getPlayerID());
+                }
 
                 EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
                 this.sendSelectedCards();
