@@ -604,8 +604,6 @@ enum EEnvironment implements ICourse
 
     public RCoordinate getQualityGoal()
     {
-        /* TODO Here we have to check if we collected another checkpoint and now our target goal has changed. */
-
         if (this.cachedGoal != null)
         {
             return this.cachedGoal.location;
