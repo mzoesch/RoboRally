@@ -166,6 +166,11 @@ public record RDefaultServerRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getInt("number");
     }
 
+    public int getCheckpointMovedID() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("checkpointID");
+    }
+
     public String[] getDrawnDamageCards() throws JSONException
     {
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cards").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cards").getString(i)).toArray(String[]::new);
