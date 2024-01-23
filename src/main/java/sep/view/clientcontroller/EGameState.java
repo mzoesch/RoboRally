@@ -40,9 +40,10 @@ public enum EGameState
     private final ArrayList<RemotePlayer>   remotePlayers;
     private RemotePlayer                    currentPlayer;
 
-    private String[]                        serverCourses;
-    private String                          currentServerCourse;
-    private JSONArray                       currentServerCourseJSON;
+    private String[]                            serverCourses;
+    private String                              currentServerCourse;
+    private JSONArray                           currentServerCourseJSON;
+    private final ArrayList<RCheckpointMask>    currentCheckpointLocations;
 
     private final String[]                  registers;
     private final ArrayList<String>         gotRegisters;
