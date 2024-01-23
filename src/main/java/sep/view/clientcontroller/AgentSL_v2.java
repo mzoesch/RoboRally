@@ -575,9 +575,8 @@ enum EEnvironment implements ICourse
             return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
-        if (target.isCheckpoint())
+        if (target.isCheckpoint() && Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getCheckPointsReached() == target.getCheckpointCount())
         {
-            /* TODO Check if it is the right checkpoint. */
             return EEnvironment.GOAL_REWARD;
         }
 
