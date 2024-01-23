@@ -1862,6 +1862,27 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
+    private void executeDefaultBehaviourForAChangedCheckpoint()
+    {
+        if (this.qualityLearningService != null && this.qualityLearningService.isAlive())
+        {
+            l.info("Agent {} detected that the Checkpoint Moved Event was triggered. Interrupting the Quality Learning Service as it is not needed anymore for the old game state.", EClientInformation.INSTANCE.getPlayerID());
+
+            l.debug("Interrupting Quality Learning Service.");
+            EEnvironment.INSTANCE.setAbortedQualityLearning(true);
+
+            synchronized (EEnvironment.INSTANCE.lock)
+            {
+                EEnvironment.INSTANCE.lock.notifyAll();
+            }
+
+            EEnvironment.INSTANCE.setAbortedQualityLearning(false);
+            l.debug("Successfully interrupted Quality Learning Service.");
+        }
+
+        EEnvironment.INSTANCE.onCourseChanged();
+    }
+
     private void evaluateProgrammingPhaseWithQLearning(final boolean bSetRegisterCards)
     {
         if (this.qualityLearningService == null || !this.qualityLearningService.isAlive())
@@ -2247,6 +2268,12 @@ public final class AgentSL_v2 extends ServerListener
     {
         l.debug("Player {} reached checkpoint {}.", this.dsrp.getPlayerID(), this.dsrp.getCheckpointNumber());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getCheckpointNumber());
+
+        if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID() == this.dsrp.getPlayerID())
+        {
+            this.executeDefaultBehaviourForAChangedCheckpoint();
+        }
+
         return true;
     }
 
@@ -2327,7 +2354,11 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onCheckpointMoved() throws JSONException
     {
-        return false;
+        l.debug("Checkpoint {} has moved to {}.", this.dsrp.getCheckpointMovedID(), this.dsrp.getCoordinate().toString());
+
+        this.executeDefaultBehaviourForAChangedCheckpoint();
+
+        return true;
     }
 
     @Override
