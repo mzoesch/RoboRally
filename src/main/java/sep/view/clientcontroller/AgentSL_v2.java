@@ -41,9 +41,9 @@ final class TileModifier
         return this.modifier.getJSONArray("orientations").getString(0);
     }
 
-    public String getCheckpointCount()
+    public int getCheckpointCount() throws JSONException
     {
-        return this.modifier.getString("count");
+        return this.modifier.getInt("count");
     }
 
 }
