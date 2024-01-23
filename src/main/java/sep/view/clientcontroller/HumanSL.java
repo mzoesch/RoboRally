@@ -449,22 +449,19 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onExchangeShop() throws JSONException
     {
-        l.debug("Received exchange shop from server.");
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onRefillShop() throws JSONException
     {
-        l.debug("Received refill shop from server.");
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        l.debug("Received upgrade bought from server.");
-        return true;
+        return false;
     }
 
     @Override
@@ -498,8 +495,7 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onRegisterChosen() throws JSONException
     {
-        l.debug("Received register chosen from server.");
-        return true;
+        return false;
     }
 
     // endregion Server request handlers
