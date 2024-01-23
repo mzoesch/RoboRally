@@ -2353,7 +2353,7 @@ public final class AgentSL_v2 extends ServerListener
                                 continue;
                             }
 
-                            /* This code may be critical. */
+                            /* TODO This code may result in a deadlock. */
                             EEnvironment.INSTANCE.lock.notifyAll();
                             try
                             {
