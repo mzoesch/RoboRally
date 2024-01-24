@@ -136,7 +136,7 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onErrorMsg() throws JSONException
     {
-        l.debug("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
+        l.error("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
         ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, this.dsrp.getErrorMessage()));
         return true;
     }
