@@ -173,6 +173,12 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         return checkPointsReached;
     }
 
+    @Override
+    public String toString()
+    {
+        return String.format("RemotePlayer{id:%d,name:%s,figure:%s,ready:%b}", this.playerID, this.playerName, this.figure, this.bReady);
+    }
+
     // endregion Getters and Setters
 
 }
