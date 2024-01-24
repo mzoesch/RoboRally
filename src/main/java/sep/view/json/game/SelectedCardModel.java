@@ -26,7 +26,7 @@ public final class SelectedCardModel extends AServerRequestModel
     public JSONObject toJSON()
     {
         JSONObject body = new JSONObject();
-        body.put("register", this.register);
+        body.put("register", this.register + 1); /* The registers in the protocol are not zero-based. */
         body.put("card", this.cardName == null ? JSONObject.NULL : this.cardName);
 
         JSONObject j = new JSONObject();
