@@ -9,6 +9,7 @@ import sep.view.lib.                RCheckpointMask;
 import sep.view.viewcontroller.     ViewSupervisor;
 
 import java.util.                   ArrayList;
+import java.util.                   Arrays;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -299,7 +300,7 @@ public enum EGameState
             continue;
         }
 
-        l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored.");
+        l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored. Searched for {}, but found {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(this.remotePlayers.toArray(new RemotePlayer[0])));
 
         return null;
     }
