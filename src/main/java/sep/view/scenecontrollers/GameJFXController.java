@@ -1940,6 +1940,12 @@ public final class GameJFXController
 
     private void renderCheckpoints()
     {
+        if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
+        {
+            l.error("Tried to render checkpoints on game scene but no course data is available.");
+            return;
+        }
+
         if (Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).isEmpty())
         {
             l.fatal("No checkpoints found. Every course must have at least one checkpoint.");
