@@ -474,12 +474,14 @@ public enum EClientInformation
             {
                 l.fatal("Failed to reset disconnect atomic flag.");
                 l.fatal(e.getMessage());
-                GameInstance.kill();
+                GameInstance.kill(GameInstance.EXIT_FATAL);
                 return;
             }
 
             l.debug("Resetting disconnect atomic flag.");
             this.bDisconnectHandled.set(false);
+
+            return;
         })
         .start();
 
