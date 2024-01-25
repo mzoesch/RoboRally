@@ -289,7 +289,7 @@ public enum EClientInformation
         this.serverListener         = null;
         this.executorService        = null;
 
-        this.playerID               = -1;
+        this.playerID               = EClientInformation.INVALID_PLAYER_ID;
         this.preferredSessionID     = "";
 
         return;
