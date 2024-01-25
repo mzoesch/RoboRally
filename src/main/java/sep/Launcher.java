@@ -541,8 +541,18 @@ public final class Launcher
                 //      This is a bug on the server and not on the client and should properly be fixed ASAP.
                 try
                 {
-                    //noinspection BusyWait
-                    Thread.sleep(200); /* On slower end hardware, this delay must be increased. */
+                    /* On slower end hardware, this delay must be increased. */
+
+                    if (Types.EOS.isOSX())
+                    {
+                        //noinspection BusyWait
+                        Thread.sleep(1_000);
+                    }
+                    else
+                    {
+                        //noinspection BusyWait
+                        Thread.sleep(200);
+                    }
                 }
                 catch (final InterruptedException e)
                 {
