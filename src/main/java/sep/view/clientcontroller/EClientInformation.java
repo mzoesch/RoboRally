@@ -193,8 +193,9 @@ public enum EClientInformation
             return;
         }
 
-        this.executorService    = Executors.newFixedThreadPool(1);
-        this.serverListener     = new HumanSL(this.bufferedReader);
+        final ThreadFactory     factory     = new ServerListenerFactory("ServerListenerPool");
+        this.executorService                = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, factory);
+        this.serverListener                 = new HumanSL(this.bufferedReader);
         this.executorService.execute(this.serverListener);
 
         l.debug("Now listening for standard server responses.");
