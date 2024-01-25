@@ -485,40 +485,40 @@ public final class Launcher
 
                 final ProcessBuilder pb =
                     Types.EOS.isWindows()
-                    ?
-                    new ProcessBuilder(
-                        System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
-                        String.format(
-                            "java -cp %s sep.Launcher --cl --nocmd %s %s %s %s %s %s",
-                            f,
-                            "--isAgent",
-                            !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
-                            EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
-                            String.format("--name \"%s\"", EArgs.getAgentNames().get(i)),
-                            !Objects.equals(EArgs.getCustomSessionID(), "") ? String.format("--sid %s", EArgs.getCustomSessionID()) : "",
-                            EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                        ?
+                        new ProcessBuilder(
+                            System.getenv("COMSPEC"), "/c", "start", "cmd", "/k",
+                            String.format(
+                                "java -cp %s sep.Launcher --cl --nocmd %s %s %s %s %s %s",
+                                f,
+                                "--isAgent",
+                                !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
+                                EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                                String.format("--name \"%s\"", EArgs.getAgentNames().get(i)),
+                                !Objects.equals(EArgs.getCustomSessionID(), "") ? String.format("--sid %s", EArgs.getCustomSessionID()) : "",
+                                EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                            )
                         )
-                    )
-                    :
-                    Types.EOS.isOSX()
-                    ?
-                    new ProcessBuilder(
-                        "osascript", "-e",
-                        String.format(
-                            "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --sv --nocmd %s %s %s %s %s %s\"",
-                            fp.substring(0, fp.lastIndexOf("/")),
-                            f,
-                            "--isAgent",
-                            !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
-                            EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
-                            String.format("--name \"%s\"", EArgs.getAgentNames().get(i)),
-                            !Objects.equals(EArgs.getCustomSessionID(), "") ? String.format("--sid %s", EArgs.getCustomSessionID()) : "",
-                            EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                        :
+                        Types.EOS.isOSX()
+                        ?
+                        new ProcessBuilder(
+                            "osascript", "-e",
+                            String.format(
+                                "tell application \"Terminal\" to do script \"cd %s && java -cp %s sep.Launcher --cl %s %s %s %s %s %s\"",
+                                fp.substring(0, fp.lastIndexOf("/")),
+                                f,
+                                "--isAgent",
+                                !Objects.equals(EArgs.getCustomServerIP(), "") ? String.format("--ip %s", EArgs.getCustomServerIP()) : "",
+                                EArgs.getCustomServerPort() != Types.EPort.INVALID.i ? String.format("--port %d", EArgs.getCustomServerPort()) : "",
+                                String.format("--name %s", EArgs.getAgentNames().get(i)),
+                                !Objects.equals(EArgs.getCustomSessionID(), "") ? String.format("--sid %s", EArgs.getCustomSessionID()) : "",
+                                EArgs.getNoClose() ? "" : Arrays.asList(args).contains("--noclose") ? "" : "& exit"
+                            )
                         )
-                    )
-                    :
-                    null
-                    ;
+                        :
+                        null
+                        ;
 
                 if (pb == null)
                 {
