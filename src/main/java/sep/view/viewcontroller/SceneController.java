@@ -338,7 +338,6 @@ public final class SceneController
         if (this.screens.isEmpty())
         {
             l.fatal("No screens are loaded.");
-            GameInstance.kill();
             return null;
         }
 
