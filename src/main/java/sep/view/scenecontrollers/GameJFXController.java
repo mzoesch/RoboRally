@@ -2068,6 +2068,11 @@ public final class GameJFXController
                 continue;
             }
 
+            if (rp.hasRebooted())
+            {
+                continue;
+            }
+
             for (final RLaserMask mask : rp.getRobotView().getLaserAffectedTiles(this.tiles, 1))
             {
                 final ImageView iv = Tile.getFormattedImageView(mask);
