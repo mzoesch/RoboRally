@@ -909,7 +909,7 @@ public class GameMode {
                 continue;
             }
 
-            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex + 1);
+            l.warn("Player {} does not have a card in register {}. If this was after a reboot, this can be ignored.", p.getController().getPlayerID(), this.currentRegisterIndex + 1);
         }
 
         addDelay(2000);
