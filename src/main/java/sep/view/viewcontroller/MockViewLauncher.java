@@ -990,6 +990,9 @@ public final class MockViewLauncher implements IMockView
                 EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{new RRegisterCard(0, "MoveI"), new RRegisterCard(1, "MoveI"), new RRegisterCard(2, "MoveI"), new RRegisterCard(3, "MoveII"), new RRegisterCard(4, "MoveII"), new RRegisterCard(5, "MoveII"), });
                 continue;
             }
+
+            EClientInformation.INSTANCE.setPlayerID(0);
+
             ViewSupervisor.updatePlayerInformationArea();
 
             ViewSupervisor.centerGameCourseLater();
