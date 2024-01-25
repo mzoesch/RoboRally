@@ -90,6 +90,11 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
             return;
         }
 
+        if (ViewSupervisor.getSceneController().getCurrentScreen() == null)
+        {
+            return;
+        }
+
         /* We are never connected to a server in the lobby scene. */
         if (ViewSupervisor.getSceneController().getCurrentScreen().id().equals(SceneController.MAIN_MENU_ID))
         {
