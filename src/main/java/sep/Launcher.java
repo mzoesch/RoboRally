@@ -483,6 +483,14 @@ public final class Launcher
             {
                 l.info("Launching agent {} [{} of {}].", EArgs.getAgentNames().get(i), i + 1, EArgs.getAgentNames().size());
 
+                /* We have to replace all spaces and special characters in osascript. */
+                if (Types.EOS.isOSX())
+                {
+                    EArgs.getAgentNames().set(i, EArgs.getAgentNames().get(i).replaceAll(" ", "_"));
+                    EArgs.getAgentNames().set(i, EArgs.getAgentNames().get(i).replaceAll("\\[", ""));
+                    EArgs.getAgentNames().set(i, EArgs.getAgentNames().get(i).replaceAll("\\]", ""));
+                }
+
                 final ProcessBuilder pb =
                     Types.EOS.isWindows()
                         ?
