@@ -839,33 +839,27 @@ public final class ViewSupervisor extends Application
         final HBox h = new HBox();
         h.setAlignment(Pos.CENTER);
 
-        final Label header = new Label("Damage Cards drawn");
+        final Label header = new Label(String.format("You have drawn the following damage cards: %s.", drawnCards));
+        header.setStyle("-fx-alignment: center; -fx-text-alignment: center;");
         header.getStyleClass().add("text-xl");
-        header.setStyle("-fx-alignment: center;");
+        header.setWrapText(true);
 
-        AnchorPane.setLeftAnchor(       header, 0.0      );
         AnchorPane.setRightAnchor(      header, 0.0      );
-        AnchorPane.setTopAnchor(        header, 50.0     );
+        AnchorPane.setTopAnchor(        header, 0.0      );
+        AnchorPane.setBottomAnchor(     header, 0.0      );
+        AnchorPane.setLeftAnchor(       header, 0.0      );
 
-        final Label form = new Label("You have drawn following damage cards: " + drawnCards);
-        form.getStyleClass().add("text-base");
-        form.setStyle("-fx-alignment: center;");
+        final AnchorPane ap = new AnchorPane(header);
+        ap.setId("draw-damage-container");
+        ap.setMouseTransparent(true);
 
-        AnchorPane.setLeftAnchor(       form, 0.0      );
-        AnchorPane.setRightAnchor(      form, 0.0      );
-        AnchorPane.setBottomAnchor(     form, 50.0      );
-
-        final AnchorPane p = new AnchorPane(header, form);
-        p.setId("phase-update-container");
-
-        h.getChildren().add(p);
+        h.getChildren().add(ap);
 
         AnchorPane.setLeftAnchor(       h, 0.0      );
         AnchorPane.setRightAnchor(      h, 0.0      );
-        AnchorPane.setTopAnchor(        h, 0.0      );
-        AnchorPane.setBottomAnchor(     h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 50.0     );
 
-        ViewSupervisor.createPopUp(h, 2000, false);
+        ViewSupervisor.createPopUp(h, 4_000, false);
 
         return;
     }
