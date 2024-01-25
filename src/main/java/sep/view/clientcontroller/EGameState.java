@@ -300,7 +300,13 @@ public enum EGameState
             continue;
         }
 
-        l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored. Searched for {}, but found {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(this.remotePlayers.toArray(new RemotePlayer[0])));
+        if (EClientInformation.INSTANCE.hasPlayerID())
+        {
+            l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored. Searched for {}, but found {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(this.remotePlayers.toArray(new RemotePlayer[0])));
+            return null;
+        }
+
+        l.warn("Could not find the client remote player because the client player id has not been yet set.");
 
         return null;
     }
