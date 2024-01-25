@@ -66,7 +66,7 @@ public final class Tile
         iv.setPreserveRatio(true);
         iv.setSmooth(true);
         iv.setCache(true);
-        iv.setImage(TileModifier.loadCachedImage(String.format(("Checkpoint%d"), mask.id())));
+        iv.setImage(TileModifier.loadCachedImage(String.format(("CheckPoint%d"), mask.id())));
 
         return iv;
 
