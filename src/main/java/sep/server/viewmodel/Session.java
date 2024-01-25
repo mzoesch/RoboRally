@@ -546,7 +546,8 @@ public final class Session
     public void broadcastCurrentCards(final int register) {
         final ArrayList<Player> players = this.getGameState().getAuthGameMode().getPlayers();
         if (players.isEmpty()) {
-            l.error("No players exist.");
+            l.fatal("No players exist.");
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
             return;
         }
 
