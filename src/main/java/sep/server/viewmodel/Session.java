@@ -557,7 +557,6 @@ public final class Session
             CardInfo ci;
 
             if (card == null) {
-                l.error("Card does not exist");
                 ci = new CardInfo(p.getController().getPlayerID(), null);
             } else {
                 ci = new CardInfo(p.getController().getPlayerID(), card.getCardType());
