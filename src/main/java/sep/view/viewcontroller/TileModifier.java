@@ -284,10 +284,11 @@ public final class TileModifier
 
         if (Types.EConfigurations.isDev())
         {
-            final Image i = new Image(String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION));
+            final String    strURL  = String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION);
+            final Image     i       = new Image(strURL);
             if (i.isError())
             {
-                l.error("Could not load image: {}", modName);
+                l.error("Could not load image: {}", strURL);
                 l.error(i.getException().getMessage());
                 return i;
             }
@@ -297,12 +298,13 @@ public final class TileModifier
 
         if (Types.EConfigurations.isProd())
         {
-            final URL               url     = TileModifier.class.getResource(String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION));
+            final String            strURL  = String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION);
+            final URL               url     = TileModifier.class.getResource(strURL);
             final BufferedImage     awtImg;
 
             if (url == null)
             {
-                l.error("Could not load image because the calculated url does not exist: {}", modName);
+                l.error("Could not load image because the calculated url does not exist: {}", strURL);
                 return null;
             }
 
