@@ -3,8 +3,10 @@ package sep.view.clientcontroller;
 import sep.view.viewcontroller.     RobotView;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                RRegisterCard;
 
 import java.util.                   ArrayList;
+import java.util.                   Objects;
 
 /**
  * Represents a player in a session. Not just remote players but also the client player.
@@ -25,6 +27,7 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     private static final int            REGISTER_SLOTS      = 5;
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
     private final String[]              registerSlots;
+    private boolean                     bRebooted;
 
     private int                         energyCubes         = 5;
 
@@ -44,6 +47,7 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         this.possessing             = new RobotView(this);
 
         this.registerSlots          = new String[REGISTER_SLOTS];
+        this.bRebooted              = false;
 
         this.bSelectionFinished     = false;
         this.checkPointsReached     = 0;
@@ -150,12 +154,21 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     public void clearPlayedRCards()
     {
         this.playedRCards.clear();
+        this.bRebooted = false;
         return;
     }
 
     public void addPlayedRCards(final String card)
     {
+        /* If a pawn has been rebooted. */
+        if (Objects.equals(card, RRegisterCard.NULL_CARD))
+        {
+            this.playedRCards.clear();
+            return;
+        }
+
         this.playedRCards.add(card);
+
         return;
     }
 
@@ -177,6 +190,17 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     public String toString()
     {
         return String.format("RemotePlayer{id:%d,name:%s,figure:%s,ready:%b}", this.playerID, this.playerName, this.figure, this.bReady);
+    }
+
+    public boolean hasRebooted()
+    {
+        return this.bRebooted;
+    }
+
+    public void setHasRebooted(final boolean bRebooted)
+    {
+        this.bRebooted = bRebooted;
+        return;
     }
 
     // endregion Getters and Setters
