@@ -398,6 +398,8 @@ public final class HumanSL extends ServerListener
     {
         l.debug("Player {} has been rebooted.", this.dsrp.getPlayerID());
 
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setHasRebooted(true);
+
         if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
         {
             l.debug("Local player has been rebooted. Showing reboot dialog.");
