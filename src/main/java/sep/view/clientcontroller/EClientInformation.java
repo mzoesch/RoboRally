@@ -171,7 +171,7 @@ public enum EClientInformation
 
     /**
      * @param bBlock If false, a new executor service will be created and the {@link ServerListener} will be
-     *               initialized on it. If true, the {@link ServerListener} will be initialized on the main thread.
+     *               initialized on it. If true, the {@link ServerListener} will be initialized on the calling thread.
      *
      * @see sep.view.clientcontroller.ServerListener
      */
