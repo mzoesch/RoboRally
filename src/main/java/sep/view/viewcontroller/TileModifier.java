@@ -326,8 +326,9 @@ public final class TileModifier
             return SwingFXUtils.toFXImage(awtImg, null);
         }
 
-        l.fatal("Failed to detect application configuration.");
-        GameInstance.kill();
+        l.fatal("Failed to detect application configuration during image load task.");
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
         return null;
     }
 
@@ -341,6 +342,7 @@ public final class TileModifier
         l.debug("Loading and caching image: {}.", modName);
         final Image i = TileModifier.loadImage(modName);
         TileModifier.IMG_CACHE.put(modName, new RImageMask(i, Types.EConfigurations.isDev() ? null : String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION)));
+
         return i;
     }
 
