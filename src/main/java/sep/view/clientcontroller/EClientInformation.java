@@ -10,19 +10,21 @@ import sep.view.lib.                EAgentDifficulty;
 
 import org.json.                    JSONObject;
 import java.util.concurrent.        ExecutorService;
+import java.util.concurrent.        Executors;
+import java.util.concurrent.        ThreadFactory;
+import java.util.concurrent.        ThreadPoolExecutor;
 import java.io.                     BufferedReader;
 import java.io.                     InputStreamReader;
 import java.io.                     BufferedWriter;
 import java.io.                     IOException;
 import java.io.                     OutputStreamWriter;
-import java.util.concurrent.        Executors;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import java.net.                    ConnectException;
 import java.net.                    UnknownHostException;
 import java.net.                    Socket;
-import java.util.concurrent.atomic. AtomicBoolean;
 import java.util.                   Objects;
+import java.util.concurrent.atomic. AtomicBoolean;
 
 /**
  * Singleton object that holds all relevant information about the client's connection to the server and the game
@@ -33,11 +35,13 @@ public enum EClientInformation
 {
     INSTANCE;
 
-    private static final Logger l = LogManager.getLogger(EClientInformation.class);
+    private static final Logger l                               = LogManager.getLogger(EClientInformation.class);
 
-    public static final String AGENT_PREFIX = "[BOT]";
+    public static final String  AGENT_PREFIX                    = "[BOT]";
 
-    private static final int DISCONNECT_ATOMIC_RESET_DELAY = 500;
+    private static final int    DISCONNECT_ATOMIC_RESET_DELAY   = 500;
+
+    private static final int    INVALID_PLAYER_ID               = -1;
 
     private String                  serverIP;
     private int                     serverPort;
@@ -89,7 +93,7 @@ public enum EClientInformation
         this.serverListener         = null;
         this.executorService        = null;
 
-        this.playerID               = -1;
+        this.playerID               = EClientInformation.INVALID_PLAYER_ID;
         this.preferredSessionID     = "";
 
         this.bIsAgent               = false;
@@ -260,6 +264,11 @@ public enum EClientInformation
     {
         this.playerID = playerID;
         return;
+    }
+
+    public boolean hasPlayerID()
+    {
+        return this.playerID != EClientInformation.INVALID_PLAYER_ID;
     }
 
     public int getPlayerID()
