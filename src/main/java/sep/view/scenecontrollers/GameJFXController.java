@@ -1582,79 +1582,82 @@ public final class GameJFXController
                 ap.setMaxWidth(ap.getWidth());
             }
 
-            ap.setOnMouseEntered(e ->
+            if (!rp.hasRebooted())
             {
-                final ArrayList<Integer> newTranslations = new ArrayList<Integer>();
-
-                for (int j = ap.getChildren().size() - 1; j >= 0; --j)
+                ap.setOnMouseEntered(e ->
                 {
-                    newTranslations.add( (int) ( (-GameJFXController.RCARD_PREVIEW_TRANSLATION_X * (ap.getChildren().size() - 1 - j)) + Math.abs(ap.getChildren().get(j).getTranslateX())) );
-                    continue;
-                }
+                    final ArrayList<Integer> newTranslations = new ArrayList<Integer>();
 
-                /* East translation cleanup. */
-                if (finalI % 2 == 1)
-                {
-                    for (int j = 0; j < ap.getChildren().size(); j++)
+                    for (int j = ap.getChildren().size() - 1; j >= 0; --j)
                     {
-                        newTranslations.set(j, newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP));
+                        newTranslations.add( (int) ( (-GameJFXController.RCARD_PREVIEW_TRANSLATION_X * (ap.getChildren().size() - 1 - j)) + Math.abs(ap.getChildren().get(j).getTranslateX())) );
                         continue;
                     }
-                }
 
-                for (int j = 0; j < ap.getChildren().size(); j++)
-                {
-                    final Timeline t    = new Timeline();
-                    final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.RCARDS_TRANSLATION_DURATION), new KeyValue(ap.getChildren().get(j).translateXProperty(), newTranslations.get(j)));
-                    t.getKeyFrames().add(kf);
-                    t.play();
-
-                    continue;
-                }
-
-                for (final Rectangle r : GameJFXController.getHoverPCardBackgrounds(ap, newTranslations, finalI))
-                {
-                    ap.getChildren().add(0, r);
-                    continue;
-                }
-
-                return;
-            }
-            );
-
-            ap.setOnMouseExited(e ->
-            {
-                ap.getChildren().clear();
-                ap.setStyle("");
-
-                for (int j = 0; j < rp.getPlayedRCards().length; ++j)
-                {
-                    final ImageView iv = new ImageView();
-
-                    iv.setFitWidth(GameJFXController.RCARD_WIDTH);
-                    iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
-                    iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
-                    iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (finalI % 2 == 0 ? 1 : -1));
-
-                    if (finalI % 2 == 0)
+                    /* East translation cleanup. */
+                    if (finalI % 2 == 1)
                     {
-                        AnchorPane.setLeftAnchor(iv, 10.0);
-                    }
-                    else
-                    {
-                        AnchorPane.setRightAnchor(iv, 10.0);
+                        for (int j = 0; j < ap.getChildren().size(); j++)
+                        {
+                            newTranslations.set(j, newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP));
+                            continue;
+                        }
                     }
 
-                    AnchorPane.setTopAnchor(iv, 6.0);
+                    for (int j = 0; j < ap.getChildren().size(); j++)
+                    {
+                        final Timeline t    = new Timeline();
+                        final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.RCARDS_TRANSLATION_DURATION), new KeyValue(ap.getChildren().get(j).translateXProperty(), newTranslations.get(j)));
+                        t.getKeyFrames().add(kf);
+                        t.play();
 
-                    ap.getChildren().add(iv);
+                        continue;
+                    }
 
-                    continue;
+                    for (final Rectangle r : GameJFXController.getHoverPCardBackgrounds(ap, newTranslations, finalI))
+                    {
+                        ap.getChildren().add(0, r);
+                        continue;
+                    }
+
+                    return;
                 }
+                );
 
-                return;
+                ap.setOnMouseExited(e ->
+                {
+                    ap.getChildren().clear();
+                    ap.setStyle("");
+
+                    for (int j = 0; j < rp.getPlayedRCards().length; ++j)
+                    {
+                        final ImageView iv = new ImageView();
+
+                        iv.setFitWidth(GameJFXController.RCARD_WIDTH);
+                        iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
+                        iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+                        iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (finalI % 2 == 0 ? 1 : -1));
+
+                        if (finalI % 2 == 0)
+                        {
+                            AnchorPane.setLeftAnchor(iv, 10.0);
+                        }
+                        else
+                        {
+                            AnchorPane.setRightAnchor(iv, 10.0);
+                        }
+
+                        AnchorPane.setTopAnchor(iv, 6.0);
+
+                        ap.getChildren().add(iv);
+
+                        continue;
+                    }
+
+                    return;
+                }
+                );
             }
-            );
 
             final HBox h = new HBox();
             h.getStyleClass().add("player-information-container");
