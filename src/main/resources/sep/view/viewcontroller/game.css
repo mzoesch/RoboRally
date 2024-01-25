@@ -324,6 +324,19 @@
     -fx-max-height: 150px;
 }
 
+#draw-damage-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 500px;
+    -fx-min-height: 150px;
+    -fx-max-width: 500px;
+    -fx-max-height: 150px;
+}
+
+
 #damage-card-selection-dialog-container{
     -fx-background-color: #2b2a33f2;
     -fx-border-width: 2px;
