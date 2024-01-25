@@ -179,7 +179,8 @@ public enum EClientInformation
     {
         if (this.serverListener != null)
         {
-            l.error("ServerListener already initialized.");
+            l.fatal("ServerListener already initialized.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
             return;
         }
 
