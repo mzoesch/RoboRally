@@ -198,7 +198,19 @@ public record RDefaultServerRequestParser(JSONObject request)
 
     public RRegisterCard[] getCurrentRegisterCards() throws JSONException
     {
-        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()).mapToObj(i -> new RRegisterCard(this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"), this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card"))).toArray(RRegisterCard[]::new);
+        return IntStream.range(
+                0,
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()
+            )
+            .mapToObj(i -> new RRegisterCard(
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"),
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).has("card")
+                ?
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card")
+                :
+                RRegisterCard.NULL_CARD
+            )
+            ).toArray(RRegisterCard[]::new);
     }
 
     public EAnimation getAnimation() throws JSONException
