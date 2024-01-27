@@ -1156,4 +1156,17 @@ public final class ViewSupervisor extends Application
         return ViewSupervisor.lock;
     }
 
+    private static Node createHSpacer()
+    {
+        final Region s = new Region();
+        HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private static Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
+        return s;
+    }
 }
