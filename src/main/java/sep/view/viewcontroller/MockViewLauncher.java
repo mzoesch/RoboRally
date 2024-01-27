@@ -10,6 +10,8 @@ import sep.view.lib.                RRegisterCard;
 import org.json.                    JSONObject;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import java.util.                   ArrayList;
+import java.util.                   Arrays;
 
 /** Mocking Game View with no server connection required. */
 public final class MockViewLauncher implements IMockView
@@ -17,6 +19,7 @@ public final class MockViewLauncher implements IMockView
     private static final Logger l = LogManager.getLogger(MockViewLauncher.class);
 
     private static final int    MOCK_PLAYER_COUNT      = 6;
+    /** Due to JFX error on Sonoma 14.x.x. */
     private static final int    INIT_TIMEOUT_OSX       = 7_000;
     private static final int    INIT_TIMEOUT_OTHER     = 1_000;
 
@@ -29,7 +32,7 @@ public final class MockViewLauncher implements IMockView
     public void run()
     {
         EClientInformation.INSTANCE.setMockView(true);
-        Thread t = new Thread(() ->
+        final Thread t = new Thread(() ->
         {
             l.info("Mock view started. Waiting for JavaFX thread to start.");
             try
