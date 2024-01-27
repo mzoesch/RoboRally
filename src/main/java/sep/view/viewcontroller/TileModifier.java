@@ -194,16 +194,16 @@ public final class TileModifier
                 switch (this.tile.getJSONArray("orientations").getString(0))
                 {
                     case "top":
-                        iv.setRotate(0);
+                        iv.setRotate(270);
                         break;
                     case "right":
-                        iv.setRotate(90);
+                        iv.setRotate(0);
                         break;
                     case "bottom":
-                        iv.setRotate(180);
+                        iv.setRotate(90);
                         break;
                     case "left":
-                        iv.setRotate(270);
+                        iv.setRotate(180);
                         break;
 
                     default:
