@@ -439,7 +439,7 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.registers.length)
         {
-            l.error("Tried getting a register card that is out of bounds [{}].", idx);
+            l.warn("Tried getting a register card that is out of bounds [{} / {}].", idx, this.registers.length);
             return null;
         }
 
@@ -450,6 +450,8 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.gotRegisters.size())
         {
+            /* This is normal, therefore, we may trace this. */
+            l.trace("Tried getting a got register card that is out of bounds [{} / {}].", idx, this.gotRegisters.size());
             return null;
         }
 
