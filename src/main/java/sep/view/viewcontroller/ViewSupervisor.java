@@ -1156,6 +1156,38 @@ public final class ViewSupervisor extends Application
         return ViewSupervisor.lock;
     }
 
+    private static ImageView getUpgradeShopImageAtIndex(final int idx)
+    {
+        final ImageViewCreator ivc = (idxImp) ->
+        {
+            final ImageView iv = new ImageView();
+
+            iv.setFitHeight(ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+            iv.setFitWidth(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH);
+            iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getUpgradeShop(idxImp) == null ? "EmptyRegisterSlot" : EGameState.INSTANCE.getUpgradeShop(idxImp)));
+
+            return iv;
+        };
+
+        return ivc.create(idx);
+    }
+
+    private static ImageView getBoughtUpgradeImageAtIndex(final int idx)
+    {
+        final ImageViewCreator ivc = (idxImp) ->
+        {
+            final ImageView iv = new ImageView();
+
+            iv.setFitHeight(ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+            iv.setFitWidth(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH);
+            iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getBoughtUpgradeCard(idxImp) == null ? "EmptyRegisterSlot" : EGameState.INSTANCE.getBoughtUpgradeCard(idxImp)));
+
+            return iv;
+        };
+
+        return ivc.create(idx);
+    }
+
     private static Node createHSpacer()
     {
         final Region s = new Region();
