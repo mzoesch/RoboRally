@@ -91,6 +91,7 @@
 
 /*#region Buttons*/
 
+.primary-btn-tiny,
 .primary-btn-mini,
 .primary-btn {
     -fx-background-color: -primary-btn-color;
@@ -116,6 +117,14 @@
     -fx-font-size: 16px;
     -fx-font-weight: 500;
     -fx-padding: 8px 24px 8px 24px;
+
+    -fx-cursor: hand;
+}
+
+.primary-btn-tiny {
+    -fx-font-size: 12px;
+    -fx-font-weight: 300;
+    -fx-padding: 2px 6px 2px 6px;
 
     -fx-cursor: hand;
 }
