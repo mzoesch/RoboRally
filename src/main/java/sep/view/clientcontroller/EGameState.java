@@ -1,7 +1,6 @@
 package sep.view.clientcontroller;
 
 import sep.view.json.               RDefaultServerRequestParser;
-import sep.view.lib.                EShopState;
 import sep.view.lib.                RRegisterCard;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                EFigure;
@@ -10,6 +9,7 @@ import sep.view.viewcontroller.     ViewSupervisor;
 
 import java.util.                   ArrayList;
 import java.util.                   Arrays;
+import java.util.                   Collection;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -48,12 +48,8 @@ public enum EGameState
 
     private final String[]                  registers;
     private final ArrayList<String>         gotRegisters;
-
-    public static final String[]            SHOP_STATES         = new String[] {"Upgrade", "Damage", "Reboot"};
-    private EShopState                      shopState;
-    private ArrayList<String>               temporayUpgradeCards;
-    private ArrayList<String>               permanentUpgradeCards;
-    private String[]                        shopSlots;
+    private final String[]                  boughtUpgradeCards;
+    private final ArrayList<String>         upgradeShopCards;
 
     private int                             damageCardsCountToDraw;
     private ArrayList<String>               selectedDamageCards;
@@ -76,11 +72,8 @@ public enum EGameState
 
         this.registers                  = new String[5];
         this.gotRegisters               = new ArrayList<String>();
-
-        this.shopState                  = EShopState.DEACTIVATED;
-        this.temporayUpgradeCards       = new ArrayList<String>();
-        this.permanentUpgradeCards      = new ArrayList<String>();
-        this.shopSlots                  = new String[5];
+        this.boughtUpgradeCards         = new String[6];
+        this.upgradeShopCards           = new ArrayList<String>();
 
         this.damageCardsCountToDraw     = 0;
         this.selectedDamageCards        = new ArrayList<String>();
@@ -102,7 +95,7 @@ public enum EGameState
         EGameState.INSTANCE.serverCourses               = new String[0];
         EGameState.INSTANCE.currentServerCourse         = "";
         EGameState.INSTANCE.currentServerCourseJSON     = null;
-        EGameState.INSTANCE.currentCheckpointLocations  .clear();
+        EGameState.INSTANCE.currentCheckpointLocations   .clear();
 
         EGameState.INSTANCE.registers[0]                = null;
         EGameState.INSTANCE.registers[1]                = null;
@@ -111,17 +104,16 @@ public enum EGameState
         EGameState.INSTANCE.registers[4]                = null;
         EGameState.INSTANCE.gotRegisters                 .clear();
 
-        EGameState.INSTANCE.shopState                   = EShopState.DEACTIVATED;
-        EGameState.INSTANCE.temporayUpgradeCards         .clear();
-        EGameState.INSTANCE.permanentUpgradeCards        .clear();
-        EGameState.INSTANCE.shopSlots[0]                = null;
-        EGameState.INSTANCE.shopSlots[1]                = null;
-        EGameState.INSTANCE.shopSlots[2]                = null;
-        EGameState.INSTANCE.shopSlots[3]                = null;
-        EGameState.INSTANCE.shopSlots[4]                = null;
+        EGameState.INSTANCE.boughtUpgradeCards[0]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[1]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[2]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[3]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[4]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[5]       = null;
+        EGameState.INSTANCE.upgradeShopCards             .clear();
 
         EGameState.INSTANCE.damageCardsCountToDraw      = 0;
-        EGameState.INSTANCE.selectedDamageCards         .clear();
+        EGameState.INSTANCE.selectedDamageCards          .clear();
 
         EGameState.INSTANCE.shopActive                  = false;
         EGameState.INSTANCE.winner                      = null;
@@ -463,6 +455,17 @@ public enum EGameState
         return this.gotRegisters.get(idx);
     }
 
+    public String getBoughtUpgradeCard(final int idx)
+    {
+        if (idx < 0 || idx >= this.boughtUpgradeCards.length)
+        {
+            l.warn("Tried getting a upgrade card that is out of bounds [{} / {}].", idx, this.boughtUpgradeCards.length);
+            return null;
+        }
+
+        return this.boughtUpgradeCards[idx];
+    }
+
     public String[] getRegisters()
     {
         return this.registers;
@@ -800,6 +803,109 @@ public enum EGameState
     public ArrayList<RCheckpointMask> getCurrentCheckpointLocations()
     {
         return this.currentCheckpointLocations;
+    }
+
+    public void refillShop(final ArrayList<String> cards)
+    {
+        for (int i = 0; i < this.upgradeShopCards.size(); ++i)
+        {
+            if (this.upgradeShopCards.get(i) == null)
+            {
+                this.upgradeShopCards.set(i, cards.get(0));
+                cards.remove(0);
+                continue;
+            }
+
+            continue;
+        }
+
+        /* If the ctrl count was decreased (e.g., through a disconnect), the shop size will also shrink. */
+        this.upgradeShopCards.removeIf(Objects::isNull);
+
+        /* The same if the ctrl count increases. */
+        if (!cards.isEmpty())
+        {
+            this.upgradeShopCards.addAll(cards);
+        }
+
+        return;
+    }
+
+    public void exchangeShop(final ArrayList<String> cards)
+    {
+        this.upgradeShopCards.clear();
+        this.refillShop(cards);
+        return;
+    }
+
+    public ArrayList<String> getUpgradeShop()
+    {
+        return this.upgradeShopCards;
+    }
+
+    public String getUpgradeShop(final int idx)
+    {
+        return this.upgradeShopCards.get(idx);
+    }
+
+    public String[] getBoughtUpgradeCard()
+    {
+        return this.boughtUpgradeCards;
+    }
+
+    private void addBoughtUpgradeCard(final String card)
+    {
+        /* A little bit cheeky. */
+        final boolean isTemporary = card.contains("MemorySwap") || card.contains("SpamBlocker");
+
+        for (int i = isTemporary ? 0 : 3; i < (isTemporary ? 3 : this.boughtUpgradeCards.length); ++i)
+        {
+            if (this.boughtUpgradeCards[i] == null)
+            {
+                this.boughtUpgradeCards[i] = card;
+                l.info("Added the {} upgrade card \"{}\" to bought upgrade cards. Total upgrades bought: {}.", isTemporary ? "temporary" : "permanent", card, Arrays.toString(this.boughtUpgradeCards));
+                return;
+            }
+
+            continue;
+        }
+
+        l.fatal("Could not add the {} upgrade card \"{}\" to bought upgrade cards. Bought upgrade cards are full.", isTemporary ? "temporary" : "permanent", card);
+        l.fatal(Arrays.toString(this.boughtUpgradeCards));
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
+        return;
+    }
+
+    private void removeUpgradeCardFromShop(final String card)
+    {
+        this.upgradeShopCards.set(this.upgradeShopCards.indexOf(card), null);
+        return;
+    }
+
+    /**
+     * @param card          The card that was bought.
+     * @param bLocalOwner   If the local client bought the card.
+     */
+    public void onUpgradeCardBought(final String card, final boolean bLocalOwner)
+    {
+        this.removeUpgradeCardFromShop(card);
+
+        /* TODO Add the bought cards to the other players as well. */
+
+        if (bLocalOwner)
+        {
+            this.addBoughtUpgradeCard(card);
+        }
+
+        if (EClientInformation.INSTANCE.isAgent())
+        {
+            return;
+        }
+
+        ViewSupervisor.updatePlayerView();
+
+        return;
     }
 
     // endregion Getters and Setters
