@@ -1,6 +1,8 @@
 package sep.server.model.game;
 
 import sep.server.json.game.damage.DrawDamageModel;
+import sep.server.model.game.tiles.FieldType;
+import sep.server.model.game.tiles.RestartPoint;
 import sep.server.viewmodel.PlayerController;
 import sep.server.viewmodel.Session;
 import sep.server.model.game.tiles.Coordinate;
@@ -213,6 +215,7 @@ public class Robot {
         Player robotOwner = determineRobotOwner();
         Tile sourceTile = this.getCurrentTile();
         Tile restartPoint = null;
+        String restartDirection = "top";
         this.rebootTriggered = true;
 
         this.getAuthGameMode().getSession().broadcastReboot(robotOwner.getController().getPlayerID());
@@ -269,9 +272,17 @@ public class Robot {
             }
         }
 
-        this.setCurrentTile(restartPoint);
+        //we need the direction of the rebootToken if we want to reboot on an occupied rebootField
+        for(FieldType f : restartPoint.getFieldTypes()){
+            if(f instanceof RestartPoint r){
+                restartDirection = r.getRestartOrientation();
+                l.debug("RebootDirection is set to {} ", restartDirection);
+            }
+        }
 
         if(restartPoint != null) {
+
+            //TODO brauchen wir das so? Oder ist das eher hard-coded im client?
 
             switch(this.direction) {
                 case "right" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
@@ -282,9 +293,19 @@ public class Robot {
                 case "left" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
             }
 
-            this.determineRobotOwner().getAuthGameMode().addDelay(2000);
+            if(restartPoint.isOccupied() && restartPoint.hasUnmovableRobot(restartDirection)) {
+                restartPoint = startingPoint;
+                l.debug("RebootField is occupied and occupying robot can not be moved. Rebooting on startingField");
+            } else if(restartPoint.isOccupied()){
+                restartPoint.getRobot().moveRobotOneTile(true, restartDirection);
+                l.debug("RebootField is occupied. Occupying robot should move one tile in direction: {} .", restartDirection);
+            }
+
+            this.setCurrentTile(restartPoint);
+            this.getCurrentTile().setOccupiedBy(this);
+            this.determineRobotOwner().getAuthGameMode().addDelay(1000);
             this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
-            this.determineRobotOwner().getAuthGameMode().addDelay(2000);
+            this.determineRobotOwner().getAuthGameMode().addDelay(1000);
             l.debug("Player {} was assigned a restart point.", this.determineRobotOwner().getController().getPlayerID());
 
         } else {
