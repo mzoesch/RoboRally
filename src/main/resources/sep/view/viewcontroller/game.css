@@ -52,6 +52,12 @@
     -fx-text-alignment: center;
 }
 
+#upgrade-slots-label-container {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+
 #ui-footer {
     -fx-min-height: 200px;
     -fx-background-color: #2d2d2dff;
@@ -71,6 +77,9 @@
 #got-register-container {
 }
 
+#upgrade-container {
+}
+
 #register-hbox {
     -fx-spacing: 8px;
     -fx-alignment: center-left;
@@ -82,6 +91,11 @@
 }
 
 #got-register-hbox {
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+#upgrade-slot-hbox {
     -fx-spacing: 8px;
     -fx-alignment: center-left;
 }
@@ -301,12 +315,52 @@
     -fx-max-height: 300px;
 }
 
+#upgrade-dialog-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 700px;
+    -fx-min-height: 500px;
+    -fx-max-width: 130px;
+    -fx-max-height: 600px;
+}
+
 #reboot-dialog-body {
     -fx-spacing: 8px;
     -fx-alignment: center;
 }
 
+#upgrade-shop-available-cards {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#upgrade-shop-bought-cards {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#upgrade-shop-form {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#upgrade-shop-form-wrapper {
+    -fx-alignment: center;
+}
+
+#upgrade-shop-available-cards-wrapper {
+}
+
 .reboot-btn {
+    -fx-min-width: 170px;
+    -fx-max-width: 170px;
+    -fx-wrap-text: false;
+}
+
+.upgrade-btn {
     -fx-min-width: 170px;
     -fx-max-width: 170px;
     -fx-wrap-text: false;
