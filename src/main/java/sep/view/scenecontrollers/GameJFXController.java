@@ -1255,6 +1255,21 @@ public final class GameJFXController
         return iv;
     }
 
+    private ImageView getUpgradeCardSlot(final int idx)
+    {
+        if (EGameState.INSTANCE.getBoughtUpgradeCard(idx) == null)
+        {
+            return this.getEmptyRegisterSlot(ViewSupervisor.UPGRADE_SLOT_WIDTH, ViewSupervisor.UPGRADE_SLOT_HEIGHT);
+        }
+
+        final ImageView iv = new ImageView();
+        iv.setFitWidth(ViewSupervisor.UPGRADE_SLOT_WIDTH);
+        iv.setFitHeight(ViewSupervisor.UPGRADE_SLOT_HEIGHT);
+        iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getBoughtUpgradeCard(idx)));
+
+        return iv;
+    }
+
     /** @param idx Index of the register slot. */
     private void addRegisterSlot(final int idx, final boolean bIsGotRegister, final Pane p, final int w, final int h)
     {
@@ -1378,6 +1393,28 @@ public final class GameJFXController
         return;
     }
 
+    private void addUpgradeSlot(final int idx, final Pane p)
+    {
+        // We have to be a little bit cheeky here because the idx-es are not in order.
+        //      0 1             0 3
+        //      2 3     -->     1 4
+        //      4 5             2 5
+
+        final int realIdx = idx % 2 == 0 ? idx / 2 : idx / 2 + 3;
+
+        final ImageView     iv  = this.getUpgradeCardSlot(realIdx);
+        final AnchorPane    ap  = new AnchorPane();
+
+        ap.getStyleClass().clear();
+        ap.getStyleClass().add("register-slot-disabled");
+
+        ap.getChildren().clear();
+        ap.getChildren().add(iv);
+
+        p.getChildren().add(ap);
+
+        return;
+    }
 
     private void renderRegisterSlots()
     {
@@ -1401,9 +1438,19 @@ public final class GameJFXController
             this.gotRegisterHBox.getChildren().clear();
         }
 
+        if (this.upgradeSlotHBox == null)
+        {
+            this.upgradeSlotHBox = new HBox();
+            this.upgradeSlotHBox.setId("upgrade-slot-hbox");
+        }
+        else
+        {
+            this.upgradeSlotHBox.getChildren().clear();
+        }
+
         this.registerContainer.getChildren().clear();
         this.registerContainer.getChildren().add(this.registerHBox);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; ++i)
         {
             this.addRegisterSlot(i, false, this.registerHBox, ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT);
             continue;
@@ -1412,7 +1459,7 @@ public final class GameJFXController
         this.gotRegisterContainer.getChildren().clear();
         this.gotRegisterContainer.getChildren().add(this.gotRegisterHBox);
         this.gotRegisterHBox.getChildren().add(new VBox());
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; ++i)
         {
             if (i % 3 == 0)
             {
@@ -1428,6 +1475,21 @@ public final class GameJFXController
             , ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT
             )
             ;
+
+            continue;
+        }
+
+        this.upgradeSlotContainer.getChildren().clear();
+        this.upgradeSlotContainer.getChildren().add(this.upgradeSlotHBox);
+        this.upgradeSlotHBox.getChildren().add(new VBox());
+        for (int i = 0; i < 6; ++i)
+        {
+            if (i % 2 == 0)
+            {
+                ( (Pane) this.upgradeSlotHBox.getChildren().get(this.upgradeSlotHBox.getChildren().size() - 1) ).getChildren().add(new HBox());
+            }
+
+            this.addUpgradeSlot(i, (Pane) ( (Pane) this.upgradeSlotHBox.getChildren().get(this.upgradeSlotHBox.getChildren().size() - 1) ).getChildren().get( ( (Pane) this.upgradeSlotHBox.getChildren().get(this.upgradeSlotHBox.getChildren().size() - 1) ).getChildren().size() - 1) );
 
             continue;
         }
