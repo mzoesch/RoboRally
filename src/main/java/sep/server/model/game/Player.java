@@ -34,7 +34,7 @@ public class Player {
 
     private String[] memorySwapCards;
 
-
+    private final ArrayList<String> boughtUpgradeCards;
 
 
     public Player(final IOwnershipable ctrl, final Course currentCourse) {
@@ -54,6 +54,8 @@ public class Player {
         //TODO: Make this work: this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
 
         this.checkpointsCollected = 0;
+
+        this.boughtUpgradeCards = new ArrayList<String>();
     }
 
     /**
@@ -364,4 +366,14 @@ public class Player {
         return this.playerRobot.getCurrentTile().getCoordinate();
     }
 
+    @Override
+    public String toString()
+    {
+        return String.format("Player{%d,%s,%s}",this.ctrl.getPlayerID(), this.ctrl.getName(), this.playerRobot.getCurrentTile().getCoordinate());
+    }
+
+    public ArrayList<String> getBoughtUpgradeCards()
+    {
+        return this.boughtUpgradeCards;
+    }
 }
