@@ -412,9 +412,9 @@ public class GameMode {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
                         Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
-                        curvedArrowCheck(player, targetCoordinate);
 
                         if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
+                            curvedArrowCheck(player, targetCoordinate, outDirection);
                             player.getPlayerRobot().moveRobotOneTile(true, outDirection);
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
                             course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
@@ -442,7 +442,7 @@ public class GameMode {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
                         Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
-                        curvedArrowCheck(player, targetCoordinate);
+                        curvedArrowCheck(player, targetCoordinate, outDirection);
 
                         if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
                             player.getPlayerRobot().moveRobotOneTile(true, outDirection);
@@ -517,15 +517,13 @@ public class GameMode {
      * @param player Owner of the current robot
      * @param coordinate Coordinate of the new tile the robot moved onto
      */
-    public void curvedArrowCheck(Player player, Coordinate coordinate) {
+    public void curvedArrowCheck(Player player, Coordinate coordinate, String direction) {
         Tile newTile = course.getTileByCoordinate(coordinate);
         for(FieldType newFieldType : newTile.getFieldTypes()) {
             if(newFieldType instanceof ConveyorBelt conveyorBelt) {
                 String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                String[] inDirection = conveyorBelt.getIncomingFlowDirection();
 
-                if(inDirection != null && outDirection != null) {
-                    for(String direction : inDirection) {
+                if(direction != null && outDirection != null) {
                         if((Objects.equals(direction, "bottom") && outDirection.equals("right")) ||
                                 (Objects.equals(direction, "left") && outDirection.equals("bottom")) ||
                                 (Objects.equals(direction, "top") && outDirection.equals("left")) ||
@@ -555,7 +553,6 @@ public class GameMode {
                             this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
 
                         }
-                    }
                 }
             }
         }
