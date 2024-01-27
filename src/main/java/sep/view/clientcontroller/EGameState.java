@@ -48,6 +48,7 @@ public enum EGameState
 
     private final String[]                  registers;
     private final ArrayList<String>         gotRegisters;
+    /** The first three slots represent the temporary upgrade cards, the last slots the permanent ones. */
     private final String[]                  boughtUpgradeCards;
     private final ArrayList<String>         upgradeShopCards;
 
