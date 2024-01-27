@@ -198,7 +198,9 @@ public class GameMode {
         this.getSession().broadcastCurrentPlayer(this.curPlayerInRegistration.getController().getPlayerID());
 
         if (this.curPlayerInRegistration.getController() instanceof final Agent a) {
-            l.error("An agent must never be the first current player in a game. Fault agent ID: {}.", a.getPlayerID());
+            l.fatal("An agent must never be the first current player in a game. Fault agent ID: {}.", a.getPlayerID());
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return;
         }
 
         l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
