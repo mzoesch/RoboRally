@@ -46,7 +46,9 @@ public class GameMode {
     private final ArrayList<Player> players;
     private Player curPlayerInRegistration;
 
-    /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
+    /**
+     * TODO This may not be safe. Because clients may change behaviour during the activation phase.
+     */
     private int currentRegisterIndex;
 
     private int energyBank;
@@ -94,8 +96,8 @@ public class GameMode {
      * @return true if finished, false if not finished
      */
     private boolean startingPointSelectionFinished() {
-        for(Player player : players) {
-            if(player.getPlayerRobot().getCurrentTile() == null) {
+        for (Player player : players) {
+            if (player.getPlayerRobot().getCurrentTile() == null) {
                 return false;
             }
         }
@@ -113,20 +115,20 @@ public class GameMode {
     public synchronized void setStartingPoint(IOwnershipable ctrl, int x, int y) {
         if (ableToSetStartPoint(ctrl)) {
 
-            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
-            if(validation == 1) {
+            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x, y);
+            if (validation == 1) {
 
-                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
+                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x, y);
                 l.info("StartingPointSelected from PlayerID: " + ctrl.getPlayerID() + " with Coordinates: " + x + " , " + y);
-                ctrl.getAuthGameMode().getSession().broadcastSelectedStartingPoint(ctrl.getPlayerID(),x,y);
+                ctrl.getAuthGameMode().getSession().broadcastSelectedStartingPoint(ctrl.getPlayerID(), x, y);
                 ctrl.getAuthGameMode().getSession().broadcastRotationUpdate(ctrl.getPlayerID(), course.getStartingTurningDirection());
 
-                if(startingPointSelectionFinished()) {
+                if (startingPointSelectionFinished()) {
                     l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
                     this.handleNewPhase(EGamePhase.UPGRADE);
 
                 } else {
-                    for(Player player : players) {
+                    for (Player player : players) {
                         if (player.getPlayerRobot().getCurrentTile() == null) {
                             curPlayerInRegistration = player;
                             l.info("Now Player with ID: " + player.getController().getPlayerID() + " has to set StartingPoint");
@@ -138,13 +140,13 @@ public class GameMode {
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
                 if (ctrl instanceof PlayerController pc) {
                     new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
+                } else {
+                    l.error("The agent {} tried to do something illegal. Starting point selection failed.", ctrl.getPlayerID());
                 }
-                else {l.error("The agent {} tried to do something illegal. Starting point selection failed.", ctrl.getPlayerID());}
             }
         }
     }
@@ -153,23 +155,25 @@ public class GameMode {
      * Checks if setting a starting point is possibl and prints corresponding error messages.
      *
      * @param ctrl Player that wants to set a starting point
-     * @return     true if possible, false if not possible
+     * @return true if possible, false if not possible
      */
     public boolean ableToSetStartPoint(IOwnershipable ctrl) {
         if (gamePhase != EGamePhase.REGISTRATION) {
             l.debug("Unable to set StartPoint due to wrong GamePhase");
             if (ctrl instanceof PlayerController pc) {
                 new ErrorMsgModel(pc.getClientInstance(), "Wrong GamePhase");
+            } else {
+                l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());
             }
-            else {l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());}
             return false;
 
         } else if (ctrl.getPlayerID() != curPlayerInRegistration.getController().getPlayerID()) {
             l.error("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer. [CurrentPlayer: {}, ChoosingPlayer: {}]", curPlayerInRegistration.getController().getPlayerID(), ctrl.getPlayerID());
             if (ctrl instanceof PlayerController pc) {
                 new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            } else {
+                l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());
             }
-            else {l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());}
             return false;
 
         } else {
@@ -201,7 +205,7 @@ public class GameMode {
      * Sets up the upgrade shop by either refilling it or exchanging upgrade slots.
      */
     private void setupUpgradeShop() {
-        if(upgradeShopIsEmpty()) {
+        if (upgradeShopIsEmpty()) {
             refillUpgradeShop();
         } else {
             exchangeUpgradeSlots();
@@ -227,8 +231,8 @@ public class GameMode {
      * Refills the upgrade shop with new upgrade cards.
      */
     private void refillUpgradeShop() {
-        for(int i = 0; i<upgradeShop.length; i++) {
-            if(upgradeShop[i] == null) {
+        for (int i = 0; i < upgradeShop.length; i++) {
+            if (upgradeShop[i] == null) {
                 upgradeShop[i] = upgradeDeck.get(0);
                 l.info("Refilled upgrade shop at index " + i);
             }
@@ -240,8 +244,8 @@ public class GameMode {
      * Exchanges upgrade slots in the upgrade shop.
      */
     private void exchangeUpgradeSlots() {
-        for(int i = 0; i<upgradeShop.length; i++) {
-            if(upgradeShop[i] != null) {
+        for (int i = 0; i < upgradeShop.length; i++) {
+            if (upgradeShop[i] != null) {
                 upgradeDeck.add(upgradeShop[i]);
                 upgradeShop[i] = null;
             }
@@ -333,7 +337,7 @@ public class GameMode {
         }
 
         int currentPriority = this.players.size();
-        for (int j = 0; j < this.players.size(); j++){
+        for (int j = 0; j < this.players.size(); j++) {
             int minDistance = Integer.MAX_VALUE;
             int minIndex = -1;
 
@@ -375,12 +379,22 @@ public class GameMode {
         this.players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
-    /**
-     * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
-     * The robot is moved in the out-coming flow direction of the conveyor belt.
-     * @param speed determines the amount of fields the robot is moved
-     */
-    private void activateConveyorBelts(int speed) {
+
+    public void activateConveyorBelts() {
+
+        activateBlueConveyorBelts();
+        activateBlueConveyorBelts();
+        for (Player player : players) {
+            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition().getX(), player.getPosition().getY());
+        }
+        activateGreenConveyorBelts();
+        for (Player player : players) {
+            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition().getX(), player.getPosition().getY());
+        }
+    }
+
+    private void activateBlueConveyorBelts() {
+
         for (Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -388,15 +402,62 @@ public class GameMode {
                 if (fieldType instanceof ConveyorBelt conveyorBelt) {
                     int beltSpeed = conveyorBelt.getSpeed();
 
-                    if (beltSpeed == speed) {
+                    if (beltSpeed == 2) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
                         Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
                         curvedArrowCheck(player, targetCoordinate);
-                        if(speed>1) {
-                            targetCoordinate = calculateNewCoordinate(outDirection, targetCoordinate);
-                            curvedArrowCheck(player, targetCoordinate);
+
+                        //TODO refactor to use moveForward method from Robot class:
+                        if (!player.getPlayerRobot().getCourse().isCoordinateWithinBounds(targetCoordinate) ||
+                                player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+                            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .",
+                                    player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
+                                    targetCoordinate.toString());
+                            player.getPlayerRobot().reboot();
+                            return;
                         }
+
+                        if (player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
+                            l.debug("Player {}'s robot moved to {} and fell down a pit. Rebooting . . .",
+                                    player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
+                                    targetCoordinate.toString());
+                            player.getPlayerRobot().reboot();
+                            return;
+                        }
+
+                        if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
+                                        getTileByCoordinate(oldCoordinate),
+                                player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
+                            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
+                                    "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
+                                    getPlayerID(), oldCoordinate.toString(), targetCoordinate.toString());
+                            return;
+                        }
+
+                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
+                        course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
+                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
+                    }
+                }
+            }
+        }
+    }
+
+
+    public void activateGreenConveyorBelts(){
+        for (Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                    int beltSpeed = conveyorBelt.getSpeed();
+
+                    if (beltSpeed == 1) {
+                        Coordinate oldCoordinate = currentTile.getCoordinate();
+                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                        Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                        curvedArrowCheck(player, targetCoordinate);
 
                         //TODO refactor to use moveForward method from Robot class:
 
@@ -418,7 +479,7 @@ public class GameMode {
                         }
 
                         if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
-                                getTileByCoordinate(oldCoordinate),
+                                        getTileByCoordinate(oldCoordinate),
                                 player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
                             l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
                                     "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
@@ -430,7 +491,6 @@ public class GameMode {
                         course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
                         player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
 
-                        this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), targetCoordinate.getX(), targetCoordinate.getY());
                     }
                 }
             }
@@ -913,8 +973,7 @@ public class GameMode {
         }
 
         addDelay(2000);
-        this.activateConveyorBelts(2);
-        this.activateConveyorBelts(1);
+        this.activateConveyorBelts();
         this.activatePushPanels();
         this.activateGears();
         this.findLasers();
