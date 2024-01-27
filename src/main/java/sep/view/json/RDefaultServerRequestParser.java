@@ -218,4 +218,19 @@ public record RDefaultServerRequestParser(JSONObject request)
         return EAnimation.fromString(this.request.getJSONObject("messageBody").getString("type"));
     }
 
+    public String[] getRefillShopCards() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("cards").toList().stream().map(Object::toString).toArray(String[]::new);
+    }
+
+    public String[] getExchangeShopCards() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("cards").toList().stream().map(Object::toString).toArray(String[]::new);
+    }
+
+    public String getCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
+
 }
