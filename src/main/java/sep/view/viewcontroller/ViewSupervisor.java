@@ -1201,4 +1201,242 @@ public final class ViewSupervisor extends Application
         VBox.setVgrow(s, Priority.ALWAYS);
         return s;
     }
+
+    private static void clearPendingShopActions()
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().clear();
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions clear. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static void outputPendingShopActions()
+    {
+        try
+        {
+            l.debug("Pending shop actions: {}", ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().toString());
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions output. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static void addShopAction(final RShopAction action)
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().add(action);
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions add. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static void removeShopAction(final RShopAction action)
+    {
+        try
+        {
+            if (!( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().contains(action))
+            {
+                l.fatal("Tried to remove a shop action but the pending shop action list does not contain the specified action:; {}", action);
+                GameInstance.kill(GameInstance.EXIT_FATAL);
+                return;
+            }
+
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().remove(action);
+
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions remove. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static ArrayList<RShopAction> getPendingShopActions()
+    {
+        try
+        {
+            return ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions();
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions get. Ignoring.");
+            l.error(e.getMessage());
+            return null;
+        }
+    }
+
+
+    private static AnchorPane getAnchorPaneForShopSlot(ImageView iv, int i)
+    {
+        final AnchorPane ap = new AnchorPane(iv);
+
+        ap.setMinSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+        ap.setMaxSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+
+        final int finalI = i;
+
+        ap.setOnMouseEntered(e ->
+        {
+            if (EGameState.INSTANCE.getUpgradeShop(finalI) == null)
+            {
+                return;
+            }
+
+            ap.setStyle("-fx-border-color: #00ff007f; -fx-border-width: 2px;");
+
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, finalI)))
+            {
+                return;
+            }
+
+            final Button b = new Button("Buy");
+            b.getStyleClass().add("primary-btn-mini");
+            b.setStyle("-fx-background-color: #0809d6ff;");
+
+            b.setOnMouseEntered(btnEvent ->     {   b.setStyle("-fx-background-color: #0000ffff;");     return;     });
+            b.setOnMouseExited(btnEvent ->      {   b.setStyle("-fx-background-color: #0809d6ff;");     return;     });
+
+            b.setOnAction(onBuy ->
+            {
+                final RShopAction action = new RShopAction(EShopAction.BUY, finalI);
+
+                ViewSupervisor.addShopAction(action);
+                ViewSupervisor.outputPendingShopActions();
+
+                for (final Node n : ap.getChildren())
+                {
+                    if (n instanceof final HBox wrapper)
+                    {
+                        ap.getChildren().remove(wrapper);
+                        break;
+                    }
+
+                    continue;
+                }
+
+                final Button        discardBtn  = new Button();
+                final ImageView     checkmark   = new ImageView(TileModifier.loadCachedImage("Checkmark"));
+                checkmark.setFitHeight(20);
+                checkmark.setFitWidth(20);
+                discardBtn.setGraphic(checkmark);
+                discardBtn.getStyleClass().add("primary-btn-mini");
+                discardBtn.setStyle("-fx-background-color: #0809d6ff;");
+                discardBtn.setTextOverrun(OverrunStyle.CLIP);
+
+                discardBtn.setOnMouseEntered(btnEvent ->
+                {
+                    discardBtn.setStyle("-fx-background-color: #0000ffff;");
+                    final ImageView cross = new ImageView(TileModifier.loadCachedImage("Cross"));
+                    cross.setFitHeight(20);
+                    cross.setFitWidth(20);
+                    discardBtn.setGraphic(cross);
+                    discardBtn.setTextOverrun(OverrunStyle.CLIP);
+                    return;
+                });
+
+                discardBtn.setOnMouseExited(btnEvent ->
+                {
+                    discardBtn.setStyle("-fx-background-color: #0809d6ff;");
+                    final ImageView eventCheckmark = new ImageView(TileModifier.loadCachedImage("Checkmark"));
+                    eventCheckmark.setFitHeight(20);
+                    eventCheckmark.setFitWidth(20);
+                    discardBtn.setGraphic(eventCheckmark);
+                    discardBtn.setTextOverrun(OverrunStyle.CLIP);
+                    return;
+                });
+
+                discardBtn.setOnAction(onDiscard ->
+                {
+                    ViewSupervisor.removeShopAction(new RShopAction(EShopAction.BUY, finalI));
+                    ViewSupervisor.outputPendingShopActions();
+
+                    for (final Node n : ap.getChildren())
+                    {
+                        if (n instanceof final HBox wrapper)
+                        {
+                            ap.getChildren().remove(wrapper);
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    ViewSupervisor.getAnchorPaneForShopSlot(ViewSupervisor.getUpgradeShopImageAtIndex(finalI), finalI);
+
+                    ap.setStyle("-fx-border-color: transparent; -fx-border-width: 2px;");
+
+                    return;
+                });
+
+                final HBox discardWrapper = new HBox(discardBtn);
+                discardWrapper.setAlignment(Pos.CENTER);
+
+                AnchorPane.setLeftAnchor(       discardWrapper, 0.0      );
+                AnchorPane.setRightAnchor(      discardWrapper, 0.0      );
+                AnchorPane.setTopAnchor(        discardWrapper, 0.0      );
+                AnchorPane.setBottomAnchor(     discardWrapper, 0.0      );
+
+                ap.getChildren().add(discardWrapper);
+
+                return;
+            });
+
+            final HBox btnWrapper = new HBox(b);
+            btnWrapper.setAlignment(Pos.CENTER);
+
+            AnchorPane.setLeftAnchor(       btnWrapper, 0.0      );
+            AnchorPane.setRightAnchor(      btnWrapper, 0.0      );
+            AnchorPane.setBottomAnchor(     btnWrapper, 0.0      );
+            AnchorPane.setTopAnchor(        btnWrapper, 0.0      );
+
+            ap.getChildren().add(btnWrapper);
+
+            return;
+        });
+
+        ap.setOnMouseExited(e ->
+        {
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, finalI)))
+            {
+                return;
+            }
+
+            ap.setStyle("-fx-border-color: transparent; -fx-border-width: 2px;");
+
+            for (final Node n : ap.getChildren())
+            {
+                if (n instanceof final HBox wrapper)
+                {
+                    ap.getChildren().remove(wrapper);
+                    break;
+                }
+
+                continue;
+            }
+
+            return;
+        });
+
+        return ap;
+    }
+
 }
