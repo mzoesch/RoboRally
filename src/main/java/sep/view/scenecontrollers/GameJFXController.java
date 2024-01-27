@@ -313,7 +313,7 @@ public final class GameJFXController
             case W:
                 if (this.tileDimensions + GameJFXController.RESIZE_AMOUNT > GameJFXController.MAX_ALLOW_ZOOM)
                 {
-                    l.debug("User tried to zoom in but the zoom level is already at max. {}", this.tileDimensions);
+                    l.debug("User tried to zoom in but the zoom level is already above the max pixel threshold [{}].", this.tileDimensions);
                     return;
                 }
 
@@ -326,6 +326,7 @@ public final class GameJFXController
             case S:
                 if (this.tileDimensions - GameJFXController.RESIZE_AMOUNT < GameJFXController.MIN_ALLOW_ZOOM)
                 {
+                    l.debug("User tried to zoom out but the zoom level is already below the min pixel threshold [{}].", this.tileDimensions);
                     return;
                 }
 
