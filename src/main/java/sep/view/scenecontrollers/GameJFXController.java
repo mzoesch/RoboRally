@@ -18,6 +18,7 @@ import sep.view.lib.                RGearMask;
 import sep.view.lib.                EFigure;
 import sep.view.lib.                EModifier;
 import sep.view.lib.                RCheckpointMask;
+import sep.view.lib.                RShopAction;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
@@ -74,6 +75,7 @@ public final class GameJFXController
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
     private static final int    QUICK_TIP_DURATION              = 60_000;
 
+    @FXML private AnchorPane    upgradeSlotContainer;
     @FXML private AnchorPane    gotRegisterContainer;
     @FXML private Label         programmingTimerLabel;
     @FXML private Label         UIHeaderPhaseLabel;
@@ -112,6 +114,7 @@ public final class GameJFXController
 
     private HBox                registerHBox;
     private HBox                gotRegisterHBox;
+    private HBox                upgradeSlotHBox;
     private static final int    FOOTER_PEEK_HEIGHT  = 50;
     private static final int    NULL_FOOTER_HEIGHT  = 265;
 
@@ -123,6 +126,8 @@ public final class GameJFXController
     private double                      minXTranslation;
     private double                      maxXTranslation;
     private double                      centralXTranslation;
+
+    private final ArrayList<RShopAction> pendingShopActions;
 
     public GameJFXController()
     {
@@ -146,6 +151,8 @@ public final class GameJFXController
         this.minXTranslation            = 0.0;
         this.maxXTranslation            = 0.0;
         this.centralXTranslation        = 0.0;
+
+        this.pendingShopActions         = new ArrayList<RShopAction>();
 
         return;
     }
@@ -2402,6 +2409,11 @@ public final class GameJFXController
         }
 
         return rs;
+    }
+
+    public ArrayList<RShopAction> getPendingShopActions()
+    {
+        return this.pendingShopActions;
     }
 
     // endregion Getters and Setters
