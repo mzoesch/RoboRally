@@ -362,3 +362,22 @@
     -fx-background-radius: 1px;
     -fx-border-width: 1px;
 }
+
+.upgrade-shop-dialog-splitter {
+    -fx-border-width: 2px;
+    -fx-border-color: #181818ff;
+}
+
+.vertical-shop-dialog-splitter {
+    -fx-border-width: 2px;
+    -fx-border-color: #181818ff;
+    -fx-min-height: 10px;
+}
+
+#upgrade-shop-bought-cards-horizontal-splitter-wrapper {
+    -fx-spacing: 8px;
+}
+
+#upgrade-shop-bought-cards-vertical-splitter-wrapper {
+    -fx-spacing: 8px;
+}
