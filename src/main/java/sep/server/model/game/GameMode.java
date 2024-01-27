@@ -511,11 +511,12 @@ public class GameMode {
     /**
      * The following method is required during the conveyor belt activation period.
      * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
-     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
+     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow direction
      * with the out-coming flow direction. If yes, the direction of the robot is changed accordingly
      * and the corresponding JSON message is sent.
      * @param player Owner of the current robot
      * @param coordinate Coordinate of the new tile the robot moved onto
+     * @param direction Direction from which the robot was moved into the conveyor belt
      */
     public void curvedArrowCheck(Player player, Coordinate coordinate, String direction) {
         Tile newTile = course.getTileByCoordinate(coordinate);
