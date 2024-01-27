@@ -121,7 +121,6 @@ public class GameMode {
                 curPlayerInRegistration.getPlayerRobot().setStartingPoint(x, y);
                 l.info("StartingPointSelected from PlayerID: " + ctrl.getPlayerID() + " with Coordinates: " + x + " , " + y);
                 ctrl.getAuthGameMode().getSession().broadcastSelectedStartingPoint(ctrl.getPlayerID(), x, y);
-                ctrl.getAuthGameMode().getSession().broadcastRotationUpdate(ctrl.getPlayerID(), course.getStartingTurningDirection());
 
                 if (startingPointSelectionFinished()) {
                     l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
