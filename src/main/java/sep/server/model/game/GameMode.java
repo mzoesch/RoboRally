@@ -380,6 +380,9 @@ public class GameMode {
     }
 
 
+    /**
+     * activate the ConveyorBelts and broadcast player positions
+     */
     public void activateConveyorBelts() {
 
         activateBlueConveyorBelts();
@@ -393,6 +396,9 @@ public class GameMode {
         }
     }
 
+    /**
+     * activates blue conveyor belts (but only one time)
+     */
     private void activateBlueConveyorBelts() {
 
         for (Player player : players) {
@@ -408,11 +414,12 @@ public class GameMode {
                         Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
                         curvedArrowCheck(player, targetCoordinate);
 
-                        player.getPlayerRobot().moveRobotOneTile(true, outDirection);
-
-                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
-                        course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
-                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
+                        if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
+                            player.getPlayerRobot().moveRobotOneTile(true, outDirection);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
+                            course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
+                        }
                     }
                 }
             }
@@ -420,6 +427,9 @@ public class GameMode {
     }
 
 
+    /**
+     * activates green conveyor belts
+     */
     public void activateGreenConveyorBelts(){
         for (Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
@@ -434,12 +444,12 @@ public class GameMode {
                         Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
                         curvedArrowCheck(player, targetCoordinate);
 
-                        player.getPlayerRobot().moveRobotOneTile(true, outDirection);
-
-                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
-                        course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
-                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
-
+                        if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
+                            player.getPlayerRobot().moveRobotOneTile(true, outDirection);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
+                            course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
+                        }
                     }
                 }
             }
