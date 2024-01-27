@@ -308,7 +308,15 @@ public final class ClientInstance implements Runnable
 
     private synchronized boolean onBuyUpgrade()
     {
-        l.debug("Received buy upgrade from client.");
+        if (!this.dcrp.hasBuyUpgradeCard())
+        {
+            l.debug("Client {} does not want to buy an upgrade card.", this.getPlayerController().getPlayerID());
+            this.playerController.getSession().getGameState().getAuthGameMode().onUpgradeCardBought(this.playerController, null);
+            return true;
+        }
+
+        l.debug("Client {} wants to buy the following Upgrade Card {}.", this.getPlayerController().getPlayerID(), this.dcrp.getBuyUpgradeCard());
+        this.playerController.getSession().getGameState().getAuthGameMode().onUpgradeCardBought(this.playerController, this.dcrp.getBuyUpgradeCard());
         return true;
     }
 
