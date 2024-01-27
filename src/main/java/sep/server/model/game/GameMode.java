@@ -13,7 +13,7 @@ import sep.server.model.game.cards.damage.*;
 import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
-
+import sep.server.viewmodel.EServerInstance;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -46,15 +46,17 @@ public class GameMode {
     private final ArrayList<Player> players;
     private Player curPlayerInRegistration;
 
-    /**
-     * TODO This may not be safe. Because clients may change behaviour during the activation phase.
-     */
+    /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
     private int currentRegisterIndex;
 
     private int energyBank;
-    private AUpgradeCard[] upgradeShop;
+    private ArrayList<AUpgradeCard> upgradeShop;
 
     private Thread activationPhaseThread;
+
+    private boolean bFirstRound;
+
+    private final ArrayList<Player> upgradePhasePlayersSortedByPriority;
 
     public GameMode(final String courseName, final GameState gameState) {
         super();
@@ -74,7 +76,7 @@ public class GameMode {
 
         this.upgradeDeck = deckBuilder.buildUpgradeDeck();
         Collections.shuffle(this.upgradeDeck);
-        this.upgradeShop = new AUpgradeCard[3];
+        this.upgradeShop = new ArrayList<AUpgradeCard>();
 
         this.energyBank = 48;
 
@@ -82,6 +84,10 @@ public class GameMode {
         Arrays.stream(this.getControllers()).forEach(ctrl -> this.players.stream().filter(p -> p.getController() == ctrl).findFirst().ifPresent(ctrl::setPlayer));
         this.curPlayerInRegistration = this.players.get(0);
         this.currentRegisterIndex = 0;
+
+        this.bFirstRound = true;
+
+        this.upgradePhasePlayersSortedByPriority = new ArrayList<Player>();
 
         this.handleNewPhase(EGamePhase.REGISTRATION);
     }
@@ -200,17 +206,68 @@ public class GameMode {
 
     //region Upgrade Phase helpers
 
-    /**
-     * Sets up the upgrade shop by either refilling it or exchanging upgrade slots.
-     */
-    private void setupUpgradeShop() {
-        if (upgradeShopIsEmpty()) {
-            refillUpgradeShop();
-        } else {
-            exchangeUpgradeSlots();
-        }
+    private static final class RefilledCards
+    {
+        public final ArrayList<String> out;
+        public RefilledCards() { super(); this.out = new ArrayList<String>(); return; }
     }
 
+    /**
+     * Sets up the upgrade shop by either refilling it or exchanging upgrade slots.
+     *
+     * @return True if the upgrade shop was exchanged, false otherwise.
+     */
+    private boolean setupUpgradeShop(final RefilledCards outRefilledCards)
+    {
+        if (!this.isUpgradeShopRightSize())
+        {
+            l.warn("The upgrade shop is not the right size. Expected {}, got {}. Adjusting upgrade shop.", this.players.size(), this.upgradeShop.size());
+
+            for (final AUpgradeCard upgradeCard : this.upgradeShop)
+            {
+                if (upgradeCard == null)
+                {
+                    continue;
+                }
+
+                this.upgradeDeck.add(upgradeCard);
+
+                continue;
+            }
+
+            this.upgradeShop.clear();
+
+            for (int i = 0; i < this.players.size(); ++i)
+            {
+                this.upgradeShop.add(null);
+                continue;
+            }
+
+            l.debug("Adjust upgrade shop size to {}.", this.upgradeShop.size());
+        }
+
+        final boolean bExchange = !this.isACardMissingInUpgradeShop();
+
+        if (bExchange)
+        {
+            l.debug("No upgrade cards were bought last phase. Exchanging upgrade slots. Old shop: {}.", this.upgradeShop.toString());
+        }
+        else
+        {
+            l.debug("Upgrade cards were bought last phase. Refilling upgrade shop. Old shop: {}.", this.upgradeShop.toString());
+        }
+
+        if (this.isACardMissingInUpgradeShop())
+        {
+            this.refillUpgradeShop(outRefilledCards);
+        }
+        else
+        {
+            this.exchangeUpgradeSlots();
+        }
+
+        return bExchange;
+    }
 
     /**
      * Checks if the upgrade shop is empty.
@@ -226,32 +283,94 @@ public class GameMode {
         return true;
     }
 
+    private boolean isACardMissingInUpgradeShop()
+    {
+        for (final AUpgradeCard upgradeCard : this.upgradeShop)
+        {
+            if (upgradeCard == null)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Refills the upgrade shop with new upgrade cards.
      */
-    private void refillUpgradeShop() {
-        for (int i = 0; i < upgradeShop.length; i++) {
-            if (upgradeShop[i] == null) {
-                upgradeShop[i] = upgradeDeck.get(0);
-                l.info("Refilled upgrade shop at index " + i);
+    private void refillUpgradeShop(final RefilledCards outRefilledCards)
+    {
+        for (int i = 0; i < this.upgradeShop.size(); ++i)
+        {
+            if (this.upgradeShop.get(i) == null)
+            {
+                if (this.upgradeDeck.get(0) == null)
+                {
+                    l.error("Something went wrong while refilling the upgrade shop. The upgrade deck is: {}.", this.upgradeDeck.toString());
+                    EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                    return;
+                }
+
+                this.upgradeShop.set(i, this.upgradeDeck.get(0));
+                this.upgradeDeck.remove(0);
+
+                outRefilledCards.out.add(this.upgradeShop.get(i).getCardType());
+
+                l.debug("Refilled upgrade shop at index {} with {}.", i, this.upgradeShop.get(i).toString());
             }
+
+            continue;
         }
-        l.info("Upgrade shop refilled.");
+
+        l.info("Upgrade shop refilled. The new cards are: {}.", this.upgradeShop.toString());
+
+        return;
     }
 
     /**
      * Exchanges upgrade slots in the upgrade shop.
      */
-    private void exchangeUpgradeSlots() {
-        for (int i = 0; i < upgradeShop.length; i++) {
-            if (upgradeShop[i] != null) {
-                upgradeDeck.add(upgradeShop[i]);
-                upgradeShop[i] = null;
+    private void exchangeUpgradeSlots()
+    {
+        for (int i = 0; i < this.upgradeShop.size(); ++i)
+        {
+            if (this.upgradeShop.get(i) != null)
+            {
+                this.upgradeDeck.add(this.upgradeShop.get(i));
+                this.upgradeShop.set(i, null);
             }
-            upgradeShop[i] = upgradeDeck.get(0);
-            l.info("Refilled upgrade shop at index " + i);
+
+            this.upgradeShop.set(i, this.upgradeDeck.get(0));
+            this.upgradeDeck.remove(0);
+
+            l.debug("Refilled upgrade shop at index {} with {}.", i, upgradeShop.get(i).toString());
         }
-        l.info("Cards in upgrade shop slots exchanged.");
+
+        l.info("Cards in upgrade shop slots exchanged. The new cards are: {}.", upgradeShop.toString());
+
+        return;
+    }
+
+    private void removeCardFromShop(final String card)
+    {
+        for (int i = 0; i < this.upgradeShop.size(); ++i)
+        {
+            if (this.upgradeShop.get(i) == null)
+            {
+                continue;
+            }
+
+            if (this.upgradeShop.get(i).getCardType().equals(card))
+            {
+                this.upgradeShop.set(i, null);
+                break;
+            }
+
+            continue;
+        }
+
+        return;
     }
 
     /**
@@ -272,6 +391,35 @@ public class GameMode {
         this.setupUpgradeShop();
          */
         l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
+    private void triggerUpgradePhase()
+    {
+        final RefilledCards     out         = new RefilledCards();
+        final boolean           bExchanged  = this.setupUpgradeShop(out);
+
+        /* We always send the refill shop request to the client in the first round. */
+        if (this.bFirstRound)
+        {
+            this.getSession().broadcastShopRefill(this.upgradeShop.stream().filter(Objects::nonNull).map(AUpgradeCard::getCardType).collect(Collectors.toCollection(ArrayList::new)));
+            this.bFirstRound = false;
+        }
+        else
+        {
+            if (bExchanged)
+            {
+                this.getSession().broadcastShopExchange(this.upgradeShop.stream().filter(Objects::nonNull).map(AUpgradeCard::getCardType).collect(Collectors.toCollection(ArrayList::new)));
+            }
+            else
+            {
+                this.getSession().broadcastShopRefill(out.out);
+            }
+        }
+
+        this.evaluateUpgradePhasePriorities();
+        this.getSession().broadcastCurrentPlayer(this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
+        this.upgradePhasePlayersSortedByPriority.remove(0);
+
+        return;
+    }
         this.handleNewPhase(EGamePhase.PROGRAMMING);
     }
 
@@ -1208,6 +1356,27 @@ public class GameMode {
         t.setName(String.format("PhaseIIIService-%s", this.getSession().getSessionID()));
 
         return t;
+    }
+
+    private boolean isUpgradeShopRightSize()
+    {
+        /* The shop must always have the size of all controllers connected. */
+        return this.players.size() == this.upgradeShop.size();
+    }
+
+    private boolean doesUpgradeShopContains(final String card)
+    {
+        for (final AUpgradeCard upgradeCard : this.upgradeShop)
+        {
+            if (upgradeCard.getCardType().equals(card))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
     }
 
     // endregion Getters and Setters
