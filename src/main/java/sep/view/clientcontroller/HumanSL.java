@@ -8,6 +8,7 @@ import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
 import org.json.                    JSONException;
+import java.util.                   ArrayList;
 import java.util.stream.            Collectors;
 import java.util.stream.            IntStream;
 import java.io.                     BufferedReader;
@@ -128,9 +129,25 @@ public final class HumanSL extends ServerListener
             return true;
         }
 
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
+        {
+            if (this.dsrp.getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
+            {
+                EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), true);
+                ViewSupervisor.updateCourseView();
+                ViewSupervisor.createShopDialogLater();
+
+                return true;
+            }
+
+            EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), false);
+            return true;
+        }
+
+        l.warn("Received player turn change, but the current phase is not registration or upgrade. Ignoring.");
         EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), false);
 
-        return true;
+        return false;
     }
 
     @Override
@@ -452,19 +469,26 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onExchangeShop() throws JSONException
     {
-        return false;
+        l.debug("Upgrade shop was exchanged with the following cards: {}.", String.join(", ", Arrays.asList(this.dsrp.getExchangeShopCards())));
+        EGameState.INSTANCE.exchangeShop(new ArrayList<String>(Arrays.asList(this.dsrp.getExchangeShopCards())));
+        return true;
     }
 
     @Override
     protected boolean onRefillShop() throws JSONException
     {
-        return false;
+        l.debug("Upgrade shop was refilled with the following cards: {}.", String.join(", ", Arrays.asList(this.dsrp.getRefillShopCards())));
+        EGameState.INSTANCE.refillShop(new ArrayList<String>(Arrays.asList(this.dsrp.getRefillShopCards())));
+        return true;
     }
 
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        return false;
+        l.debug("Client {} has bought the following upgrade card: {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
+        EGameState.INSTANCE.onUpgradeCardBought(this.dsrp.getCard(), this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has bought the following upgrade card: %s.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCard()));
+        return true;
     }
 
     @Override
