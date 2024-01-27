@@ -4,19 +4,27 @@ import sep.server.json.game.activatingphase.    ActivePhaseModel;
 import sep.server.json.game.activatingphase.    ReplaceCardModel;
 import sep.server.json.game.activatingphase.    CardInfo;
 import sep.server.json.game.activatingphase.    CurrentCardsModel;
-import sep.server.json.game.effects.*;
+import sep.server.json.game.effects.            AnimationModel;
+import sep.server.json.game.effects.            CheckPointReachedModel;
+import sep.server.json.game.effects.            CheckpointMovedModel;
+import sep.server.json.game.effects.            EnergyModel;
+import sep.server.json.game.effects.            GameFinishedModel;
+import sep.server.json.game.effects.            MovementModel;
+import sep.server.json.game.effects.            PlayerTurningModel;
+import sep.server.json.game.effects.            RebootModel;
+import sep.server.json.game.effects.            RegisterChosenModel;
 import sep.server.json.lobby.                   PlayerAddedModel;
 import sep.server.json.lobby.                   PlayerStatusModel;
 import sep.server.json.lobby.                   SelectMapModel;
 import sep.server.json.lobby.                   MapSelectedModel;
+import sep.server.model.                        EServerInformation;
+import sep.server.model.                        IOwnershipable;
+import sep.server.model.                        Agent;
 import sep.server.model.game.                   GameState;
 import sep.server.model.game.                   EGamePhase;
 import sep.server.model.game.                   Tile;
 import sep.server.model.game.                   Player;
 import sep.server.model.game.                   EAnimation;
-import sep.server.model.                        EServerInformation;
-import sep.server.model.                        IOwnershipable;
-import sep.server.model.                        Agent;
 import sep.server.json.common.                  ChatMsgModel;
 import sep.server.json.common.                  CurrentPlayerModel;
 import sep.server.json.common.                  ConnectionUpdateModel;
@@ -33,6 +41,9 @@ import sep.server.json.game.                    GameStartedModel;
 import sep.server.json.game.                    StartingPointTakenModel;
 import sep.server.model.game.cards.             Card;
 import sep.                                     Types;
+import sep.server.json.game.upgradephase.       RefillShopModel;
+import sep.server.json.game.upgradephase.       ExchangeShopModel;
+import sep.server.json.game.upgradephase.       UpgradeBoughtModel;
 
 import java.util.                   ArrayList;
 import java.util.                   Objects;
@@ -643,6 +654,39 @@ public final class Session
         for (final PlayerController pc : this.getRemotePlayers())
         {
             new PlayerTurningModel(pc.getClientInstance(), ctrlID, rotation).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastShopRefill(final ArrayList<String> cards)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new RefillShopModel(pc.getClientInstance(), cards).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastShopExchange(final ArrayList<String> cards)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new ExchangeShopModel(pc.getClientInstance(), cards).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastBoughtUpgradeCard(final int ctrlID, final String card)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new UpgradeBoughtModel(pc.getClientInstance(), ctrlID, card).send();
             continue;
         }
 
