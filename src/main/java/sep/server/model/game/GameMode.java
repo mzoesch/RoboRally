@@ -387,12 +387,6 @@ public class GameMode {
     /**
      * The following method triggers the upgrade phase.
      */
-    private void triggerUpgradePhase() {
-        //TODO
-        /*
-        this.setupUpgradeShop();
-         */
-        l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
     private void triggerUpgradePhase()
     {
         final RefilledCards     out         = new RefilledCards();
