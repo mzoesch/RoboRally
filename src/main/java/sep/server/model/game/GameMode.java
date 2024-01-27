@@ -1394,6 +1394,60 @@ public class GameMode {
         return t;
     }
 
+    private void evaluateUpgradePhasePriorities()
+    {
+        l.debug("Determining priority for all players during this upgrade phase.");
+        this.upgradePhasePlayersSortedByPriority.clear();
+
+        final Coordinate antennaLocation = this.course.getPriorityAntennaCoordinate();
+
+        final int[] distances = new int[this.players.size()];
+        for (int i = 0; i < this.players.size(); ++i)
+        {
+            final Coordinate    robotCoordinate     = this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate();
+                                distances[i]        = Math.abs(antennaLocation.getX() - robotCoordinate.getX()) + Math.abs(antennaLocation.getY() - robotCoordinate.getY());
+            continue;
+        }
+
+        int currentPriority = this.players.size();
+        for (int i = 0; i < this.players.size(); ++i)
+        {
+            int     minDistance     = Integer.MAX_VALUE;
+            int     minIndex        = -1;
+
+            for (int j = 0; j < distances.length; ++j)
+            {
+                if (distances[j] < minDistance)
+                {
+                    minDistance     = distances[j];
+                    minIndex        = j;
+                }
+
+                continue;
+            }
+
+            //Now, includes AdminPrivilege logic. Still needs to be tested once shop is available.
+            if (minIndex == -1)
+            {
+                l.fatal("Could not determine priority for upgrade phase.");
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            final Player currentPlayer = this.players.get(minIndex);
+
+            this.upgradePhasePlayersSortedByPriority.add(currentPlayer);
+            currentPriority--;
+            distances[minIndex] = Integer.MAX_VALUE;
+
+            continue;
+        }
+
+        l.debug("Upgrade Phase priorities determined: {}.", this.upgradePhasePlayersSortedByPriority);
+
+        return;
+    }
+
     private boolean isUpgradeShopRightSize()
     {
         /* The shop must always have the size of all controllers connected. */
