@@ -2,6 +2,7 @@ package sep.view.lib;
 
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import sep.view.clientcontroller.EGameState;
 
 /** Represents a rotation of an actor in degrees. A rotation of zero degrees means that the actor is facing north. */
 public final record RRotation(int rotation)
@@ -16,7 +17,7 @@ public final record RRotation(int rotation)
         return;
     }
 
-    /** Valid rotation inputs are "clockwise", "counterclockwise", "NORTH", "EAST", "SOUTH", "WEST". */
+    /** Valid rotation inputs are "clockwise", "counterclockwise", "NORTH", "EAST", "SOUTH", "WEST", "startingDirection" */
     public RRotation addRotation(final String r)
     {
         if (r.equals("clockwise"))
@@ -50,6 +51,19 @@ public final record RRotation(int rotation)
         if (r.equals("WEST"))
         {
             return new RRotation(270);
+        }
+
+        if (r.equals("startingDirection")){
+            switch(EGameState.INSTANCE.getCurrentServerCourse()){
+                case ("Dizzy Highway"), ("Lost Bearings"), ("Extra Crispy"), ("Twister") -> {
+                    return new RRotation(90);
+                }
+                case ("Death Trap") -> {
+                    return new RRotation(270);
+                }
+
+            }
+
         }
 
         }
