@@ -1,8 +1,10 @@
 package sep.view.lib;
 
+import sep.view.clientcontroller.   EGameState;
+import sep.view.clientcontroller.   GameInstance;
+
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
-import sep.view.clientcontroller.EGameState;
 
 /** Represents a rotation of an actor in degrees. A rotation of zero degrees means that the actor is facing north. */
 public final record RRotation(int rotation)
@@ -30,7 +32,7 @@ public final record RRotation(int rotation)
             return new RRotation(this.rotation + -90);
         }
 
-        /* Legacy */
+        /* Begin Legacy */
         {
 
         if (r.equals("NORTH"))
@@ -53,22 +55,32 @@ public final record RRotation(int rotation)
             return new RRotation(270);
         }
 
-        if (r.equals("startingDirection")){
-            switch(EGameState.INSTANCE.getCurrentServerCourse()){
-                case ("Dizzy Highway"), ("Lost Bearings"), ("Extra Crispy"), ("Twister") -> {
-                    return new RRotation(90);
-                }
-                case ("Death Trap") -> {
-                    return new RRotation(270);
-                }
+        }
+        /* End Legacy */
 
+        if (r.equals("startingDirection"))
+        {
+            l.debug("Getting current server course name [{}] for starting direction.", EGameState.INSTANCE.getCurrentServerCourse());
+
+            switch(EGameState.INSTANCE.getCurrentServerCourse())
+            {
+
+            case ("Dizzy Highway"), ("Lost Bearings"), ("Extra Crispy"), ("Twister") ->
+            {
+                return new RRotation(90);
             }
 
+            case ("Death Trap") ->
+            {
+                return new RRotation(270);
+            }
+
+            }
         }
 
-        }
+        l.fatal("Invalid rotation input: {}", r);
+        GameInstance.kill(GameInstance.EXIT_FATAL);
 
-        l.error("Invalid rotation input: {}", r);
         return null;
     }
 
