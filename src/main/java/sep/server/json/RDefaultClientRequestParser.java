@@ -106,6 +106,14 @@ public record RDefaultClientRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getInt("register");
     }
 
+    public String getBuyUpgradeCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
 
+    public boolean hasBuyUpgradeCard()
+    {
+        return this.request.getJSONObject("messageBody").has("card");
+    }
 
 }
