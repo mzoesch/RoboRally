@@ -306,7 +306,6 @@ public final class GameJFXController
 
         this.masterContainer.setOnKeyPressed(e ->
         {
-            // TODO Add min max
             switch (e.getCode())
             {
 
