@@ -1,9 +1,10 @@
 package sep.view.viewcontroller;
 
-import sep.view.json.game.ChooseRegisterModel;
-import sep.view.json.game.DiscardSomeModel;
+import sep.view.json.game.          ChooseRegisterModel;
+import sep.view.json.game.          DiscardSomeModel;
 import sep.view.json.game.          SelectedDamageModel;
 import sep.view.json.game.          RebootDirectionModel;
+import sep.view.json.game.          BuyUpgradeModel;
 import sep.                         Types;
 import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
@@ -15,28 +16,44 @@ import sep.view.clientcontroller.   EGameState;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EAnimation;
+import sep.view.lib.                EShopAction;
+import sep.view.lib.                RShopAction;
 
 import javafx.scene.control.        Label;
 import javafx.scene.control.        Button;
+import javafx.scene.control.        OverrunStyle;
 import javafx.geometry.             Pos;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
 import javafx.application.          Platform;
 import javafx.application.          Application;
+import javafx.scene.                Node;
 import javafx.scene.                Parent;
 import javafx.scene.                Scene;
 import javafx.stage.                WindowEvent;
 import javafx.stage.                Stage;
 import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
+import javafx.scene.layout.         VBox;
+import javafx.scene.layout.         Region;
 import javafx.scene.layout.         AnchorPane;
+import javafx.scene.layout.         Priority;
 import java.util.                   ArrayList;
 import java.util.                   Arrays;
 import java.util.                   List;
 import java.util.                   Objects;
 import java.util.concurrent.atomic. AtomicBoolean;
 import java.util.concurrent.atomic. AtomicReference;
+import javafx.scene.image.          ImageView;
+import javafx.scene.effect.         GaussianBlur;
+import javafx.scene.effect.         ColorAdjust;
+
+@FunctionalInterface
+interface ImageViewCreator
+{
+    public abstract ImageView create(final int idx);
+}
 
 /**
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
@@ -61,8 +78,12 @@ public final class ViewSupervisor extends Application
     public static final int     VIRTUAL_SPACE_HORIZONTAL    = 512;
     public static final int     REGISTER_SLOT_WIDTH         = 102;
     public static final int     REGISTER_SLOT_HEIGHT        = 180;
+    public static final int     SHOP_DIALOG_SLOT_WIDTH      = 82;
+    public static final int     SHOP_DIALOG_SLOT_HEIGHT     = 144;
     public static final int     GOT_REGISTER_SLOT_WIDTH     = 34;
     public static final int     GOT_REGISTER_SLOT_HEIGHT    = 58;
+    public static final int     UPGRADE_SLOT_WIDTH          = 34;
+    public static final int     UPGRADE_SLOT_HEIGHT         = 58;
     public static final int     PHASE_POPUP_TIME            = 5_000;
 
     public ViewSupervisor()
@@ -877,6 +898,233 @@ public final class ViewSupervisor extends Application
             l.error(e.getMessage());
             return;
         }
+    }
+
+    public static void createShopDialog()
+    {
+        ViewSupervisor.clearPendingShopActions();
+
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Label header = new Label("Upgrade Your Robot");
+        header.getStyleClass().add("text-2xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 10.0     );
+
+        final HBox availableCards = new HBox();
+        availableCards.setId("upgrade-shop-available-cards");
+
+        for (int i = 0; i < EGameState.INSTANCE.getUpgradeShop().size(); ++i)
+        {
+            final ImageView     iv  = ViewSupervisor.getUpgradeShopImageAtIndex(i);
+            final AnchorPane    ap  = ViewSupervisor.getAnchorPaneForShopSlot(iv, i);
+
+            availableCards.getChildren().add(ap);
+
+            continue;
+        }
+
+        final Region LeftSplitLine = new Region();
+        LeftSplitLine.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        final Region RightSplitLine = new Region();
+        RightSplitLine.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final HBox verticalSplitLineBox = new HBox(LeftSplitLine, ViewSupervisor.createHSpacer(), RightSplitLine);
+
+        final Region splitLineAvailableCards = new Region();
+        splitLineAvailableCards.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        final Region fiveGap = new Region();
+        fiveGap.setPrefHeight(5);
+
+        final VBox availableCardsWrapper = new VBox(availableCards, fiveGap, verticalSplitLineBox, splitLineAvailableCards);
+        availableCardsWrapper.setId("upgrade-shop-available-cards-wrapper");
+
+        final Label availableCardsLabel = new Label("SHOP CARDS");
+        availableCardsLabel.getStyleClass().add("text-xl");
+        availableCardsLabel.setStyle("-fx-alignment: center;");
+        availableCardsLabel.setWrapText(true);
+
+        final Label temporaryCardsLabel = new Label("TEMPORARY");
+        temporaryCardsLabel.getStyleClass().add("text-xl");
+        temporaryCardsLabel.setStyle("-fx-alignment: center;");
+        temporaryCardsLabel.setWrapText(true);
+        temporaryCardsLabel.setMaxWidth(Double.MAX_VALUE);
+
+        final Label permanentCardsLabel = new Label("PERMANENT");
+        permanentCardsLabel.getStyleClass().add("text-xl");
+        permanentCardsLabel.setStyle("-fx-alignment: center;");
+        permanentCardsLabel.setWrapText(true);
+        permanentCardsLabel.setMaxWidth(Double.MAX_VALUE);
+
+        HBox.setHgrow(temporaryCardsLabel, Priority.ALWAYS);
+        HBox.setHgrow(permanentCardsLabel, Priority.ALWAYS);
+
+        final HBox boughtCardsLabelWrapper = new HBox(temporaryCardsLabel, permanentCardsLabel);
+
+        final Region temporaryBoughtCardsHorizontalSplitter = new Region();
+        temporaryBoughtCardsHorizontalSplitter.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        final Region permanentBoughtCardsHorizontalSplitter = new Region();
+        permanentBoughtCardsHorizontalSplitter.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        HBox.setHgrow(temporaryBoughtCardsHorizontalSplitter, Priority.ALWAYS);
+        HBox.setHgrow(permanentBoughtCardsHorizontalSplitter, Priority.ALWAYS);
+
+        final HBox boughtCardsHorizontalSplitterWrapper = new HBox(temporaryBoughtCardsHorizontalSplitter, permanentBoughtCardsHorizontalSplitter);
+        boughtCardsHorizontalSplitterWrapper.setId("upgrade-shop-bought-cards-horizontal-splitter-wrapper");
+
+        final Region temporaryLeftBoughtCardsVerticalSplitter = new Region();
+        temporaryLeftBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final Region temporaryRightBoughtCardsVerticalSplitter = new Region();
+        temporaryRightBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final Region permanentLeftBoughtCardsVerticalSplitter = new Region();
+        permanentLeftBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final Region permanentRightBoughtCardsVerticalSplitter = new Region();
+        permanentRightBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final HBox temporaryBoughtCardsVerticalSplitterWrapper = new HBox(temporaryLeftBoughtCardsVerticalSplitter, ViewSupervisor.createHSpacer(), temporaryRightBoughtCardsVerticalSplitter);
+
+        final HBox permanentBoughtCardsVerticalSplitterWrapper = new HBox(permanentLeftBoughtCardsVerticalSplitter, ViewSupervisor.createHSpacer(), permanentRightBoughtCardsVerticalSplitter);
+
+        HBox.setHgrow(temporaryBoughtCardsVerticalSplitterWrapper, Priority.ALWAYS);
+        HBox.setHgrow(permanentBoughtCardsVerticalSplitterWrapper, Priority.ALWAYS);
+
+        final HBox boughtCardsVerticalSplitterWrapper = new HBox(temporaryBoughtCardsVerticalSplitterWrapper, permanentBoughtCardsVerticalSplitterWrapper);
+        boughtCardsVerticalSplitterWrapper.setId("upgrade-shop-bought-cards-vertical-splitter-wrapper");
+
+        final HBox boughtCards = new HBox();
+        boughtCards.setId("upgrade-shop-bought-cards");
+
+        for (int i = 0; i < EGameState.INSTANCE.getBoughtUpgradeCard().length; ++i)
+        {
+            final ImageView iv = ViewSupervisor.getBoughtUpgradeImageAtIndex(i);
+
+            final AnchorPane ap = new AnchorPane(iv);
+            ap.setMinSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+            ap.setMaxSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+
+            final int finalI = i;
+            iv.setOnMouseClicked(e ->
+            {
+                return;
+            });
+
+            iv.setOnMouseEntered(e ->
+            {
+            });
+
+            iv.setOnMouseExited(e ->
+            {
+            });
+
+            boughtCards.getChildren().add(ap);
+
+            continue;
+        }
+
+        final Region boughtFiveGap = new Region();
+        boughtFiveGap.setPrefHeight(5);
+
+        final VBox boughtWrapper = new VBox(boughtCardsHorizontalSplitterWrapper, boughtCardsVerticalSplitterWrapper, boughtFiveGap, boughtCards);
+
+        final Button b = new Button("Confirm");
+        b.getStyleClass().add("secondary-btn");
+        b.getStyleClass().add("upgrade-shop-confirm-btn");
+        b.setOnAction(e ->
+        {
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).isEmpty())
+            {
+                l.debug("Client {} decided to not take any actions in this upgrade phase.", EClientInformation.INSTANCE.getPlayerID());
+                new BuyUpgradeModel(false, null).send();
+                ViewSupervisor.getSceneController().destroyPopUp(h, false);
+                return;
+            }
+
+            for (final RShopAction action : ViewSupervisor.getPendingShopActions())
+            {
+                l.debug("Client {} decided to take action {} in this upgrade phase.", EClientInformation.INSTANCE.getPlayerID(), action);
+
+                if (action.action() == EShopAction.BUY)
+                {
+                    new BuyUpgradeModel(true, EGameState.INSTANCE.getUpgradeShop(action.idx())).send();
+                    continue;
+                }
+
+                if (action.action() == EShopAction.SELL)
+                {
+                    /* TODO: Implement selling. */
+                    l.error("Selling is not yet implemented. Ignoring.");
+                    continue;
+                }
+
+                continue;
+            }
+
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
+
+            for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
+            {
+                n.setEffect(null);
+                continue;
+            }
+
+            return;
+        });
+
+        final HBox confirmButtonWrapper = new HBox(ViewSupervisor.createHSpacer(), b);
+
+        final VBox form = new VBox(availableCardsWrapper, availableCardsLabel, boughtCardsLabelWrapper, boughtWrapper, confirmButtonWrapper);
+        form.setId("upgrade-shop-form");
+
+        final HBox formWrapper = new HBox(form);
+        formWrapper.setId("upgrade-shop-form-wrapper");
+
+        AnchorPane.setLeftAnchor(       formWrapper, 0.0      );
+        AnchorPane.setRightAnchor(      formWrapper, 0.0      );
+        AnchorPane.setBottomAnchor(     formWrapper, 10.0      );
+
+        final AnchorPane p = new AnchorPane(header, formWrapper);
+        p.setId("upgrade-dialog-container");
+
+        final GaussianBlur blur     = new GaussianBlur(7.0);
+        final ColorAdjust adj       = new ColorAdjust(0.0, -0.9, -0.5, 0.0);
+        adj.setInput(blur);
+        for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
+        {
+            n.setEffect(adj);
+            continue;
+        }
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h);
+
+        return;
+    }
+
+    public static void createShopDialogLater()
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createShopDialog();
+            return;
+        });
+
+        return;
     }
 
     // endregion Updating methods
