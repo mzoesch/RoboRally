@@ -7,6 +7,7 @@ import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EAgentDifficulty;
 import sep.view.json.game.          SetStartingPointModel;
 import sep.view.json.game.          SelectedCardModel;
+import sep.view.json.game.          BuyUpgradeModel;
 
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
@@ -2139,7 +2140,22 @@ public final class AgentSL_v2 extends ServerListener
             return true;
         }
 
-        return true;
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
+        {
+            if (this.dsrp.getPlayerID() != EClientInformation.INSTANCE.getPlayerID())
+            {
+                return true;
+            }
+
+            l.error("Agent {} was notified to buy an upgrade. But this is not implemented yet. Sending Mock JSON.", EClientInformation.INSTANCE.getPlayerID());
+            new BuyUpgradeModel(false, null).send();
+            return true;
+        }
+
+        l.warn("Received player turn change, but the current phase is not registration or upgrade. Ignoring.");
+        EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), true);
+
+        return false;
     }
 
     @Override
