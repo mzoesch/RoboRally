@@ -381,4 +381,9 @@ public final class SceneController
         return s;
     }
 
+    public Pane getRenderTarget()
+    {
+        return this.getPopUpTarget();
+    }
+
 }
