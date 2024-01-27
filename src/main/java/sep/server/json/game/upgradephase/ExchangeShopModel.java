@@ -1,22 +1,33 @@
 package sep.server.json.game.upgradephase;
 
-import org.json.JSONObject;
-import sep.server.json.AModel;
-import sep.server.viewmodel.ClientInstance;
+import sep.server.json.         AModel;
+import sep.server.viewmodel.    ClientInstance;
 
-public class ExchangeShopModel extends AModel {
-    private final String cards;
+import org.json.    JSONObject;
+import org.json.    JSONArray;
+import java.util.   ArrayList;
 
-    public ExchangeShopModel(ClientInstance ci, String cards) {
+public final class ExchangeShopModel extends AModel
+{
+    private final ArrayList<String> cards;
+
+    public ExchangeShopModel(final ClientInstance ci, final ArrayList<String> cards)
+    {
         super(ci);
+
         this.cards = cards;
+
+        return;
     }
 
     @Override
-    public JSONObject toJSON() {
-        JSONObject j = new JSONObject();
-        j.put("messageType", "ExchangeShop");
-        j.put("messageBody", new JSONObject().put("cards", this.cards));
-        return null;
+    public JSONObject toJSON()
+    {
+        final JSONObject j = new JSONObject();
+        j.put(  "messageType",  "ExchangeShop"                                              );
+        j.put(  "messageBody",  new JSONObject().put("cards", new JSONArray(this.cards))    );
+
+        return j;
     }
+
 }
