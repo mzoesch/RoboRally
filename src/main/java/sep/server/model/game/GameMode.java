@@ -416,7 +416,47 @@ public class GameMode {
 
         return;
     }
+
+    private void executePostBuyBehavior()
+    {
+        if (!this.upgradePhasePlayersSortedByPriority.isEmpty())
+        {
+            l.debug("Waiting for client {} to finish their upgrade phase.", this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
+            this.getSession().broadcastCurrentPlayer(this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
+            this.upgradePhasePlayersSortedByPriority.remove(0);
+
+            return;
+        }
+
         this.handleNewPhase(EGamePhase.PROGRAMMING);
+
+        return;
+    }
+
+    public void onUpgradeCardBought(final PlayerController pc, final String card)
+    {
+        if (card == null)
+        {
+            l.debug("Player {} bought nothing. Continuing.", pc.getPlayerID());
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        if (!this.doesUpgradeShopContains(card))
+        {
+            l.error("Player {} tried to buy a card that is not in the upgrade shop. Ignoring.", pc.getPlayerID());
+            new ErrorMsgModel(pc.getClientInstance(), "The card you tried to buy is not in the upgrade shop.");
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        this.removeCardFromShop(card);
+        pc.getPlayer().getBoughtUpgradeCards().add(card);
+        this.getSession().broadcastBoughtUpgradeCard(pc.getPlayerID(), card);
+        l.debug("Player {} bought {}. The new upgrade shop is: {}.", pc.getPlayerID(), card, this.upgradeShop.toString());
+        this.executePostBuyBehavior();
+
+        return;
     }
 
     /**
