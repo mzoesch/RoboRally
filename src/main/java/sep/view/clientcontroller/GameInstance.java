@@ -2,6 +2,7 @@ package sep.view.clientcontroller;
 
 import sep.view.json.mainmenu.      InitialClientConnectionModel;
 import sep.view.lib.                OutErr;
+import sep.                         Types;
 
 import javafx.application.          Platform;
 import java.io.                     IOException;
@@ -94,7 +95,8 @@ public abstract sealed class GameInstance permits GI_Agent, GI_Human
         boolean bOk = InitialClientConnectionModel.checkServerProtocolVersion(serverProtocolVersion);
         if (!bOk)
         {
-            l.fatal("Server protocol version mismatch.");
+            l.error("Server protocol version mismatch. Excepted Version {} but found {}.", Types.EProps.VERSION.toString(), InitialClientConnectionModel.getServerProtocolVersion());
+            outErr.set(String.format("Server protocol version mismatch. Expected Version %s but found %s.", Types.EProps.VERSION.toString(), InitialClientConnectionModel.getServerProtocolVersion()));
             return false;
         }
 
