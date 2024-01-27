@@ -225,6 +225,7 @@ public class Robot {
 
             if (robotOwner.getController() instanceof PlayerController pc)
             {
+                //TODO noch nicht implementiert, was passiert, wenn keine Spam-Karten mehr vorhanden
                 new DrawDamageModel(pc.getClientInstance(), robotOwner.getController().getPlayerID(), new String[]{"Spam", "Spam"}).send();
             }
             else
@@ -257,11 +258,11 @@ public class Robot {
                     restartPoint = startingPoint;
                 }
             }
-            case "StartAR", "1A", "2A", "4A" -> {
+            case "1A", "4A" -> {
                 restartPoint = course.getTileByNumbers(0, 0);
             }
             case "5B" -> {
-                restartPoint = course.getTileByNumbers(4, 3);
+                restartPoint = course.getTileByNumbers(7, 3);
             }
         }
 
