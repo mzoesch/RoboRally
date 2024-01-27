@@ -264,6 +264,9 @@ public class Robot {
             case "5B" -> {
                 restartPoint = course.getTileByNumbers(7, 3);
             }
+            case "6B" -> {
+                restartPoint = course.getTileByNumbers(0, 7);
+            }
         }
 
         this.setCurrentTile(restartPoint);
