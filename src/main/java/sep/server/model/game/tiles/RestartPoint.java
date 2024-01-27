@@ -8,6 +8,10 @@ public class RestartPoint implements FieldType{
     public RestartPoint(String orientation){
         this.orientation = orientation;
     }
+    public String getRestartOrientation(){
+        return orientation;
+    }
+
     public JSONObject toJSON(String isOnBoard){
         JSONObject fieldInfo = new JSONObject();
         fieldInfo.put("isOnBoard", isOnBoard);
