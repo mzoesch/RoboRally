@@ -498,17 +498,6 @@ public enum EGameState
         return;
     }
 
-    public void clearShopSlots()
-    {
-        for (int i = 0; i < this.shopSlots.length; ++i)
-        {
-            this.shopSlots[i] = null;
-
-            continue;
-        }
-
-        return;
-    }
     public void addRegister(final int idx, final String register)
     {
         if (idx < 0 || idx >= this.registers.length)
@@ -526,7 +515,6 @@ public enum EGameState
         this.gotRegisters.add(register);
         return;
     }
-
 
     /**
      * Sets a register slot from a given got register slot.
@@ -631,119 +619,6 @@ public enum EGameState
     {
         this.currentRegister = register;
         return;
-    }
-
-    public String getTemporaryUpgradeCard(final int idx)
-    {
-        if (idx < 0 || idx >= this.temporayUpgradeCards.size())
-        {
-            return null;
-        }
-
-        return this.temporayUpgradeCards.get(idx);
-    }
-
-    public String getPermanentUpgradeCard(final int idx)
-    {
-        if (idx < 0 || idx >= this.permanentUpgradeCards.size())
-        {
-            return null;
-        }
-
-        return this.permanentUpgradeCards.get(idx);
-    }
-
-    public String getShopSlot(final int idx)
-    {
-        if (idx < 0 || idx > shopSlots.length)
-        {
-            l.debug("Tried getting content of shopSlot outside of range of Slots");
-            return null;
-        }
-
-        return this.shopSlots[idx];
-    }
-
-    public void addTemporaryUpgradeCards(final String temporaryUpgradeCard)
-    {
-        if (this.temporayUpgradeCards.size() >= 3)
-        {
-            l.warn("Tried adding temporaryUpgradeCard in Slot whilst filled");
-            return;
-        }
-
-        this.temporayUpgradeCards.add(temporaryUpgradeCard);
-
-        return;
-    }
-
-    public void addPermanentUpgradeCard(final String permanentUpgradeCard)
-    {
-        if (this.permanentUpgradeCards.size() <= 3)
-        {
-            l.warn("Tried adding permanentUpgradeCard in Slot whilst filled");
-            return;
-        }
-
-        this.permanentUpgradeCards.add(permanentUpgradeCard);
-
-        return;
-    }
-
-    public void addShopSlot(final int idx, final String elementName)
-    {
-        if (idx < 0 || idx >= this.shopSlots.length)
-        {
-            l.debug("Tried adding {} outside of shopSlotRange on Position {}.", elementName, idx);
-            return;
-        }
-
-        if (this.shopSlots[idx] != null)
-        {
-            l.debug("Tried adding {} on filled shopSlot {}", elementName, idx);
-            return;
-        }
-
-        this.shopSlots[idx] = elementName;
-
-        return;
-    }
-
-    public boolean isShopFull()
-    {
-        for (final String s : this.shopSlots)
-        {
-            if (s == null)
-            {
-                return false;
-            }
-
-            continue;
-        }
-
-        return true;
-    }
-
-    public boolean isShopActive()
-    {
-        return this.shopActive;
-    }
-
-    public void setShopActive(final boolean bActive)
-    {
-        this.shopActive = bActive;
-        return;
-    }
-
-    public void setShopState(final EShopState state)
-    {
-        this.shopState = state;
-        return;
-    }
-
-    public EShopState getShopState()
-    {
-        return this.shopState;
     }
 
     public int getDamageCardsCountToDraw()
