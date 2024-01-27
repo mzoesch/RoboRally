@@ -980,11 +980,12 @@ public final class MockViewLauncher implements IMockView
 
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
             ViewSupervisor.updateCourseView();
-            EGameState.INSTANCE.setCurrentPhase(EGamePhase.PROGRAMMING);
+            EGameState.INSTANCE.setCurrentPhase(EGamePhase.UPGRADE);
             final String[] mockPCards = new String[] {"MoveI", "MoveI", "MoveI", "MoveII", "MoveII", "MoveII", "MoveIII", "MoveIII", "MoveIII"};
             for (final String s : mockPCards)
             {
                 EGameState.INSTANCE.addGotRegister(s);
+                continue;
             }
             EGameState.INSTANCE.setCurrentPlayer(0, false);
 
@@ -996,7 +997,16 @@ public final class MockViewLauncher implements IMockView
 
             EClientInformation.INSTANCE.setPlayerID(0);
 
+            EGameState.INSTANCE.refillShop(new ArrayList<String>(Arrays.asList("AdminPrivilege", "RearLaser", "MemorySwap", "SpamBlocker", "AdminPrivilege", "RearLaser")));
+//            EGameState.INSTANCE.exchangeShop(new ArrayList<String>(Arrays.asList("AdminPrivilege", null)));
+
+            EGameState.INSTANCE.onUpgradeCardBought("AdminPrivilege", true);
+            EGameState.INSTANCE.onUpgradeCardBought("SpamBlocker", true);
+            EGameState.INSTANCE.onUpgradeCardBought("RearLaser", false);
+
             ViewSupervisor.updatePlayerInformationArea();
+
+            ViewSupervisor.createShopDialogLater();
 
             ViewSupervisor.centerGameCourseLater();
 
