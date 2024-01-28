@@ -1573,6 +1573,7 @@ public final class GameJFXController
 
             final Label ctrlName = new Label(rp.getPlayerName());
             ctrlName.getStyleClass().add("text-sm");
+            ctrlName.setTextOverrun(OverrunStyle.CLIP);
 
             final ImageView ivEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
             ivEnergy.setFitWidth(15);
