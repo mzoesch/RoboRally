@@ -1294,26 +1294,29 @@ public final class ViewSupervisor extends Application
         }
     }
 
-
-    private static AnchorPane getAnchorPaneForShopSlot(ImageView iv, int i)
+    private static AnchorPane getAnchorPaneForShopSlot(final ImageView iv, final int i)
     {
         final AnchorPane ap = new AnchorPane(iv);
 
         ap.setMinSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
         ap.setMaxSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
 
-        final int finalI = i;
-
         ap.setOnMouseEntered(e ->
         {
-            if (EGameState.INSTANCE.getUpgradeShop(finalI) == null)
+            if (EGameState.INSTANCE.getUpgradeShop(i) == null)
+            {
+                return;
+            }
+
+            /* A client may only purchase one card for each upgrade phase. */
+            if (ViewSupervisor.containsPendingActions(EShopAction.BUY))
             {
                 return;
             }
 
             ap.setStyle("-fx-border-color: #00ff007f; -fx-border-width: 2px;");
 
-            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, finalI)))
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, i)))
             {
                 return;
             }
@@ -1327,7 +1330,7 @@ public final class ViewSupervisor extends Application
 
             b.setOnAction(onBuy ->
             {
-                final RShopAction action = new RShopAction(EShopAction.BUY, finalI);
+                final RShopAction action = new RShopAction(EShopAction.BUY, i);
 
                 ViewSupervisor.addShopAction(action);
                 ViewSupervisor.outputPendingShopActions();
@@ -1376,7 +1379,7 @@ public final class ViewSupervisor extends Application
 
                 discardBtn.setOnAction(onDiscard ->
                 {
-                    ViewSupervisor.removeShopAction(new RShopAction(EShopAction.BUY, finalI));
+                    ViewSupervisor.removeShopAction(new RShopAction(EShopAction.BUY, i));
                     ViewSupervisor.outputPendingShopActions();
 
                     for (final Node n : ap.getChildren())
@@ -1390,7 +1393,7 @@ public final class ViewSupervisor extends Application
                         continue;
                     }
 
-                    ViewSupervisor.getAnchorPaneForShopSlot(ViewSupervisor.getUpgradeShopImageAtIndex(finalI), finalI);
+                    ViewSupervisor.getAnchorPaneForShopSlot(ViewSupervisor.getUpgradeShopImageAtIndex(i), i);
 
                     ap.setStyle("-fx-border-color: transparent; -fx-border-width: 2px;");
 
@@ -1425,7 +1428,7 @@ public final class ViewSupervisor extends Application
 
         ap.setOnMouseExited(e ->
         {
-            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, finalI)))
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, i)))
             {
                 return;
             }
@@ -1447,6 +1450,20 @@ public final class ViewSupervisor extends Application
         });
 
         return ap;
+    }
+
+    private static boolean containsPendingActions(final EShopAction action)
+    {
+        try
+        {
+            return ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().stream().anyMatch(a -> a.action() == action);
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending {} shop actions check. Ignoring.", action.toString());
+            l.error(e.getMessage());
+            return false;
+        }
     }
 
 }
