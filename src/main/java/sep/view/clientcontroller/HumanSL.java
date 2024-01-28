@@ -388,10 +388,22 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onEnergyTokenChanged() throws JSONException
     {
-        l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
         l.debug("Player {}'s energy amount has been updated to {}. Source: {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount(), this.dsrp.getEnergySource());
+        final int deprecatedEnergy = Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getEnergy();
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
         ViewSupervisor.updatePlayerView();
+
+        /* If a client bought an upgrade card, for example. */
+        if (deprecatedEnergy - this.dsrp.getEnergyCount() >= 0)
+        {
+            return true;
+        }
+
+        if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+        {
+            ViewSupervisor.createEnergyTokenPopUpLater(this.dsrp.getEnergyCount() - deprecatedEnergy, this.dsrp.getEnergySource());
+        }
+
         return true;
     }
 
