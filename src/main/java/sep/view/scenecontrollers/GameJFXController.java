@@ -1230,6 +1230,75 @@ public final class GameJFXController
         return;
     }
 
+    private void renderInfoTitle()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.INVALID)
+        {
+            this.programmingTimerLabel.setText("");
+            this.programmingTimerLabel.setStyle("");
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
+        {
+            this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+            if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                this.programmingTimerLabel.setText("Set Your Starting Position.");
+                return;
+            }
+
+            this.programmingTimerLabel.setText(String.format("Waiting for %s ...", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
+        {
+
+            if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                this.programmingTimerLabel.setText("");
+                this.programmingTimerLabel.setStyle("");
+                return;
+            }
+
+            this.programmingTimerLabel.setText(String.format("Waiting for %s ...", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+            this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING)
+        {
+            // TIMER
+
+            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished())
+            {
+                this.programmingTimerLabel.setText("Waiting for others ...");
+                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+                return;
+            }
+
+            this.programmingTimerLabel.setText("5s");
+            this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.ACTIVATION)
+        {
+            this.programmingTimerLabel.setText("");
+            this.programmingTimerLabel.setStyle("");
+            return;
+        }
+
+
+        return;
+    }
+
     // endregion HUD Side Panel
 
     // region HUD Footer
@@ -1530,6 +1599,7 @@ public final class GameJFXController
     private void renderHUDHeader()
     {
         this.renderPhaseTitle();
+        this.renderInfoTitle();
         return;
     }
 
@@ -1552,6 +1622,8 @@ public final class GameJFXController
      */
     private void renderPlayerInformationArea()
     {
+        this.renderHUDHeader();
+
         this.playerContainer.getChildren().clear();
 
         for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; ++i)
@@ -1797,7 +1869,6 @@ public final class GameJFXController
      */
     public void renderHUD()
     {
-        this.renderHUDHeader();
         this.renderHUDFooter();
         this.renderPlayerInformationArea();
 
