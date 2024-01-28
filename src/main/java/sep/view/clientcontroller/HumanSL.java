@@ -382,6 +382,7 @@ public final class HumanSL extends ServerListener
         l.debug("Player {} has reached {} checkpoints.", this.dsrp.getPlayerID(), this.dsrp.getCheckpointNumber());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getCheckpointNumber());
         ViewSupervisor.handleChatInfo(String.format("Player %s has reached %s checkpoints.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCheckpointNumber()));
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 
