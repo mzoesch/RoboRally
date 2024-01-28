@@ -46,6 +46,7 @@ import javafx.scene.shape.          Rectangle;
 import javafx.event.                ActionEvent;
 import javafx.scene.input.          KeyCode;
 import javafx.util.                 Duration;
+import javafx.scene.control.        OverrunStyle;
 import javafx.scene.control.        Label;
 import javafx.scene.control.        TextField;
 import javafx.scene.control.        ScrollPane;
@@ -1597,7 +1598,21 @@ public final class GameJFXController
             hEnergyCheckpoint.setSpacing(10);
             hEnergyCheckpoint.setAlignment(Pos.CENTER);
 
-            final VBox v = new VBox(figureName, ctrlName, hEnergyCheckpoint);
+            final HBox boughtUpgrades = new HBox();
+            boughtUpgrades.setSpacing(5);
+            boughtUpgrades.setAlignment(Pos.CENTER);
+            for (int j = 0; j < rp.getBoughtUpgradeCards().size(); ++j)
+            {
+                final ImageView iv = new ImageView();
+                iv.setFitWidth(     GameJFXController.UPGRADE_PREVIEW_WIDTH   );
+                iv.setFitHeight(    GameJFXController.UPGRADE_PREVIEW_HEIGHT  );
+                iv.setImage(TileModifier.loadUpgradePreview(rp.getBoughtUpgradeCards().get(j)));
+
+                boughtUpgrades.getChildren().add(iv);
+                continue;
+            }
+
+            final VBox v = new VBox(figureName, ctrlName, hEnergyCheckpoint, boughtUpgrades);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
             if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
