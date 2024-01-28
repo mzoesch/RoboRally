@@ -61,7 +61,7 @@ public final class GameJFXController
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
     private static final String     COLOR_HAMMER                = "#ff000033";
-    private static final String     COLOR_TRUNDLE               = "#0000ff33";
+    private static final String     COLOR_TRUNDLE               = "#0078ff33";
     private static final String     COLOR_SQUASH                = "#ffc0cb33";
     private static final String     COLOR_X90                   = "#00ff0033";
     private static final String     COLOR_SPIN                  = "#00ffff33";
