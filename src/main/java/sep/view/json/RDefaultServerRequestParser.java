@@ -233,4 +233,9 @@ public record RDefaultServerRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getString("card");
     }
 
+    public String getEnergySource() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("source");
+    }
+
 }
