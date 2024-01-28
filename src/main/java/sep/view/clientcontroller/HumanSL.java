@@ -500,7 +500,7 @@ public final class HumanSL extends ServerListener
     protected boolean onUpgradeBought() throws JSONException
     {
         l.debug("Client {} has bought the following upgrade card: {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
-        EGameState.INSTANCE.onUpgradeCardBought(this.dsrp.getCard(), this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID());
+        EGameState.INSTANCE.onUpgradeCardBought(this.dsrp.getPlayerID(), this.dsrp.getCard());
         ViewSupervisor.handleChatInfo(String.format("Player %s has bought the following upgrade card: %s.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCard()));
         return true;
     }
