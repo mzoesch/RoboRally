@@ -51,6 +51,7 @@ import javafx.scene.control.        TextField;
 import javafx.scene.control.        ScrollPane;
 import javafx.scene.control.        Button;
 import javafx.geometry.             Insets;
+import javafx.geometry.             Pos;
 import javafx.scene.paint.          Color;
 import java.util.concurrent.atomic. AtomicReference;
 
@@ -1570,10 +1571,18 @@ public final class GameJFXController
             final Label ctrlName = new Label(rp.getPlayerName());
             ctrlName.getStyleClass().add("text-sm");
 
-            final Label energyCubes = new Label(String.format("Energy: %d", rp.getEnergyCubes()));
-            energyCubes.getStyleClass().add("text-sm");
+            final ImageView ivEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
+            ivEnergy.setFitWidth(15);
+            ivEnergy.setFitHeight(15);
 
-            final VBox v = new VBox(figureName, ctrlName, energyCubes);
+            final Label lEnergy = new Label(String.format("%d", rp.getEnergy()));
+            lEnergy.getStyleClass().add("text-sm");
+
+            final HBox hEnergy = new HBox(ivEnergy, lEnergy);
+            hEnergy.setSpacing(5);
+            hEnergy.setAlignment(Pos.CENTER);
+
+            final VBox v = new VBox(figureName, ctrlName, hEnergy);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
             if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
