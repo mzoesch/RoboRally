@@ -761,20 +761,18 @@ public enum EGameState
         return;
     }
 
-    /**
-     * @param card          The card that was bought.
-     * @param bLocalOwner   If the local client bought the card.
-     */
-    public void onUpgradeCardBought(final String card, final boolean bLocalOwner)
+    public void onUpgradeCardBought(final int id, final String card)
     {
-        this.removeUpgradeCardFromShop(card);
+        final boolean bLocalOwner = id == EClientInformation.INSTANCE.getPlayerID();
 
-        /* TODO Add the bought cards to the other players as well. */
+        this.removeUpgradeCardFromShop(card);
 
         if (bLocalOwner)
         {
             this.addBoughtUpgradeCard(card);
         }
+
+        Objects.requireNonNull(this.getRemotePlayerByPlayerID(id)).getBoughtUpgradeCards().add(card);
 
         if (EClientInformation.INSTANCE.isAgent())
         {

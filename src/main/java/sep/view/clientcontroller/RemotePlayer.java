@@ -37,6 +37,8 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
 
     private final ArrayList<String>     playedRCards;
 
+    private final ArrayList<String>     boughtUpgradeCards;
+
     public RemotePlayer(final int playerID, final String playerName, final EFigure figure, final boolean bReady)
     {
         this.playerID               = playerID;
@@ -56,6 +58,8 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         this.checkPointsReached     = 0;
 
         this.playedRCards           = new ArrayList<String>();
+
+        this.boughtUpgradeCards     = new ArrayList<String>();
 
         return;
     }
@@ -204,6 +208,11 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     {
         this.bRebooted = bRebooted;
         return;
+    }
+
+    public ArrayList<String> getBoughtUpgradeCards()
+    {
+        return this.boughtUpgradeCards;
     }
 
     // endregion Getters and Setters
