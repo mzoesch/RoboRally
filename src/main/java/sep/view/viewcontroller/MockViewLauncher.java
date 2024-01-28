@@ -12,6 +12,7 @@ import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import java.util.                   ArrayList;
 import java.util.                   Arrays;
+import java.util.                   Objects;
 
 /** Mocking Game View with no server connection required. */
 public final class MockViewLauncher implements IMockView
@@ -1000,9 +1001,22 @@ public final class MockViewLauncher implements IMockView
             EGameState.INSTANCE.refillShop(new ArrayList<String>(Arrays.asList("AdminPrivilege", "RearLaser", "MemorySwap", "SpamBlocker", "AdminPrivilege", "RearLaser")));
 //            EGameState.INSTANCE.exchangeShop(new ArrayList<String>(Arrays.asList("AdminPrivilege", null)));
 
-            EGameState.INSTANCE.onUpgradeCardBought("AdminPrivilege", true);
-            EGameState.INSTANCE.onUpgradeCardBought("SpamBlocker", true);
-            EGameState.INSTANCE.onUpgradeCardBought("RearLaser", false);
+            EGameState.INSTANCE.onUpgradeCardBought(0, "AdminPrivilege");
+            EGameState.INSTANCE.onUpgradeCardBought(0, "SpamBlocker");
+            EGameState.INSTANCE.onUpgradeCardBought(1, "RearLaser");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getBoughtUpgradeCards().add("RearLaser");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("AdminPrivilege");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("RearLaser");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("MemorySwap");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("SpamBlocker");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getBoughtUpgradeCards().add("RearLaser");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getBoughtUpgradeCards().add("AdminPrivilege");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getBoughtUpgradeCards().add("RearLaser");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getBoughtUpgradeCards().add("MemorySwap");
 
             ViewSupervisor.updatePlayerInformationArea();
 
