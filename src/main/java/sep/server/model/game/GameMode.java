@@ -1488,6 +1488,23 @@ public class GameMode {
         return false;
     }
 
+    private int getUpgradeCardCost(final String card)
+    {
+        for (final AUpgradeCard upgradeCard : this.upgradeShop)
+        {
+            if (upgradeCard.getCardType().equals(card))
+            {
+                return upgradeCard.getCost();
+            }
+
+            continue;
+        }
+
+        l.error("Could not find cost for upgrade card {}.", card);
+
+        return -1;
+    }
+
     // endregion Getters and Setters
 
 }
