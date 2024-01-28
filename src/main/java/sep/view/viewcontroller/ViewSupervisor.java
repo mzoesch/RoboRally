@@ -18,7 +18,10 @@ import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EAnimation;
 import sep.view.lib.                EShopAction;
 import sep.view.lib.                RShopAction;
+import sep.view.lib.                EUpgradeCard;
 
+import javafx.scene.text.           TextFlow;
+import javafx.scene.text.           Text;
 import javafx.scene.control.        Label;
 import javafx.scene.control.        Button;
 import javafx.scene.control.        OverrunStyle;
@@ -472,17 +475,13 @@ public final class ViewSupervisor extends Application
                     return;
                 }
 
-                l.error("Failed to sleep thread for {}ms.", autoDestroyDelay);
+                l.error("Failed to sleep auto popup destroy thread for {}ms.", autoDestroyDelay);
                 l.error(e.getMessage());
 
                 return;
             }
 
-            Platform.runLater(() ->
-            {
-                ViewSupervisor.getSceneController().destroyPopUp(p, bSoftDestroy);
-                return;
-            });
+            ViewSupervisor.destroyPopUpLater(p, bSoftDestroy);
 
             return;
         });
@@ -490,6 +489,15 @@ public final class ViewSupervisor extends Application
         t.start();
 
         return t;
+    }
+
+    public static void destroyPopUpLater(final Pane target, final boolean bSoft)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.getSceneController().destroyPopUp(target, bSoft);
+            return;
+        });
     }
 
     public static AtomicReference<Thread> createPopUpLater(final Pane p, final int autoDestroyDelay)
