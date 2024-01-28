@@ -2297,7 +2297,7 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onEnergyTokenChanged() throws JSONException
     {
-        l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
+        l.debug("Player {}'s energy amount has been updated to {}. Source: {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount(), this.dsrp.getEnergySource());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
         return true;
     }
