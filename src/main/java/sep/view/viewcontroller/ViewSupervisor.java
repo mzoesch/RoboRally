@@ -1047,7 +1047,15 @@ public final class ViewSupervisor extends Application
             {
                 l.debug("Client {} decided to not take any actions in this upgrade phase.", EClientInformation.INSTANCE.getPlayerID());
                 new BuyUpgradeModel(false, null).send();
+
                 ViewSupervisor.getSceneController().destroyPopUp(h, false);
+
+                for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
+                {
+                    n.setEffect(null);
+                    continue;
+                }
+
                 return;
             }
 
