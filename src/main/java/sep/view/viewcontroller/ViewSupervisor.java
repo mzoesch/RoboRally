@@ -1012,7 +1012,9 @@ public final class ViewSupervisor extends Application
             ap.setMinSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
             ap.setMaxSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
 
-            final int finalI = i;
+            /* TODO Are we allowed to discard purchased upgrade cards with protocol 2.0? */
+
+            // final int finalI = i;
             iv.setOnMouseClicked(e ->
             {
                 return;
