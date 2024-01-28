@@ -1159,6 +1159,57 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    public static void createEnergyTokenPopUp(final int energy, final String source)
+    {
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Text t1 = new Text("You gained ");
+        t1.getStyleClass().add("text-xl");
+        t1.setStyle("-fx-fill: #f5f5f5ff");
+
+        final ImageView iv = new ImageView(TileModifier.loadCachedImage("Energy"));
+        iv.setFitHeight(20);
+        iv.setFitWidth(20);
+
+        final Text t2 = new Text(String.format(" %s from %s.", energy, source));
+        t2.getStyleClass().add("text-xl");
+        t2.setStyle("-fx-fill: #f5f5f5ff");
+
+        final TextFlow flow = new TextFlow(t1, iv, t2);
+        flow.setStyle("-fx-alignment: center; -fx-text-alignment: center;");
+
+        AnchorPane.setRightAnchor(      flow, 0.0     );
+        AnchorPane.setLeftAnchor(       flow, 0.0     );
+        AnchorPane.setTopAnchor(        flow, 20.0     );
+        AnchorPane.setBottomAnchor(     flow, 0.0     );
+
+        final AnchorPane p = new AnchorPane(flow);
+        p.setMouseTransparent(true);
+        p.setId("energy-update-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 50.0      );
+
+        ViewSupervisor.createPopUp(h, 4_000, false);
+
+        return;
+    }
+
+    public static void createEnergyTokenPopUpLater(final int energy, final String source)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createEnergyTokenPopUp(energy, source);
+            return;
+        });
+
+        return;
+    }
+
     // endregion Updating methods
 
     /** Only valid on the JFX thread. */
