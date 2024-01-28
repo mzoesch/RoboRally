@@ -29,7 +29,8 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     private final String[]              registerSlots;
     private boolean                     bRebooted;
 
-    private int                         energyCubes         = 5;
+    private static final int            START_ENERGY        = 5;
+    private int                         energyCubes;
 
     private boolean                     bSelectionFinished;
     private int                         checkPointsReached;
@@ -46,8 +47,10 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         this.startPos               = null;
         this.possessing             = new RobotView(this);
 
-        this.registerSlots          = new String[REGISTER_SLOTS];
+        this.registerSlots          = new String[RemotePlayer.REGISTER_SLOTS];
         this.bRebooted              = false;
+
+        this.energyCubes            = RemotePlayer.START_ENERGY;
 
         this.bSelectionFinished     = false;
         this.checkPointsReached     = 0;
@@ -134,7 +137,7 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         return;
     }
 
-    public int getEnergyCubes()
+    public int getEnergy()
     {
         return this.energyCubes;
     }
