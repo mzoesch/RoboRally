@@ -378,6 +378,18 @@
     -fx-max-height: 150px;
 }
 
+#energy-update-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 450px;
+    -fx-min-height: 75px;
+    -fx-max-width: 450px;
+    -fx-max-height: 75px;
+}
+
 #draw-damage-container {
     -fx-background-color: #2b2a33f2;
     -fx-border-width: 2px;
