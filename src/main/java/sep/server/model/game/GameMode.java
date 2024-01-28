@@ -450,10 +450,29 @@ public class GameMode {
             return;
         }
 
+        if (this.getUpgradeCardCost(card) == -1)
+        {
+            l.error("Player {} tried to buy a card that is not in the upgrade shop. They requested {} but the upgrade shop is: {}.", pc.getPlayerID(), card, this.upgradeShop.toString());
+            new ErrorMsgModel(pc.getClientInstance(), "The card you tried to buy is not in the upgrade shop.");
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        if (pc.getPlayer().getEnergyCollected() < this.getUpgradeCardCost(card))
+        {
+            l.error("Player {} tried to buy a card but does not have enough energy. They had {} but needed {}.", pc.getPlayerID(), pc.getPlayer().getEnergyCollected(), this.getUpgradeCardCost(card));
+            new ErrorMsgModel(pc.getClientInstance(), String.format("You need %d energy to buy %s.", this.getUpgradeCardCost(card), card));
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        final int cost = this.getUpgradeCardCost(card);
         this.removeCardFromShop(card);
         pc.getPlayer().getBoughtUpgradeCards().add(card);
+        pc.getPlayer().setEnergyCollected(pc.getPlayer().getEnergyCollected() - cost);
         this.getSession().broadcastBoughtUpgradeCard(pc.getPlayerID(), card);
         l.debug("Player {} bought {}. The new upgrade shop is: {}.", pc.getPlayerID(), card, this.upgradeShop.toString());
+        this.getSession().broadcastEnergyUpdate(pc.getPlayerID(), pc.getPlayer().getEnergyCollected(), "EnergySpent");
         this.executePostBuyBehavior();
 
         return;
