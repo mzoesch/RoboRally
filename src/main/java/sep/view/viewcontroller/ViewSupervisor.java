@@ -1387,21 +1387,48 @@ public final class ViewSupervisor extends Application
                 return;
             }
 
-            ap.setStyle("-fx-border-color: #00ff007f; -fx-border-width: 2px;");
+            final EUpgradeCard card = EUpgradeCard.fromString(EGameState.INSTANCE.getUpgradeShop(i));
+
+            assert card != null;
+
+            final boolean bCanAfford = Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() >= card.getEnergy();
+
+            ap.setStyle(String.format("-fx-border-color: %s; -fx-border-width: 2px;", bCanAfford ? "#00ff007f" : "#ff00007f"));
 
             if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, i)))
             {
                 return;
             }
 
-            final Button b = new Button("Buy");
-            b.getStyleClass().add("primary-btn-mini");
-            b.setStyle("-fx-background-color: #0809d6ff;");
+            final ImageView btnEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
+            btnEnergy.setFitHeight(20);
+            btnEnergy.setFitWidth(20);
 
-            b.setOnMouseEntered(btnEvent ->     {   b.setStyle("-fx-background-color: #0000ffff;");     return;     });
-            b.setOnMouseExited(btnEvent ->      {   b.setStyle("-fx-background-color: #0809d6ff;");     return;     });
+            final Label btnLabel = new Label(String.format("%s", bCanAfford ? card.getEnergy() : Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() - card.getEnergy()));
+            btnLabel.getStyleClass().add("text-base");
+            btnLabel.setStyle(String.format("-fx-text-fill: %s;", bCanAfford ? "#ffffffff" : "#ff50ffff"));
+            btnLabel.setMinWidth(15);
+            btnLabel.setTextOverrun(OverrunStyle.CLIP);
 
-            b.setOnAction(onBuy ->
+            final HBox btnContent = new HBox(btnEnergy, btnLabel);
+            btnContent.setAlignment(Pos.CENTER);
+            btnContent.setSpacing(5);
+
+            AnchorPane.setLeftAnchor(       btnContent, 0.0      );
+            AnchorPane.setRightAnchor(      btnContent, 0.0      );
+            AnchorPane.setBottomAnchor(     btnContent, 0.0      );
+            AnchorPane.setTopAnchor(        btnContent, 0.0      );
+
+            final AnchorPane b = new AnchorPane(btnContent);
+            b.getStyleClass().add(bCanAfford ? "secondary-btn-mini" : "danger-btn-mini");
+            b.setDisable(!bCanAfford);
+            b.setStyle(String.format("-fx-background-color: %s;", bCanAfford ? "#53565dff" : "#53232aff"));
+            b.setMaxHeight(30);
+
+            b.setOnMouseEntered(btnEvent ->     {   b.setStyle("-fx-background-color: #3d4148ff;");     return;     });
+            b.setOnMouseExited(btnEvent ->      {   b.setStyle("-fx-background-color: #53565dff;");     return;     });
+
+            b.setOnMouseClicked(onBuy ->
             {
                 final RShopAction action = new RShopAction(EShopAction.BUY, i);
 
@@ -1424,13 +1451,13 @@ public final class ViewSupervisor extends Application
                 checkmark.setFitHeight(20);
                 checkmark.setFitWidth(20);
                 discardBtn.setGraphic(checkmark);
-                discardBtn.getStyleClass().add("primary-btn-mini");
-                discardBtn.setStyle("-fx-background-color: #0809d6ff;");
+                discardBtn.getStyleClass().add("secondary-btn-mini");
+                discardBtn.setStyle("-fx-background-color: #53565dff;");
                 discardBtn.setTextOverrun(OverrunStyle.CLIP);
 
                 discardBtn.setOnMouseEntered(btnEvent ->
                 {
-                    discardBtn.setStyle("-fx-background-color: #0000ffff;");
+                    discardBtn.setStyle("-fx-background-color: #3d4148ff;");
                     final ImageView cross = new ImageView(TileModifier.loadCachedImage("Cross"));
                     cross.setFitHeight(20);
                     cross.setFitWidth(20);
@@ -1441,7 +1468,7 @@ public final class ViewSupervisor extends Application
 
                 discardBtn.setOnMouseExited(btnEvent ->
                 {
-                    discardBtn.setStyle("-fx-background-color: #0809d6ff;");
+                    discardBtn.setStyle("-fx-background-color: #53565dff;");
                     final ImageView eventCheckmark = new ImageView(TileModifier.loadCachedImage("Checkmark"));
                     eventCheckmark.setFitHeight(20);
                     eventCheckmark.setFitWidth(20);
@@ -1473,6 +1500,9 @@ public final class ViewSupervisor extends Application
                     return;
                 });
 
+                /* Kinda sketchy. */
+                discardBtn.setMinWidth(83);
+
                 final HBox discardWrapper = new HBox(discardBtn);
                 discardWrapper.setAlignment(Pos.CENTER);
 
@@ -1488,9 +1518,10 @@ public final class ViewSupervisor extends Application
 
             final HBox btnWrapper = new HBox(b);
             btnWrapper.setAlignment(Pos.CENTER);
+            btnWrapper.setMaxWidth(40);
 
-            AnchorPane.setLeftAnchor(       btnWrapper, 0.0      );
-            AnchorPane.setRightAnchor(      btnWrapper, 0.0      );
+            AnchorPane.setLeftAnchor(       btnWrapper, 10.0      );
+            AnchorPane.setRightAnchor(      btnWrapper, 10.0      );
             AnchorPane.setBottomAnchor(     btnWrapper, 0.0      );
             AnchorPane.setTopAnchor(        btnWrapper, 0.0      );
 
