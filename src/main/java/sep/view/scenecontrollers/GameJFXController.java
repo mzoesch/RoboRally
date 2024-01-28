@@ -99,6 +99,8 @@ public final class GameJFXController
     private static final int    RCARD_PREVIEW_TRANSLATION_X             = 50;
     private static final int    RCARD_PREVIEW_TRANSLATION_X_CLEANUP     = 5;
     private static final int    RCARD_PREVIEW_TRANSLATION_X_ALPHA       = 2;
+    private static final int    UPGRADE_PREVIEW_WIDTH                   = 15;
+    private static final int    UPGRADE_PREVIEW_HEIGHT                  = 15;
     private static final int    MIN_ALLOW_ZOOM                          = 30;
     private static final int    MAX_ALLOW_ZOOM                          = 120;
 
