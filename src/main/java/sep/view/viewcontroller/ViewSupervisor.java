@@ -923,6 +923,20 @@ public final class ViewSupervisor extends Application
         AnchorPane.setRightAnchor(      header, 0.0      );
         AnchorPane.setTopAnchor(        header, 10.0     );
 
+        final Label lEnergy = new Label(String.format("%s", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy()));
+        lEnergy.getStyleClass().add("text-xl");
+
+        final ImageView ivEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
+        ivEnergy.setFitHeight(25);
+        ivEnergy.setFitWidth(25);
+
+        final HBox hEnergy = new HBox(ivEnergy, lEnergy);
+        hEnergy.setAlignment(Pos.CENTER);
+        hEnergy.setSpacing(5);
+
+        AnchorPane.setRightAnchor(      hEnergy, 10.0      );
+        AnchorPane.setTopAnchor(        hEnergy, 10.0     );
+
         final HBox availableCards = new HBox();
         availableCards.setId("upgrade-shop-available-cards");
 
