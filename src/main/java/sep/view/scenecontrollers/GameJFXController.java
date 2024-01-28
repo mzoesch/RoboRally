@@ -1582,7 +1582,22 @@ public final class GameJFXController
             hEnergy.setSpacing(5);
             hEnergy.setAlignment(Pos.CENTER);
 
-            final VBox v = new VBox(figureName, ctrlName, hEnergy);
+            final ImageView ivCheckpoint = new ImageView(TileModifier.loadCachedImage("CheckPointIcon"));
+            ivCheckpoint.setFitWidth(15);
+            ivCheckpoint.setFitHeight(15);
+
+            final Label lCheckpoint = new Label(String.format("%d", rp.getCheckPointsReached()));
+            lCheckpoint.getStyleClass().add("text-sm");
+
+            final HBox hCheckpoint = new HBox(ivCheckpoint, lCheckpoint);
+            hCheckpoint.setSpacing(5);
+            hCheckpoint.setAlignment(Pos.CENTER);
+
+            final HBox hEnergyCheckpoint = new HBox(hEnergy, hCheckpoint);
+            hEnergyCheckpoint.setSpacing(10);
+            hEnergyCheckpoint.setAlignment(Pos.CENTER);
+
+            final VBox v = new VBox(figureName, ctrlName, hEnergyCheckpoint);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
             if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
