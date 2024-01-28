@@ -538,6 +538,11 @@ public final class TileModifier
         return TileModifier.loadCachedImage("Empty");
     }
 
+    public static Image loadUpgradePreview(final String card)
+    {
+        return TileModifier.loadCachedImage(String.format("%sPreview", card));
+    }
+
     public int getCount()
     {
         return this.tile.getInt("count");
