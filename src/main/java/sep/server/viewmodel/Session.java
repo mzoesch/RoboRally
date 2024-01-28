@@ -617,9 +617,9 @@ public final class Session
     }
 
     /**
-     * @param ctrlID The ID of the controller that has changed its energy.
-     * @param energy The new energy value.
-     * @param source The source of the energy change.
+     * @param ctrlID    The ID of the controller that has changed its energy.
+     * @param energy    The new energy value.
+     * @param source    The source of the energy change.
      */
     public void broadcastEnergyUpdate(final int ctrlID, final int energy, final String source)
     {
