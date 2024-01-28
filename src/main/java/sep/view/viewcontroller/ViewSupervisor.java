@@ -1124,7 +1124,7 @@ public final class ViewSupervisor extends Application
         AnchorPane.setRightAnchor(      formWrapper, 0.0      );
         AnchorPane.setBottomAnchor(     formWrapper, 10.0      );
 
-        final AnchorPane p = new AnchorPane(header, formWrapper);
+        final AnchorPane p = new AnchorPane(header, hEnergy, formWrapper);
         p.setId("upgrade-dialog-container");
 
         final GaussianBlur blur     = new GaussianBlur(7.0);
