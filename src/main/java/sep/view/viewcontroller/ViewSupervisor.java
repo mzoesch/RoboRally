@@ -1127,8 +1127,8 @@ public final class ViewSupervisor extends Application
         final AnchorPane p = new AnchorPane(header, hEnergy, formWrapper);
         p.setId("upgrade-dialog-container");
 
-        final GaussianBlur blur     = new GaussianBlur(7.0);
-        final ColorAdjust adj       = new ColorAdjust(0.0, -0.9, -0.5, 0.0);
+        final GaussianBlur  blur     = new GaussianBlur(7.0);
+        final ColorAdjust   adj      = new ColorAdjust(0.0, -0.3, -0.2, 0.0);
         adj.setInput(blur);
         for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
         {
