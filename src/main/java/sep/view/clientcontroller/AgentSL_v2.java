@@ -2346,7 +2346,8 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onDrawDamage() throws JSONException
     {
-        return false;
+        l.debug("Player {} has drawn {} damage.", this.dsrp.getPlayerID(), this.dsrp.getDrawnDamageCards());
+        return true;
     }
 
     @Override
@@ -2364,7 +2365,8 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
