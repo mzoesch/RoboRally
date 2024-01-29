@@ -149,8 +149,9 @@ public class CourseBuilder {
         switch(courseName){
             case("Dizzy Highway") -> {
                 return "clockwise";}
-            //TODO add other courses
-        }
+            case ("Death Trap") -> {
+                return "counterclockwise";}
+            }
         return "clockwise";
     }
 
