@@ -755,6 +755,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(0);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -784,6 +797,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(1);
+            this.renderHUDFooter();
             return;
         }
 
@@ -820,6 +846,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(2);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -849,6 +888,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(3);
+            this.renderHUDFooter();
             return;
         }
 
@@ -884,6 +936,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(4);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -913,6 +978,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(5);
+            this.renderHUDFooter();
             return;
         }
 
@@ -948,6 +1026,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(6);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -980,6 +1071,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(7);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -1009,6 +1113,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(8);
+            this.renderHUDFooter();
             return;
         }
 
