@@ -511,7 +511,7 @@ public class GameMode {
             }
 
             p.shuffleAndRefillDeck();
-            l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
+            l.debug("Client {}'s deck is being shuffled and refilled.", p.getController().getPlayerID());
             this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
 
             int remainingCards = 9 - maxCards;
@@ -519,7 +519,7 @@ public class GameMode {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-            l.debug("P {} - Has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
+            l.debug("Client {} has following programming cards in his Hand: {}", p.getController().getPlayerID(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
             if (p.getController() instanceof PlayerController pc) {
                 pc.getSession().sendHandCardsToPlayer(pc, p.getPlayerHandAsStringArray());
