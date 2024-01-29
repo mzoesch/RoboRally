@@ -1260,6 +1260,12 @@ public final class GameJFXController
 
         if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
         {
+            if (EGameState.INSTANCE.getCurrentPlayer() == null)
+            {
+                this.programmingTimerLabel.setText("Waiting for server.");
+                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+                return;
+            }
 
             if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
             {
