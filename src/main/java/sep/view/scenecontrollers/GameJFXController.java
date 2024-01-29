@@ -1322,6 +1322,13 @@ public final class GameJFXController
         {
             this.programmingTimerLabel.setText("");
             this.programmingTimerLabel.setStyle("");
+
+            if (programmingTimeline != null)
+            {
+                this.programmingTimeline.stop();
+                this.programmingTimeline = null;
+            }
+
             return;
         }
 
