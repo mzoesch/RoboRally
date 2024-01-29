@@ -1784,6 +1784,44 @@ public final class GameJFXController
         return;
     }
 
+    private void applyPlayableUpgradeEffect(final AnchorPane target)
+    {
+        target.setStyle("-fx-cursor: hand; -fx-background-color: rgba(0, 0, 0, 0);");
+
+        final AnchorPane effectTarget = new AnchorPane();
+
+        final Animation anim = new Transition()
+        {
+            {
+                this.setCycleDuration(Duration.millis(800));
+                this.setInterpolator(Interpolator.EASE_OUT);
+            }
+
+            @Override
+            protected void interpolate(double frac)
+            {
+                Color vColor = new Color(0.5, 0.5, 0.5, 1 - frac);
+                effectTarget.setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                return;
+            }
+        };
+
+        effectTarget.setTranslateX(1);
+        effectTarget.setTranslateY(1);
+
+        effectTarget.setPrefWidth(  ViewSupervisor.UPGRADE_SLOT_WIDTH   );
+        effectTarget.setPrefHeight( ViewSupervisor.UPGRADE_SLOT_HEIGHT  );
+
+        anim.setCycleCount(Animation.INDEFINITE);
+        anim.setAutoReverse(true);
+        anim.play();
+
+        target.getChildren().add(0, effectTarget);
+
+        return;
+    }
+
     private void addUpgradeSlot(final int idx, final Pane p)
     {
         // We have to be a little bit cheeky here because the idx-es are not in order.
