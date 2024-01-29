@@ -6,10 +6,13 @@ import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.tiles.Coordinate;
+import sep.server.viewmodel.EServerInstance;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,10 +24,16 @@ public class Player {
     private final IOwnershipable ctrl;
     private final Robot playerRobot;
 
+    /** The cards a player can draw from his pillar. */
     private final ArrayList<IPlayableCard> playerDeck;
+    /**
+     * The cards that are being discarded in one phase.
+     * These cards will be shuffled and added to the {@link #playerDeck} in the next programming phase.
+     */
     private final ArrayList<IPlayableCard> discardPile;
     private final ArrayList<AUpgradeCard> upgradeCards;
     private final IPlayableCard[] registers;
+    /** The nine programming cards a player has drawn. */
     private final ArrayList<IPlayableCard> playerHand;
     private int energyCollected;
     private int checkpointsCollected;
