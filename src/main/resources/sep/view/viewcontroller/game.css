@@ -327,6 +327,18 @@
     -fx-max-height: 600px;
 }
 
+#memory-swap-dialog-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 500px;
+    -fx-min-height: 400px;
+    -fx-max-width: 500px;
+    -fx-max-height: 400px;
+}
+
 #reboot-dialog-body {
     -fx-spacing: 8px;
     -fx-alignment: center;
