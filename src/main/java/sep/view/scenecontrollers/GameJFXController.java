@@ -1524,6 +1524,10 @@ public final class GameJFXController
         iv.setFitHeight(ViewSupervisor.UPGRADE_SLOT_HEIGHT);
         iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getBoughtUpgradeCard(idx)));
 
+        /* Kinda sketchy. But we have a 1px border. */
+        iv.setTranslateX(1);
+        iv.setTranslateY(1);
+
         return iv;
     }
 
@@ -1547,6 +1551,9 @@ public final class GameJFXController
             :  "register-slot-disabled"
             )
             ;
+
+            iv.setTranslateX(1);
+            iv.setTranslateY(1);
         }
         else
         {
