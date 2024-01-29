@@ -250,23 +250,26 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onForcedFinishProgramming() throws JSONException
     {
-        l.debug("Player {} has been forced to finish programming because they did not submit their selection in time. Filling cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
+        l.info("Player {} has been forced to finish programming because they did not submit their selection in time. Filling cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
 
         EGameState.INSTANCE.setSelectionFinished(EClientInformation.INSTANCE.getPlayerID());
         EGameState.INSTANCE.clearGotRegisters();
 
-        for (String c : this.dsrp.getForcedCards())
+        cardSelection: for (final String c : this.dsrp.getForcedCards())
         {
             for (int i = 0; i < EGameState.INSTANCE.getRegisters().length; ++i)
             {
                 if (EGameState.INSTANCE.getRegisters()[i] == null)
                 {
                     EGameState.INSTANCE.addRegister(i, c);
-                    break;
+                    l.debug("Added card {} to register {}.", c, i);
+                    continue cardSelection;
                 }
 
                 continue;
             }
+
+            l.error("Could not add card {} to any register. Ignoring.", c);
 
             continue;
         }
