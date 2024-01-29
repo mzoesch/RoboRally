@@ -271,20 +271,6 @@ public class GameMode {
         return bExchange;
     }
 
-    /**
-     * Checks if the upgrade shop is empty.
-     *
-     * @return True if empty, false otherwise.
-     */
-    private boolean upgradeShopIsEmpty() {
-        for (AUpgradeCard upgradeCard : upgradeShop) {
-            if (upgradeCard != null) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private boolean isACardMissingInUpgradeShop()
     {
         for (final AUpgradeCard upgradeCard : this.upgradeShop)
@@ -373,13 +359,6 @@ public class GameMode {
         }
 
         return;
-    }
-
-    /**
-     * Handles the purchase of upgrades during the upgrade phase.
-     */
-    private void handleUpgradePurchase() {
-        //TODO
     }
 
     //endregion Upgrade Phase helpers
