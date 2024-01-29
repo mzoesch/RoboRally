@@ -60,6 +60,7 @@ public enum EGameState
     private RemotePlayer                    winner;
 
     private final AtomicBoolean             bProgrammingTimerRunning;
+    private final AtomicBoolean             bMemorySwapPlayed;
 
     private EGameState()
     {
@@ -86,6 +87,7 @@ public enum EGameState
         this.winner                     = null;
 
         this.bProgrammingTimerRunning   = new AtomicBoolean(false);
+        this.bMemorySwapPlayed          = new AtomicBoolean(false);
 
         return;
     }
@@ -822,6 +824,40 @@ public enum EGameState
     public String[] getBoughtUpgradeCards()
     {
         return this.boughtUpgradeCards;
+    }
+
+    public boolean isMemorySwapPlayed()
+    {
+        return this.bMemorySwapPlayed.get();
+    }
+
+    public void setMemorySwapPlayed(final boolean bPlayed)
+    {
+        this.bMemorySwapPlayed.set(bPlayed);
+        return;
+    }
+
+    public void overrideGotRegister(final int idx, final String newCard)
+    {
+        this.gotRegisters.set(idx, newCard);
+        return;
+    }
+
+    public void executePostCardPlayedBehaviour(final int playerID, final String card)
+    {
+        final RemotePlayer rp = this.getRemotePlayerByPlayerID(playerID);
+
+        assert rp != null;
+
+        if (Objects.equals(card, "MemorySwap") || Objects.equals(card, "SpamBlocker"))
+        {
+            rp.getBoughtUpgradeCards().remove(card);
+            return;
+        }
+
+        l.error("Could not execute post card played behaviour for card \"{}\". Ignoring.", card);
+
+        return;
     }
 
     // endregion Getters and Setters
