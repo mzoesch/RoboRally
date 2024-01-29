@@ -23,6 +23,7 @@ import sep.view.lib.                RShopAction;
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
 import java.util.                   Objects;
+import java.util.                   Locale;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         VBox;
 import javafx.scene.layout.         AnchorPane;
@@ -131,7 +132,9 @@ public final class GameJFXController
     private double                      maxXTranslation;
     private double                      centralXTranslation;
 
-    private final ArrayList<RShopAction> pendingShopActions;
+    private final ArrayList<RShopAction>    pendingShopActions;
+    private static final int                PROGRAMMING_TIMER_DURATION      = 30_000;
+    private Timeline                        programmingTimeline;
 
     public GameJFXController()
     {
@@ -157,6 +160,7 @@ public final class GameJFXController
         this.centralXTranslation        = 0.0;
 
         this.pendingShopActions         = new ArrayList<RShopAction>();
+        this.programmingTimeline        = null;
 
         return;
     }
@@ -1272,18 +1276,24 @@ public final class GameJFXController
 
         if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING)
         {
-            // TIMER
-
             if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished())
             {
                 this.programmingTimerLabel.setText("Waiting for others ...");
                 this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
 
+                if (this.programmingTimeline != null)
+                {
+                    this.programmingTimeline.stop();
+                    this.programmingTimeline = null;
+                }
+
                 return;
             }
 
-            this.programmingTimerLabel.setText("5s");
-            this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+            if (this.programmingTimeline == null && EGameState.INSTANCE.isProgrammingTimerRunning())
+            {
+                final long startTime = System.currentTimeMillis();
+                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
 
             return;
         }
@@ -2589,6 +2599,19 @@ public final class GameJFXController
     public ArrayList<RShopAction> getPendingShopActions()
     {
         return this.pendingShopActions;
+    }
+
+    public void resetProgrammingTimeline()
+    {
+        if (this.programmingTimeline == null)
+        {
+            return;
+        }
+
+        this.programmingTimeline.stop();
+        this.programmingTimeline = null;
+
+        return;
     }
 
     // endregion Getters and Setters
