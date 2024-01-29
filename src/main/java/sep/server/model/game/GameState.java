@@ -134,6 +134,7 @@ public final class GameState
         }
     }
 
+    /** @deprecated  */
     public void setMemorySwapCards (PlayerController playerController, String[] cards) {
         playerController.getPlayer().setMemorySwapCards(cards);
     }
