@@ -9,6 +9,8 @@ import sep.server.model.            EServerInformation;
 
 import java.util.                   Objects;
 import java.util.                   HashMap;
+import java.util.                   Arrays;
+import java.util.                   ArrayList;
 import java.io.                     IOException;
 import java.io.                     InputStreamReader;
 import java.io.                     OutputStreamWriter;
@@ -262,10 +264,10 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-    /** TODO What is the purpose of this req? */
     private synchronized boolean onCardPlay()
     {
-        l.error("Received play Card from client: {}", this.dcrp.request().toString(0));
+        l.info("Client {} played card {}.", this.getAddr(), this.dcrp.getPlayedCard());
+        this.getPlayerController().getAuthGameMode().onCardPlayed(this.playerController, this.dcrp.getPlayedCard());
         return true;
     }
 
