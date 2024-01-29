@@ -4,9 +4,11 @@ import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
+import sep.view.json.               ChatMsgModel;
 import sep.view.json.game.          SelectedCardModel;
 import sep.view.json.game.          SetStartingPointModel;
-import sep.view.json.               ChatMsgModel;
+import sep.view.json.game.          DiscardSomeModel;
+import sep.view.json.game.          PlayCardModel;
 import sep.view.viewcontroller.     Tile;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     TileModifier;
@@ -30,16 +32,22 @@ import javafx.scene.layout.         AnchorPane;
 import javafx.scene.layout.         Priority;
 import javafx.scene.layout.         Region;
 import javafx.scene.layout.         Pane;
+import javafx.scene.layout.         Background;
+import javafx.scene.layout.         BackgroundFill;
+import javafx.scene.layout.         CornerRadii;
 import javafx.animation.            Animation;
 import javafx.animation.            PauseTransition;
 import javafx.animation.            Timeline;
 import javafx.animation.            KeyFrame;
 import javafx.animation.            KeyValue;
 import javafx.animation.            FillTransition;
+import javafx.animation.            Transition;
+import javafx.animation.            Interpolator;
 import javafx.fxml.                 FXML;
 import javafx.beans.value.          ChangeListener;
 import javafx.beans.value.          ObservableValue;
 import javafx.scene.                Node;
+import javafx.scene.                Cursor;
 import javafx.scene.image.          ImageView;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -78,6 +86,7 @@ public final class GameJFXController
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
     private static final int    QUICK_TIP_DURATION              = 60_000;
 
+    @FXML private AnchorPane    memorySwapContainer;
     @FXML private AnchorPane    upgradeSlotContainer;
     @FXML private AnchorPane    gotRegisterContainer;
     @FXML private Label         programmingTimerLabel;
@@ -136,6 +145,12 @@ public final class GameJFXController
     private static final int                PROGRAMMING_TIMER_DURATION      = 30_000;
     private Timeline                        programmingTimeline;
 
+    /** The new three cards a player gets after playing the memory swap card. */
+    private final ArrayList<String>         memorySwapCards;
+    /** The three cards a player has to discard from his hand. */
+    private final ArrayList<Integer>        memorySwapDiscardedCards;
+    private HBox                            memorySwapHBox;
+
     public GameJFXController()
     {
         super();
@@ -161,6 +176,11 @@ public final class GameJFXController
 
         this.pendingShopActions         = new ArrayList<RShopAction>();
         this.programmingTimeline        = null;
+
+        this.memorySwapCards            = new ArrayList<String>();
+        this.memorySwapDiscardedCards   = new ArrayList<Integer>();
+
+        this.memorySwapHBox             = null;
 
         return;
     }
@@ -1220,6 +1240,133 @@ public final class GameJFXController
 
     // region Head Up Display
 
+    // region MISC
+
+    private void renderMemorySwapDialog()
+    {
+        if (this.memorySwapHBox != null)
+        {
+            ViewSupervisor.getSceneController().getRenderTarget().getChildren().remove(this.memorySwapHBox);
+            this.memorySwapHBox = null;
+        }
+
+        final Label l = new Label("Select three cards to discard.");
+        l.getStyleClass().add("text-xl");
+
+        final HBox cards = new HBox();
+        cards.setSpacing(10.0);
+
+        for (int i = 0; i < 3; ++i)
+        {
+            final int gotIdx;
+            if (this.memorySwapDiscardedCards.size() > i)
+            {
+                gotIdx = this.memorySwapDiscardedCards.get(i);
+            }
+            else
+            {
+                gotIdx = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            }
+
+            final ImageView iv = new ImageView();
+            iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
+            iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
+            iv.setImage(gotIdx == GameJFXController.INVALID_GOT_REGISTER_SLOT ? TileModifier.loadCachedImage("EmptyRegisterSlot") : TileModifier.loadCachedImage(EGameState.INSTANCE.getGotRegister(gotIdx)));
+            iv.setOnMouseClicked(e ->
+            {
+                this.memorySwapDiscardedCards.remove( (Integer) gotIdx );
+                this.renderHUDFooter();
+                return;
+            });
+
+            if (gotIdx != GameJFXController.INVALID_GOT_REGISTER_SLOT)
+            {
+                iv.setCursor(Cursor.HAND);
+            }
+
+            cards.getChildren().add(iv);
+
+            continue;
+        }
+
+        final HBox cardsWrapper = new HBox(GameJFXController.createHSpacer(), cards, GameJFXController.createHSpacer());
+
+        final VBox v = new VBox(l, cardsWrapper);
+        v.setSpacing(30.0);
+        v.setAlignment(Pos.CENTER);
+
+        final Button b = new Button("Confirm");
+        b.getStyleClass().add("secondary-btn");
+
+        if (this.memorySwapDiscardedCards.size() < 3)
+        {
+            b.setDisable(true);
+        }
+
+        b.setOnAction(e ->
+        {
+            final ArrayList<String> discardedCards = new ArrayList<String>();
+
+            for (final int idx : this.memorySwapDiscardedCards)
+            {
+                discardedCards.add(EGameState.INSTANCE.getGotRegister(idx));
+                continue;
+            }
+
+            GameJFXController.l.info("MemorySwapDialog: User wants to discard: {} -> {}.", this.memorySwapDiscardedCards, discardedCards);
+
+            new DiscardSomeModel(discardedCards.toArray(new String[0])).send();
+
+            for (final int gotIdx : this.memorySwapDiscardedCards)
+            {
+                EGameState.INSTANCE.overrideGotRegister(gotIdx, this.memorySwapCards.remove(0));
+                continue;
+            }
+
+            if (this.memorySwapCards.isEmpty())
+            {
+                ViewSupervisor.getSceneController().getRenderTarget().getChildren().remove(this.memorySwapHBox);
+                this.memorySwapHBox = null;
+                this.memorySwapDiscardedCards.clear();
+                this.memorySwapContainer.getChildren().clear();
+
+                GameJFXController.l.debug("MemorySwapDialog: Successfully sent server discard request.");
+
+                this.renderHUDFooter();
+
+                return;
+            }
+
+            GameJFXController.l.fatal("MemorySwapDialog: MemorySwapCards is not empty after discarding: {}.", this.memorySwapCards);
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+
+            return;
+        });
+
+        AnchorPane.setLeftAnchor(   v, 0.0  );
+        AnchorPane.setRightAnchor(  v, 0.0  );
+        AnchorPane.setTopAnchor(    v, 25.0 );
+
+        AnchorPane.setRightAnchor(  b, 25.0 );
+        AnchorPane.setBottomAnchor( b, 25.0 );
+
+        final AnchorPane p = new AnchorPane(v, b);
+        p.setId("memory-swap-dialog-container");
+
+        this.memorySwapHBox = new HBox(p);
+        this.memorySwapHBox.setAlignment(Pos.CENTER);
+
+        AnchorPane.setLeftAnchor(   this.memorySwapHBox, 0.0 );
+        AnchorPane.setRightAnchor(  this.memorySwapHBox, 0.0 );
+        AnchorPane.setTopAnchor(    this.memorySwapHBox, 20.0 );
+
+        ViewSupervisor.createPopUp(this.memorySwapHBox);
+
+        return;
+    }
+
+    // endregion MISC
+
     // region HUD Side Panel
 
     private void renderPhaseTitle()
@@ -1587,6 +1734,42 @@ public final class GameJFXController
             ;
 
             continue;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            this.memorySwapContainer.getChildren().clear();
+
+            final ImageView arrow = new ImageView();
+            arrow.setFitWidth(  35.0  );
+            arrow.setFitHeight( 35.0  );
+            /* Extremely sketchy. Please center and not translate. */
+            arrow.setTranslateY( 75.0);
+            arrow.setImage(TileModifier.loadCachedImage("MemorySwapPreview"));
+            final VBox v = new VBox();
+            v.setAlignment(Pos.CENTER);
+
+            for (final String memorySwapCard : this.memorySwapCards)
+            {
+                final ImageView iv = new ImageView();
+                iv.setFitWidth(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH);
+                iv.setFitHeight(ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT);
+                iv.setImage(TileModifier.loadCachedImage(memorySwapCard));
+
+                iv.setTranslateX(1);
+                iv.setTranslateY(1);
+
+                final AnchorPane ap = new AnchorPane(iv);
+                ap.getStyleClass().add("register-slot");
+
+                v.getChildren().add(ap);
+
+                continue;
+            }
+
+            final HBox h = new HBox(arrow, v);
+            h.setSpacing(8);
+            this.memorySwapContainer.getChildren().add(h);
         }
 
         this.upgradeSlotContainer.getChildren().clear();
@@ -2534,6 +2717,20 @@ public final class GameJFXController
         Platform.runLater(() ->
         {
             this.renderCheckpoints();
+            return;
+        });
+
+        return;
+    }
+
+    public void onMemoryCardsReceived(final ArrayList<String> cards)
+    {
+        Platform.runLater(() ->
+        {
+            this.memorySwapCards.clear();
+            this.memorySwapDiscardedCards.clear();
+            this.memorySwapCards.addAll(cards);
+            this.renderHUDFooter();
             return;
         });
 
