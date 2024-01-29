@@ -93,6 +93,7 @@ public final class HumanSL extends ServerListener
         l.debug("Game phase has changed to: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
 
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
+        EGameState.INSTANCE.setProgrammingTimerRunning(false);
 
         if (!ViewSupervisor.hasLoadedGameScene())
         {
@@ -296,18 +297,20 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onProgrammingTimerStart() throws JSONException
     {
-        /* TODO Implement timer. */
-        l.error("Programming phase timer has started.");
+        l.info("Programming phase timer has started.");
         ViewSupervisor.handleChatInfo("The programming phase timer has started. Submit your cards in time!");
+        EGameState.INSTANCE.setProgrammingTimerRunning(true);
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 
     @Override
     protected boolean onProgrammingTimerEnd() throws JSONException
     {
-        /* TODO Implement timer. */
-        l.debug("Programming phase timer has ended.");
+        l.info("Programming phase timer has ended. Forced to finish programming clients: {}.", this.dsrp.getForcedFinishedProgrammingClients());
         ViewSupervisor.handleChatInfo("The programming phase timer has ended.");
+        EGameState.INSTANCE.setProgrammingTimerRunning(false);
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 
