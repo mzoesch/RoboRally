@@ -816,6 +816,14 @@ public enum EGameState
         return this.bProgrammingTimerRunning.get();
     }
 
+    /** For developing purposes only!
+     * @deprecated
+     */
+    public String[] getBoughtUpgradeCards()
+    {
+        return this.boughtUpgradeCards;
+    }
+
     // endregion Getters and Setters
 
 }
