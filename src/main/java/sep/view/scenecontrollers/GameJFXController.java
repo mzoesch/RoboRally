@@ -2030,6 +2030,11 @@ public final class GameJFXController
         this.setFooterBtnText();
         this.translateFooter();
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            this.renderMemorySwapDialog();
+        }
+
         return;
     }
 
