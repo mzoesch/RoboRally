@@ -92,6 +92,8 @@ public final class HumanSL extends ServerListener
     {
         l.debug("Game phase has changed to: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
 
+        EGameState.INSTANCE.setMemorySwapPlayed(false);
+
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
         EGameState.INSTANCE.setProgrammingTimerRunning(false);
 
@@ -162,9 +164,8 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
-        /* We still need to figure out what this does. */
-        l.fatal("Server triggered onCardPlayedEvent. {}.", this.dsrp.request().toString(0));
-        GameInstance.kill(GameInstance.EXIT_FATAL);
+        l.info("Player {} has played card {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
+        EGameState.INSTANCE.executePostCardPlayedBehaviour(this.dsrp.getPlayerID(), this.dsrp.getCard());
         return false;
     }
 
@@ -320,7 +321,13 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onProgrammingCardsReceived() throws JSONException
     {
-        l.debug("Received nine new programming cards from server: {}", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+        l.debug("Received {} new programming cards from server: {}", this.dsrp.getCardsInHand().length == 3 ? "three" : "nine", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+
+        if (EGameState.INSTANCE.isMemorySwapPlayed())
+        {
+            ViewSupervisor.onMemoryCardsReceived(this.dsrp.getCardsInHand());
+            return true;
+        }
 
         EGameState.INSTANCE.clearAllRegisters();
         for (final String c : this.dsrp.getCardsInHand())
