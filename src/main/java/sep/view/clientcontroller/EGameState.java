@@ -1,5 +1,6 @@
 package sep.view.clientcontroller;
 
+import sep.view.scenecontrollers.   GameJFXController;
 import sep.view.json.               RDefaultServerRequestParser;
 import sep.view.lib.                RRegisterCard;
 import sep.view.lib.                EGamePhase;
@@ -9,12 +10,12 @@ import sep.view.viewcontroller.     ViewSupervisor;
 
 import java.util.                   ArrayList;
 import java.util.                   Arrays;
-import java.util.                   Collection;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
 import org.json.                    JSONObject;
+import java.util.concurrent.atomic. AtomicBoolean;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
@@ -58,6 +59,8 @@ public enum EGameState
     private boolean                         shopActive;
     private RemotePlayer                    winner;
 
+    private final AtomicBoolean             bProgrammingTimerRunning;
+
     private EGameState()
     {
         this.currentPhase               = EGamePhase.INVALID;
@@ -79,8 +82,10 @@ public enum EGameState
         this.damageCardsCountToDraw     = 0;
         this.selectedDamageCards        = new ArrayList<String>();
 
-        this.shopActive                = false;
+        this.shopActive                 = false;
         this.winner                     = null;
+
+        this.bProgrammingTimerRunning   = new AtomicBoolean(false);
 
         return;
     }
@@ -782,6 +787,33 @@ public enum EGameState
         ViewSupervisor.updatePlayerView();
 
         return;
+    }
+
+    public void setProgrammingTimerRunning(final boolean bRunning)
+    {
+        this.bProgrammingTimerRunning.set(bRunning);
+
+        if (!bRunning)
+        {
+            try
+            {
+                ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).resetProgrammingTimeline();
+                return;
+            }
+            catch (final ClassCastException e)
+            {
+                l.error("Could not cast the current scene controller to GameJFXController during programming timer reset. Ignoring.");
+                l.error(e.getMessage());
+                return;
+            }
+        }
+
+        return;
+    }
+
+    public boolean isProgrammingTimerRunning()
+    {
+        return this.bProgrammingTimerRunning.get();
     }
 
     // endregion Getters and Setters
