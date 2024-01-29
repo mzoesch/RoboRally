@@ -1829,6 +1829,7 @@ public final class GameJFXController
         //      2 3     -->     1 4
         //      4 5             2 5
 
+        /* We can do this because Integers are always floored. */
         final int realIdx = idx % 2 == 0 ? idx / 2 : idx / 2 + 3;
 
         final ImageView     iv  = this.getUpgradeCardSlot(realIdx);
