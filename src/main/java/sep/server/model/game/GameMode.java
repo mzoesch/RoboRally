@@ -463,6 +463,39 @@ public class GameMode {
         return;
     }
 
+    public void onCardPlayed(final PlayerController pc, final String card)
+    {
+        if (Objects.equals(card, "MemorySwap"))
+        {
+            this.getSession().broadcastPlayedCard(pc.getPlayerID(), card);
+
+            /* The three new cards the client will get. */
+            final ArrayList<String> newCards = new ArrayList<String>();
+            for (int i = 0; i < 3; ++i)
+            {
+                if (pc.getPlayer().getPlayerDeck().isEmpty())
+                {
+                    pc.getPlayer().shuffleAndRefillDeck();
+                }
+
+                newCards.add(pc.getPlayer().getPlayerDeck().get(0).getCardType());
+                pc.getPlayer().getPlayerHand().add(pc.getPlayer().getPlayerDeck().remove(0));
+                continue;
+            }
+
+            l.debug("Player {} played MemorySwap. The new cards are: {}. Their current hand is now: {}.", pc.getPlayerID(), newCards.toString(), pc.getPlayer().getPlayerHand());
+
+            pc.getSession().sendHandCardsToPlayer(pc, newCards.toArray(new String[0]));
+
+            return;
+        }
+
+        l.error("Player {} tried to play a card that is not allowed. They tried to play {}.", pc.getPlayerID(), card);
+        new ErrorMsgModel(pc.getClientInstance(), String.format("You tried to play %s but that was not allowed.", card));
+
+        return;
+    }
+
     /**
      * The following method triggers the programming phase and prepares the player decks.
      */
