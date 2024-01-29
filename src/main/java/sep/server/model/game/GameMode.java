@@ -58,6 +58,8 @@ public class GameMode {
 
     private final ArrayList<Player> upgradePhasePlayersSortedByPriority;
 
+    private Thread programmingPhaseTimerService;
+
     public GameMode(final String courseName, final GameState gameState) {
         super();
 
@@ -90,6 +92,10 @@ public class GameMode {
         this.upgradePhasePlayersSortedByPriority = new ArrayList<Player>();
 
         this.handleNewPhase(EGamePhase.REGISTRATION);
+
+        this.programmingPhaseTimerService = null;
+
+        return;
     }
 
     // region Game Phases
@@ -1198,55 +1204,84 @@ public class GameMode {
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
-    public void startTimer() {
-        this.getSession().getGameState().sendStartTimer();
+    public void startProgrammingTimerService()
+    {
+        this.getSession().broadcastProgrammingTimerStart();
 
-        // Sleep for 30 seconds
-        Thread programmingCardThread = new Thread(() -> {
-            try {
-                Thread.sleep(30000); // Sleep for 30 seconds
-            } catch (InterruptedException e) {
-                l.info("All Players have set their Cards");
+        if (this.programmingPhaseTimerService != null && this.programmingPhaseTimerService.isAlive())
+        {
+            l.error("Programming Phase Timer Service is already running.");
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return;
+        }
+
+        this.programmingPhaseTimerService = new Thread(() ->
+        {
+            final long startTime = System.currentTimeMillis();
+            try
+            {
+                Thread.sleep(30_000);
+            }
+            catch (final InterruptedException e)
+            {
+                l.info("All Players have set their register cards in time. Time left [{}s].Starting next phase . . ." , ( (double) 30_000 - (System.currentTimeMillis() - startTime) ) / 1_000);
             }
 
-            int[] playerIdWhoNotFinished = new int[players.size()];
-            ArrayList playerWhoNotFinished = new ArrayList();
-            int index = 0;
-            for (Player player : players) {
-                if (!player.hasPlayerFinishedProgramming()) {
-                    playerIdWhoNotFinished[index++] = player.getController().getPlayerID();
-                    playerWhoNotFinished.add(player);
-                }
-            }
-            if (index < players.size()) {
-                playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
-            }
-            this.getSession().getGameState().sendStopTimer(playerIdWhoNotFinished);
+            l.info("Programming Phase Timer Service was interrupted or finished waiting successfully.");
 
-            discardAndDrawBlind(playerWhoNotFinished);
+            this.executePostProgrammingPhaseTimerServiceBehavior();
 
-            triggerActivationPhase();
+            return;
         });
 
-        programmingCardThread.start();
+        this.programmingPhaseTimerService.setName(String.format("ProgrammingPhaseTimerService-%s", this.getSession().getSessionID()));
+        this.programmingPhaseTimerService.start();
 
-        boolean haveAllPlayersSetTheirCards = true;
-        for (Player player : players) {
-            if (!player.hasPlayerFinishedProgramming()) {
-                haveAllPlayersSetTheirCards= false;
-            }
-        }
-
-        if (haveAllPlayersSetTheirCards) {
-            programmingCardThread.interrupt();
-            triggerActivationPhase();
-        }
+        return;
     }
 
-    public void discardAndDrawBlind(ArrayList<Player> players) {
-        for (Player player : players) {
-            player.handleIncompleteProgramming();
+    public void executePostProgrammingPhaseTimerServiceBehavior()
+    {
+        if (this.getUnfinishedPlayersDuringProgrammingPhase().length > 0)
+        {
+            l.info("The following players did not finish their programming phase in time: {}.", Arrays.toString(this.getUnfinishedPlayersDuringProgrammingPhase()));
+            this.getSession().broadcastProgrammingTimerFinish(this.getUnfinishedPlayersDuringProgrammingPhase());
+            this.discardAndDrawBlind(Arrays.stream(this.getUnfinishedPlayersDuringProgrammingPhase()).mapToObj(i -> Objects.requireNonNull(this.getSession().getOwnershipableByID(i)).getPlayer()).collect(Collectors.toCollection(ArrayList::new)));
         }
+
+        this.programmingPhaseTimerService = null;
+
+        this.handleNewPhase(EGamePhase.ACTIVATION);
+
+        return;
+    }
+
+    private int[] getUnfinishedPlayersDuringProgrammingPhase()
+    {
+        ArrayList<Integer> unfinishedPlayers = new ArrayList<Integer>();
+        for (final Player p : this.players)
+        {
+            if (!p.hasPlayerFinishedProgramming())
+            {
+                unfinishedPlayers.add(p.getController().getPlayerID());
+                continue;
+            }
+
+            continue;
+        }
+
+        return unfinishedPlayers.stream().mapToInt(i -> i).toArray();
+    }
+
+    public void discardAndDrawBlind(final ArrayList<Player> players)
+    {
+        for (final Player p : players)
+        {
+            p.executeIncompleteProgrammingBehavior();
+            continue;
+        }
+
+        return;
     }
 
     /**
@@ -1482,6 +1517,16 @@ public class GameMode {
         l.error("Could not find cost for upgrade card {}.", card);
 
         return -1;
+    }
+
+    public boolean isProgrammingTimerServiceRunning()
+    {
+        return this.programmingPhaseTimerService != null && this.programmingPhaseTimerService.isAlive();
+    }
+
+    public Thread getProgrammingTimerService()
+    {
+        return this.programmingPhaseTimerService;
     }
 
     // endregion Getters and Setters
