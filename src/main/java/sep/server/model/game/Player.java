@@ -111,7 +111,6 @@ public class Player {
             pc.getSession().sendCardSelected(getController().getPlayerID(), pos, true);
         }
 
-
         if (this.hasPlayerFinishedProgramming())
         {
             l.debug("Player {} has finished programming. Notifying session.", this.ctrl.getPlayerID());
@@ -119,15 +118,36 @@ public class Player {
 
             if (this.ctrl instanceof final PlayerController pc)
             {
-                if (pc.getSession().haveAllPlayersFinishedProgramming())
+                if (this.getAuthGameMode().getSession().haveAllPlayersFinishedProgramming())
                 {
-                    l.debug("All players have finished programming in time. Interrupting timer.");
-                    // TODO Interrupt timer
-                    pc.getSession().getGameState().getAuthGameMode().handleNewPhase(EGamePhase.ACTIVATION);
+                    l.info("All players have finished programming in time. Interrupting Programming Timer Service.");
+
+                    if (this.getAuthGameMode().getProgrammingTimerService() == null)
+                    {
+                        this.getAuthGameMode().executePostProgrammingPhaseTimerServiceBehavior();
+                        return;
+                    }
+
+                    this.getAuthGameMode().getProgrammingTimerService().interrupt();
+
+                    return;
                 }
 
-                // TODO We ignore this for now.
-                // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
+                if (pc.isRemoteAgent())
+                {
+                    l.debug("Player {} is a remote agent. Therefore, the timer will not be started nor interrupted.", this.ctrl.getPlayerID());
+                    return;
+                }
+
+                if (this.getAuthGameMode().isProgrammingTimerServiceRunning())
+                {
+                    return;
+                }
+
+                l.debug("Player {} has finished programming and is the first player to do so. Starting programming timer.", this.ctrl.getPlayerID());
+                this.getAuthGameMode().startProgrammingTimerService();
+
+                return;
             }
 
             l.debug("Player {} is a local player. Therefore, the timer will not be started nor interrupted.", this.ctrl.getPlayerID());
@@ -137,23 +157,61 @@ public class Player {
 
     }
 
-    public void handleIncompleteProgramming() {
+    private IPlayableCard drawCardFromHand()
+    {
+        return this.playerHand.remove(0);
+    }
+
+    public void executeIncompleteProgrammingBehavior()
+    {
         if (this.ctrl instanceof PlayerController pc)
         {
-            discardPile.addAll(playerHand);
-            playerHand.clear();
-            shuffleAndRefillDeck();
+            l.debug("Player {} has not finished programming in time. Their current hand is: {}.", this.ctrl.getPlayerID(), this.registers);
 
-            for (int i = 0; i < registers.length; i++) {
-                if (registers[i] == null) {
-                    registers[i] = playerDeck.remove(0);
+            final ArrayList<IPlayableCard> addedCards = new ArrayList<IPlayableCard>();
+
+            for (int i = 0; i < this.registers.length; ++i)
+            {
+                if (this.registers[i] == null)
+                {
+                    while (true)
+                    {
+                        final IPlayableCard card = this.drawCardFromHand();
+                        if (i == 0 && Objects.equals(card.getCardType(), "Again"))
+                        {
+                            this.playerHand.add(card);
+                            continue;
+                        }
+
+                        this.registers[i] = card;
+                        break;
+                    }
+
+                    addedCards.add(this.registers[i]);
+
+                    continue;
                 }
+
+                continue;
             }
-            pc.getSession().sendCardsYouGotNow(pc, getRegistersAsStringArray());
+
+            if (addedCards.isEmpty())
+            {
+                l.warn("Player {}'s registers are full. No cards have been added while post incomplete programming behavior.", this.ctrl.getPlayerID());
+                return;
+            }
+
+            l.debug("Player {}'s hand cards after incomplete programming task execution: {}. Notifying them.", this.ctrl.getPlayerID(), this.registers);
+
+            pc.getSession().sendIncompleteProgrammingCards(pc, addedCards.stream().map(IPlayableCard::getCardType).toArray(String[]::new));
+
             return;
         }
 
-        l.error("A local player has not finished programming in time. This must never happen.");
+        l.fatal("A local player has not finished programming in time. This must never happen.");
+        EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+
+        return;
     }
 
     /**
