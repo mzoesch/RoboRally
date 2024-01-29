@@ -39,6 +39,7 @@ import sep.server.json.game.programmingphase.   SelectionFinishedModel;
 import sep.server.model.game.tiles.             Coordinate;
 import sep.server.json.game.                    GameStartedModel;
 import sep.server.json.game.                    StartingPointTakenModel;
+import sep.server.json.game.                    CardPlayedModel;
 import sep.server.model.game.cards.             Card;
 import sep.                                     Types;
 import sep.server.json.game.upgradephase.       RefillShopModel;
@@ -1002,6 +1003,17 @@ public final class Session
         for (final PlayerController pc : this.getRemotePlayers())
         {
             new AnimationModel(pc.getClientInstance(), anim).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastPlayedCard(final int id, final String card)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new CardPlayedModel(pc.getClientInstance(), id, card).send();
             continue;
         }
 
