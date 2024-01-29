@@ -2319,6 +2319,7 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPlayerReboot() throws JSONException
     {
+        /* TODO Check in Environment for the best rotation. */
         return false;
     }
 
