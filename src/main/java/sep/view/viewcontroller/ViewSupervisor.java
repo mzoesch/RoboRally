@@ -414,6 +414,23 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    public static void onMemoryCardsReceived(final String[] cards)
+    {
+        l.debug("Received memory swap cards: {}.", Arrays.toString(cards));
+
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onMemoryCardsReceived(new ArrayList<String>(Arrays.asList(cards)));
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during memory swap dialog creation. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // endregion Game Events
 
     public static void createPopUp(final RPopUpMask mask)
