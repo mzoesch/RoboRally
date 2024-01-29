@@ -115,14 +115,6 @@ public final class GameState
         l.info("CourseName set to: " + courseName);
     }
 
-    public void sendStartTimer(){
-        session.sendTimerStarted();
-    }
-
-    public void sendStopTimer(int[] playerIDS) {
-        session.sendTimerEnded(playerIDS);
-    }
-
     public synchronized void setStartPoint(final PlayerController playerController, final Coordinate coordinate)
     {
         this.gameMode.setStartingPoint(playerController, coordinate.getX(), coordinate.getY());
