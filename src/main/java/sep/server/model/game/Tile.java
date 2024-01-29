@@ -77,12 +77,12 @@ public class Tile {
         this.occupiedBy = occupiedBy;
     }
 
-    public boolean hasUnmovableRobot(String pushingDirection) {
+    public boolean hasUnmovableRobot(String pushingDirection, int depth) {
         if(this.isOccupied()) {
             Robot currentOccupier = this.occupiedBy;
 
             /* TODO This does not make scene. Because this will result in a Stack Overflow error if the robot indeed can not be moved. */
-            currentOccupier.moveRobotOneTile(true, pushingDirection);
+            currentOccupier.moveRobotOneTile(true, pushingDirection, depth);
 
             currentOccupier.getAuthGameMode().getSession().broadcastPositionUpdate(
                     currentOccupier.determineRobotOwner().getController().getPlayerID(), currentOccupier.determineRobotOwner().getPosition());

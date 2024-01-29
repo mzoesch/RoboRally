@@ -602,7 +602,7 @@ public class GameMode {
 
                         if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
                             curvedArrowCheck(player, targetCoordinate, outDirection);
-                            player.getPlayerRobot().moveRobotOneTile(true, outDirection);
+                            player.getPlayerRobot().moveRobotOneTile(true, outDirection, 0);
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
                             course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
@@ -632,7 +632,7 @@ public class GameMode {
                         curvedArrowCheck(player, targetCoordinate, outDirection);
 
                         if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
-                            player.getPlayerRobot().moveRobotOneTile(true, outDirection);
+                            player.getPlayerRobot().moveRobotOneTile(true, outDirection, 0);
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
                             course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
                             player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
@@ -787,7 +787,7 @@ public class GameMode {
 
                             if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
                                             getTileByCoordinate(oldCoordinate),
-                                    player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
+                                    player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate), 0)) {
                                 l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
                                         "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
                                         getPlayerID(), oldCoordinate.toString(), targetCoordinate.toString());
