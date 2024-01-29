@@ -116,4 +116,9 @@ public record RDefaultClientRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").has("card");
     }
 
+    public String getPlayedCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
+
 }
