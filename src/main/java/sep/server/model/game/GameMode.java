@@ -429,16 +429,16 @@ public class GameMode {
 
         if (!this.doesUpgradeShopContains(card))
         {
-            l.error("Player {} tried to buy a card that is not in the upgrade shop. Ignoring.", pc.getPlayerID());
-            new ErrorMsgModel(pc.getClientInstance(), "The card you tried to buy is not in the upgrade shop.");
+            l.error("Player {} tried to buy a card that is not in the upgrade shop. They requested {} but the upgrade shop is: {}. Ignoring.", pc.getPlayerID(), card, this.upgradeShop.toString());
+            new ErrorMsgModel(pc.getClientInstance(), String.format("The card %s you tried to buy is not in the upgrade shop.", card));
             this.executePostBuyBehavior();
             return;
         }
 
         if (this.getUpgradeCardCost(card) == -1)
         {
-            l.error("Player {} tried to buy a card that is not in the upgrade shop. They requested {} but the upgrade shop is: {}.", pc.getPlayerID(), card, this.upgradeShop.toString());
-            new ErrorMsgModel(pc.getClientInstance(), "The card you tried to buy is not in the upgrade shop.");
+            l.error("Player {} tried to buy a card that is not in the upgrade shop. They requested {} but the upgrade shop is: {}. Ignoring", pc.getPlayerID(), card, this.upgradeShop.toString());
+            new ErrorMsgModel(pc.getClientInstance(), String.format("The card %s you tried to buy is not in the upgrade shop.", card));
             this.executePostBuyBehavior();
             return;
         }
