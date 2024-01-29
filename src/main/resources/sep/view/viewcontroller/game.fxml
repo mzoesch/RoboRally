@@ -113,6 +113,12 @@
                     </VBox>
                     <VBox>
                         <AnchorPane
+                            fx:id="memorySwapContainer"
+                            VBox.vgrow="ALWAYS"
+                        />
+                    </VBox>
+                    <VBox>
+                        <AnchorPane
                             id="upgrade-container" stylesheets="@game.css"
                             fx:id="upgradeSlotContainer"
                             VBox.vgrow="ALWAYS"
