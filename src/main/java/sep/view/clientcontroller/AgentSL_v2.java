@@ -2169,10 +2169,8 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
-        /* We still need to figure out what this does. */
-        l.fatal("Server triggered onCardPlayedEvent. {}.", this.dsrp.request().toString(0));
-        GameInstance.kill(GameInstance.EXIT_FATAL);
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
