@@ -346,7 +346,6 @@ public class Player {
         }
     }
 
-
     public void clearOldRegister() {
         if (Arrays.asList(registers).isEmpty()) {
             l.debug("P {} - Clearing old Register. {} Cards has been moved to discard pile: {}", getController().getName(), registers.length, getRegistersAsStringArray());
@@ -356,10 +355,6 @@ public class Player {
             l.debug("P {} - Register is empty. No cards moved to discard pile.", getController().getName());
         }
     }
-
-
-
-
 
     public Coordinate getPosition()
     {

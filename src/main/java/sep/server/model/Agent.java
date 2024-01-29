@@ -110,4 +110,10 @@ public final class Agent implements IOwnershipable
         return;
     }
 
+    @Override
+    public Player getPlayer()
+    {
+        return this.possessing;
+    }
+    
 }
