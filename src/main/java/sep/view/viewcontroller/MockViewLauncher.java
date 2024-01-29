@@ -1032,6 +1032,8 @@ public final class MockViewLauncher implements IMockView
 
 //            ViewSupervisor.createShopDialogLater();
 
+            ViewSupervisor.onMemoryCardsReceived(new ArrayList<String>(Arrays.asList("MoveI", "MoveI", "MoveI")).toArray(new String[0]));
+
             ViewSupervisor.centerGameCourseLater();
 
             l.debug("Mock view ready.");
