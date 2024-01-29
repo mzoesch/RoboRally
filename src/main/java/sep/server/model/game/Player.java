@@ -442,4 +442,34 @@ public class Player {
     {
         return this.boughtUpgradeCards;
     }
+
+    public void onMemorySwapCardPlayed(final ArrayList<String> discardedCards)
+    {
+        l.debug("Player {}'s hand is: {}. Removing {}.", this.ctrl.getPlayerID(), this.playerHand, discardedCards);
+
+        for (final String card : discardedCards)
+        {
+            if (!this.playerHand.contains(this.getCardByName(card)))
+            {
+                l.fatal("Player {}'s hand does not contain card {} after MemorySwap card was played.", this.ctrl.getPlayerID(), card);
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            this.playerHand.remove(this.getCardByName(card));
+            continue;
+        }
+
+        l.debug("Player {}'s hand after removing {} is: {}.", this.ctrl.getPlayerID(), discardedCards, this.playerHand);
+
+        if (this.playerHand.size() > 9)
+        {
+            l.fatal("Player {}'s hand is larger than 9 after MemorySwap card was played.", this.ctrl.getPlayerID());
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return;
+        }
+
+        return;
+    }
+
 }
