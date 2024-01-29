@@ -1301,6 +1301,20 @@ public final class GameJFXController
                 final long startTime = System.currentTimeMillis();
                 this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
 
+                this.programmingTimeline = new Timeline(new KeyFrame(Duration.millis(100), e ->
+                {
+                    final long timeLeft = GameJFXController.PROGRAMMING_TIMER_DURATION - (System.currentTimeMillis() - startTime);
+                    this.programmingTimerLabel.setText(String.format(Locale.US, "%.2fs", ( (double) timeLeft ) / 1_000));
+                    return;
+                }
+                ));
+
+                this.programmingTimeline.setCycleCount(Animation.INDEFINITE);
+                this.programmingTimeline.play();
+
+                return;
+            }
+
             return;
         }
 
