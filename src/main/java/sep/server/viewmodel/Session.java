@@ -941,43 +941,29 @@ public final class Session
         return;
     }
 
-    public void sendCardsYouGotNow(final PlayerController tPC, final String[] hand)
+    public void sendIncompleteProgrammingCards(final PlayerController tPC, final String[] hand)
     {
-        for (PlayerController pc : this.getRemotePlayers())
-        {
-            if (pc == tPC)
-            {
-                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(pc.getClientInstance(), hand);
-                cardsYouGotNowModel.send();
-            }
+        new CardsYouGotNowModel(tPC.getClientInstance(), hand).send();
+        return;
+    }
 
+    public void broadcastProgrammingTimerStart()
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new TimerStartedModel(pc.getClientInstance()).send();
             continue;
         }
 
         return;
     }
 
-    public void sendTimerStarted()
+    /** @param ctrlIDs The players that have not finished programming in time. */
+    public void broadcastProgrammingTimerFinish(final int[] ctrlIDs)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
-            TimerStartedModel timerStartedModel = new TimerStartedModel(pc.getClientInstance());
-            timerStartedModel.send();
-
-            continue;
-        }
-
-        return;
-    }
-
-    /** @param playerIDs The players that have not finished programming in time. */
-    public void sendTimerEnded(final int[] playerIDs)
-    {
-        for (final PlayerController pc : this.getRemotePlayers())
-        {
-            TimerEndedModel timerEndedModel = new TimerEndedModel(pc.getClientInstance(), playerIDs);
-            timerEndedModel.send();
-
+            new TimerEndedModel(pc.getClientInstance(), ctrlIDs).send();
             continue;
         }
 
@@ -1217,6 +1203,22 @@ public final class Session
     public boolean hasStarted()
     {
         return this.gameState.hasGameStarted();
+    }
+
+    public IOwnershipable getOwnershipableByID(final int playerID)
+    {
+        for (final IOwnershipable ctrl : this.getControllers())
+        {
+            if (ctrl.getPlayerID() == playerID)
+            {
+                return ctrl;
+            }
+
+            continue;
+        }
+
+        l.error("Could not find any ownershipable with the ID {}.", playerID);
+        return null;
     }
 
     // endregion Getters and Setters
