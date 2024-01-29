@@ -1654,7 +1654,12 @@ public final class GameJFXController
         final ImageView     iv  = this.getCardRegisterSlot(w, h, bIsGotRegister ? EGameState.INSTANCE.getGotRegister(idx) : EGameState.INSTANCE.getRegister(idx));
         final AnchorPane    ap  = new AnchorPane();
 
-        if (bIsGotRegister)
+        if (bIsGotRegister && this.memorySwapDiscardedCards.contains(idx))
+        {
+            iv.setImage(TileModifier.loadCachedImage("EmptyRegisterSlot"));
+            ap.getStyleClass().add("register-slot-disabled");
+        }
+        else if (bIsGotRegister)
         {
             ap.getStyleClass().add(
                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
@@ -1700,6 +1705,11 @@ public final class GameJFXController
         ap.setOnMouseClicked(e
         ->
         {
+            if (bIsGotRegister && this.memorySwapDiscardedCards.contains(idx))
+            {
+                return;
+            }
+
             if (bIsGotRegister)
             {
                 switch (idx)
@@ -1787,10 +1797,34 @@ public final class GameJFXController
         final AnchorPane    ap  = new AnchorPane();
 
         ap.getStyleClass().clear();
+
         ap.getStyleClass().add("register-slot-disabled");
+        ap.setPrefWidth(ViewSupervisor.UPGRADE_SLOT_WIDTH);
+        ap.setPrefHeight(ViewSupervisor.UPGRADE_SLOT_HEIGHT);
 
         ap.getChildren().clear();
         ap.getChildren().add(iv);
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING && !Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished() && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(idx), "MemorySwap") && !EGameState.INSTANCE.isMemorySwapPlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on MemorySwap upgrade card.");
+
+
+                EGameState.INSTANCE.setMemorySwapPlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(idx)).send();
+
+                return;
+            });
+        }
 
         p.getChildren().add(ap);
 
