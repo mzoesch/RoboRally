@@ -322,19 +322,19 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-    /*For the UpgradeCard AdminPriviledge*/
+    /** For the UpgradeCard AdminPrivilege. */
     private synchronized boolean onChooseRegister()
     {
-        l.debug("Client {} choose the following Register {}", this.getPlayerController().getName(), this.dcrp.getChosenRegister());
+        l.debug("Client {} choose the following register for with the admin privilege card: {}.", this.getAddr(), this.dcrp.getChosenRegister());
         this.playerController.getSession().getGameState().setRegisterForAdminPriviledge(playerController, this.dcrp.getChosenRegister());
         return true;
     }
 
-    /* For the UpgradeCard MemorySwap*/
+    /** For the UpgradeCard MemorySwap. */
     private synchronized boolean onDiscardSome()
     {
-        l.debug("Client {} discard the following three Cards {}", this.getPlayerController().getName(), this.dcrp.getMemorySwapCard());
-        this.playerController.getSession().getGameState().setMemorySwapCards(playerController, this.dcrp.getMemorySwapCard());
+        l.debug("Client {} discarded the following three cards {}.", this.getAddr(), this.dcrp.getMemorySwapCard());
+        this.playerController.getPlayer().onMemorySwapCardPlayed(new ArrayList<String>(Arrays.asList(this.dcrp.getMemorySwapCard())));
         return true;
     }
 
