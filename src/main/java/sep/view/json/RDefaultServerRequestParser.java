@@ -238,4 +238,9 @@ public record RDefaultServerRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getString("source");
     }
 
+    public int[] getForcedFinishedProgrammingClients()
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("clientIDs").length()).map(i -> this.request.getJSONObject("messageBody").getJSONArray("clientIDs").getInt(i)).toArray();
+    }
+
 }
