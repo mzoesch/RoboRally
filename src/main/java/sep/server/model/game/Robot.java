@@ -128,12 +128,7 @@ public class Robot {
             return;
         }
 
-        boolean loggingInProgress = false;
-        if (!loggingInProgress) {
-            loggingInProgress = true;
-            l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
-            loggingInProgress = false;
-        }
+        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
 
         if (!this.getCourse().isCoordinateWithinBounds(targetCoordinate)) {
             l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), targetCoordinate.toString());
