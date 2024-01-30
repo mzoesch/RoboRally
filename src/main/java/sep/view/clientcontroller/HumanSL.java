@@ -322,11 +322,17 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onProgrammingCardsReceived() throws JSONException
     {
-        l.debug("Received {} new programming cards from server: {}", this.dsrp.getCardsInHand().length == 3 ? "three" : "nine", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+        l.debug("Received {} new programming cards from server: {}.", this.dsrp.getCardsInHand().length, String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
 
         if (EGameState.INSTANCE.isMemorySwapPlayed())
         {
             ViewSupervisor.onMemoryCardsReceived(this.dsrp.getCardsInHand());
+            return true;
+        }
+
+        if (EGameState.INSTANCE.isSpamBlockerPlayed())
+        {
+            ViewSupervisor.onSpamBlockerCardsReceived(this.dsrp.getCardsInHand());
             return true;
         }
 
