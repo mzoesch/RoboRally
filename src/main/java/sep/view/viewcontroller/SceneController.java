@@ -113,7 +113,18 @@ public final class SceneController
         outerContainer.setStyle("-fx-alignment: center;");
 
         final Label headerLabel = new Label(mask.header());
-        headerLabel.getStyleClass().add("text-2xl-error");
+        if (mask.type() == EPopUp.ERROR)
+        {
+            headerLabel.getStyleClass().add("text-2xl-error");
+        }
+        else if (mask.type() == EPopUp.WARNING)
+        {
+            headerLabel.getStyleClass().add("text-2xl-warning");
+        }
+        else
+        {
+            headerLabel.getStyleClass().add("text-2xl");
+        }
         headerLabel.setWrapText(true);
         headerLabel.setTextAlignment(TextAlignment.CENTER);
         final HBox header = new HBox(headerLabel);
@@ -130,6 +141,18 @@ public final class SceneController
         final HBox form = new HBox();
         form.setId("pop-up-form");
         if (Objects.requireNonNull(mask.type()) == EPopUp.ERROR)
+        {
+            final Button b = new Button("OK");
+            b.getStyleClass().add("secondary-btn");
+            b.setOnAction(e ->
+            {
+                target.getChildren().remove(outerContainer);
+                return;
+            });
+
+            form.getChildren().add(b);
+        }
+        else if (Objects.requireNonNull(mask.type()) == EPopUp.WARNING)
         {
             final Button b = new Button("OK");
             b.getStyleClass().add("secondary-btn");
