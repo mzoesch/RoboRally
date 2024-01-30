@@ -167,7 +167,7 @@ public final class HumanSL extends ServerListener
     {
         l.info("Player {} has played card {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
         EGameState.INSTANCE.executePostCardPlayedBehaviour(this.dsrp.getPlayerID(), this.dsrp.getCard());
-        return false;
+        return true;
     }
 
     @Override
