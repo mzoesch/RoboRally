@@ -871,6 +871,28 @@ public enum EGameState
         if (Objects.equals(card, "MemorySwap") || Objects.equals(card, "SpamBlocker"))
         {
             rp.getBoughtUpgradeCards().remove(card);
+
+            if (playerID == EClientInformation.INSTANCE.getPlayerID())
+            {
+                for (int i = 0; i < this.boughtUpgradeCards.length; ++i)
+                {
+                    if (this.boughtUpgradeCards[i] == null)
+                    {
+                        continue;
+                    }
+
+                    if (Objects.equals(this.boughtUpgradeCards[i], card))
+                    {
+                        this.boughtUpgradeCards[i] = null;
+                        break;
+                    }
+
+                    continue;
+                }
+            }
+
+            l.debug("Removed {} from bought upgrade cards of player {}. Their bought upgrade cards are now {}.", card, playerID, rp.getBoughtUpgradeCards());
+
             return;
         }
 
