@@ -76,7 +76,7 @@ public final class GameJFXController
     private static final String     COLOR_SPIN                  = "#00ffff33";
     private static final String     COLOR_TWONKY                = "#ffff0033";
     private static final String     COLOR_TWITCH                = "#aaaaaa33";
-    private static final String     COLOR_RCARD_PREVIEW_BG      = "#707070e5";
+    private static final String     COLOR_RCARD_PREVIEW_BG      = "#909090e5";
 
     private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
     private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
@@ -2160,7 +2160,7 @@ public final class GameJFXController
                     iv.setFitWidth(     GameJFXController.RCARD_WIDTH   );
                     iv.setFitHeight(    GameJFXController.RCARD_HEIGHT  );
                     iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (i % 2 == 0 ? 1 : -1));
-                    iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+                    iv.setImage(TileModifier.loadCachedImage(String.format("%sSolid", rp.getPlayedRCards()[j])));
 
                     if (i % 2 == 0)
                     {
@@ -2240,7 +2240,7 @@ public final class GameJFXController
 
                         iv.setFitWidth(GameJFXController.RCARD_WIDTH);
                         iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
-                        iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+                        iv.setImage(TileModifier.loadCachedImage(String.format("%sSolid", rp.getPlayedRCards()[j])));
                         iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (finalI % 2 == 0 ? 1 : -1));
 
                         if (finalI % 2 == 0)
@@ -3011,7 +3011,7 @@ public final class GameJFXController
 
             r.setWidth(GameJFXController.RCARD_PREVIEW_TRANSLATION_X + 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP);
             r.setHeight(target.getHeight());
-            r.setStyle(String.format("-fx-fill: %s", GameJFXController.COLOR_RCARD_PREVIEW_BG));
+            r.setStyle(String.format("-fx-fill: %s;", GameJFXController.COLOR_RCARD_PREVIEW_BG));
             r.setTranslateX(newTranslations.get(j) + (idx % 2 == 0 ? GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP : GameJFXController.RCARD_PREVIEW_TRANSLATION_X - RCARD_PREVIEW_TRANSLATION_X_CLEANUP - GameJFXController.RCARD_PREVIEW_TRANSLATION_X_ALPHA));
 
             rs.add(r);
