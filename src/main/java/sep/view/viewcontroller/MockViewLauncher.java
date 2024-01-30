@@ -982,7 +982,7 @@ public final class MockViewLauncher implements IMockView
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
             ViewSupervisor.updateCourseView();
             EGameState.INSTANCE.setCurrentPhase(EGamePhase.PROGRAMMING);
-            final String[] mockPCards = new String[] {"MoveI", "MoveI", "MoveI", "MoveII", "MoveII", "MoveII", "MoveIII", "MoveIII", "MoveIII"};
+            final String[] mockPCards = new String[] {"MoveI", "MoveII", "MoveIII", "PowerUp", "Again", "TurnLeft", "UTurn", "TurnRight", "BackUp"};
             for (final String s : mockPCards)
             {
                 EGameState.INSTANCE.addGotRegister(s);
@@ -992,7 +992,7 @@ public final class MockViewLauncher implements IMockView
 
             for (int i = 0; i < 5; i++)
             {
-                EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{new RRegisterCard(0, "MoveI"), new RRegisterCard(1, "MoveI"), new RRegisterCard(2, "MoveI"), new RRegisterCard(3, "MoveII"), new RRegisterCard(4, "MoveII"), new RRegisterCard(5, "MoveII"), });
+                EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{new RRegisterCard(0, "MoveI"), new RRegisterCard(1, "MoveII"), new RRegisterCard(2, "MoveIII"), new RRegisterCard(3, "Again"), new RRegisterCard(4, "UTurn"), new RRegisterCard(5, "PowerUp"), });
                 continue;
             }
 
@@ -1032,7 +1032,7 @@ public final class MockViewLauncher implements IMockView
 
 //            ViewSupervisor.createShopDialogLater();
 
-            ViewSupervisor.onMemoryCardsReceived(new ArrayList<String>(Arrays.asList("MoveI", "MoveI", "MoveI")).toArray(new String[0]));
+//            ViewSupervisor.onMemoryCardsReceived(new ArrayList<String>(Arrays.asList("MoveI", "MoveI", "MoveI")).toArray(new String[0]));
 
             ViewSupervisor.centerGameCourseLater();
 
