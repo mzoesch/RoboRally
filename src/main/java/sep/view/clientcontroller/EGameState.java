@@ -130,6 +130,10 @@ public enum EGameState
         EGameState.INSTANCE.shopActive                  = false;
         EGameState.INSTANCE.winner                      = null;
 
+        EGameState.INSTANCE.bProgrammingTimerRunning    .set(false);
+        EGameState.INSTANCE.bMemorySwapPlayed           .set(false);
+        EGameState.INSTANCE.bSpamBlockerPlayed          .set(false);
+
         return;
     }
 
