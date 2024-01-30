@@ -93,6 +93,7 @@ public final class HumanSL extends ServerListener
         l.debug("Game phase has changed to: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
 
         EGameState.INSTANCE.setMemorySwapPlayed(false);
+        EGameState.INSTANCE.setSpamBlockerPlayed(false);
 
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
         EGameState.INSTANCE.setProgrammingTimerRunning(false);
