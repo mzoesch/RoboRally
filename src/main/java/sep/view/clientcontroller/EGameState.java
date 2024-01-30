@@ -901,6 +901,41 @@ public enum EGameState
         return;
     }
 
+    public void onSpamBlockerCardsReceived(final ArrayList<String> cards)
+    {
+        if (cards.isEmpty())
+        {
+            l.warn("No spam blocker cards received. Ignoring.");
+            ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.WARNING, "You played a Spam Blocker card, but it seems like you did not had any Spam cards in your hand."));
+            return;
+        }
+
+        spamBlockerCards: for (final String card : cards)
+        {
+            for (int i = 0; i < this.gotRegisters.size(); ++i)
+            {
+                if (this.gotRegisters.get(i) == null)
+                {
+                    continue;
+                }
+
+                if (this.gotRegisters.get(i).equals("SpamDamage"))
+                {
+                    this.gotRegisters.set(i, card);
+                    l.debug("Replaced spam card with spam blocker card {}.", card);
+                    continue spamBlockerCards;
+                }
+
+                continue;
+            }
+
+            l.error("Could not replace spam card with spam blocker card {}. The current got cards are: {}.", card, this.gotRegisters);
+            continue spamBlockerCards;
+        }
+
+        return;
+    }
+
     // endregion Getters and Setters
 
 }
