@@ -817,28 +817,20 @@ public class GameMode {
                                 (Objects.equals(direction, "top") && outDirection.equals("left")) ||
                                 (Objects.equals(direction, "right") && outDirection.equals("top"))) {
 
-                            switch(player.getPlayerRobot().getDirection()) {
-                                case("top") -> player.getPlayerRobot().setDirection("right");
-                                case("right") -> player.getPlayerRobot().setDirection("bottom");
-                                case("bottom") -> player.getPlayerRobot().setDirection("left");
-                                case("left") -> player.getPlayerRobot().setDirection("top");
-                            }
+                            //rotate robot counterclockwise
+                            player.getPlayerRobot().rotateRobotOnTileToTheLeft();
 
-                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
 
                         } else if((Objects.equals(direction, "bottom") && outDirection.equals("left")) ||
                                 (Objects.equals(direction, "left") && outDirection.equals("top")) ||
                                 (Objects.equals(direction, "top") && outDirection.equals("right")) ||
                                 (Objects.equals(direction, "right") && outDirection.equals("bottom"))) {
 
-                            switch(player.getPlayerRobot().getDirection()) {
-                                case ("top") -> player.getPlayerRobot().setDirection("left");
-                                case ("right") -> player.getPlayerRobot().setDirection("top");
-                                case ("bottom") -> player.getPlayerRobot().setDirection("right");
-                                case ("left") -> player.getPlayerRobot().setDirection("bottom");
-                            }
+                            //rotate robot clockwise
+                            player.getPlayerRobot().rotateRobotOnTileToTheRight();
 
-                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
 
                         }
                 }
