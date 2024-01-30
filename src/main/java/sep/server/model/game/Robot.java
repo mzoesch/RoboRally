@@ -414,12 +414,19 @@ public class Robot {
         return possessor;
     }
 
+    /** @deprecated  */
     public void setCanShootBackward(Boolean canShootBackward) {
         this.canShootBackward = canShootBackward;
     }
 
     public Boolean getCanShootBackward() {
-        return canShootBackward;
+        return this.hasRearLaserCard();
+    }
+
+    private boolean hasRearLaserCard()
+    {
+        l.debug("Checking if player {} has RearLaser card. Their bought upgrade cards are: {}", this.getPossessor().getController().getPlayerID(), this.getPossessor().getBoughtUpgradeCards());
+        return this.getPossessor().getBoughtUpgradeCards().contains("RearLaser");
     }
 
     public boolean isRebootTriggered() {
