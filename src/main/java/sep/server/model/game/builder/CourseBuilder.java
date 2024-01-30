@@ -3204,6 +3204,10 @@ public class CourseBuilder {
         fieldtypes.add(new Empty());
         arrayListY.add(new Tile("6B",new Coordinate(9,9), fieldtypes));
         fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
+
         return board;
     }
 }
