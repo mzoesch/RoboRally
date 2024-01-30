@@ -288,7 +288,7 @@ public final class TileModifier
             final Image     i       = new Image(strURL);
             if (i.isError())
             {
-                l.error("Could not load image: {}", strURL);
+                l.error("Could not load image: {}.", strURL);
                 l.error(i.getException().getMessage());
                 return i;
             }
@@ -304,7 +304,7 @@ public final class TileModifier
 
             if (url == null)
             {
-                l.error("Could not load image because the calculated url does not exist: {}", strURL);
+                l.error("Could not load image because the calculated url does not exist: {}.", strURL);
                 return null;
             }
 
@@ -314,7 +314,7 @@ public final class TileModifier
             }
             catch (final IOException e)
             {
-                l.fatal("Could not load image: {}", modName);
+                l.fatal("Could not load image: {}.", modName);
                 l.fatal(e.getMessage());
                 GameInstance.kill();
                 return null;
