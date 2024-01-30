@@ -1859,7 +1859,27 @@ public final class GameJFXController
                 ap.setStyle("");
                 ap.getChildren().remove(0, 1);
 
-                new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(idx)).send();
+                new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx)).send();
+
+                return;
+            });
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING && !Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished() && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "SpamBlocker") && !EGameState.INSTANCE.isSpamBlockerPlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on SpamBlocker upgrade card.");
+
+                EGameState.INSTANCE.setSpamBlockerPlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx)).send();
 
                 return;
             });
