@@ -2677,7 +2677,7 @@ public final class GameJFXController
                 continue;
             }
 
-            for (final RLaserMask mask : rp.getRobotView().getLaserAffectedTiles(this.tiles, 1))
+            for (final RLaserMask mask : rp.getRobotView().getLaserAffectedTiles(this.tiles, 1, rp.hasRearLaser()))
             {
                 final ImageView iv = Tile.getFormattedImageView(mask);
                 iv.setFitHeight(    this.tileDimensions );
