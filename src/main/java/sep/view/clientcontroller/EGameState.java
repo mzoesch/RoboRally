@@ -5,6 +5,8 @@ import sep.view.json.               RDefaultServerRequestParser;
 import sep.view.lib.                RRegisterCard;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
 import sep.view.lib.                RCheckpointMask;
 import sep.view.viewcontroller.     ViewSupervisor;
 
@@ -61,6 +63,7 @@ public enum EGameState
 
     private final AtomicBoolean             bProgrammingTimerRunning;
     private final AtomicBoolean             bMemorySwapPlayed;
+    private final AtomicBoolean             bSpamBlockerPlayed;
 
     private EGameState()
     {
@@ -88,6 +91,7 @@ public enum EGameState
 
         this.bProgrammingTimerRunning   = new AtomicBoolean(false);
         this.bMemorySwapPlayed          = new AtomicBoolean(false);
+        this.bSpamBlockerPlayed         = new AtomicBoolean(false);
 
         return;
     }
@@ -840,6 +844,17 @@ public enum EGameState
     public void overrideGotRegister(final int idx, final String newCard)
     {
         this.gotRegisters.set(idx, newCard);
+        return;
+    }
+
+    public boolean isSpamBlockerPlayed()
+    {
+        return this.bSpamBlockerPlayed.get();
+    }
+
+    public void setSpamBlockerPlayed(final boolean bPlayed)
+    {
+        this.bSpamBlockerPlayed.set(bPlayed);
         return;
     }
 
