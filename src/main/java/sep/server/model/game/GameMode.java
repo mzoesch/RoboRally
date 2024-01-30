@@ -927,6 +927,7 @@ public class GameMode {
             }
 
             if (playerRobot.getCanShootBackward()) {
+                l.debug("Player {}'s robot can shoot backwards. Checking hits.", player.getController().getPlayerID());
                 switch (robotDirection) {
                     case "top" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate - 1, 0, -1);
                     case "right" -> handleLaserShooting("left", 1, robotTileXCoordinate + 1, robotTileYCoordinate, 1, 0);
@@ -1183,8 +1184,8 @@ public class GameMode {
     private void triggerActivationPhase()
     {
         for (Player p : players) {
-            l.debug("P Player {} - Cards in register {}.",
-                    p.getController().getName(),
+            l.debug("Player {} has these cards in their registers: {}.",
+                    p.getController().getPlayerID(),
                     p.getRegistersAsStringArray());
         }
 
