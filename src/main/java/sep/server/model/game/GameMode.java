@@ -487,6 +487,9 @@ public class GameMode {
 
             pc.getSession().sendHandCardsToPlayer(pc, newCards.toArray(new String[0]));
 
+            pc.getPlayer().getBoughtUpgradeCards().remove("MemorySwap");
+            l.debug("Player {}'s MemorySwap card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
+
             return;
         }
 
