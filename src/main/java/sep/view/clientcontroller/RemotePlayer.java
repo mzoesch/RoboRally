@@ -21,7 +21,7 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     private boolean                     bReady;
 
     protected RCoordinate               startPos;
-    /** Only updates by Human Server Listeners. */
+    /** Only updated by Human Server Listeners. */
     private final RobotView             possessing;
 
     private static final int            REGISTER_SLOTS      = 5;
