@@ -2959,6 +2959,19 @@ public final class GameJFXController
         return;
     }
 
+    public void onSpamBlockerCardsReceived(final ArrayList<String> cards)
+    {
+        EGameState.INSTANCE.onSpamBlockerCardsReceived(cards);
+
+        Platform.runLater(() ->
+        {
+            this.renderHUD();
+            return;
+        });
+
+        return;
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters
