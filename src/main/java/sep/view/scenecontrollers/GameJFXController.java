@@ -115,7 +115,7 @@ public final class GameJFXController
     private static final int    MAX_ALLOW_ZOOM                          = 120;
 
     private VBox                chatContainer;
-    private boolean             showServerInfo;
+    private boolean             bShowServerInfo;
 
     private int                 tileDimensions;
     private static final int    RESIZE_AMOUNT   = 10;
@@ -155,7 +155,7 @@ public final class GameJFXController
     {
         super();
 
-        this.showServerInfo             = false;
+        this.bShowServerInfo            = false;
 
         this.tileDimensions             = ViewSupervisor.TILE_DIMENSIONS;
 
@@ -1277,20 +1277,20 @@ public final class GameJFXController
 
                 this.chatContainer.getChildren().removeAll(serverInfo);
                 this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is now hidden.", false);
-                this.showServerInfo = false;
+                this.bShowServerInfo = false;
 
                 return;
             }
 
             if (this.getChatCommand(token).equals("show"))
             {
-                if (this.showServerInfo)
+                if (this.bShowServerInfo)
                 {
                     this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is already shown.", false);
                 }
                 else
                 {
-                    this.showServerInfo = true;
+                    this.bShowServerInfo = true;
                     this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is now shown.", false);
                 }
 
@@ -1316,7 +1316,7 @@ public final class GameJFXController
     {
         if (caller == ChatMsgModel.SERVER_ID)
         {
-            if (this.showServerInfo)
+            if (this.bShowServerInfo)
             {
                 final Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
                 l.getStyleClass().add("lobby-msg-server");
