@@ -556,7 +556,7 @@ public class GameMode {
         }
 
         l.error("Player {} tried to play a card that is not allowed. They tried to play {}.", pc.getPlayerID(), card);
-        new ErrorMsgModel(pc.getClientInstance(), String.format("You tried to play %s but that was not allowed.", card));
+        new ErrorMsgModel(pc.getClientInstance(), String.format("You tried to play %s but that was not allowed.", card)).send();
 
         return;
     }
