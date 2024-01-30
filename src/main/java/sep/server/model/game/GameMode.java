@@ -467,6 +467,8 @@ public class GameMode {
 
     public void onCardPlayed(final PlayerController pc, final String card)
     {
+        /* TODO Some validation is required. A player may not always play a card at any given time. */
+
         if (Objects.equals(card, "MemorySwap"))
         {
             this.getSession().broadcastPlayedCard(pc.getPlayerID(), card);
