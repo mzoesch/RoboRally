@@ -15,6 +15,8 @@ import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
 import sep.server.viewmodel.EServerInstance;
 import java.util.*;
+import sep.server.model.game.cards.damage.SpamDamage;
+import sep.server.json.game.programmingphase.YourCardsModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -489,6 +491,66 @@ public class GameMode {
 
             pc.getPlayer().getBoughtUpgradeCards().remove("MemorySwap");
             l.debug("Player {}'s MemorySwap card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
+
+            return;
+        }
+
+        if (Objects.equals(card, "SpamBlocker"))
+        {
+            this.getSession().broadcastPlayedCard(pc.getPlayerID(), card);
+
+            final ArrayList<IPlayableCard> spam = new ArrayList<IPlayableCard>();
+
+            for (int i = 0; i < pc.getPlayer().getPlayerHand().size(); ++i)
+            {
+                final IPlayableCard cursor = pc.getPlayer().getPlayerHand().get(i);
+
+                if (cursor instanceof final SpamDamage sd)
+                {
+                    spam.add(sd);
+                }
+
+                continue;
+            }
+
+            pc.getPlayer().getBoughtUpgradeCards().remove("SpamBlocker");
+            l.debug("Player {}'s Spam Blocker card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
+
+            if (spam.isEmpty())
+            {
+                l.debug("Player {} played Spam Blocker but had no spam cards in their hand. Sending empty programming cards model.", pc.getPlayerID());
+                new YourCardsModel(pc.getClientInstance(), new String[0]).send();
+                return;
+            }
+
+            final ArrayList<IPlayableCard> newCards = new ArrayList<IPlayableCard>();
+
+            for (final IPlayableCard sd : spam)
+            {
+                pc.getPlayer().getPlayerHand().remove(sd);
+                pc.getAuthGameMode().getSpamDeck().add( (SpamDamage) sd);
+
+                if (pc.getPlayer().getPlayerDeck().isEmpty())
+                {
+                    pc.getPlayer().shuffleAndRefillDeck();
+                }
+
+                newCards.add(pc.getPlayer().getPlayerDeck().get(0));
+
+                pc.getPlayer().getPlayerHand().add(pc.getPlayer().getPlayerDeck().remove(0));
+
+                continue;
+            }
+
+            if (pc.getPlayer().getPlayerHand().size() > 9)
+            {
+                l.fatal("Player {} has more than 9 cards in their hand after Spam Blocker behavior execution. Their hand is: {}.", pc.getPlayerID(), pc.getPlayer().getPlayerHand().toString());
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            l.debug("Player {} played Spam Blocker. The new cards are: {}. Their current hand is now: {}.", pc.getPlayerID(), newCards.toString(), pc.getPlayer().getPlayerHand());
+            new YourCardsModel(pc.getClientInstance(), newCards.stream().map(IPlayableCard::getCardType).toArray(String[]::new)).send();
 
             return;
         }
