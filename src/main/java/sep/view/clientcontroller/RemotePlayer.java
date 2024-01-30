@@ -215,6 +215,11 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         return this.boughtUpgradeCards;
     }
 
+    public boolean hasRearLaser()
+    {
+        return this.boughtUpgradeCards.contains("RearLaser");
+    }
+
     // endregion Getters and Setters
 
 }
