@@ -1844,7 +1844,7 @@ public final class GameJFXController
         ap.getChildren().clear();
         ap.getChildren().add(iv);
 
-        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING && !Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished() && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(idx), "MemorySwap") && !EGameState.INSTANCE.isMemorySwapPlayed())
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING && !Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished() && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "MemorySwap") && !EGameState.INSTANCE.isMemorySwapPlayed())
         {
             this.applyPlayableUpgradeEffect(ap);
 
