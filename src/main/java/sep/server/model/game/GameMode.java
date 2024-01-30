@@ -487,12 +487,12 @@ public class GameMode {
                 continue;
             }
 
-            l.debug("Player {} played MemorySwap. The new cards are: {}. Their current hand is now: {}.", pc.getPlayerID(), newCards.toString(), pc.getPlayer().getPlayerHand());
+            l.debug("Player {} played Memory Swap. The new cards are: {}. Their current hand is now: {}.", pc.getPlayerID(), newCards.toString(), pc.getPlayer().getPlayerHand());
 
             pc.getSession().sendHandCardsToPlayer(pc, newCards.toArray(new String[0]));
 
             pc.getPlayer().getBoughtUpgradeCards().remove("MemorySwap");
-            l.debug("Player {}'s MemorySwap card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
+            l.debug("Player {}'s Memory Swap card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
 
             return;
         }
