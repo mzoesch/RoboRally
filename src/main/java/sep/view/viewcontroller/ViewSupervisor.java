@@ -431,6 +431,23 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void onSpamBlockerCardsReceived(final String[] cards)
+    {
+        l.debug("Received spam blocker cards: {}.", Arrays.toString(cards));
+
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onSpamBlockerCardsReceived(new ArrayList<String>(Arrays.asList(cards)));
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during memory swap dialog creation. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // endregion Game Events
 
     public static void createPopUp(final RPopUpMask mask)
