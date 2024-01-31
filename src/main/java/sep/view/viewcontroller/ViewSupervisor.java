@@ -87,7 +87,7 @@ public final class ViewSupervisor extends Application
     public static final int     GOT_REGISTER_SLOT_HEIGHT    = 58;
     public static final int     UPGRADE_SLOT_WIDTH          = 34;
     public static final int     UPGRADE_SLOT_HEIGHT         = 58;
-    public static final int     PHASE_POPUP_TIME            = 5_000;
+    public static final int     PHASE_POPUP_TIME            = 2_000;
 
     public ViewSupervisor()
     {
