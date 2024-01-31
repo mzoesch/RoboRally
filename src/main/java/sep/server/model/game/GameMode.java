@@ -1584,9 +1584,10 @@ public class GameMode {
     {
         for (final AUpgradeCard upgradeCard : this.upgradeShop)
         {
-            if (upgradeCard.getCardType().equals(card))
-            {
-                return true;
+            if(upgradeCard != null) {
+                if (upgradeCard.getCardType().equals(card)) {
+                    return true;
+                }
             }
 
             continue;
@@ -1599,9 +1600,10 @@ public class GameMode {
     {
         for (final AUpgradeCard upgradeCard : this.upgradeShop)
         {
-            if (upgradeCard.getCardType().equals(card))
-            {
-                return upgradeCard.getCost();
+            if(upgradeCard != null) {
+                if (upgradeCard.getCardType().equals(card)) {
+                    return upgradeCard.getCost();
+                }
             }
 
             continue;
