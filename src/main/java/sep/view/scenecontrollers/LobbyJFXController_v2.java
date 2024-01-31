@@ -420,14 +420,19 @@ public final class LobbyJFXController_v2
         this.readyButton.setDisable(!EGameState.INSTANCE.hasClientSelectedARobot());
         this.readyButton.getStyleClass().clear();
 
-        if (EGameState.INSTANCE.getClientRemotePlayer() == null)
+        if (this.readyButton.isDisabled())
         {
-            this.readyButton.setText("Not Ready");
+            this.readyButton.setText("Select Robot");
+            this.readyButton.getStyleClass().add("secondary-btn-mini");
+        }
+        else if (EGameState.INSTANCE.getClientRemotePlayer() == null)
+        {
+            this.readyButton.setText("Ready");
             this.readyButton.getStyleClass().add("secondary-btn-mini");
         }
         else
         {
-            this.readyButton.setText(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "Ready" : "Not Ready");
+            this.readyButton.setText(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "Not Ready" : "Ready");
             this.readyButton.getStyleClass().add(Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).isReady() ? "confirm-btn-mini" : "secondary-btn-mini");
             if (!EGameState.INSTANCE.getClientRemotePlayer().isReady())
             {
