@@ -450,7 +450,7 @@ public class Player {
     @Override
     public String toString()
     {
-        return String.format("Player{%d,%s,%s}",this.ctrl.getPlayerID(), this.ctrl.getName(), this.playerRobot.getCurrentTile().getCoordinate());
+        return String.format("Player{%d,%s}",this.ctrl.getPlayerID(), this.playerRobot.getCurrentTile().getCoordinate());
     }
 
     public ArrayList<String> getBoughtUpgradeCards()
