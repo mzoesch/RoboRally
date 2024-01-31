@@ -325,8 +325,13 @@ public final class ClientInstance implements Runnable
     /** For the UpgradeCard AdminPrivilege. */
     private synchronized boolean onChooseRegister()
     {
-        l.debug("Client {} choose the following register for with the admin privilege card: {}.", this.getAddr(), this.dcrp.getChosenRegister());
-        this.playerController.getSession().getGameState().setRegisterForAdminPriviledge(playerController, this.dcrp.getChosenRegister());
+        /* TODO This is unsafe. We may want to do some type checking here. */
+
+        l.debug("Client {} choose the register {} with the admin privilege card.", this.getAddr(), this.dcrp.getChosenRegister());
+
+        this.playerController.getPlayer().setChosenRegisterAdminPrivilegeUpgrade(this.dcrp.getChosenRegister());
+        this.playerController.getSession().broadcastAdminPrivilegeRegisterUpdate(this.playerController, this.dcrp.getChosenRegister());
+
         return true;
     }
 
