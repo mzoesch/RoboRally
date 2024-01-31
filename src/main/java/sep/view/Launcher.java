@@ -22,21 +22,21 @@ public final class Launcher
      * This is the entry point of the client part of the application.
      * The Game Instance is created here.
      *
-     * @param args Valid program arguments in descending order of precedence. Invalid arguments will be ignored:
+     * @param args Valid program arguments in descending order of precedence:
      *             <ul>
      *              <li>[--dev]                 - Start mock game view (if also started with the [--isAgent] flag, the
      *                                            agent mock view will be called instead).
      *              <li>[--isAgent]             - Start agent view.
-     *              <li>[--addr ADDR]           - The address to auto connect to (if isAgent flag is set). Default is
+     *              <li>[--addr ADDR]           - The address to auto connect to (if [--isAgent] flag is set). Default is
      *                                            {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
-     *              <li>[--port PORT]           - The port number to auto connect to (if isAgent flag is set). Default is
+     *              <li>[--port PORT]           - The port number to auto connect to (if [--isAgent] flag is set). Default is
      *                                            {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
-     *              <li>[--sid SID]             - The session ID to auto connect to (if isAgent flag is set). Default is
+     *              <li>[--sid SID]             - The session ID to auto connect to (if [--isAgent] flag is set). Default is
      *                                            {@link sep.Types.EProps#DESCRIPTION EProps.DESCRIPTION}.
-     *              <li>[--name NAME]           - The name of the agent (if isAgent flag is set).
+     *              <li>[--name NAME]           - The name of the agent (if [--isAgent] flag is set).
      *              <li>[--allowLegacyAgents]   - Allow legacy agent logic to be displayed in the client Graphical User
      *                                            Interface (the deprecated server agent logic will be used).
-     *              <li>[--help]                - Print help message.
+     *              <li>[--help]                - Print view help message.
      *             </ul>
      */
     public static void main(String[] args)
@@ -52,7 +52,7 @@ public final class Launcher
 
                 if (Arrays.asList(args).contains("--isAgent"))
                 {
-                    l.info("Command line argument [--isAgent] detected. Starting in Agent View Mode.");
+                    l.info("Command line argument [--isAgent] detected. Starting in Agent Mock View Mode.");
 
                     EClientInformation.INSTANCE.setIsAgent(true);
                     new sep.view.viewcontroller.AgentMockViewLauncher().run();
@@ -62,7 +62,7 @@ public final class Launcher
                     return;
                 }
 
-                l.info("Starting mock game view.");
+                l.info("Starting Mock View.");
                 new sep.view.viewcontroller.MockViewLauncher().run();
 
                 l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -202,17 +202,16 @@ public final class Launcher
             if (Arrays.asList(args).contains("--help"))
             {
                 l.info("##################### CLIENT HELP #####################");
-                l.info("Valid view program arguments in descending order of precedence. Invalid arguments will be ignored.");
-                l.info("Usage: java -cp {jar-name}.jar sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]");
-                l.info("Valid server program arguments in descending order of precedence.");
+                l.info("Valid view program arguments in descending order of precedence.");
+                l.info("Usage: java -cp {} sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]", Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath().lastIndexOf("/") + 1));
                 l.info("  --dev                 Start mock game view (if also started with the [--isAgent] flag, the agent mock view will be called instead).");
                 l.info("  --isAgent             Start agent view.");
-                l.info("  --addr <ADDR>         The address to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_IP);
-                l.info("  --port <PORT>         The port number to auto connect to (if isAgent flag is set). Default is {}.", sep.EArgs.PREF_SERVER_PORT);
-                l.info("  --sid <SID>           The session ID to auto connect to (if isAgent flag is set). Default is {}.", sep.Types.EProps.DESCRIPTION);
-                l.info("  --name <NAME>         The name of the agent (if isAgent flag is set).");
+                l.info("  --addr <ADDR>         The address to auto connect to (if [--isAgent] flag is set). Default is {}.", sep.EArgs.PREF_SERVER_IP);
+                l.info("  --port <PORT>         The port number to auto connect to (if [--isAgent] flag is set). Default is {}.", sep.EArgs.PREF_SERVER_PORT.i);
+                l.info("  --sid <SID>           The session ID to auto connect to (if [--isAgent] flag is set). Default is {}.", sep.Types.EProps.DESCRIPTION);
+                l.info("  --name <NAME>         The name of the agent (if [--isAgent] flag is set).");
                 l.info("  --allowLegacyAgents   Allow legacy agent logic to be displayed in the client Graphical User Interface (the deprecated server agent logic will be used).");
-                l.info("  --help                Print view help message.");
+                l.info("  --help                Print this help message.");
                 l.info("#######################################################");
                 System.exit(sep.EArgs.OK);
                 return;

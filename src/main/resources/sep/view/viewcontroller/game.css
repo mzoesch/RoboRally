@@ -52,6 +52,12 @@
     -fx-text-alignment: center;
 }
 
+#upgrade-slots-label-container {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+
 #ui-footer {
     -fx-min-height: 200px;
     -fx-background-color: #2d2d2dff;
@@ -71,6 +77,9 @@
 #got-register-container {
 }
 
+#upgrade-container {
+}
+
 #register-hbox {
     -fx-spacing: 8px;
     -fx-alignment: center-left;
@@ -82,6 +91,11 @@
 }
 
 #got-register-hbox {
+    -fx-spacing: 8px;
+    -fx-alignment: center-left;
+}
+
+#upgrade-slot-hbox {
     -fx-spacing: 8px;
     -fx-alignment: center-left;
 }
@@ -295,10 +309,46 @@
     -fx-border-color: #ffffff;
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
-    -fx-min-width: 600px;
+    -fx-min-width: 900px;
     -fx-min-height: 300px;
     -fx-max-width: 900px;
     -fx-max-height: 300px;
+}
+
+#upgrade-dialog-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 700px;
+    -fx-min-height: 500px;
+    -fx-max-width: 130px;
+    -fx-max-height: 600px;
+}
+
+#memory-swap-dialog-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 500px;
+    -fx-min-height: 400px;
+    -fx-max-width: 500px;
+    -fx-max-height: 400px;
+}
+
+#admin-privilege-dialog-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 500px;
+    -fx-min-height: 200px;
+    -fx-max-width: 500px;
+    -fx-max-height: 200px;
 }
 
 #reboot-dialog-body {
@@ -306,7 +356,35 @@
     -fx-alignment: center;
 }
 
+#upgrade-shop-available-cards {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#upgrade-shop-bought-cards {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#upgrade-shop-form {
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+}
+
+#upgrade-shop-form-wrapper {
+    -fx-alignment: center;
+}
+
+#upgrade-shop-available-cards-wrapper {
+}
+
 .reboot-btn {
+    -fx-min-width: 170px;
+    -fx-max-width: 170px;
+    -fx-wrap-text: false;
+}
+
+.upgrade-btn {
     -fx-min-width: 170px;
     -fx-max-width: 170px;
     -fx-wrap-text: false;
@@ -323,6 +401,31 @@
     -fx-max-width: 400px;
     -fx-max-height: 150px;
 }
+
+#energy-update-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 450px;
+    -fx-min-height: 75px;
+    -fx-max-width: 450px;
+    -fx-max-height: 75px;
+}
+
+#draw-damage-container {
+    -fx-background-color: #2b2a33f2;
+    -fx-border-width: 2px;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-min-width: 500px;
+    -fx-min-height: 150px;
+    -fx-max-width: 500px;
+    -fx-max-height: 150px;
+}
+
 
 #damage-card-selection-dialog-container{
     -fx-background-color: #2b2a33f2;
@@ -348,4 +451,23 @@
     -fx-border-radius: 1px;
     -fx-background-radius: 1px;
     -fx-border-width: 1px;
+}
+
+.upgrade-shop-dialog-splitter {
+    -fx-border-width: 2px;
+    -fx-border-color: #181818ff;
+}
+
+.vertical-shop-dialog-splitter {
+    -fx-border-width: 2px;
+    -fx-border-color: #181818ff;
+    -fx-min-height: 10px;
+}
+
+#upgrade-shop-bought-cards-horizontal-splitter-wrapper {
+    -fx-spacing: 8px;
+}
+
+#upgrade-shop-bought-cards-vertical-splitter-wrapper {
+    -fx-spacing: 8px;
 }

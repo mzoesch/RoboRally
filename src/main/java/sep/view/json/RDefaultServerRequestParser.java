@@ -166,6 +166,11 @@ public record RDefaultServerRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getInt("number");
     }
 
+    public int getCheckpointMovedID() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getInt("checkpointID");
+    }
+
     public String[] getDrawnDamageCards() throws JSONException
     {
         return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("cards").length()).mapToObj(i -> this.request.getJSONObject("messageBody").getJSONArray("cards").getString(i)).toArray(String[]::new);
@@ -193,12 +198,49 @@ public record RDefaultServerRequestParser(JSONObject request)
 
     public RRegisterCard[] getCurrentRegisterCards() throws JSONException
     {
-        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()).mapToObj(i -> new RRegisterCard(this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"), this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card"))).toArray(RRegisterCard[]::new);
+        return IntStream.range(
+                0,
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").length()
+            )
+            .mapToObj(i -> new RRegisterCard(
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getInt("clientID"),
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).has("card")
+                ?
+                this.request.getJSONObject("messageBody").getJSONArray("activeCards").getJSONObject(i).getString("card")
+                :
+                RRegisterCard.NULL_CARD
+            )
+            ).toArray(RRegisterCard[]::new);
     }
 
     public EAnimation getAnimation() throws JSONException
     {
         return EAnimation.fromString(this.request.getJSONObject("messageBody").getString("type"));
+    }
+
+    public String[] getRefillShopCards() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("cards").toList().stream().map(Object::toString).toArray(String[]::new);
+    }
+
+    public String[] getExchangeShopCards() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getJSONArray("cards").toList().stream().map(Object::toString).toArray(String[]::new);
+    }
+
+    public String getCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
+
+    public String getEnergySource() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("source");
+    }
+
+    public int[] getForcedFinishedProgrammingClients()
+    {
+        return IntStream.range(0, this.request.getJSONObject("messageBody").getJSONArray("clientIDs").length()).map(i -> this.request.getJSONObject("messageBody").getJSONArray("clientIDs").getInt(i)).toArray();
     }
 
 }

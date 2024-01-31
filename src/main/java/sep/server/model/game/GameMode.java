@@ -13,8 +13,10 @@ import sep.server.model.game.cards.damage.*;
 import sep.server.viewmodel.Session;
 import sep.server.model.IOwnershipable;
 import sep.server.model.Agent;
-
+import sep.server.viewmodel.EServerInstance;
 import java.util.*;
+import sep.server.model.game.cards.damage.SpamDamage;
+import sep.server.json.game.programmingphase.YourCardsModel;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -50,9 +52,15 @@ public class GameMode {
     private int currentRegisterIndex;
 
     private int energyBank;
-    private AUpgradeCard[] upgradeShop;
+    private ArrayList<AUpgradeCard> upgradeShop;
 
     private Thread activationPhaseThread;
+
+    private boolean bFirstRound;
+
+    private final ArrayList<Player> upgradePhasePlayersSortedByPriority;
+
+    private Thread programmingPhaseTimerService;
 
     public GameMode(final String courseName, final GameState gameState) {
         super();
@@ -72,7 +80,7 @@ public class GameMode {
 
         this.upgradeDeck = deckBuilder.buildUpgradeDeck();
         Collections.shuffle(this.upgradeDeck);
-        this.upgradeShop = new AUpgradeCard[3];
+        this.upgradeShop = new ArrayList<AUpgradeCard>();
 
         this.energyBank = 48;
 
@@ -81,7 +89,15 @@ public class GameMode {
         this.curPlayerInRegistration = this.players.get(0);
         this.currentRegisterIndex = 0;
 
+        this.bFirstRound = true;
+
+        this.upgradePhasePlayersSortedByPriority = new ArrayList<Player>();
+
         this.handleNewPhase(EGamePhase.REGISTRATION);
+
+        this.programmingPhaseTimerService = null;
+
+        return;
     }
 
     // region Game Phases
@@ -94,8 +110,8 @@ public class GameMode {
      * @return true if finished, false if not finished
      */
     private boolean startingPointSelectionFinished() {
-        for(Player player : players) {
-            if(player.getPlayerRobot().getCurrentTile() == null) {
+        for (Player player : players) {
+            if (player.getPlayerRobot().getCurrentTile() == null) {
                 return false;
             }
         }
@@ -113,20 +129,19 @@ public class GameMode {
     public synchronized void setStartingPoint(IOwnershipable ctrl, int x, int y) {
         if (ableToSetStartPoint(ctrl)) {
 
-            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x,y);
-            if(validation == 1) {
+            int validation = curPlayerInRegistration.getPlayerRobot().validStartingPoint(x, y);
+            if (validation == 1) {
 
-                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x,y);
+                curPlayerInRegistration.getPlayerRobot().setStartingPoint(x, y);
                 l.info("StartingPointSelected from PlayerID: " + ctrl.getPlayerID() + " with Coordinates: " + x + " , " + y);
-                ctrl.getAuthGameMode().getSession().broadcastSelectedStartingPoint(ctrl.getPlayerID(),x,y);
-                ctrl.getAuthGameMode().getSession().broadcastRotationUpdate(ctrl.getPlayerID(), course.getStartingTurningDirection());
+                ctrl.getAuthGameMode().getSession().broadcastSelectedStartingPoint(ctrl.getPlayerID(), x, y);
 
-                if(startingPointSelectionFinished()) {
+                if (startingPointSelectionFinished()) {
                     l.debug("Registration Phase has concluded. Upgrade Phase must be started.");
                     this.handleNewPhase(EGamePhase.UPGRADE);
 
                 } else {
-                    for(Player player : players) {
+                    for (Player player : players) {
                         if (player.getPlayerRobot().getCurrentTile() == null) {
                             curPlayerInRegistration = player;
                             l.info("Now Player with ID: " + player.getController().getPlayerID() + " has to set StartingPoint");
@@ -138,13 +153,13 @@ public class GameMode {
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 l.warn("StartingPointSelection failed. Error Code from method validStartingPoint(): " + validation);
                 if (ctrl instanceof PlayerController pc) {
                     new ErrorMsgModel(pc.getClientInstance(), "StartingPointSelection failed");
+                } else {
+                    l.error("The agent {} tried to do something illegal. Starting point selection failed.", ctrl.getPlayerID());
                 }
-                else {l.error("The agent {} tried to do something illegal. Starting point selection failed.", ctrl.getPlayerID());}
             }
         }
     }
@@ -153,23 +168,25 @@ public class GameMode {
      * Checks if setting a starting point is possibl and prints corresponding error messages.
      *
      * @param ctrl Player that wants to set a starting point
-     * @return     true if possible, false if not possible
+     * @return true if possible, false if not possible
      */
     public boolean ableToSetStartPoint(IOwnershipable ctrl) {
         if (gamePhase != EGamePhase.REGISTRATION) {
             l.debug("Unable to set StartPoint due to wrong GamePhase");
             if (ctrl instanceof PlayerController pc) {
                 new ErrorMsgModel(pc.getClientInstance(), "Wrong GamePhase");
+            } else {
+                l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());
             }
-            else {l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());}
             return false;
 
         } else if (ctrl.getPlayerID() != curPlayerInRegistration.getController().getPlayerID()) {
             l.error("Unable to set StartPoint due to wrong Player. Choosing Player is not currentPlayer. [CurrentPlayer: {}, ChoosingPlayer: {}]", curPlayerInRegistration.getController().getPlayerID(), ctrl.getPlayerID());
             if (ctrl instanceof PlayerController pc) {
                 new ErrorMsgModel(pc.getClientInstance(), "Your are not CurrentPlayer");
+            } else {
+                l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());
             }
-            else {l.error("The agent {} tried to do something illegal.", ctrl.getPlayerID());}
             return false;
 
         } else {
@@ -189,7 +206,9 @@ public class GameMode {
         this.getSession().broadcastCurrentPlayer(this.curPlayerInRegistration.getController().getPlayerID());
 
         if (this.curPlayerInRegistration.getController() instanceof final Agent a) {
-            l.error("An agent must never be the first current player in a game. Fault agent ID: {}.", a.getPlayerID());
+            l.fatal("An agent must never be the first current player in a game. Fault agent ID: {}.", a.getPlayerID());
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return;
         }
 
         l.debug("Registration Phase started. Waiting for players to set their starting positions . . .");
@@ -197,65 +216,157 @@ public class GameMode {
 
     //region Upgrade Phase helpers
 
-    /**
-     * Sets up the upgrade shop by either refilling it or exchanging upgrade slots.
-     */
-    private void setupUpgradeShop() {
-        if(upgradeShopIsEmpty()) {
-            refillUpgradeShop();
-        } else {
-            exchangeUpgradeSlots();
-        }
+    private static final class RefilledCards
+    {
+        public final ArrayList<String> out;
+        public RefilledCards() { super(); this.out = new ArrayList<String>(); return; }
     }
 
-
     /**
-     * Checks if the upgrade shop is empty.
+     * Sets up the upgrade shop by either refilling it or exchanging upgrade slots.
      *
-     * @return True if empty, false otherwise.
+     * @return True if the upgrade shop was exchanged, false otherwise.
      */
-    private boolean upgradeShopIsEmpty() {
-        for (AUpgradeCard upgradeCard : upgradeShop) {
-            if (upgradeCard != null) {
-                return false;
+    private boolean setupUpgradeShop(final RefilledCards outRefilledCards)
+    {
+        if (!this.isUpgradeShopRightSize())
+        {
+            l.warn("The upgrade shop is not the right size. Expected {}, got {}. Adjusting upgrade shop.", this.players.size(), this.upgradeShop.size());
+
+            for (final AUpgradeCard upgradeCard : this.upgradeShop)
+            {
+                if (upgradeCard == null)
+                {
+                    continue;
+                }
+
+                this.upgradeDeck.add(upgradeCard);
+
+                continue;
+            }
+
+            this.upgradeShop.clear();
+
+            for (int i = 0; i < this.players.size(); ++i)
+            {
+                this.upgradeShop.add(null);
+                continue;
+            }
+
+            l.debug("Adjust upgrade shop size to {}.", this.upgradeShop.size());
+        }
+
+        final boolean bExchange = !this.isACardMissingInUpgradeShop();
+
+        if (bExchange)
+        {
+            l.debug("No upgrade cards were bought last phase. Exchanging upgrade slots. Old shop: {}.", this.upgradeShop.toString());
+        }
+        else
+        {
+            l.debug("Upgrade cards were bought last phase. Refilling upgrade shop. Old shop: {}.", this.upgradeShop.toString());
+        }
+
+        if (this.isACardMissingInUpgradeShop())
+        {
+            this.refillUpgradeShop(outRefilledCards);
+        }
+        else
+        {
+            this.exchangeUpgradeSlots();
+        }
+
+        return bExchange;
+    }
+
+    private boolean isACardMissingInUpgradeShop()
+    {
+        for (final AUpgradeCard upgradeCard : this.upgradeShop)
+        {
+            if (upgradeCard == null)
+            {
+                return true;
             }
         }
-        return true;
+
+        return false;
     }
 
     /**
      * Refills the upgrade shop with new upgrade cards.
      */
-    private void refillUpgradeShop() {
-        for(int i = 0; i<upgradeShop.length; i++) {
-            if(upgradeShop[i] == null) {
-                upgradeShop[i] = upgradeDeck.get(0);
-                l.info("Refilled upgrade shop at index " + i);
+    private void refillUpgradeShop(final RefilledCards outRefilledCards)
+    {
+        for (int i = 0; i < this.upgradeShop.size(); ++i)
+        {
+            if (this.upgradeShop.get(i) == null)
+            {
+                if (this.upgradeDeck.get(0) == null)
+                {
+                    l.error("Something went wrong while refilling the upgrade shop. The upgrade deck is: {}.", this.upgradeDeck.toString());
+                    EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                    return;
+                }
+
+                this.upgradeShop.set(i, this.upgradeDeck.get(0));
+                this.upgradeDeck.remove(0);
+
+                outRefilledCards.out.add(this.upgradeShop.get(i).getCardType());
+
+                l.debug("Refilled upgrade shop at index {} with {}.", i, this.upgradeShop.get(i).toString());
             }
+
+            continue;
         }
-        l.info("Upgrade shop refilled.");
+
+        l.info("Upgrade shop refilled. The new cards are: {}.", this.upgradeShop.toString());
+
+        return;
     }
 
     /**
      * Exchanges upgrade slots in the upgrade shop.
      */
-    private void exchangeUpgradeSlots() {
-        for(int i = 0; i<upgradeShop.length; i++) {
-            if(upgradeShop[i] != null) {
-                upgradeDeck.add(upgradeShop[i]);
-                upgradeShop[i] = null;
+    private void exchangeUpgradeSlots()
+    {
+        for (int i = 0; i < this.upgradeShop.size(); ++i)
+        {
+            if (this.upgradeShop.get(i) != null)
+            {
+                this.upgradeDeck.add(this.upgradeShop.get(i));
+                this.upgradeShop.set(i, null);
             }
-            upgradeShop[i] = upgradeDeck.get(0);
-            l.info("Refilled upgrade shop at index " + i);
+
+            this.upgradeShop.set(i, this.upgradeDeck.get(0));
+            this.upgradeDeck.remove(0);
+
+            l.debug("Refilled upgrade shop at index {} with {}.", i, upgradeShop.get(i).toString());
         }
-        l.info("Cards in upgrade shop slots exchanged.");
+
+        l.info("Cards in upgrade shop slots exchanged. The new cards are: {}.", upgradeShop.toString());
+
+        return;
     }
 
-    /**
-     * Handles the purchase of upgrades during the upgrade phase.
-     */
-    private void handleUpgradePurchase() {
-        //TODO
+    private void removeCardFromShop(final String card)
+    {
+        for (int i = 0; i < this.upgradeShop.size(); ++i)
+        {
+            if (this.upgradeShop.get(i) == null)
+            {
+                continue;
+            }
+
+            if (this.upgradeShop.get(i).getCardType().equals(card))
+            {
+                this.upgradeShop.set(i, null);
+                break;
+            }
+
+            continue;
+        }
+
+        return;
     }
 
     //endregion Upgrade Phase helpers
@@ -263,13 +374,193 @@ public class GameMode {
     /**
      * The following method triggers the upgrade phase.
      */
-    private void triggerUpgradePhase() {
-        //TODO
-        /*
-        this.setupUpgradeShop();
-         */
-        l.debug("Upgrade Phase not implemented yet. Skipping to Programming Phase.");
+    private void triggerUpgradePhase()
+    {
+        final RefilledCards     out         = new RefilledCards();
+        final boolean           bExchanged  = this.setupUpgradeShop(out);
+
+        /* We always send the refill shop request to the client in the first round. */
+        if (this.bFirstRound)
+        {
+            this.getSession().broadcastShopRefill(this.upgradeShop.stream().filter(Objects::nonNull).map(AUpgradeCard::getCardType).collect(Collectors.toCollection(ArrayList::new)));
+            this.bFirstRound = false;
+        }
+        else
+        {
+            if (bExchanged)
+            {
+                this.getSession().broadcastShopExchange(this.upgradeShop.stream().filter(Objects::nonNull).map(AUpgradeCard::getCardType).collect(Collectors.toCollection(ArrayList::new)));
+            }
+            else
+            {
+                this.getSession().broadcastShopRefill(out.out);
+            }
+        }
+
+        this.evaluateUpgradePhasePriorities();
+        this.getSession().broadcastCurrentPlayer(this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
+        this.upgradePhasePlayersSortedByPriority.remove(0);
+
+        return;
+    }
+
+    private void executePostBuyBehavior()
+    {
+        if (!this.upgradePhasePlayersSortedByPriority.isEmpty())
+        {
+            l.debug("Waiting for client {} to finish their upgrade phase.", this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
+            this.getSession().broadcastCurrentPlayer(this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
+            this.upgradePhasePlayersSortedByPriority.remove(0);
+
+            return;
+        }
+
         this.handleNewPhase(EGamePhase.PROGRAMMING);
+
+        return;
+    }
+
+    public void onUpgradeCardBought(final PlayerController pc, final String card)
+    {
+        if (card == null)
+        {
+            l.debug("Player {} bought nothing. Continuing.", pc.getPlayerID());
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        if (!this.doesUpgradeShopContains(card))
+        {
+            l.error("Player {} tried to buy a card that is not in the upgrade shop. They requested {} but the upgrade shop is: {}. Ignoring.", pc.getPlayerID(), card, this.upgradeShop.toString());
+            new ErrorMsgModel(pc.getClientInstance(), String.format("The card %s you tried to buy is not in the upgrade shop.", card));
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        if (this.getUpgradeCardCost(card) == -1)
+        {
+            l.error("Player {} tried to buy a card that is not in the upgrade shop. They requested {} but the upgrade shop is: {}. Ignoring", pc.getPlayerID(), card, this.upgradeShop.toString());
+            new ErrorMsgModel(pc.getClientInstance(), String.format("The card %s you tried to buy is not in the upgrade shop.", card));
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        if (pc.getPlayer().getEnergyCollected() < this.getUpgradeCardCost(card))
+        {
+            l.error("Player {} tried to buy a card but does not have enough energy. They had {} but needed {}.", pc.getPlayerID(), pc.getPlayer().getEnergyCollected(), this.getUpgradeCardCost(card));
+            new ErrorMsgModel(pc.getClientInstance(), String.format("You need %d energy to buy %s.", this.getUpgradeCardCost(card), card));
+            this.executePostBuyBehavior();
+            return;
+        }
+
+        final int cost = this.getUpgradeCardCost(card);
+        this.removeCardFromShop(card);
+        pc.getPlayer().getBoughtUpgradeCards().add(card);
+        pc.getPlayer().setEnergyCollected(pc.getPlayer().getEnergyCollected() - cost);
+        this.getSession().broadcastBoughtUpgradeCard(pc.getPlayerID(), card);
+        l.debug("Player {} bought {}. The new upgrade shop is: {}.", pc.getPlayerID(), card, this.upgradeShop.toString());
+        this.getSession().broadcastEnergyUpdate(pc.getPlayerID(), pc.getPlayer().getEnergyCollected(), "EnergySpent");
+        this.executePostBuyBehavior();
+
+        return;
+    }
+
+    public void onCardPlayed(final PlayerController pc, final String card)
+    {
+        /* TODO Some validation is required. A player may not always play a card at any given time. */
+
+        if (Objects.equals(card, "MemorySwap"))
+        {
+            this.getSession().broadcastPlayedCard(pc.getPlayerID(), card);
+
+            /* The three new cards the client will get. */
+            final ArrayList<String> newCards = new ArrayList<String>();
+            for (int i = 0; i < 3; ++i)
+            {
+                if (pc.getPlayer().getPlayerDeck().isEmpty())
+                {
+                    pc.getPlayer().shuffleAndRefillDeck();
+                }
+
+                newCards.add(pc.getPlayer().getPlayerDeck().get(0).getCardType());
+                pc.getPlayer().getPlayerHand().add(pc.getPlayer().getPlayerDeck().remove(0));
+                continue;
+            }
+
+            l.debug("Player {} played Memory Swap. The new cards are: {}. Their current hand is now: {}.", pc.getPlayerID(), newCards.toString(), pc.getPlayer().getPlayerHand());
+
+            pc.getSession().sendHandCardsToPlayer(pc, newCards.toArray(new String[0]));
+
+            pc.getPlayer().getBoughtUpgradeCards().remove("MemorySwap");
+            l.debug("Player {}'s Memory Swap card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
+
+            return;
+        }
+
+        if (Objects.equals(card, "SpamBlocker"))
+        {
+            this.getSession().broadcastPlayedCard(pc.getPlayerID(), card);
+
+            final ArrayList<IPlayableCard> spam = new ArrayList<IPlayableCard>();
+
+            for (int i = 0; i < pc.getPlayer().getPlayerHand().size(); ++i)
+            {
+                final IPlayableCard cursor = pc.getPlayer().getPlayerHand().get(i);
+
+                if (cursor instanceof final SpamDamage sd)
+                {
+                    spam.add(sd);
+                }
+
+                continue;
+            }
+
+            pc.getPlayer().getBoughtUpgradeCards().remove("SpamBlocker");
+            l.debug("Player {}'s Spam Blocker card was removed from their bought upgrade cards because it is a one-time use card. Their bought upgrade cards are now: {}.", pc.getPlayerID(), pc.getPlayer().getBoughtUpgradeCards().toString());
+
+            if (spam.isEmpty())
+            {
+                l.debug("Player {} played Spam Blocker but had no spam cards in their hand. Sending empty programming cards model.", pc.getPlayerID());
+                new YourCardsModel(pc.getClientInstance(), new String[0]).send();
+                return;
+            }
+
+            final ArrayList<IPlayableCard> newCards = new ArrayList<IPlayableCard>();
+
+            for (final IPlayableCard sd : spam)
+            {
+                pc.getPlayer().getPlayerHand().remove(sd);
+                pc.getAuthGameMode().getSpamDeck().add( (SpamDamage) sd);
+
+                if (pc.getPlayer().getPlayerDeck().isEmpty())
+                {
+                    pc.getPlayer().shuffleAndRefillDeck();
+                }
+
+                newCards.add(pc.getPlayer().getPlayerDeck().get(0));
+
+                pc.getPlayer().getPlayerHand().add(pc.getPlayer().getPlayerDeck().remove(0));
+
+                continue;
+            }
+
+            if (pc.getPlayer().getPlayerHand().size() > 9)
+            {
+                l.fatal("Player {} has more than 9 cards in their hand after Spam Blocker behavior execution. Their hand is: {}.", pc.getPlayerID(), pc.getPlayer().getPlayerHand().toString());
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            l.debug("Player {} played Spam Blocker. The new cards are: {}. Their current hand is now: {}.", pc.getPlayerID(), newCards.toString(), pc.getPlayer().getPlayerHand());
+            new YourCardsModel(pc.getClientInstance(), newCards.stream().map(IPlayableCard::getCardType).toArray(String[]::new)).send();
+
+            return;
+        }
+
+        l.error("Player {} tried to play a card that is not allowed. They tried to play {}.", pc.getPlayerID(), card);
+        new ErrorMsgModel(pc.getClientInstance(), String.format("You tried to play %s but that was not allowed.", card)).send();
+
+        return;
     }
 
     /**
@@ -287,7 +578,7 @@ public class GameMode {
             }
 
             p.shuffleAndRefillDeck();
-            l.debug("P {} - Shuffling and refilling deck.", p.getController().getName());
+            l.debug("Client {}'s deck is being shuffled and refilled.", p.getController().getPlayerID());
             this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
 
             int remainingCards = 9 - maxCards;
@@ -295,7 +586,7 @@ public class GameMode {
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
             }
 
-            l.debug("P {} - Has following Cards in his Hand: {}", p.getController().getName(), Arrays.toString(p.getPlayerHandAsStringArray()));
+            l.debug("Client {} has following programming cards in his Hand: {}", p.getController().getPlayerID(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
             if (p.getController() instanceof PlayerController pc) {
                 pc.getSession().sendHandCardsToPlayer(pc, p.getPlayerHandAsStringArray());
@@ -318,54 +609,159 @@ public class GameMode {
 
     // region Activation Phase Helpers
 
+    private ArrayList<Player> getOverriddenPrioritiesPlayersASC()
+    {
+        final ArrayList<Player> out = new ArrayList<Player>();
+
+        for (final Player player : this.players)
+        {
+            if (player.getChosenRegisterAdminPrivilegeUpgrade() == null)
+            {
+                continue;
+            }
+
+            if (player.getChosenRegisterAdminPrivilegeUpgrade().register() == this.currentRegisterIndex)
+            {
+                out.add(player);
+                continue;
+            }
+
+            continue;
+        }
+
+        if (out.isEmpty() || out.size() == 1)
+        {
+            return out;
+        }
+
+        // If multiple players have set their override request for the current register.
+        // We sort all players by the time they have sent their request.
+        // The player with the lowest time passed will get the highest priority.
+        for (int i = 0; i < out.size(); ++i)
+        {
+            int min = i;
+
+            for (int j = i + 1; j < out.size(); ++j)
+            {
+                if (out.get(j).getChosenRegisterAdminPrivilegeUpgrade().in() < out.get(min).getChosenRegisterAdminPrivilegeUpgrade().in())
+                {
+                    min = j;
+                    continue;
+                }
+
+                continue;
+            }
+
+            final Player tmp = out.get(i);
+            out.set(i, out.get(min));
+            out.set(min, tmp);
+
+            continue;
+        }
+
+        return out;
+    }
+
+    private void resetOverriddenPrioritiesForRegister()
+    {
+        for (final Player player : this.players)
+        {
+            if (player.getChosenRegisterAdminPrivilegeUpgrade() == null)
+            {
+                continue;
+            }
+
+            if (player.getChosenRegisterAdminPrivilegeUpgrade().register() == this.currentRegisterIndex)
+            {
+                player.setChosenRegisterAdminPrivilegeUpgrade(null);
+                l.debug("Reset overridden priority for player {} for register {}.", player.getController().getPlayerID(), this.currentRegisterIndex);
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
     /**
      * The following method calculates the priorities for all players: First the distance from each robot to the
      * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
      */
-    private void determinePriorities() {
+    private void determinePriorities()
+    {
         final Coordinate antennaCoordinate = this.course.getPriorityAntennaCoordinate();
         l.debug("Determining priorities for all players. Found Priority Antenna at {}.", antennaCoordinate.toString());
 
         final int[] distances = new int[this.players.size()];
-        for (int i = 0; i < this.players.size(); i++) {
-            Coordinate robotCoordinate = this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate();
-            distances[i] = Math.abs(antennaCoordinate.getX() - robotCoordinate.getX()) + Math.abs(antennaCoordinate.getY() - robotCoordinate.getY());
+        for (int i = 0; i < this.players.size(); ++i)
+        {
+            distances[i] = Math.abs(antennaCoordinate.getX() - this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate().getX()) + Math.abs(antennaCoordinate.getY() - this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate().getY());
+            continue;
         }
 
         int currentPriority = this.players.size();
-        for (int j = 0; j < this.players.size(); j++){
-            int minDistance = Integer.MAX_VALUE;
-            int minIndex = -1;
 
-            for (int i = 0; i < distances.length; i++) {
-                if (distances[i] < minDistance) {
-                    minDistance = distances[i];
-                    minIndex = i;
+        /* Priorities with distance calculations. */
+
+        for (int i = 0; i < distances.length; ++i)
+        {
+            int min = 0;
+
+            for (int j = 0; j < distances.length; ++j)
+            {
+                if (distances[j] < distances[min])
+                {
+                    min = j;
+                    continue;
                 }
+
+                continue;
             }
 
-            //Leave until new code was tested
-            /*if (minIndex != -1) {
-                this.players.get(minIndex).setPriority(currentPriority);
-                currentPriority--;
-                distances[minIndex] = Integer.MAX_VALUE;
-            }*/
+            this.players.get(min).setPriority(currentPriority--);
+            distances[min] = Integer.MAX_VALUE;
 
-            //Now, includes AdminPrivilege logic. Still needs to be tested once shop is available.
-            if (minIndex != -1) {
-                Player currentPlayer = this.players.get(minIndex);
-
-                if (currentPlayer.getHasAdminPrivilegeUpgrade() && currentPlayer.getChosenRegisterAdminPrivilegeUpgrade() == currentRegisterIndex) {
-                    currentPlayer.setPriority(currentPriority);
-                    currentPriority--;
-                    distances[minIndex] = Integer.MAX_VALUE;
-                } else {
-                    currentPlayer.setPriority(currentPriority);
-                    currentPriority--;
-                    distances[minIndex] = Integer.MAX_VALUE;
-                }
-            }
+            continue;
         }
+
+        /* Priorities with admin privilege cards. */
+
+        final ArrayList<Player> overriddenPrioritiesPlayers = this.getOverriddenPrioritiesPlayersASC();
+
+        if (overriddenPrioritiesPlayers.isEmpty())
+        {
+            l.debug("No players have overridden priorities. The priorities are: {}.", this.getPrioritiesAsString().toString());
+            return;
+        }
+
+        l.debug("The following players have overridden priorities: {}.", overriddenPrioritiesPlayers.toString());
+
+        int priority = 1_000;
+        for (final Player player : overriddenPrioritiesPlayers)
+        {
+            player.setPriority(priority++);
+            continue;
+        }
+
+        l.debug("The priorities for register {} are: {}.", this.currentRegisterIndex, this.getPrioritiesAsString().toString());
+
+        this.resetOverriddenPrioritiesForRegister();
+
+        return;
+    }
+
+    private ArrayList<String> getPrioritiesAsString()
+    {
+        final ArrayList<String> out = new ArrayList<String>();
+
+        for (final Player player : this.players)
+        {
+            out.add(String.format("%d", player.getPriority()));
+            continue;
+        }
+
+        return out;
     }
 
     /**
@@ -375,12 +771,28 @@ public class GameMode {
         this.players.sort(Comparator.comparingInt(Player::getPriority).reversed());
     }
 
+
     /**
-     * The following method handles the activation of conveyor belts and sends the corresponding JSON messages.
-     * The robot is moved in the out-coming flow direction of the conveyor belt.
-     * @param speed determines the amount of fields the robot is moved
+     * activate the ConveyorBelts and broadcast player positions
      */
-    private void activateConveyorBelts(int speed) {
+    public void activateConveyorBelts() {
+
+        activateBlueConveyorBelts();
+        activateBlueConveyorBelts();
+        for (Player player : players) {
+            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition().getX(), player.getPosition().getY());
+        }
+        activateGreenConveyorBelts();
+        for (Player player : players) {
+            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition().getX(), player.getPosition().getY());
+        }
+    }
+
+    /**
+     * activates blue conveyor belts (but only one time)
+     */
+    private void activateBlueConveyorBelts() {
+
         for (Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
@@ -388,49 +800,48 @@ public class GameMode {
                 if (fieldType instanceof ConveyorBelt conveyorBelt) {
                     int beltSpeed = conveyorBelt.getSpeed();
 
-                    if (beltSpeed == speed) {
+                    if (beltSpeed == 2) {
                         Coordinate oldCoordinate = currentTile.getCoordinate();
                         String outDirection = conveyorBelt.getOutcomingFlowDirection();
                         Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
-                        curvedArrowCheck(player, targetCoordinate);
-                        if(speed>1) {
-                            targetCoordinate = calculateNewCoordinate(outDirection, targetCoordinate);
-                            curvedArrowCheck(player, targetCoordinate);
+
+                        if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
+                            curvedArrowCheck(player, targetCoordinate, outDirection);
+                            player.getPlayerRobot().moveRobotOneTile(true, outDirection, 0);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
+                            course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
                         }
+                    }
+                }
+            }
+        }
+    }
 
-                        //TODO refactor to use moveForward method from Robot class:
 
-                        if (!player.getPlayerRobot().getCourse().isCoordinateWithinBounds(targetCoordinate) ||
-                                player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
-                            l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .",
-                                    player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
-                                    targetCoordinate.toString());
-                            player.getPlayerRobot().reboot();
-                            return;
+    /**
+     * activates green conveyor belts
+     */
+    public void activateGreenConveyorBelts(){
+        for (Player player : players) {
+            Tile currentTile = player.getPlayerRobot().getCurrentTile();
+
+            for (FieldType fieldType : currentTile.getFieldTypes()) {
+                if (fieldType instanceof ConveyorBelt conveyorBelt) {
+                    int beltSpeed = conveyorBelt.getSpeed();
+
+                    if (beltSpeed == 1) {
+                        Coordinate oldCoordinate = currentTile.getCoordinate();
+                        String outDirection = conveyorBelt.getOutcomingFlowDirection();
+                        Coordinate targetCoordinate = calculateNewCoordinate(outDirection, oldCoordinate);
+                        curvedArrowCheck(player, targetCoordinate, outDirection);
+
+                        if(!course.getTileByCoordinate(targetCoordinate).isOccupied()){
+                            player.getPlayerRobot().moveRobotOneTile(true, outDirection, 0);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
+                            course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
+                            player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
                         }
-
-                        if(player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
-                            l.debug("Player {}'s robot moved to {} and fell down a pit. Rebooting . . .",
-                                    player.getPlayerRobot().determineRobotOwner().getController().getPlayerID(),
-                                    targetCoordinate.toString());
-                            player.getPlayerRobot().reboot();
-                            return;
-                        }
-
-                        if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
-                                getTileByCoordinate(oldCoordinate),
-                                player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
-                            l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
-                                    "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
-                                    getPlayerID(), oldCoordinate.toString(), targetCoordinate.toString());
-                            return;
-                        }
-
-                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(null);
-                        course.updateRobotPosition(player.getPlayerRobot(), targetCoordinate);
-                        player.getPlayerRobot().getCurrentTile().setOccupiedBy(player.getPlayerRobot());
-
-                        this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), targetCoordinate.getX(), targetCoordinate.getY());
                     }
                 }
             }
@@ -463,7 +874,7 @@ public class GameMode {
                 Tile newTile = course.getTileByCoordinate(targetCoordinate);
                 newTile.addCheckPoint(checkpoint);
 
-                this.getSession().broadcastCheckPointMoved(checkpoint.getCheckpointNumber(), targetCoordinate.getX(), targetCoordinate.getX());
+                this.getSession().broadcastCheckPointMoved(checkpoint.getCheckpointNumber(), targetCoordinate.getX(), targetCoordinate.getY());
             }
         }
     }
@@ -492,51 +903,41 @@ public class GameMode {
     /**
      * The following method is required during the conveyor belt activation period.
      * It checks if the robot moved onto another conveyor belt tile. If yes, the method checks
-     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow directions
+     * if the new conveyor belt tile has a curved arrow by comparing the incoming flow direction
      * with the out-coming flow direction. If yes, the direction of the robot is changed accordingly
      * and the corresponding JSON message is sent.
      * @param player Owner of the current robot
      * @param coordinate Coordinate of the new tile the robot moved onto
+     * @param direction Direction from which the robot was moved into the conveyor belt
      */
-    public void curvedArrowCheck(Player player, Coordinate coordinate) {
+    public void curvedArrowCheck(Player player, Coordinate coordinate, String direction) {
         Tile newTile = course.getTileByCoordinate(coordinate);
         for(FieldType newFieldType : newTile.getFieldTypes()) {
             if(newFieldType instanceof ConveyorBelt conveyorBelt) {
                 String outDirection = conveyorBelt.getOutcomingFlowDirection();
-                String[] inDirection = conveyorBelt.getIncomingFlowDirection();
 
-                if(inDirection != null && outDirection != null) {
-                    for(String direction : inDirection) {
+                if(direction != null && outDirection != null) {
                         if((Objects.equals(direction, "bottom") && outDirection.equals("right")) ||
                                 (Objects.equals(direction, "left") && outDirection.equals("bottom")) ||
                                 (Objects.equals(direction, "top") && outDirection.equals("left")) ||
                                 (Objects.equals(direction, "right") && outDirection.equals("top"))) {
 
-                            switch(player.getPlayerRobot().getDirection()) {
-                                case("top") -> player.getPlayerRobot().setDirection("right");
-                                case("right") -> player.getPlayerRobot().setDirection("bottom");
-                                case("bottom") -> player.getPlayerRobot().setDirection("left");
-                                case("left") -> player.getPlayerRobot().setDirection("top");
-                            }
+                            //rotate robot counterclockwise
+                            player.getPlayerRobot().rotateRobotOnTileToTheLeft();
 
-                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
+                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
 
                         } else if((Objects.equals(direction, "bottom") && outDirection.equals("left")) ||
                                 (Objects.equals(direction, "left") && outDirection.equals("top")) ||
                                 (Objects.equals(direction, "top") && outDirection.equals("right")) ||
                                 (Objects.equals(direction, "right") && outDirection.equals("bottom"))) {
 
-                            switch(player.getPlayerRobot().getDirection()) {
-                                case ("top") -> player.getPlayerRobot().setDirection("left");
-                                case ("right") -> player.getPlayerRobot().setDirection("top");
-                                case ("bottom") -> player.getPlayerRobot().setDirection("right");
-                                case ("left") -> player.getPlayerRobot().setDirection("bottom");
-                            }
+                            //rotate robot clockwise
+                            player.getPlayerRobot().rotateRobotOnTileToTheRight();
 
-                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
+                            this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "clockwise");
 
                         }
-                    }
                 }
             }
         }
@@ -583,7 +984,7 @@ public class GameMode {
 
                             if (!player.getPlayerRobot().isTraversable(player.getPlayerRobot().getCourse().
                                             getTileByCoordinate(oldCoordinate),
-                                    player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate))) {
+                                    player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate), 0)) {
                                 l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. " +
                                         "Ignoring.", player.getPlayerRobot().determineRobotOwner().getController().
                                         getPlayerID(), oldCoordinate.toString(), targetCoordinate.toString());
@@ -687,6 +1088,7 @@ public class GameMode {
             }
 
             if (playerRobot.getCanShootBackward()) {
+                l.debug("Player {}'s robot can shoot backwards. Checking hits.", player.getController().getPlayerID());
                 switch (robotDirection) {
                     case "top" -> handleLaserShooting("bottom", 1, robotTileXCoordinate, robotTileYCoordinate - 1, 0, -1);
                     case "right" -> handleLaserShooting("left", 1, robotTileXCoordinate + 1, robotTileYCoordinate, 1, 0);
@@ -909,12 +1311,11 @@ public class GameMode {
                 continue;
             }
 
-            l.warn("Player {} does not have a card in register {}.", p.getController().getPlayerID(), this.currentRegisterIndex + 1);
+            l.warn("Player {} does not have a card in register {}. If this was after a reboot, this can be ignored.", p.getController().getPlayerID(), this.currentRegisterIndex + 1);
         }
 
         addDelay(2000);
-        this.activateConveyorBelts(2);
-        this.activateConveyorBelts(1);
+        this.activateConveyorBelts();
         this.activatePushPanels();
         this.activateGears();
         this.findLasers();
@@ -944,8 +1345,8 @@ public class GameMode {
     private void triggerActivationPhase()
     {
         for (Player p : players) {
-            l.debug("P Player {} - Cards in register {}.",
-                    p.getController().getName(),
+            l.debug("Player {} has these cards in their registers: {}.",
+                    p.getController().getPlayerID(),
                     p.getRegistersAsStringArray());
         }
 
@@ -1001,55 +1402,84 @@ public class GameMode {
     /**
      * Called in the method addCardToRegister in the Class Player when the players register is full
      */
-    public void startTimer() {
-        this.getSession().getGameState().sendStartTimer();
+    public void startProgrammingTimerService()
+    {
+        this.getSession().broadcastProgrammingTimerStart();
 
-        // Sleep for 30 seconds
-        Thread programmingCardThread = new Thread(() -> {
-            try {
-                Thread.sleep(30000); // Sleep for 30 seconds
-            } catch (InterruptedException e) {
-                l.info("All Players have set their Cards");
+        if (this.programmingPhaseTimerService != null && this.programmingPhaseTimerService.isAlive())
+        {
+            l.error("Programming Phase Timer Service is already running.");
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return;
+        }
+
+        this.programmingPhaseTimerService = new Thread(() ->
+        {
+            final long startTime = System.currentTimeMillis();
+            try
+            {
+                Thread.sleep(30_000);
+            }
+            catch (final InterruptedException e)
+            {
+                l.info("All Players have set their register cards in time. Time left [{}s].Starting next phase . . ." , ( (double) 30_000 - (System.currentTimeMillis() - startTime) ) / 1_000);
             }
 
-            int[] playerIdWhoNotFinished = new int[players.size()];
-            ArrayList playerWhoNotFinished = new ArrayList();
-            int index = 0;
-            for (Player player : players) {
-                if (!player.hasPlayerFinishedProgramming()) {
-                    playerIdWhoNotFinished[index++] = player.getController().getPlayerID();
-                    playerWhoNotFinished.add(player);
-                }
-            }
-            if (index < players.size()) {
-                playerIdWhoNotFinished = Arrays.copyOf(playerIdWhoNotFinished, index);
-            }
-            this.getSession().getGameState().sendStopTimer(playerIdWhoNotFinished);
+            l.info("Programming Phase Timer Service was interrupted or finished waiting successfully.");
 
-            discardAndDrawBlind(playerWhoNotFinished);
+            this.executePostProgrammingPhaseTimerServiceBehavior();
 
-            triggerActivationPhase();
+            return;
         });
 
-        programmingCardThread.start();
+        this.programmingPhaseTimerService.setName(String.format("ProgrammingPhaseTimerService-%s", this.getSession().getSessionID()));
+        this.programmingPhaseTimerService.start();
 
-        boolean haveAllPlayersSetTheirCards = true;
-        for (Player player : players) {
-            if (!player.hasPlayerFinishedProgramming()) {
-                haveAllPlayersSetTheirCards= false;
-            }
-        }
-
-        if (haveAllPlayersSetTheirCards) {
-            programmingCardThread.interrupt();
-            triggerActivationPhase();
-        }
+        return;
     }
 
-    public void discardAndDrawBlind(ArrayList<Player> players) {
-        for (Player player : players) {
-            player.handleIncompleteProgramming();
+    public void executePostProgrammingPhaseTimerServiceBehavior()
+    {
+        if (this.getUnfinishedPlayersDuringProgrammingPhase().length > 0)
+        {
+            l.info("The following players did not finish their programming phase in time: {}.", Arrays.toString(this.getUnfinishedPlayersDuringProgrammingPhase()));
+            this.getSession().broadcastProgrammingTimerFinish(this.getUnfinishedPlayersDuringProgrammingPhase());
+            this.discardAndDrawBlind(Arrays.stream(this.getUnfinishedPlayersDuringProgrammingPhase()).mapToObj(i -> Objects.requireNonNull(this.getSession().getOwnershipableByID(i)).getPlayer()).collect(Collectors.toCollection(ArrayList::new)));
         }
+
+        this.programmingPhaseTimerService = null;
+
+        this.handleNewPhase(EGamePhase.ACTIVATION);
+
+        return;
+    }
+
+    private int[] getUnfinishedPlayersDuringProgrammingPhase()
+    {
+        ArrayList<Integer> unfinishedPlayers = new ArrayList<Integer>();
+        for (final Player p : this.players)
+        {
+            if (!p.hasPlayerFinishedProgramming())
+            {
+                unfinishedPlayers.add(p.getController().getPlayerID());
+                continue;
+            }
+
+            continue;
+        }
+
+        return unfinishedPlayers.stream().mapToInt(i -> i).toArray();
+    }
+
+    public void discardAndDrawBlind(final ArrayList<Player> players)
+    {
+        for (final Player p : players)
+        {
+            p.executeIncompleteProgrammingBehavior();
+            continue;
+        }
+
+        return;
     }
 
     /**
@@ -1151,7 +1581,8 @@ public class GameMode {
 
     private Thread createActivationThread()
     {
-        return new Thread(
+
+        final Thread t = new Thread(
         () ->
         {
             l.debug("Activation Phase started.");
@@ -1188,6 +1619,114 @@ public class GameMode {
 
             return;
         });
+
+        t.setName(String.format("PhaseIIIService-%s", this.getSession().getSessionID()));
+
+        return t;
+    }
+
+    private void evaluateUpgradePhasePriorities()
+    {
+        l.debug("Determining priority for all players during this upgrade phase.");
+        this.upgradePhasePlayersSortedByPriority.clear();
+
+        final Coordinate antennaLocation = this.course.getPriorityAntennaCoordinate();
+
+        final int[] distances = new int[this.players.size()];
+        for (int i = 0; i < this.players.size(); ++i)
+        {
+            final Coordinate    robotCoordinate     = this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate();
+                                distances[i]        = Math.abs(antennaLocation.getX() - robotCoordinate.getX()) + Math.abs(antennaLocation.getY() - robotCoordinate.getY());
+            continue;
+        }
+
+        int currentPriority = this.players.size();
+        for (int i = 0; i < this.players.size(); ++i)
+        {
+            int     minDistance     = Integer.MAX_VALUE;
+            int     minIndex        = -1;
+
+            for (int j = 0; j < distances.length; ++j)
+            {
+                if (distances[j] < minDistance)
+                {
+                    minDistance     = distances[j];
+                    minIndex        = j;
+                }
+
+                continue;
+            }
+
+            //Now, includes AdminPrivilege logic. Still needs to be tested once shop is available.
+            if (minIndex == -1)
+            {
+                l.fatal("Could not determine priority for upgrade phase.");
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            final Player currentPlayer = this.players.get(minIndex);
+
+            this.upgradePhasePlayersSortedByPriority.add(currentPlayer);
+            currentPriority--;
+            distances[minIndex] = Integer.MAX_VALUE;
+
+            continue;
+        }
+
+        l.debug("Upgrade Phase priorities determined: {}.", this.upgradePhasePlayersSortedByPriority);
+
+        return;
+    }
+
+    private boolean isUpgradeShopRightSize()
+    {
+        /* The shop must always have the size of all controllers connected. */
+        return this.players.size() == this.upgradeShop.size();
+    }
+
+    private boolean doesUpgradeShopContains(final String card)
+    {
+        for (final AUpgradeCard upgradeCard : this.upgradeShop)
+        {
+            if(upgradeCard != null) {
+                if (upgradeCard.getCardType().equals(card)) {
+                    return true;
+                }
+            }
+
+            continue;
+        }
+
+        return false;
+    }
+
+    private int getUpgradeCardCost(final String card)
+    {
+        for (final AUpgradeCard upgradeCard : this.upgradeShop)
+        {
+            if(upgradeCard != null) {
+                if (upgradeCard.getCardType().equals(card)) {
+                    return upgradeCard.getCost();
+                }
+            }
+
+            continue;
+        }
+
+        l.error("Could not find cost for upgrade card {}.", card);
+
+        return -1;
+    }
+
+    public boolean isProgrammingTimerServiceRunning()
+    {
+        return this.programmingPhaseTimerService != null && this.programmingPhaseTimerService.isAlive();
+    }
+
+    public Thread getProgrammingTimerService()
+    {
+        return this.programmingPhaseTimerService;
     }
 
     // endregion Getters and Setters

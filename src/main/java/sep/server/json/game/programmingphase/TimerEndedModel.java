@@ -1,28 +1,35 @@
 package sep.server.json.game.programmingphase;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import sep.server.json.AModel;
-import sep.server.viewmodel.ClientInstance;
+import sep.server.json.         AModel;
+import sep.server.viewmodel.    ClientInstance;
 
-public class TimerEndedModel extends AModel {
+import org.json.        JSONArray;
+import org.json.        JSONObject;
 
+public final class TimerEndedModel extends AModel
+{
     private final int[] playerID;
 
-    public TimerEndedModel(ClientInstance ci, int[] playerID) {
+    public TimerEndedModel(final ClientInstance ci, final int[] playerID)
+    {
         super(ci);
+
         this.playerID = playerID;
+
+        return;
     }
 
     @Override
-    public JSONObject toJSON() {
-        JSONObject body = new JSONObject();
-        body.put("clientIDs", new JSONArray(playerID));
+    public JSONObject toJSON()
+    {
+        final JSONObject body = new JSONObject();
+        body.put(   "clientIDs",    new JSONArray(this.playerID)    );
 
-        JSONObject j = new JSONObject();
-        j.put("messageType", "TimerEnded");
-        j.put("messageBody",body);
+        final JSONObject j = new JSONObject();
+        j.put(      "messageType",  "TimerEnded"                    );
+        j.put(      "messageBody",  body                            );
 
         return j;
     }
+
 }

@@ -27,17 +27,17 @@
             id="btn-container" stylesheets="@wrapper.css"
         >
             <Button
-                text="START CLIENT"
+                text="START ONLY CLIENT"
                 styleClass="secondary-btn" style="-fx-min-width: 350px;"
                 onAction="#onStartClientBtn"
             />
             <Button
-                text="START SERVER"
+                text="START ONLY SERVER"
                 styleClass="secondary-btn" style="-fx-min-width: 350px;"
                 onAction="#onStartServerBtn"
             />
             <Button
-                text="CONFIGURE AGENTS"
+                text="CUSTOM START"
                 styleClass="secondary-btn" style="-fx-min-width: 350px;"
                 onAction="#onAgentConfigBtn"
             />

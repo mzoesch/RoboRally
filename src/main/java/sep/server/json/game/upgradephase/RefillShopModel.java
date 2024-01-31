@@ -1,25 +1,33 @@
 package sep.server.json.game.upgradephase;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import sep.server.json.AModel;
-import sep.server.viewmodel.ClientInstance;
+import sep.server.json.         AModel;
+import sep.server.viewmodel.    ClientInstance;
 
-public class RefillShopModel extends AModel {
+import org.json.    JSONArray;
+import org.json.    JSONObject;
+import java.util.   ArrayList;
 
-    private final String cards;
+public final class RefillShopModel extends AModel
+{
+    private final ArrayList<String> cards;
 
-    public RefillShopModel(ClientInstance ci, String cards) {
+    public RefillShopModel(final ClientInstance ci, final ArrayList<String> cards)
+    {
         super(ci);
+
         this.cards = cards;
+
+        return;
     }
 
     @Override
-    public JSONObject toJSON() {
-        JSONObject j = new JSONObject();
-        j.put("messageType", "RefillShop");
-        j.put("messageBody", new JSONObject().put("cards", this.cards));
+    public JSONObject toJSON()
+    {
+        final JSONObject j = new JSONObject();
+        j.put(  "messageType",  "RefillShop"                                                );
+        j.put(  "messageBody",  new JSONObject().put("cards", new JSONArray(this.cards))    );
 
         return j;
     }
+
 }

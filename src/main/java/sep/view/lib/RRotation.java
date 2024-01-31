@@ -1,5 +1,8 @@
 package sep.view.lib;
 
+import sep.view.clientcontroller.   EGameState;
+import sep.view.clientcontroller.   GameInstance;
+
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 
@@ -16,7 +19,7 @@ public final record RRotation(int rotation)
         return;
     }
 
-    /** Valid rotation inputs are "clockwise", "counterclockwise", "NORTH", "EAST", "SOUTH", "WEST". */
+    /** Valid rotation inputs are "clockwise", "counterclockwise", "NORTH", "EAST", "SOUTH", "WEST", "startingDirection" */
     public RRotation addRotation(final String r)
     {
         if (r.equals("clockwise"))
@@ -29,7 +32,7 @@ public final record RRotation(int rotation)
             return new RRotation(this.rotation + -90);
         }
 
-        /* Legacy */
+        /* Begin Legacy */
         {
 
         if (r.equals("NORTH"))
@@ -53,8 +56,31 @@ public final record RRotation(int rotation)
         }
 
         }
+        /* End Legacy */
 
-        l.error("Invalid rotation input: {}", r);
+        if (r.equals("startingDirection"))
+        {
+            l.debug("Getting current server course name [{}] for starting direction.", EGameState.INSTANCE.getCurrentServerCourse());
+
+            switch(EGameState.INSTANCE.getCurrentServerCourse())
+            {
+
+            case ("Dizzy Highway"), ("Lost Bearings"), ("Extra Crispy"), ("Twister") ->
+            {
+                return new RRotation(90);
+            }
+
+            case ("Death Trap") ->
+            {
+                return new RRotation(270);
+            }
+
+            }
+        }
+
+        l.fatal("Invalid rotation input: {}", r);
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
         return null;
     }
 

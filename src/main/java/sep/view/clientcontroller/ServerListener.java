@@ -90,6 +90,11 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
             return;
         }
 
+        if (ViewSupervisor.getSceneController().getCurrentScreen() == null)
+        {
+            return;
+        }
+
         /* We are never connected to a server in the lobby scene. */
         if (ViewSupervisor.getSceneController().getCurrentScreen().id().equals(SceneController.MAIN_MENU_ID))
         {
@@ -120,6 +125,14 @@ public sealed abstract class ServerListener implements Runnable permits AgentSL,
                     }
 
                     GameInstance.handleServerDisconnect();
+
+                    if (EClientInformation.INSTANCE.isAgent())
+                    {
+                        l.fatal("The server closed the connection in an unexpected way. Shutting down agent.");
+                        GameInstance.kill(GameInstance.EXIT_FATAL);
+                        return;
+                    }
+
                     ViewSupervisor.getSceneController().renderExistingScreen(SceneController.MAIN_MENU_ID);
                     ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, "Server closed the connection."));
 

@@ -70,6 +70,27 @@ public final class AgentRemotePlayerData extends RemotePlayer
             return;
         }
 
+        if (rotation.equals("startingDirection"))
+        {
+            l.debug("Getting current server course name [{}] for starting direction.", EGameState.INSTANCE.getCurrentServerCourse());
+
+            switch(EGameState.INSTANCE.getCurrentServerCourse())
+            {
+
+            case ("Dizzy Highway"), ("Lost Bearings"), ("Extra Crispy"), ("Twister") ->
+            {
+                this.rotation = 90;
+            }
+
+            case ("Death Trap") ->
+            {
+                this.rotation = 270;
+            }
+
+            }
+            return;
+        }
+
         l.fatal("Invalid rotation: " + rotation);
         GameInstance.kill(GameInstance.EXIT_FATAL);
 

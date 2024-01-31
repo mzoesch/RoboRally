@@ -16,6 +16,8 @@ public final class InitialClientConnectionModel
 {
     private static final Logger l = LogManager.getLogger(InitialClientConnectionModel.class);
 
+    private static String serverProtocolVersion = null;
+
     private InitialClientConnectionModel() throws IllegalStateException
     {
         super();
@@ -31,6 +33,8 @@ public final class InitialClientConnectionModel
 
         l.debug(    "Server Protocol Version: {}",  obj.getJSONObject("messageBody").getString("protocol")          );
         l.debug(    "Client Protocol Version: {}",  String.format("Version %s", Types.EProps.VERSION.toString())    );
+
+        InitialClientConnectionModel.serverProtocolVersion = obj.getJSONObject("messageBody").getString("protocol");
 
         return obj.getJSONObject("messageBody").getString("protocol").equals(String.format("Version %s", Types.EProps.VERSION.toString()));
     }
@@ -86,4 +90,10 @@ public final class InitialClientConnectionModel
     {
         return j.getJSONObject("messageBody").getString("error");
     }
+
+    public static String getServerProtocolVersion()
+    {
+        return InitialClientConnectionModel.serverProtocolVersion;
+    }
+
 }

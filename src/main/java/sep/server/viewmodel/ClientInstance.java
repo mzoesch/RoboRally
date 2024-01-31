@@ -9,6 +9,8 @@ import sep.server.model.            EServerInformation;
 
 import java.util.                   Objects;
 import java.util.                   HashMap;
+import java.util.                   Arrays;
+import java.util.                   ArrayList;
 import java.io.                     IOException;
 import java.io.                     InputStreamReader;
 import java.io.                     OutputStreamWriter;
@@ -163,7 +165,13 @@ public final class ClientInstance implements Runnable
         if (s.isFull())
         {
             new ErrorMsgModel(this, "Session is full.").send();
-            l.warn("Client {} tried to join a full session. Disconnecting them.", this.getAddr());
+            l.warn("Client {} tried to join the full session [{}]. Disconnecting them.", this.getAddr(), s.getSessionID());
+            return false;
+        }
+        if (s.hasStarted())
+        {
+            new ErrorMsgModel(this, "Session has already a game in progress.").send();
+            l.warn("Client {} tried to join the session [{}] which has already a game in progress. Disconnecting them.", this.getAddr(), s.getSessionID());
             return false;
         }
         this.playerController   = EServerInstance.createNewPlayerController(this, s);
@@ -256,10 +264,10 @@ public final class ClientInstance implements Runnable
         return true;
     }
 
-    /** TODO What is the purpose of this req? */
     private synchronized boolean onCardPlay()
     {
-        l.error("Received play Card from client: {}", this.dcrp.request().toString(0));
+        l.info("Client {} played card {}.", this.getAddr(), this.dcrp.getPlayedCard());
+        this.getPlayerController().getAuthGameMode().onCardPlayed(this.playerController, this.dcrp.getPlayedCard());
         return true;
     }
 
@@ -302,23 +310,36 @@ public final class ClientInstance implements Runnable
 
     private synchronized boolean onBuyUpgrade()
     {
-        l.debug("Received buy upgrade from client.");
+        if (!this.dcrp.hasBuyUpgradeCard())
+        {
+            l.debug("Client {} does not want to buy an upgrade card.", this.getPlayerController().getPlayerID());
+            this.playerController.getSession().getGameState().getAuthGameMode().onUpgradeCardBought(this.playerController, null);
+            return true;
+        }
+
+        l.debug("Client {} wants to buy the following Upgrade Card {}.", this.getPlayerController().getPlayerID(), this.dcrp.getBuyUpgradeCard());
+        this.playerController.getSession().getGameState().getAuthGameMode().onUpgradeCardBought(this.playerController, this.dcrp.getBuyUpgradeCard());
         return true;
     }
 
-    /*For the UpgradeCard AdminPriviledge*/
+    /** For the UpgradeCard AdminPrivilege. */
     private synchronized boolean onChooseRegister()
     {
-        l.debug("Client {} choose the following Register {}", this.getPlayerController().getName(), this.dcrp.getChosenRegister());
-        this.playerController.getSession().getGameState().setRegisterForAdminPriviledge(playerController, this.dcrp.getChosenRegister());
+        /* TODO This is unsafe. We may want to do some type checking here. */
+
+        l.debug("Client {} choose the register {} with the admin privilege card.", this.getAddr(), this.dcrp.getChosenRegister());
+
+        this.playerController.getPlayer().setChosenRegisterAdminPrivilegeUpgrade(this.dcrp.getChosenRegister());
+        this.playerController.getSession().broadcastAdminPrivilegeRegisterUpdate(this.playerController, this.dcrp.getChosenRegister());
+
         return true;
     }
 
-    /* For the UpgradeCard MemorySwap*/
+    /** For the UpgradeCard MemorySwap. */
     private synchronized boolean onDiscardSome()
     {
-        l.debug("Client {} discard the following three Cards {}", this.getPlayerController().getName(), this.dcrp.getMemorySwapCard());
-        this.playerController.getSession().getGameState().setMemorySwapCards(playerController, this.dcrp.getMemorySwapCard());
+        l.debug("Client {} discarded the following three cards {}.", this.getAddr(), this.dcrp.getMemorySwapCard());
+        this.playerController.getPlayer().onMemorySwapCardPlayed(new ArrayList<String>(Arrays.asList(this.dcrp.getMemorySwapCard())));
         return true;
     }
 

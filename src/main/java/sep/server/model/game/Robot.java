@@ -1,6 +1,8 @@
 package sep.server.model.game;
 
 import sep.server.json.game.damage.DrawDamageModel;
+import sep.server.model.game.tiles.FieldType;
+import sep.server.model.game.tiles.RestartPoint;
 import sep.server.viewmodel.PlayerController;
 import sep.server.viewmodel.Session;
 import sep.server.model.game.tiles.Coordinate;
@@ -106,9 +108,11 @@ public class Robot {
     /**
      * Moves the robot one tile based on the given direction.
      * Updates the robot's position.
+     *
      * @param forward True if the robot should move forwards, false if backwards.
+     * @param depth   How deep we already are in the recursion (should never exceed six).
      */
-    public void moveRobotOneTile(final boolean forward, String direction) {
+    public void moveRobotOneTile(final boolean forward, String direction, int depth) {
         final int dir = forward ? 1 : -1;
         final Coordinate currentCoordinate = this.getCurrentTile().getCoordinate();
         Coordinate targetCoordinate = null;
@@ -126,12 +130,7 @@ public class Robot {
             return;
         }
 
-        boolean loggingInProgress = false;
-        if (!loggingInProgress) {
-            loggingInProgress = true;
-            l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
-            loggingInProgress = false;
-        }
+        l.trace("Player {}'s robot wants to move from ({}, {}) to ({}, {}).", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.getX(), currentCoordinate.getY(), targetCoordinate.getX(), targetCoordinate.getY());
 
         if (!this.getCourse().isCoordinateWithinBounds(targetCoordinate)) {
             l.debug("Player {}'s robot moved to {} and fell off the board. Rebooting . . .", this.determineRobotOwner().getController().getPlayerID(), targetCoordinate.toString());
@@ -145,7 +144,7 @@ public class Robot {
             return;
         }
 
-        if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(targetCoordinate))) {
+        if (!this.isTraversable(this.getCurrentTile(), this.getCourse().getTileByCoordinate(targetCoordinate), depth)) {
             l.debug("Player {}'s robot wanted to traverse an impassable tile [from {} to {}]. Ignoring.", this.determineRobotOwner().getController().getPlayerID(), currentCoordinate.toString(), targetCoordinate.toString());
             return;
         }
@@ -162,7 +161,7 @@ public class Robot {
      * Updates the robot's position.
      */
     public void moveRobotOneTileForwards() {
-        moveRobotOneTile(true, this.getDirection().toLowerCase());
+        moveRobotOneTile(true, this.getDirection().toLowerCase(), 0);
     }
 
     /**
@@ -170,7 +169,7 @@ public class Robot {
      * Updates the robot's position.
      */
     public void moveRobotOneTileBackwards() {
-        moveRobotOneTile(false, this.getDirection().toLowerCase());
+        moveRobotOneTile(false, this.getDirection().toLowerCase(), 0);
     }
 
     /**
@@ -213,6 +212,7 @@ public class Robot {
         Player robotOwner = determineRobotOwner();
         Tile sourceTile = this.getCurrentTile();
         Tile restartPoint = null;
+        String restartDirection = "top";
         this.rebootTriggered = true;
 
         this.getAuthGameMode().getSession().broadcastReboot(robotOwner.getController().getPlayerID());
@@ -225,6 +225,7 @@ public class Robot {
 
             if (robotOwner.getController() instanceof PlayerController pc)
             {
+                //TODO noch nicht implementiert, was passiert, wenn keine Spam-Karten mehr vorhanden
                 new DrawDamageModel(pc.getClientInstance(), robotOwner.getController().getPlayerID(), new String[]{"Spam", "Spam"}).send();
             }
             else
@@ -257,17 +258,28 @@ public class Robot {
                     restartPoint = startingPoint;
                 }
             }
-            case "StartAR", "1A", "2A", "4A" -> {
+            case "1A", "4A" -> {
                 restartPoint = course.getTileByNumbers(0, 0);
             }
             case "5B" -> {
-                restartPoint = course.getTileByNumbers(4, 3);
+                restartPoint = course.getTileByNumbers(7, 3);
+            }
+            case "6B" -> {
+                restartPoint = course.getTileByNumbers(0, 7);
             }
         }
 
-        this.setCurrentTile(restartPoint);
+        //we need the direction of the rebootToken if we want to reboot on an occupied rebootField
+        for(FieldType f : restartPoint.getFieldTypes()){
+            if(f instanceof RestartPoint r){
+                restartDirection = r.getRestartOrientation();
+                l.debug("RebootDirection is set to {} ", restartDirection);
+            }
+        }
 
         if(restartPoint != null) {
+
+            //TODO brauchen wir das so? Oder ist das eher hard-coded im client?
 
             switch(this.direction) {
                 case "right" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
@@ -278,9 +290,19 @@ public class Robot {
                 case "left" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
             }
 
-            this.determineRobotOwner().getAuthGameMode().addDelay(2000);
+            if(restartPoint.isOccupied() && restartPoint.hasUnmovableRobot(restartDirection, 0)) {
+                restartPoint = startingPoint;
+                l.debug("RebootField is occupied and occupying robot can not be moved. Rebooting on startingField");
+            } else if(restartPoint.isOccupied()){
+                restartPoint.getRobot().moveRobotOneTile(true, restartDirection, 0);
+                l.debug("RebootField is occupied. Occupying robot should move one tile in direction: {} .", restartDirection);
+            }
+
+            this.setCurrentTile(restartPoint);
+            this.getCurrentTile().setOccupiedBy(this);
+            this.determineRobotOwner().getAuthGameMode().addDelay(1000);
             this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
-            this.determineRobotOwner().getAuthGameMode().addDelay(2000);
+            this.determineRobotOwner().getAuthGameMode().addDelay(1000);
             l.debug("Player {} was assigned a restart point.", this.determineRobotOwner().getController().getPlayerID());
 
         } else {
@@ -293,11 +315,21 @@ public class Robot {
     /**
      * The following method checks if a tile is traversable meaning if it is an antenna, if it has a wall,
      * or if it is occupied by an unmovable robot.
+     *
      * @param source tile the robot is coming from
-     * @param t1 tile the robot is moving to
+     * @param t1     tile the robot is moving to
+     * @param depth  how deep we already are in the recursion (should never exceed six).
+     *               As there is only a maximum of six players in a game.
      * @return true if traversable, false if not
      */
-    public boolean isTraversable(final Tile source, final Tile t1) {
+    public boolean isTraversable(final Tile source, final Tile t1, int depth)
+    {
+        if (depth > 7)
+        {
+            l.warn("Recursion depth exceeded while checking for traversable of tile {}. Marking tile as unpassable.", t1.getCoordinate().toString());
+            return false;
+        }
+
         if (t1.hasAntennaModifier()) {
             l.trace("Robot is unmovable because of the antenna modifier");
             return false;
@@ -347,10 +379,11 @@ public class Robot {
             }
         }
 
-        if (t1.hasUnmovableRobot(direction)){
+        if (t1.hasUnmovableRobot(direction, depth + 1)){
             l.trace("Robot is unmovable because of another unmovable robot");
             return false;
         }
+
         return true;
     }
 
@@ -381,12 +414,19 @@ public class Robot {
         return possessor;
     }
 
+    /** @deprecated  */
     public void setCanShootBackward(Boolean canShootBackward) {
         this.canShootBackward = canShootBackward;
     }
 
     public Boolean getCanShootBackward() {
-        return canShootBackward;
+        return this.hasRearLaserCard();
+    }
+
+    private boolean hasRearLaserCard()
+    {
+        l.debug("Checking if player {} has RearLaser card. Their bought upgrade cards are: {}", this.getPossessor().getController().getPlayerID(), this.getPossessor().getBoughtUpgradeCards());
+        return this.getPossessor().getBoughtUpgradeCards().contains("RearLaser");
     }
 
     public boolean isRebootTriggered() {

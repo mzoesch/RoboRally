@@ -14,6 +14,7 @@ import javafx.scene.image.          ImageView;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import java.util.                   ArrayList;
+import java.util.                   Arrays;
 import javafx.animation.            KeyFrame;
 import javafx.animation.            KeyValue;
 import javafx.animation.            Timeline;
@@ -223,10 +224,9 @@ public final class RobotView
         return this.position;
     }
 
-    public RLaserMask[] getLaserAffectedTiles(final Tile[][] tiles, final int count)
+    private RLaserMask[] getLaserAffectedTiles(final Tile[][] tiles, final int count, final ERotation rot)
     {
         final Tile t                          = tiles[this.position.x()][this.position.y()];
-        final ERotation rot                   = this.rotation.toEnum();
         final ArrayList<RLaserMask> masks     = new ArrayList<RLaserMask>();
 
         if (rot == null)
@@ -283,6 +283,22 @@ public final class RobotView
             }
 
             continue;
+        }
+
+        return masks.toArray(new RLaserMask[0]);
+    }
+
+    public RLaserMask[] getLaserAffectedTiles(final Tile[][] tiles, final int count, boolean bCheckOpposite)
+    {
+        final ERotation rot                   = this.rotation.toEnum();
+
+        assert rot != null;
+
+        final ArrayList<RLaserMask> masks = new ArrayList<RLaserMask>(new ArrayList<RLaserMask>(Arrays.asList(this.getLaserAffectedTiles(tiles, count, rot))));
+
+        if (bCheckOpposite)
+        {
+            masks.addAll(new ArrayList<RLaserMask>(Arrays.asList(this.getLaserAffectedTiles(tiles, count, rot.getOpposite()))));
         }
 
         return masks.toArray(new RLaserMask[0]);

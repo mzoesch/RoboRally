@@ -14,7 +14,7 @@ public class ChooseRegisterModel extends AServerRequestModel {
     @Override
     public JSONObject toJSON() {
         JSONObject j = new JSONObject();
-        j.put("messageTpye", "ChooseRegister");
+        j.put("messageType", "ChooseRegister");
         j.put("messageBody", new JSONObject().put("register", this.register));
 
         return j;

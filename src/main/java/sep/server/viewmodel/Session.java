@@ -4,19 +4,27 @@ import sep.server.json.game.activatingphase.    ActivePhaseModel;
 import sep.server.json.game.activatingphase.    ReplaceCardModel;
 import sep.server.json.game.activatingphase.    CardInfo;
 import sep.server.json.game.activatingphase.    CurrentCardsModel;
-import sep.server.json.game.effects.*;
+import sep.server.json.game.effects.            AnimationModel;
+import sep.server.json.game.effects.            CheckPointReachedModel;
+import sep.server.json.game.effects.            CheckpointMovedModel;
+import sep.server.json.game.effects.            EnergyModel;
+import sep.server.json.game.effects.            GameFinishedModel;
+import sep.server.json.game.effects.            MovementModel;
+import sep.server.json.game.effects.            PlayerTurningModel;
+import sep.server.json.game.effects.            RebootModel;
+import sep.server.json.game.effects.            RegisterChosenModel;
 import sep.server.json.lobby.                   PlayerAddedModel;
 import sep.server.json.lobby.                   PlayerStatusModel;
 import sep.server.json.lobby.                   SelectMapModel;
 import sep.server.json.lobby.                   MapSelectedModel;
+import sep.server.model.                        EServerInformation;
+import sep.server.model.                        IOwnershipable;
+import sep.server.model.                        Agent;
 import sep.server.model.game.                   GameState;
 import sep.server.model.game.                   EGamePhase;
 import sep.server.model.game.                   Tile;
 import sep.server.model.game.                   Player;
 import sep.server.model.game.                   EAnimation;
-import sep.server.model.                        EServerInformation;
-import sep.server.model.                        IOwnershipable;
-import sep.server.model.                        Agent;
 import sep.server.json.common.                  ChatMsgModel;
 import sep.server.json.common.                  CurrentPlayerModel;
 import sep.server.json.common.                  ConnectionUpdateModel;
@@ -31,8 +39,12 @@ import sep.server.json.game.programmingphase.   SelectionFinishedModel;
 import sep.server.model.game.tiles.             Coordinate;
 import sep.server.json.game.                    GameStartedModel;
 import sep.server.json.game.                    StartingPointTakenModel;
+import sep.server.json.game.                    CardPlayedModel;
 import sep.server.model.game.cards.             Card;
 import sep.                                     Types;
+import sep.server.json.game.upgradephase.       RefillShopModel;
+import sep.server.json.game.upgradephase.       ExchangeShopModel;
+import sep.server.json.game.upgradephase.       UpgradeBoughtModel;
 
 import java.util.                   ArrayList;
 import java.util.                   Objects;
@@ -493,7 +505,7 @@ public final class Session
 
             return;
         });
-
+        this.awaitGameStartThread.setName(String.format("AwaitGameStart-%s", this.sessionID));
         this.awaitGameStartThread.start();
 
         return;
@@ -546,7 +558,8 @@ public final class Session
     public void broadcastCurrentCards(final int register) {
         final ArrayList<Player> players = this.getGameState().getAuthGameMode().getPlayers();
         if (players.isEmpty()) {
-            l.error("No players exist.");
+            l.fatal("No players exist.");
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
             return;
         }
 
@@ -557,7 +570,6 @@ public final class Session
             CardInfo ci;
 
             if (card == null) {
-                l.error("Card does not exist");
                 ci = new CardInfo(p.getController().getPlayerID(), null);
             } else {
                 ci = new CardInfo(p.getController().getPlayerID(), card.getCardType());
@@ -606,9 +618,9 @@ public final class Session
     }
 
     /**
-     * @param ctrlID The ID of the controller that has changed its energy.
-     * @param energy The new energy value.
-     * @param source The source of the energy change.
+     * @param ctrlID    The ID of the controller that has changed its energy.
+     * @param energy    The new energy value.
+     * @param source    The source of the energy change.
      */
     public void broadcastEnergyUpdate(final int ctrlID, final int energy, final String source)
     {
@@ -643,6 +655,39 @@ public final class Session
         for (final PlayerController pc : this.getRemotePlayers())
         {
             new PlayerTurningModel(pc.getClientInstance(), ctrlID, rotation).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastShopRefill(final ArrayList<String> cards)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new RefillShopModel(pc.getClientInstance(), cards).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastShopExchange(final ArrayList<String> cards)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new ExchangeShopModel(pc.getClientInstance(), cards).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastBoughtUpgradeCard(final int ctrlID, final String card)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new UpgradeBoughtModel(pc.getClientInstance(), ctrlID, card).send();
             continue;
         }
 
@@ -848,6 +893,7 @@ public final class Session
 
     /**
      * Sends a notification to all  players to inform about the selection of a register because of the AdminPriviledge Card.
+     * @deprecated
      */
     public void sendRegisterChosenNotification(final int playerID, int register) {
         for (PlayerController playerController : getRemotePlayers()) {
@@ -856,10 +902,16 @@ public final class Session
         }
     }
 
+    public void broadcastAdminPrivilegeRegisterUpdate(final PlayerController source, final int register)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new RegisterChosenModel(pc.getClientInstance(), source.getPlayerID(), register).send();
+            continue;
+        }
 
-
-
-
+        return;
+    }
 
     /**
      * Sends a shuffle notification to all remote players.
@@ -897,43 +949,29 @@ public final class Session
         return;
     }
 
-    public void sendCardsYouGotNow(final PlayerController tPC, final String[] hand)
+    public void sendIncompleteProgrammingCards(final PlayerController tPC, final String[] hand)
     {
-        for (PlayerController pc : this.getRemotePlayers())
-        {
-            if (pc == tPC)
-            {
-                CardsYouGotNowModel cardsYouGotNowModel = new CardsYouGotNowModel(pc.getClientInstance(), hand);
-                cardsYouGotNowModel.send();
-            }
+        new CardsYouGotNowModel(tPC.getClientInstance(), hand).send();
+        return;
+    }
 
+    public void broadcastProgrammingTimerStart()
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new TimerStartedModel(pc.getClientInstance()).send();
             continue;
         }
 
         return;
     }
 
-    public void sendTimerStarted()
+    /** @param ctrlIDs The players that have not finished programming in time. */
+    public void broadcastProgrammingTimerFinish(final int[] ctrlIDs)
     {
         for (final PlayerController pc : this.getRemotePlayers())
         {
-            TimerStartedModel timerStartedModel = new TimerStartedModel(pc.getClientInstance());
-            timerStartedModel.send();
-
-            continue;
-        }
-
-        return;
-    }
-
-    /** @param playerIDs The players that have not finished programming in time. */
-    public void sendTimerEnded(final int[] playerIDs)
-    {
-        for (final PlayerController pc : this.getRemotePlayers())
-        {
-            TimerEndedModel timerEndedModel = new TimerEndedModel(pc.getClientInstance(), playerIDs);
-            timerEndedModel.send();
-
+            new TimerEndedModel(pc.getClientInstance(), ctrlIDs).send();
             continue;
         }
 
@@ -972,6 +1010,17 @@ public final class Session
         for (final PlayerController pc : this.getRemotePlayers())
         {
             new AnimationModel(pc.getClientInstance(), anim).send();
+            continue;
+        }
+
+        return;
+    }
+
+    public void broadcastPlayedCard(final int id, final String card)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new CardPlayedModel(pc.getClientInstance(), id, card).send();
             continue;
         }
 
@@ -1168,6 +1217,27 @@ public final class Session
         }
 
         return false;
+    }
+
+    public boolean hasStarted()
+    {
+        return this.gameState.hasGameStarted();
+    }
+
+    public IOwnershipable getOwnershipableByID(final int playerID)
+    {
+        for (final IOwnershipable ctrl : this.getControllers())
+        {
+            if (ctrl.getPlayerID() == playerID)
+            {
+                return ctrl;
+            }
+
+            continue;
+        }
+
+        l.error("Could not find any ownershipable with the ID {}.", playerID);
+        return null;
     }
 
     // endregion Getters and Setters

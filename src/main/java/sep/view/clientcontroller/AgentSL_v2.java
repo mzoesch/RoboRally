@@ -7,6 +7,7 @@ import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EAgentDifficulty;
 import sep.view.json.game.          SetStartingPointModel;
 import sep.view.json.game.          SelectedCardModel;
+import sep.view.json.game.          BuyUpgradeModel;
 
 import org.json.                    JSONException;
 import org.json.                    JSONObject;
@@ -19,6 +20,11 @@ import java.util.                   Arrays;
 import java.util.                   Random;
 import java.util.                   Locale;
 import java.util.                   ArrayList;
+import java.util.concurrent.atomic. AtomicBoolean;
+
+final record RCheckpointMask(RCoordinate location, int count)
+{
+}
 
 final class TileModifier
 {
@@ -30,19 +36,19 @@ final class TileModifier
         return;
     }
 
-    public String getType()
+    public String getType() throws JSONException
     {
         return this.modifier.getString("type");
     }
 
-    public String getFirstWallOrientation()
+    public String getFirstWallOrientation() throws JSONException
     {
         return this.modifier.getJSONArray("orientations").getString(0);
     }
 
-    public String getCheckpointCount()
+    public int getCheckpointCount() throws JSONException
     {
-        return this.modifier.getString("count");
+        return this.modifier.getInt("count");
     }
 
 }
@@ -62,7 +68,7 @@ final class Tile
 
     public RCoordinate getCoordinate()
     {
-        return coordinate;
+        return this.coordinate;
     }
 
     public TileModifier getModifier(final int idx)
@@ -150,15 +156,19 @@ final class Tile
         return false;
     }
 
-    public String getCheckpointNum() {
-        if(this.hasWall()) {
-            for (int i = 0; i < this.tile.length(); ++i) {
-                if(this.getModifier(i).getCheckpointCount() != null) {
-                    return this.getModifier(i).getCheckpointCount();
-                }
+    public int getCheckpointCount()
+    {
+        for (int i = 0; i < this.tile.length(); ++i)
+        {
+            if (Objects.equals(this.getModifier(i).getType(), "CheckPoint"))
+            {
+                return this.getModifier(i).getCheckpointCount();
             }
+
+            continue;
         }
-        return null;
+
+        return -1;
     }
 
     public JSONArray getJSON()
@@ -286,6 +296,8 @@ enum EEnvironment implements ICourse
         @Override
         public Tile[][] getTiles() throws JSONException
         {
+            EEnvironment.INSTANCE.goals.clear();
+
             final Tile[][] course = new Tile[this.getFiles()][this.getRanks()];
 
             for (int file = 0; file < this.getFiles(); ++file)
@@ -293,6 +305,12 @@ enum EEnvironment implements ICourse
                 for (int rank = 0; rank < this.getRanks(); ++rank)
                 {
                     course[file][rank] = new Tile(this.getTilesAsJSON().getJSONArray(file).getJSONArray(rank), new RCoordinate(file, rank));
+                    if (course[file][rank].isCheckpoint())
+                    {
+                        EEnvironment.INSTANCE.goals.add(new RCheckpointMask(course[file][rank].getLocation(), course[file][rank].getCheckpointCount()));
+                        l.info("Found goal {} at state {}.", EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).location(), EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).count());
+                    }
+
                     continue;
                 }
 
@@ -305,7 +323,9 @@ enum EEnvironment implements ICourse
         @Override
         public RCoordinate getNextFreeStartPoint() throws JSONException
         {
-            final Tile[][] tiles = this.getTiles();
+            final Tile[][] tiles = EEnvironment.INSTANCE.getTiles();
+
+            assert tiles != null;
 
             for (int file = 0; file < this.getFiles(); ++file)
             {
@@ -363,11 +383,12 @@ enum EEnvironment implements ICourse
     private static final float  MATCHING_TILE_PENALTY           = -10_000.0f;
     private static final float  EFFECTS_PENALTY                 = -50.0f;
     private static final float  EMPTY_TILE_PENALTY              = -1.0f;
-    private static final float  GOAL_REWARD                     = 1_000.0f;
+    private static final float  GOAL_REWARD                     =  1_000.0f;
 
-    private static final int    EPISODES                        = 1_000;
-    private static final int    CALCULATE_AVERAGE_ACTIONS       = 100;
-    private static final int    MAX_EPISODE_ACTIONS             = 2_000;
+    public static final int     EPISODES                                    = 20_000;
+    public static final int     CALCULATE_AVERAGE_ACTIONS                   = 300;
+    public static final int     MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION      = 2_500;
+    private static final int    MAX_EPISODE_ACTIONS                         = 2_000;
 
     /**
      * Hyperparameter for the learning rate. High values will yield a fast learning process but also an increased
@@ -389,19 +410,34 @@ enum EEnvironment implements ICourse
     // region Cached members
 
     /** This variable has to be manually set to nullptr if the goal location changed or a new goal has to be hunted. */
-    private RGoalMask       cachedGoal;
-    private Tile[][]        cachedTiles;
+    private RGoalMask                           cachedGoal;
+    private Tile[][]                            cachedTiles;
+    private final ArrayList<RCheckpointMask>    goals;
 
     // endregion Cached members
 
+    public final Object             lock                        = new Object();
+
+    private final AtomicBoolean     finishedQualityLearning;
+    private final AtomicBoolean     allowPreFinishQualityUse;
+    private final AtomicBoolean     aboardQualityLearning;
+
     /** Each matrix cell represents the travel from one state to another. */
-    private float[][]       rewards;
-    private float[][][]     qualities;
+    private float[][]               rewards;
+    private float[][][]             qualities;
 
     private EEnvironment()
     {
-        this.cachedGoal     = null;
-        this.cachedTiles    = null;
+        this.cachedGoal                 = null;
+        this.cachedTiles                = null;
+        this.goals                      = new ArrayList<RCheckpointMask>();
+
+        this.finishedQualityLearning    = new AtomicBoolean(false);
+        this.allowPreFinishQualityUse   = new AtomicBoolean(false);
+        this.aboardQualityLearning      = new AtomicBoolean(false);
+
+        this.rewards                    = null;
+        this.qualities                  = null;
 
         return;
     }
@@ -544,9 +580,8 @@ enum EEnvironment implements ICourse
             return EEnvironment.IMPOSSIBLE_TRANSITION_PENALTY;
         }
 
-        if (target.isCheckpoint())
+        if (target.isCheckpoint() && Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getCheckPointsReached() == target.getCheckpointCount())
         {
-            /* TODO Check if it is the right checkpoint. */
             return EEnvironment.GOAL_REWARD;
         }
 
@@ -570,8 +605,6 @@ enum EEnvironment implements ICourse
 
     public RCoordinate getQualityGoal()
     {
-        /* TODO Here we have to check if we collected another checkpoint and now our target goal has changed. */
-
         if (this.cachedGoal != null)
         {
             return this.cachedGoal.location;
@@ -587,8 +620,11 @@ enum EEnvironment implements ICourse
 
                 if (t.isCheckpoint())
                 {
-                    this.cachedGoal = new RGoalMask(0, t.getLocation());
-                    return this.getQualityGoal();
+                    if (t.getCheckpointCount() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getCheckPointsReached() + 1)
+                    {
+                        this.cachedGoal = new RGoalMask(t.getCheckpointCount(), t.getLocation());
+                        return this.cachedGoal.location;
+                    }
                 }
 
                 continue;
@@ -597,7 +633,7 @@ enum EEnvironment implements ICourse
             continue;
         }
 
-        l.fatal("Failed to find a checkpoint.");
+        l.fatal("Failed to find a quality checkpoint. Searched for checkpoint id: {}.", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getCheckPointsReached() + 1);
         GameInstance.kill();
 
         return null;
@@ -774,7 +810,7 @@ enum EEnvironment implements ICourse
     }
 
     /** @return The amount of iterations the agent required to get to any terminal state. */
-    private int evaluateAnEpisode(final RCoordinate start)
+    public int evaluateAnEpisode(final RCoordinate start)
     {
         int             actions     = 0;
         RCoordinate     cursor      = start;
@@ -867,36 +903,10 @@ enum EEnvironment implements ICourse
         return;
     }
 
-    public void evaluateQualityMatrix()
-    {
-        int totalActionCount    = 0;
-        int latestActionSum     = 0;
-
-        for (int i = 0; i < EEnvironment.EPISODES; ++i)
-        {
-            final int actions = this.evaluateAnEpisode(this.getPseudorandomQualityStart(i));
-
-            latestActionSum     += actions;
-            totalActionCount    += actions;
-
-            if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ACTIONS == 0)
-            {
-                l.debug("Agent {} has evaluated {} episodes. Average actions per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ACTIONS, latestActionSum / EEnvironment.CALCULATE_AVERAGE_ACTIONS);
-                latestActionSum = 0;
-            }
-
-            continue;
-        }
-
-        l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
-
-        return;
-    }
-
     public void setRegisterCardsBasedOnExploredKnowledge()
     {
-        final AgentRemotePlayerData agent = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
-        RCoordinate predictedState = agent.getLocation();
+        final AgentRemotePlayerData agent   = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
+        RCoordinate predictedState          = agent.getLocation();
 
         int oldIterationI = -1;
 
@@ -1591,7 +1601,7 @@ enum EEnvironment implements ICourse
             return null;
         }
 
-        return ECourseImpl.INSTANCE.getTiles()[location.x()][location.y()];
+        return Objects.requireNonNull(EEnvironment.INSTANCE.getTiles())[location.x()][location.y()];
     }
 
     @Override
@@ -1738,7 +1748,7 @@ enum EEnvironment implements ICourse
         for (int i = 0; i < this.getRewards().length; ++i)
         {
             l.debug(this.getRewardStateAsString(i));
-            describeConstable();
+            continue;
         }
 
         return;
@@ -1762,6 +1772,61 @@ enum EEnvironment implements ICourse
         return;
     }
 
+    /** If a checkpoint has moved, for example.  */
+    public void onCourseChanged()
+    {
+        this.cachedGoal     = null;
+        this.cachedTiles    = null;
+        this.goals           .clear();
+
+        this.finishedQualityLearning.set(false);
+        this.allowPreFinishQualityUse.set(false);
+        this.aboardQualityLearning.set(false);
+
+        this.rewards     = null;
+        this.qualities   = null;
+
+        return;
+    }
+
+    public boolean hasToRecalculateQualities()
+    {
+        return this.rewards == null || this.qualities == null;
+    }
+
+    public void setHasFinishedQualityLearning(final boolean b)
+    {
+        this.finishedQualityLearning.compareAndSet(!b, b);
+        return;
+    }
+
+    public boolean hasFinishedQualityLearning()
+    {
+        return this.finishedQualityLearning.get();
+    }
+
+    public void setAllowPreFinishQualityUse(final boolean b)
+    {
+        this.allowPreFinishQualityUse.compareAndSet(!b, b);
+        return;
+    }
+
+    public boolean getAllowPreFinishQualityUse()
+    {
+        return this.allowPreFinishQualityUse.get();
+    }
+
+    public void setAbortedQualityLearning(final boolean b)
+    {
+        this.aboardQualityLearning.compareAndSet(!b, b);
+        return;
+    }
+
+    public boolean hasAbortedQualityLearning()
+    {
+        return this.aboardQualityLearning.get();
+    }
+
     // endregion Getters and Setters
 
 }
@@ -1774,9 +1839,16 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
+    private Thread  qualityLearningService;
+    private Thread  registerCardBroadcastService;
+
     public AgentSL_v2(final BufferedReader br)
     {
         super(br);
+
+        this.qualityLearningService         = null;
+        this.registerCardBroadcastService   = null;
+
         return;
     }
 
@@ -1791,28 +1863,86 @@ public final class AgentSL_v2 extends ServerListener
         return;
     }
 
-    private synchronized void evaluateProgrammingPhaseWithQLearning()
+    private void executeDefaultBehaviourForAChangedCheckpoint()
     {
-        l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+        if (this.qualityLearningService != null && this.qualityLearningService.isAlive())
+        {
+            l.info("Agent {} detected that the Checkpoint Moved Event was triggered. Interrupting the Quality Learning Service as it is not needed anymore for the old game state.", EClientInformation.INSTANCE.getPlayerID());
 
-        EEnvironment.INSTANCE.initRewardMatrix();
+            l.debug("Interrupting Quality Learning Service.");
+            EEnvironment.INSTANCE.setAbortedQualityLearning(true);
 
-        EEnvironment.INSTANCE.outputRewards();
+            synchronized (EEnvironment.INSTANCE.lock)
+            {
+                EEnvironment.INSTANCE.lock.notifyAll();
+            }
 
-        EEnvironment.INSTANCE.initQualityMatrix();
-        EEnvironment.INSTANCE.evaluateQualityMatrix();
+            EEnvironment.INSTANCE.setAbortedQualityLearning(false);
+            l.debug("Successfully interrupted Quality Learning Service.");
+        }
 
-        EEnvironment.INSTANCE.outputQualities();
+        EEnvironment.INSTANCE.onCourseChanged();
+    }
 
-        EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+    private void evaluateProgrammingPhaseWithQLearning(final boolean bSetRegisterCards)
+    {
+        if (this.qualityLearningService == null || !this.qualityLearningService.isAlive())
+        {
+            if (EEnvironment.INSTANCE.hasFinishedQualityLearning())
+            {
+                if (!bSetRegisterCards)
+                {
+                    l.fatal("Quality learning has finished, but the agent is not allowed to set register cards.");
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return;
+                }
 
-        this.sendSelectedCards();
+                EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+                this.sendSelectedCards();
+                l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+
+                return;
+            }
+
+            this.qualityLearningService = this.createQualityLearningService();
+            this.qualityLearningService.setName("QualityLearningService");
+            this.qualityLearningService.start();
+
+            if (!bSetRegisterCards)
+            {
+                return;
+            }
+
+            this.registerCardBroadcastService            = this.createRegisterCardBroadcastService();
+            assert this.registerCardBroadcastService    != null;
+            this.registerCardBroadcastService.setName("RegisterCardBroadcastService");
+            this.registerCardBroadcastService.start();
+
+            return;
+        }
+
+        if (!bSetRegisterCards)
+        {
+            l.fatal("Already evaluating quality states.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return;
+        }
+
+        this.registerCardBroadcastService            = this.createRegisterCardBroadcastService();
+        assert this.registerCardBroadcastService    != null;
+        this.registerCardBroadcastService.setName("RegisterCardBroadcastService");
+        this.registerCardBroadcastService.start();
 
         return;
     }
 
     private synchronized void evaluateProgrammingPhaseWithRandom()
     {
+        if (EGameState.INSTANCE.getGotRegisters() == null || EGameState.INSTANCE.getGotRegister(0) == null)
+        {
+            return;
+        }
+
         int j = 0;
         for (int i = 0; i < 5; ++i)
         {
@@ -1835,24 +1965,35 @@ public final class AgentSL_v2 extends ServerListener
 
         this.sendSelectedCards();
 
+        l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+
         return;
     }
 
-    private void evaluateProgrammingPhase()
+    private void evaluateProgrammingPhaseAsync(final boolean bSetRegisterCards)
     {
         final Thread eval = new Thread(() ->
         {
             if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
             {
+                if (!bSetRegisterCards)
+                {
+                    l.fatal("Agent is not allowed to set register cards, but the agent difficulty is set to RANDOM. There is no need to evaluate the programming phase.");
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return;
+                }
+
                 this.evaluateProgrammingPhaseWithRandom();
+
+                return;
             }
 
             if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
             {
-                this.evaluateProgrammingPhaseWithQLearning();
-            }
+                this.evaluateProgrammingPhaseWithQLearning(bSetRegisterCards);
 
-            l.info("Agent {} evaluated for the current programming phase. The determined cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(EGameState.INSTANCE.getRegisters()));
+                return;
+            }
 
             return;
         });
@@ -1879,7 +2020,7 @@ public final class AgentSL_v2 extends ServerListener
     public void onDevelopmentEvaluation()
     {
         EEnvironment.INSTANCE.setCourse(EGameState.INSTANCE.getAssumedServerCourseRawJSON());
-        this.evaluateProgrammingPhase();
+        this.evaluateProgrammingPhaseAsync(true);
         return;
     }
 
@@ -1959,7 +2100,9 @@ public final class AgentSL_v2 extends ServerListener
     protected boolean onGameStart() throws JSONException
     {
         l.debug("Game start received.");
+        EEnvironment.INSTANCE.onCourseChanged();
         EEnvironment.INSTANCE.setCourse(this.dsrp.request());
+        this.evaluateProgrammingPhaseAsync(false);
         return true;
     }
 
@@ -1997,7 +2140,22 @@ public final class AgentSL_v2 extends ServerListener
             return true;
         }
 
-        return true;
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
+        {
+            if (this.dsrp.getPlayerID() != EClientInformation.INSTANCE.getPlayerID())
+            {
+                return true;
+            }
+
+            l.error("Agent {} was notified to buy an upgrade. But this is not implemented yet. Sending Mock JSON.", EClientInformation.INSTANCE.getPlayerID());
+            new BuyUpgradeModel(false, null).send();
+            return true;
+        }
+
+        l.warn("Received player turn change, but the current phase is not registration or upgrade. Ignoring.");
+        EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), true);
+
+        return false;
     }
 
     @Override
@@ -2011,10 +2169,8 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
-        /* We still need to figure out what this does. */
-        l.fatal("Server triggered onCardPlayedEvent. {}.", this.dsrp.request().toString(0));
-        GameInstance.kill(GameInstance.EXIT_FATAL);
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
@@ -2022,6 +2178,7 @@ public final class AgentSL_v2 extends ServerListener
     {
         l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
+        ( (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID()))).addRotation("startingDirection");
         return true;
     }
 
@@ -2095,7 +2252,7 @@ public final class AgentSL_v2 extends ServerListener
             continue;
         }
 
-        this.evaluateProgrammingPhase();
+        this.evaluateProgrammingPhaseAsync(true);
 
         return true;
     }
@@ -2126,13 +2283,19 @@ public final class AgentSL_v2 extends ServerListener
     {
         l.debug("Player {} reached checkpoint {}.", this.dsrp.getPlayerID(), this.dsrp.getCheckpointNumber());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getCheckpointNumber());
+
+        if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID() == this.dsrp.getPlayerID())
+        {
+            this.executeDefaultBehaviourForAChangedCheckpoint();
+        }
+
         return true;
     }
 
     @Override
     protected boolean onEnergyTokenChanged() throws JSONException
     {
-        l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
+        l.debug("Player {}'s energy amount has been updated to {}. Source: {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount(), this.dsrp.getEnergySource());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
         return true;
     }
@@ -2156,6 +2319,7 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onPlayerReboot() throws JSONException
     {
+        /* TODO Check in Environment for the best rotation. */
         return false;
     }
 
@@ -2182,7 +2346,8 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onDrawDamage() throws JSONException
     {
-        return false;
+        l.debug("Player {} has drawn {} damage.", this.dsrp.getPlayerID(), this.dsrp.getDrawnDamageCards());
+        return true;
     }
 
     @Override
@@ -2200,13 +2365,18 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        return false;
+        /* Ignored on purpose. */
+        return true;
     }
 
     @Override
     protected boolean onCheckpointMoved() throws JSONException
     {
-        return false;
+        l.debug("Checkpoint {} has moved to {}.", this.dsrp.getCheckpointMovedID(), this.dsrp.getCoordinate().toString());
+
+        this.executeDefaultBehaviourForAChangedCheckpoint();
+
+        return true;
     }
 
     @Override
@@ -2216,5 +2386,140 @@ public final class AgentSL_v2 extends ServerListener
     }
 
     // endregion Server request handlers
+
+    // region Getters and Setters
+
+    private Thread createQualityLearningService()
+    {
+        return new Thread(() ->
+        {
+            l.info("Agent {} is evaluating the current programming phase.", EClientInformation.INSTANCE.getPlayerID());
+            l.info(String.format("Current Course: {Files: %d, Ranks: %d, Goal: %s}.", EEnvironment.INSTANCE.getFiles(), EEnvironment.INSTANCE.getRanks(), Objects.requireNonNull(EEnvironment.INSTANCE.getQualityGoal()).toString()));
+
+            EEnvironment.INSTANCE.onCourseChanged();
+
+            EEnvironment.INSTANCE.initRewardMatrix();
+
+            EEnvironment.INSTANCE.outputRewards();
+
+            EEnvironment.INSTANCE.initQualityMatrix();
+
+            synchronized (EEnvironment.INSTANCE.lock)
+            {
+                int totalActionCount    = 0;
+                int latestActionSum     = 0;
+
+                for (int i = 0; i < EEnvironment.EPISODES; ++i)
+                {
+                    final int actions = EEnvironment.INSTANCE.evaluateAnEpisode(EEnvironment.INSTANCE.getPseudorandomQualityStart(i));
+
+                    latestActionSum     += actions;
+                    totalActionCount    += actions;
+
+                    if ((i + 1) % EEnvironment.CALCULATE_AVERAGE_ACTIONS == 0)
+                    {
+                        l.debug("Agent {} has evaluated {} episodes. Average actions per episode of the last {}: {}.", EClientInformation.INSTANCE.getPlayerID(), i + 1, EEnvironment.CALCULATE_AVERAGE_ACTIONS, latestActionSum / EEnvironment.CALCULATE_AVERAGE_ACTIONS);
+                        latestActionSum = 0;
+
+                        if (this.registerCardBroadcastService != null)
+                        {
+                            l.info("Agent {} detected that the Register Card Broadcast Service is alive and is interrupting the Quality Learning Service until that service has finished.", EClientInformation.INSTANCE.getPlayerID());
+
+                            if (i < EEnvironment.MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION)
+                            {
+                                l.warn("Agent {} has not evaluated enough episodes to allow interruption [{}/{}]. Skipping request.", EClientInformation.INSTANCE.getPlayerID(), i, EEnvironment.MIN_EPISODES_BEFORE_ALLOW_INTERRUPTION);
+                                continue;
+                            }
+
+                            EEnvironment.INSTANCE.setAllowPreFinishQualityUse(true);
+
+                            /* TODO This code may result in a deadlock. */
+                            EEnvironment.INSTANCE.lock.notifyAll();
+                            try
+                            {
+                                EEnvironment.INSTANCE.lock.wait();
+                            }
+                            catch (final InterruptedException e)
+                            {
+                                l.fatal("Failed to wait for Register Card Broadcast Service to finish.");
+                                GameInstance.kill(GameInstance.EXIT_FATAL);
+                                return;
+                            }
+                        }
+
+                        if (EEnvironment.INSTANCE.hasAbortedQualityLearning())
+                        {
+                            l.warn("Agent {} has aborted quality learning. Skipping quality learning for the remaining episodes. Evaluated [{} / {}] episodes.", EClientInformation.INSTANCE.getPlayerID(), i, EEnvironment.EPISODES);
+                            this.qualityLearningService = null;
+                            EEnvironment.INSTANCE.lock.notifyAll();
+                            return;
+                        }
+                    }
+
+                    continue;
+                }
+
+                EEnvironment.INSTANCE.setHasFinishedQualityLearning(true);
+
+                l.info("Agent {} has evaluated {} episodes. Average actions per episode: {}. Total actions {}.", EClientInformation.INSTANCE.getPlayerID(), EEnvironment.EPISODES, totalActionCount / EEnvironment.EPISODES, totalActionCount);
+
+                EEnvironment.INSTANCE.lock.notifyAll();
+            }
+
+            EEnvironment.INSTANCE.outputQualities();
+
+            this.qualityLearningService = null;
+
+            return;
+        });
+    }
+
+    private Thread createRegisterCardBroadcastService()
+    {
+        if (this.registerCardBroadcastService != null && this.registerCardBroadcastService.isAlive())
+        {
+            l.fatal("Agent {} is already broadcasting register cards.", EClientInformation.INSTANCE.getPlayerID());
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return null;
+        }
+
+        return new Thread(() ->
+        {
+            l.info("Agent {} is waiting for Quality Learning Service to reach an usable state to broadcast register cards.", EClientInformation.INSTANCE.getPlayerID());
+
+            synchronized (EEnvironment.INSTANCE.lock)
+            {
+                if (!EEnvironment.INSTANCE.getAllowPreFinishQualityUse())
+                {
+                    l.warn("Quality Learning Service has not finished yet. Waiting for interrupt at an usable state but not finished state.");
+
+                    try
+                    {
+                        EEnvironment.INSTANCE.lock.wait();
+                    }
+                    catch (final InterruptedException e)
+                    {
+                        l.fatal("Failed to wait for Quality Learning Service to finish.");
+                        GameInstance.kill(GameInstance.EXIT_FATAL);
+                        return;
+                    }
+
+                    l.info("Agent {}'s Card Broadcast Service was notified. Sending register cards.", EClientInformation.INSTANCE.getPlayerID());
+                }
+
+                EEnvironment.INSTANCE.setRegisterCardsBasedOnExploredKnowledge();
+                this.sendSelectedCards();
+
+                l.info("Agent {} has sent register cards. If allowed notifying Quality Learning Service.", EClientInformation.INSTANCE.getPlayerID());
+
+                this.registerCardBroadcastService = null;
+                EEnvironment.INSTANCE.lock.notifyAll();
+            }
+
+            return;
+        });
+    }
+
+    // endregion Getters and Setters
 
 }

@@ -78,7 +78,8 @@ public record RDefaultClientRequestParser(JSONObject request)
 
     public int getSelectedCardRegister() throws JSONException
     {
-        return this.request.getJSONObject("messageBody").getInt("register");
+        /* The registers in the protocol are not zero-based, but a zero-based system is used on the client and server. */
+        return this.request.getJSONObject("messageBody").getInt("register") - 1;
     }
 
     public JSONObject getBody() throws JSONException
@@ -105,6 +106,19 @@ public record RDefaultClientRequestParser(JSONObject request)
         return this.request.getJSONObject("messageBody").getInt("register");
     }
 
+    public String getBuyUpgradeCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
 
+    public boolean hasBuyUpgradeCard()
+    {
+        return this.request.getJSONObject("messageBody").has("card");
+    }
+
+    public String getPlayedCard() throws JSONException
+    {
+        return this.request.getJSONObject("messageBody").getString("card");
+    }
 
 }

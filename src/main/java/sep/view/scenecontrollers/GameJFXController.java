@@ -4,9 +4,11 @@ import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
 import sep.view.clientcontroller.   EClientInformation;
 import sep.view.clientcontroller.   GameInstance;
+import sep.view.json.               ChatMsgModel;
 import sep.view.json.game.          SelectedCardModel;
 import sep.view.json.game.          SetStartingPointModel;
-import sep.view.json.               ChatMsgModel;
+import sep.view.json.game.          DiscardSomeModel;
+import sep.view.json.game.          PlayCardModel;
 import sep.view.viewcontroller.     Tile;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     TileModifier;
@@ -17,26 +19,35 @@ import sep.view.lib.                EAnimation;
 import sep.view.lib.                RGearMask;
 import sep.view.lib.                EFigure;
 import sep.view.lib.                EModifier;
+import sep.view.lib.                RCheckpointMask;
+import sep.view.lib.                RShopAction;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
 import java.util.                   Objects;
+import java.util.                   Locale;
 import javafx.scene.layout.         HBox;
 import javafx.scene.layout.         VBox;
 import javafx.scene.layout.         AnchorPane;
 import javafx.scene.layout.         Priority;
 import javafx.scene.layout.         Region;
 import javafx.scene.layout.         Pane;
+import javafx.scene.layout.         Background;
+import javafx.scene.layout.         BackgroundFill;
+import javafx.scene.layout.         CornerRadii;
 import javafx.animation.            Animation;
 import javafx.animation.            PauseTransition;
 import javafx.animation.            Timeline;
 import javafx.animation.            KeyFrame;
 import javafx.animation.            KeyValue;
 import javafx.animation.            FillTransition;
+import javafx.animation.            Transition;
+import javafx.animation.            Interpolator;
 import javafx.fxml.                 FXML;
 import javafx.beans.value.          ChangeListener;
 import javafx.beans.value.          ObservableValue;
 import javafx.scene.                Node;
+import javafx.scene.                Cursor;
 import javafx.scene.image.          ImageView;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
@@ -44,11 +55,13 @@ import javafx.scene.shape.          Rectangle;
 import javafx.event.                ActionEvent;
 import javafx.scene.input.          KeyCode;
 import javafx.util.                 Duration;
+import javafx.scene.control.        OverrunStyle;
 import javafx.scene.control.        Label;
 import javafx.scene.control.        TextField;
 import javafx.scene.control.        ScrollPane;
 import javafx.scene.control.        Button;
 import javafx.geometry.             Insets;
+import javafx.geometry.             Pos;
 import javafx.scene.paint.          Color;
 import java.util.concurrent.atomic. AtomicReference;
 
@@ -57,13 +70,13 @@ public final class GameJFXController
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
     private static final String     COLOR_HAMMER                = "#ff000033";
-    private static final String     COLOR_TRUNDLE               = "#0000ff33";
+    private static final String     COLOR_TRUNDLE               = "#0078ff33";
     private static final String     COLOR_SQUASH                = "#ffc0cb33";
     private static final String     COLOR_X90                   = "#00ff0033";
     private static final String     COLOR_SPIN                  = "#00ffff33";
     private static final String     COLOR_TWONKY                = "#ffff0033";
     private static final String     COLOR_TWITCH                = "#aaaaaa33";
-    private static final String     COLOR_RCARD_PREVIEW_BG      = "#707070e5";
+    private static final String     COLOR_RCARD_PREVIEW_BG      = "#909090e5";
 
     private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
     private static final int    SHOOTING_WALL_LASER_DURATION    = 1_000 ;
@@ -73,6 +86,8 @@ public final class GameJFXController
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
     private static final int    QUICK_TIP_DURATION              = 60_000;
 
+    @FXML private AnchorPane    memorySwapContainer;
+    @FXML private AnchorPane    upgradeSlotContainer;
     @FXML private AnchorPane    gotRegisterContainer;
     @FXML private Label         programmingTimerLabel;
     @FXML private Label         UIHeaderPhaseLabel;
@@ -88,15 +103,19 @@ public final class GameJFXController
 
     private static final int    RCARD_WIDTH                             = 50;
     private static final int    RCARD_HEIGHT                            = 88;
+    private static final int    REBOOTED_RCARD_WIDTH                    = 100;
+    private static final int    REBOOTED_RCARD_HEIGHT                   = 88;
     private static final int    RCARD_TRANSLATION_DIFF_X                = 10;
     private static final int    RCARD_PREVIEW_TRANSLATION_X             = 50;
     private static final int    RCARD_PREVIEW_TRANSLATION_X_CLEANUP     = 5;
     private static final int    RCARD_PREVIEW_TRANSLATION_X_ALPHA       = 2;
+    private static final int    UPGRADE_PREVIEW_WIDTH                   = 15;
+    private static final int    UPGRADE_PREVIEW_HEIGHT                  = 15;
     private static final int    MIN_ALLOW_ZOOM                          = 30;
     private static final int    MAX_ALLOW_ZOOM                          = 120;
 
     private VBox                chatContainer;
-    private boolean             showServerInfo;
+    private boolean             bShowServerInfo;
 
     private int                 tileDimensions;
     private static final int    RESIZE_AMOUNT   = 10;
@@ -109,6 +128,7 @@ public final class GameJFXController
 
     private HBox                registerHBox;
     private HBox                gotRegisterHBox;
+    private HBox                upgradeSlotHBox;
     private static final int    FOOTER_PEEK_HEIGHT  = 50;
     private static final int    NULL_FOOTER_HEIGHT  = 265;
 
@@ -116,15 +136,26 @@ public final class GameJFXController
     private int                         ranks;
     private Tile[][]                    tiles;
     private final ArrayList<RGearMask>  gears;
+    private final ArrayList<AnchorPane> checkpoints;
     private double                      minXTranslation;
     private double                      maxXTranslation;
     private double                      centralXTranslation;
+
+    private final ArrayList<RShopAction>    pendingShopActions;
+    private static final int                PROGRAMMING_TIMER_DURATION      = 30_000;
+    private Timeline                        programmingTimeline;
+
+    /** The new three cards a player gets after playing the memory swap card. */
+    private final ArrayList<String>         memorySwapCards;
+    /** The three cards a player has to discard from his hand. */
+    private final ArrayList<Integer>        memorySwapDiscardedCards;
+    private HBox                            memorySwapHBox;
 
     public GameJFXController()
     {
         super();
 
-        this.showServerInfo             = false;
+        this.bShowServerInfo            = false;
 
         this.tileDimensions             = ViewSupervisor.TILE_DIMENSIONS;
 
@@ -138,9 +169,18 @@ public final class GameJFXController
         this.ranks                      = 0;
         this.tiles                      = null;
         this.gears                      = new ArrayList<RGearMask>();
+        this.checkpoints                = new ArrayList<AnchorPane>();
         this.minXTranslation            = 0.0;
         this.maxXTranslation            = 0.0;
         this.centralXTranslation        = 0.0;
+
+        this.pendingShopActions         = new ArrayList<RShopAction>();
+        this.programmingTimeline        = null;
+
+        this.memorySwapCards            = new ArrayList<String>();
+        this.memorySwapDiscardedCards   = new ArrayList<Integer>();
+
+        this.memorySwapHBox             = null;
 
         return;
     }
@@ -189,6 +229,13 @@ public final class GameJFXController
         this.chatScrollPane.setContent(this.chatContainer);
 
         this.createQuickTip();
+
+        synchronized (ViewSupervisor.getLoadGameSceneLock())
+        {
+            l.info("Finished loading game scene. Notifying post load tasks to continue.");
+            ViewSupervisor.setGameScenePostLoaded();
+            ViewSupervisor.getLoadGameSceneLock().notifyAll();
+        }
 
         return;
     }
@@ -287,7 +334,6 @@ public final class GameJFXController
 
         this.masterContainer.setOnKeyPressed(e ->
         {
-            // TODO Add min max
             switch (e.getCode())
             {
 
@@ -295,7 +341,7 @@ public final class GameJFXController
             case W:
                 if (this.tileDimensions + GameJFXController.RESIZE_AMOUNT > GameJFXController.MAX_ALLOW_ZOOM)
                 {
-                    l.debug("User tried to zoom in but the zoom level is already at max. {}", this.tileDimensions);
+                    l.debug("User tried to zoom in but the zoom level is already above the max pixel threshold [{}].", this.tileDimensions);
                     return;
                 }
 
@@ -308,6 +354,7 @@ public final class GameJFXController
             case S:
                 if (this.tileDimensions - GameJFXController.RESIZE_AMOUNT < GameJFXController.MIN_ALLOW_ZOOM)
                 {
+                    l.debug("User tried to zoom out but the zoom level is already below the min pixel threshold [{}].", this.tileDimensions);
                     return;
                 }
 
@@ -708,6 +755,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(0);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -737,6 +797,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(1);
+            this.renderHUDFooter();
             return;
         }
 
@@ -773,6 +846,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(2);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -802,6 +888,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(3);
+            this.renderHUDFooter();
             return;
         }
 
@@ -837,6 +936,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(4);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -866,6 +978,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(5);
+            this.renderHUDFooter();
             return;
         }
 
@@ -901,6 +1026,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(6);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -933,6 +1071,19 @@ public final class GameJFXController
             return;
         }
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(7);
+            this.renderHUDFooter();
+            return;
+        }
+
         if (EGameState.INSTANCE.areRegistersFull())
         {
             l.debug("User tried to change one of their programming register slots, but they are already finalized.");
@@ -962,6 +1113,19 @@ public final class GameJFXController
     {
         if (EGameState.INSTANCE.getCurrentPhase() != EGamePhase.PROGRAMMING)
         {
+            return;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            if (this.memorySwapDiscardedCards.size() >= 3)
+            {
+                l.debug("User tried to change one of their programming memory swap discarded cards but they are already full: {}.", this.memorySwapDiscardedCards);
+                return;
+            }
+
+            this.memorySwapDiscardedCards.add(8);
+            this.renderHUDFooter();
             return;
         }
 
@@ -1113,20 +1277,20 @@ public final class GameJFXController
 
                 this.chatContainer.getChildren().removeAll(serverInfo);
                 this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is now hidden.", false);
-                this.showServerInfo = false;
+                this.bShowServerInfo = false;
 
                 return;
             }
 
             if (this.getChatCommand(token).equals("show"))
             {
-                if (this.showServerInfo)
+                if (this.bShowServerInfo)
                 {
                     this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is already shown.", false);
                 }
                 else
                 {
-                    this.showServerInfo = true;
+                    this.bShowServerInfo = true;
                     this.addChatMsgToView(ChatMsgModel.SERVER_ID, "ServerInfo is now shown.", false);
                 }
 
@@ -1152,7 +1316,7 @@ public final class GameJFXController
     {
         if (caller == ChatMsgModel.SERVER_ID)
         {
-            if (this.showServerInfo)
+            if (this.bShowServerInfo)
             {
                 final Label l = new Label(String.format("[%s] %s", ChatMsgModel.SERVER_NAME, msg));
                 l.getStyleClass().add("lobby-msg-server");
@@ -1193,6 +1357,133 @@ public final class GameJFXController
 
     // region Head Up Display
 
+    // region MISC
+
+    private void renderMemorySwapDialog()
+    {
+        if (this.memorySwapHBox != null)
+        {
+            ViewSupervisor.getSceneController().getRenderTarget().getChildren().remove(this.memorySwapHBox);
+            this.memorySwapHBox = null;
+        }
+
+        final Label l = new Label("Select three cards to discard.");
+        l.getStyleClass().add("text-xl");
+
+        final HBox cards = new HBox();
+        cards.setSpacing(10.0);
+
+        for (int i = 0; i < 3; ++i)
+        {
+            final int gotIdx;
+            if (this.memorySwapDiscardedCards.size() > i)
+            {
+                gotIdx = this.memorySwapDiscardedCards.get(i);
+            }
+            else
+            {
+                gotIdx = GameJFXController.INVALID_GOT_REGISTER_SLOT;
+            }
+
+            final ImageView iv = new ImageView();
+            iv.setFitWidth(ViewSupervisor.REGISTER_SLOT_WIDTH);
+            iv.setFitHeight(ViewSupervisor.REGISTER_SLOT_HEIGHT);
+            iv.setImage(gotIdx == GameJFXController.INVALID_GOT_REGISTER_SLOT ? TileModifier.loadCachedImage("EmptyRegisterSlot") : TileModifier.loadCachedImage(EGameState.INSTANCE.getGotRegister(gotIdx)));
+            iv.setOnMouseClicked(e ->
+            {
+                this.memorySwapDiscardedCards.remove( (Integer) gotIdx );
+                this.renderHUDFooter();
+                return;
+            });
+
+            if (gotIdx != GameJFXController.INVALID_GOT_REGISTER_SLOT)
+            {
+                iv.setCursor(Cursor.HAND);
+            }
+
+            cards.getChildren().add(iv);
+
+            continue;
+        }
+
+        final HBox cardsWrapper = new HBox(GameJFXController.createHSpacer(), cards, GameJFXController.createHSpacer());
+
+        final VBox v = new VBox(l, cardsWrapper);
+        v.setSpacing(30.0);
+        v.setAlignment(Pos.CENTER);
+
+        final Button b = new Button("Confirm");
+        b.getStyleClass().add("secondary-btn");
+
+        if (this.memorySwapDiscardedCards.size() < 3)
+        {
+            b.setDisable(true);
+        }
+
+        b.setOnAction(e ->
+        {
+            final ArrayList<String> discardedCards = new ArrayList<String>();
+
+            for (final int idx : this.memorySwapDiscardedCards)
+            {
+                discardedCards.add(EGameState.INSTANCE.getGotRegister(idx));
+                continue;
+            }
+
+            GameJFXController.l.info("MemorySwapDialog: User wants to discard: {} -> {}.", this.memorySwapDiscardedCards, discardedCards);
+
+            new DiscardSomeModel(discardedCards.toArray(new String[0])).send();
+
+            for (final int gotIdx : this.memorySwapDiscardedCards)
+            {
+                EGameState.INSTANCE.overrideGotRegister(gotIdx, this.memorySwapCards.remove(0));
+                continue;
+            }
+
+            if (this.memorySwapCards.isEmpty())
+            {
+                ViewSupervisor.getSceneController().getRenderTarget().getChildren().remove(this.memorySwapHBox);
+                this.memorySwapHBox = null;
+                this.memorySwapDiscardedCards.clear();
+                this.memorySwapContainer.getChildren().clear();
+
+                GameJFXController.l.debug("MemorySwapDialog: Successfully sent server discard request.");
+
+                this.renderHUDFooter();
+
+                return;
+            }
+
+            GameJFXController.l.fatal("MemorySwapDialog: MemorySwapCards is not empty after discarding: {}.", this.memorySwapCards);
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+
+            return;
+        });
+
+        AnchorPane.setLeftAnchor(   v, 0.0  );
+        AnchorPane.setRightAnchor(  v, 0.0  );
+        AnchorPane.setTopAnchor(    v, 25.0 );
+
+        AnchorPane.setRightAnchor(  b, 25.0 );
+        AnchorPane.setBottomAnchor( b, 25.0 );
+
+        final AnchorPane p = new AnchorPane(v, b);
+        p.setId("memory-swap-dialog-container");
+
+        this.memorySwapHBox = new HBox(p);
+        this.memorySwapHBox.setAlignment(Pos.CENTER);
+
+        AnchorPane.setLeftAnchor(   this.memorySwapHBox, 0.0 );
+        AnchorPane.setRightAnchor(  this.memorySwapHBox, 0.0 );
+        AnchorPane.setTopAnchor(    this.memorySwapHBox, 20.0 );
+
+        ViewSupervisor.createPopUp(this.memorySwapHBox);
+
+        return;
+    }
+
+    // endregion MISC
+
     // region HUD Side Panel
 
     private void renderPhaseTitle()
@@ -1204,6 +1495,108 @@ public final class GameJFXController
         }
 
         this.UIHeaderPhaseLabel.setText(EGameState.PHASE_NAMES[EGameState.INSTANCE.getCurrentPhase().i]);
+        return;
+    }
+
+    private void renderInfoTitle()
+    {
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.INVALID)
+        {
+            this.programmingTimerLabel.setText("");
+            this.programmingTimerLabel.setStyle("");
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION)
+        {
+            this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+            if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                this.programmingTimerLabel.setText("Set Your Starting Position.");
+                return;
+            }
+
+            this.programmingTimerLabel.setText(String.format("Waiting for %s ...", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
+        {
+            if (EGameState.INSTANCE.getCurrentPlayer() == null)
+            {
+                this.programmingTimerLabel.setText("Waiting for server.");
+                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+                return;
+            }
+
+            if (EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+            {
+                this.programmingTimerLabel.setText("");
+                this.programmingTimerLabel.setStyle("");
+                return;
+            }
+
+            this.programmingTimerLabel.setText(String.format("Waiting for %s ...", EGameState.INSTANCE.getCurrentPlayer().getPlayerName()));
+            this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING)
+        {
+            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished())
+            {
+                this.programmingTimerLabel.setText("Waiting for others ...");
+                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+                if (this.programmingTimeline != null)
+                {
+                    this.programmingTimeline.stop();
+                    this.programmingTimeline = null;
+                }
+
+                return;
+            }
+
+            if (this.programmingTimeline == null && EGameState.INSTANCE.isProgrammingTimerRunning())
+            {
+                final long startTime = System.currentTimeMillis();
+                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
+
+                this.programmingTimeline = new Timeline(new KeyFrame(Duration.millis(100), e ->
+                {
+                    final long timeLeft = GameJFXController.PROGRAMMING_TIMER_DURATION - (System.currentTimeMillis() - startTime);
+                    this.programmingTimerLabel.setText(String.format(Locale.US, "%.2fs", ( (double) timeLeft ) / 1_000));
+                    return;
+                }
+                ));
+
+                this.programmingTimeline.setCycleCount(Animation.INDEFINITE);
+                this.programmingTimeline.play();
+
+                return;
+            }
+
+            return;
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.ACTIVATION)
+        {
+            this.programmingTimerLabel.setText("");
+            this.programmingTimerLabel.setStyle("");
+
+            if (programmingTimeline != null)
+            {
+                this.programmingTimeline.stop();
+                this.programmingTimeline = null;
+            }
+
+            return;
+        }
+
+
         return;
     }
 
@@ -1236,13 +1629,37 @@ public final class GameJFXController
         return iv;
     }
 
+    private ImageView getUpgradeCardSlot(final int idx)
+    {
+        if (EGameState.INSTANCE.getBoughtUpgradeCard(idx) == null)
+        {
+            return this.getEmptyRegisterSlot(ViewSupervisor.UPGRADE_SLOT_WIDTH, ViewSupervisor.UPGRADE_SLOT_HEIGHT);
+        }
+
+        final ImageView iv = new ImageView();
+        iv.setFitWidth(ViewSupervisor.UPGRADE_SLOT_WIDTH);
+        iv.setFitHeight(ViewSupervisor.UPGRADE_SLOT_HEIGHT);
+        iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getBoughtUpgradeCard(idx)));
+
+        /* Kinda sketchy. But we have a 1px border. */
+        iv.setTranslateX(1);
+        iv.setTranslateY(1);
+
+        return iv;
+    }
+
     /** @param idx Index of the register slot. */
     private void addRegisterSlot(final int idx, final boolean bIsGotRegister, final Pane p, final int w, final int h)
     {
         final ImageView     iv  = this.getCardRegisterSlot(w, h, bIsGotRegister ? EGameState.INSTANCE.getGotRegister(idx) : EGameState.INSTANCE.getRegister(idx));
         final AnchorPane    ap  = new AnchorPane();
 
-        if (bIsGotRegister)
+        if (bIsGotRegister && this.memorySwapDiscardedCards.contains(idx))
+        {
+            iv.setImage(TileModifier.loadCachedImage("EmptyRegisterSlot"));
+            ap.getStyleClass().add("register-slot-disabled");
+        }
+        else if (bIsGotRegister)
         {
             ap.getStyleClass().add(
                EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING
@@ -1256,6 +1673,9 @@ public final class GameJFXController
             :  "register-slot-disabled"
             )
             ;
+
+            iv.setTranslateX(1);
+            iv.setTranslateY(1);
         }
         else
         {
@@ -1285,6 +1705,11 @@ public final class GameJFXController
         ap.setOnMouseClicked(e
         ->
         {
+            if (bIsGotRegister && this.memorySwapDiscardedCards.contains(idx))
+            {
+                return;
+            }
+
             if (bIsGotRegister)
             {
                 switch (idx)
@@ -1359,6 +1784,130 @@ public final class GameJFXController
         return;
     }
 
+    private void applyPlayableUpgradeEffect(final AnchorPane target)
+    {
+        target.setStyle("-fx-cursor: hand; -fx-background-color: rgba(0, 0, 0, 0);");
+
+        final AnchorPane effectTarget = new AnchorPane();
+
+        final Animation anim = new Transition()
+        {
+            {
+                this.setCycleDuration(Duration.millis(800));
+                this.setInterpolator(Interpolator.EASE_OUT);
+            }
+
+            @Override
+            protected void interpolate(double frac)
+            {
+                Color vColor = new Color(0.5, 0.5, 0.5, 1 - frac);
+                effectTarget.setBackground(new Background(new BackgroundFill(vColor, CornerRadii.EMPTY, Insets.EMPTY)));
+
+                return;
+            }
+        };
+
+        effectTarget.setTranslateX(1);
+        effectTarget.setTranslateY(1);
+
+        effectTarget.setPrefWidth(  ViewSupervisor.UPGRADE_SLOT_WIDTH   );
+        effectTarget.setPrefHeight( ViewSupervisor.UPGRADE_SLOT_HEIGHT  );
+
+        anim.setCycleCount(Animation.INDEFINITE);
+        anim.setAutoReverse(true);
+        anim.play();
+
+        target.getChildren().add(0, effectTarget);
+
+        return;
+    }
+
+    private void addUpgradeSlot(final int idx, final Pane p)
+    {
+        // We have to be a little bit cheeky here because the idx-es are not in order.
+        //      0 1             0 3
+        //      2 3     -->     1 4
+        //      4 5             2 5
+
+        /* We can do this because Integers are always floored. */
+        final int realIdx = idx % 2 == 0 ? idx / 2 : idx / 2 + 3;
+
+        final ImageView     iv  = this.getUpgradeCardSlot(realIdx);
+        final AnchorPane    ap  = new AnchorPane();
+
+        ap.getStyleClass().clear();
+
+        ap.getStyleClass().add("register-slot-disabled");
+        ap.setPrefWidth(ViewSupervisor.UPGRADE_SLOT_WIDTH);
+        ap.setPrefHeight(ViewSupervisor.UPGRADE_SLOT_HEIGHT);
+
+        ap.getChildren().clear();
+        ap.getChildren().add(iv);
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING && !Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished() && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "MemorySwap") && !EGameState.INSTANCE.isMemorySwapPlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on MemorySwap upgrade card.");
+
+                EGameState.INSTANCE.setMemorySwapPlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx)).send();
+
+                return;
+            });
+        }
+
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING && !Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).hasSelectionFinished() && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "SpamBlocker") && !EGameState.INSTANCE.isSpamBlockerPlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on SpamBlocker upgrade card.");
+
+                EGameState.INSTANCE.setSpamBlockerPlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx)).send();
+
+                return;
+            });
+        }
+
+        if ((EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING || EGameState.INSTANCE.getCurrentPhase() == EGamePhase.ACTIVATION) && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "AdminPrivilege") && !EGameState.INSTANCE.isAdminPrivilegePlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on AdminPrivilege upgrade card.");
+
+                EGameState.INSTANCE.setAdminPrivilegePlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                ViewSupervisor.createAdminPrivilegeDialogLater();
+
+                return;
+            });
+        }
+
+        p.getChildren().add(ap);
+
+        return;
+    }
 
     private void renderRegisterSlots()
     {
@@ -1382,9 +1931,19 @@ public final class GameJFXController
             this.gotRegisterHBox.getChildren().clear();
         }
 
+        if (this.upgradeSlotHBox == null)
+        {
+            this.upgradeSlotHBox = new HBox();
+            this.upgradeSlotHBox.setId("upgrade-slot-hbox");
+        }
+        else
+        {
+            this.upgradeSlotHBox.getChildren().clear();
+        }
+
         this.registerContainer.getChildren().clear();
         this.registerContainer.getChildren().add(this.registerHBox);
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; ++i)
         {
             this.addRegisterSlot(i, false, this.registerHBox, ViewSupervisor.REGISTER_SLOT_WIDTH, ViewSupervisor.REGISTER_SLOT_HEIGHT);
             continue;
@@ -1393,7 +1952,7 @@ public final class GameJFXController
         this.gotRegisterContainer.getChildren().clear();
         this.gotRegisterContainer.getChildren().add(this.gotRegisterHBox);
         this.gotRegisterHBox.getChildren().add(new VBox());
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < 9; ++i)
         {
             if (i % 3 == 0)
             {
@@ -1409,6 +1968,57 @@ public final class GameJFXController
             , ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT
             )
             ;
+
+            continue;
+        }
+
+        if (!this.memorySwapCards.isEmpty())
+        {
+            this.memorySwapContainer.getChildren().clear();
+
+            final ImageView arrow = new ImageView();
+            arrow.setFitWidth(  35.0  );
+            arrow.setFitHeight( 35.0  );
+            /* Extremely sketchy. Please center and not translate. */
+            arrow.setTranslateY( 75.0);
+            arrow.setImage(TileModifier.loadCachedImage("MemorySwapPreview"));
+            final VBox v = new VBox();
+            v.setAlignment(Pos.CENTER);
+
+            for (final String memorySwapCard : this.memorySwapCards)
+            {
+                final ImageView iv = new ImageView();
+                iv.setFitWidth(ViewSupervisor.GOT_REGISTER_SLOT_WIDTH);
+                iv.setFitHeight(ViewSupervisor.GOT_REGISTER_SLOT_HEIGHT);
+                iv.setImage(TileModifier.loadCachedImage(memorySwapCard));
+
+                iv.setTranslateX(1);
+                iv.setTranslateY(1);
+
+                final AnchorPane ap = new AnchorPane(iv);
+                ap.getStyleClass().add("register-slot");
+
+                v.getChildren().add(ap);
+
+                continue;
+            }
+
+            final HBox h = new HBox(arrow, v);
+            h.setSpacing(8);
+            this.memorySwapContainer.getChildren().add(h);
+        }
+
+        this.upgradeSlotContainer.getChildren().clear();
+        this.upgradeSlotContainer.getChildren().add(this.upgradeSlotHBox);
+        this.upgradeSlotHBox.getChildren().add(new VBox());
+        for (int i = 0; i < 6; ++i)
+        {
+            if (i % 2 == 0)
+            {
+                ( (Pane) this.upgradeSlotHBox.getChildren().get(this.upgradeSlotHBox.getChildren().size() - 1) ).getChildren().add(new HBox());
+            }
+
+            this.addUpgradeSlot(i, (Pane) ( (Pane) this.upgradeSlotHBox.getChildren().get(this.upgradeSlotHBox.getChildren().size() - 1) ).getChildren().get( ( (Pane) this.upgradeSlotHBox.getChildren().get(this.upgradeSlotHBox.getChildren().size() - 1) ).getChildren().size() - 1) );
 
             continue;
         }
@@ -1445,6 +2055,7 @@ public final class GameJFXController
     private void renderHUDHeader()
     {
         this.renderPhaseTitle();
+        this.renderInfoTitle();
         return;
     }
 
@@ -1458,6 +2069,11 @@ public final class GameJFXController
         this.setFooterBtnText();
         this.translateFooter();
 
+        if (!this.memorySwapCards.isEmpty())
+        {
+            this.renderMemorySwapDialog();
+        }
+
         return;
     }
 
@@ -1467,6 +2083,8 @@ public final class GameJFXController
      */
     private void renderPlayerInformationArea()
     {
+        this.renderHUDHeader();
+
         this.playerContainer.getChildren().clear();
 
         for (int i = 0; i < EGameState.INSTANCE.getRemotePlayers().length; ++i)
@@ -1480,7 +2098,7 @@ public final class GameJFXController
 
             if (i % 2 == 1)
             {
-                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(GameJFXController.createHSpacer());
+                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1) ).getChildren().add(GameJFXController.createHSpacer());
             }
 
             final Label figureName = new Label(rp.getFigure().toString());
@@ -1488,11 +2106,49 @@ public final class GameJFXController
 
             final Label ctrlName = new Label(rp.getPlayerName());
             ctrlName.getStyleClass().add("text-sm");
+            ctrlName.setTextOverrun(OverrunStyle.CLIP);
 
-            final Label energyCubes = new Label(String.format("Energy: %d", rp.getEnergyCubes()));
-            energyCubes.getStyleClass().add("text-sm");
+            final ImageView ivEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
+            ivEnergy.setFitWidth(15);
+            ivEnergy.setFitHeight(15);
 
-            final VBox v = new VBox(figureName, ctrlName, energyCubes);
+            final Label lEnergy = new Label(String.format("%d", rp.getEnergy()));
+            lEnergy.getStyleClass().add("text-sm");
+
+            final HBox hEnergy = new HBox(ivEnergy, lEnergy);
+            hEnergy.setSpacing(5);
+            hEnergy.setAlignment(Pos.CENTER);
+
+            final ImageView ivCheckpoint = new ImageView(TileModifier.loadCachedImage("CheckPointIcon"));
+            ivCheckpoint.setFitWidth(15);
+            ivCheckpoint.setFitHeight(15);
+
+            final Label lCheckpoint = new Label(String.format("%d", rp.getCheckPointsReached()));
+            lCheckpoint.getStyleClass().add("text-sm");
+
+            final HBox hCheckpoint = new HBox(ivCheckpoint, lCheckpoint);
+            hCheckpoint.setSpacing(5);
+            hCheckpoint.setAlignment(Pos.CENTER);
+
+            final HBox hEnergyCheckpoint = new HBox(hEnergy, hCheckpoint);
+            hEnergyCheckpoint.setSpacing(10);
+            hEnergyCheckpoint.setAlignment(Pos.CENTER);
+
+            final HBox boughtUpgrades = new HBox();
+            boughtUpgrades.setSpacing(5);
+            boughtUpgrades.setAlignment(Pos.CENTER);
+            for (int j = 0; j < rp.getBoughtUpgradeCards().size(); ++j)
+            {
+                final ImageView iv = new ImageView();
+                iv.setFitWidth(     GameJFXController.UPGRADE_PREVIEW_WIDTH   );
+                iv.setFitHeight(    GameJFXController.UPGRADE_PREVIEW_HEIGHT  );
+                iv.setImage(TileModifier.loadUpgradePreview(rp.getBoughtUpgradeCards().get(j)));
+
+                boughtUpgrades.getChildren().add(iv);
+                continue;
+            }
+
+            final VBox v = new VBox(figureName, ctrlName, hEnergyCheckpoint, boughtUpgrades);
             v.getStyleClass().add("player-box");
             v.getStyleClass().add(String.format("player-box-%s", rp == EGameState.INSTANCE.getCurrentPlayer() ? "active" : "inactive" ));
             if (EGameState.INSTANCE.getCurrentPhase().equals(EGamePhase.PROGRAMMING))
@@ -1512,14 +2168,14 @@ public final class GameJFXController
 
             final AnchorPane ap = new AnchorPane();
             HBox.setHgrow(ap, Priority.ALWAYS);
-            for (int j = 0; j < rp.getPlayedRCards().length; ++j)
+
+            if (rp.hasRebooted())
             {
                 final ImageView iv = new ImageView();
 
-                iv.setFitWidth(     GameJFXController.RCARD_WIDTH   );
-                iv.setFitHeight(    GameJFXController.RCARD_HEIGHT  );
-                iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (i % 2 == 0 ? 1 : -1));
-                iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
+                iv.setFitWidth(     GameJFXController.REBOOTED_RCARD_WIDTH   );
+                iv.setFitHeight(    GameJFXController.REBOOTED_RCARD_HEIGHT  );
+                iv.setImage(TileModifier.loadCachedImage("RebootedCard"));
 
                 if (i % 2 == 0)
                 {
@@ -1533,73 +2189,19 @@ public final class GameJFXController
                 AnchorPane.setTopAnchor(iv, 6.0);
 
                 ap.getChildren().add(iv);
-
-                continue;
             }
-
-            final int finalI = i;
-
-            if (ap.getWidth() > 0)
+            else
             {
-                /* Legacy */
-                ap.setMaxWidth(ap.getWidth());
-            }
-
-            ap.setOnMouseEntered(e ->
-            {
-                final ArrayList<Integer> newTranslations = new ArrayList<Integer>();
-
-                for (int j = ap.getChildren().size() - 1; j >= 0; --j)
-                {
-                    newTranslations.add( (int) ( (-GameJFXController.RCARD_PREVIEW_TRANSLATION_X * (ap.getChildren().size() - 1 - j)) + Math.abs(ap.getChildren().get(j).getTranslateX())) );
-                    continue;
-                }
-
-                /* East translation cleanup. */
-                if (finalI % 2 == 1)
-                {
-                    for (int j = 0; j < ap.getChildren().size(); j++)
-                    {
-                        newTranslations.set(j, newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP));
-                        continue;
-                    }
-                }
-
-                for (int j = 0; j < ap.getChildren().size(); j++)
-                {
-                    final Timeline t    = new Timeline();
-                    final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.RCARDS_TRANSLATION_DURATION), new KeyValue(ap.getChildren().get(j).translateXProperty(), newTranslations.get(j)));
-                    t.getKeyFrames().add(kf);
-                    t.play();
-
-                    continue;
-                }
-
-                for (final Rectangle r : GameJFXController.getHoverPCardBackgrounds(ap, newTranslations, finalI))
-                {
-                    ap.getChildren().add(0, r);
-                    continue;
-                }
-
-                return;
-            }
-            );
-
-            ap.setOnMouseExited(e ->
-            {
-                ap.getChildren().clear();
-                ap.setStyle("");
-
                 for (int j = 0; j < rp.getPlayedRCards().length; ++j)
                 {
                     final ImageView iv = new ImageView();
 
-                    iv.setFitWidth(GameJFXController.RCARD_WIDTH);
-                    iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
-                    iv.setImage(TileModifier.loadCachedImage(rp.getPlayedRCards()[j]));
-                    iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (finalI % 2 == 0 ? 1 : -1));
+                    iv.setFitWidth(     GameJFXController.RCARD_WIDTH   );
+                    iv.setFitHeight(    GameJFXController.RCARD_HEIGHT  );
+                    iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (i % 2 == 0 ? 1 : -1));
+                    iv.setImage(TileModifier.loadCachedImage(String.format("%sSolid", rp.getPlayedRCards()[j])));
 
-                    if (finalI % 2 == 0)
+                    if (i % 2 == 0)
                     {
                         AnchorPane.setLeftAnchor(iv, 10.0);
                     }
@@ -1614,10 +2216,92 @@ public final class GameJFXController
 
                     continue;
                 }
-
-                return;
             }
-            );
+
+            final int finalI = i;
+
+            if (ap.getWidth() > 0)
+            {
+                /* Legacy */
+                ap.setMaxWidth(ap.getWidth());
+            }
+
+            if (!rp.hasRebooted())
+            {
+                ap.setOnMouseEntered(e ->
+                {
+                    final ArrayList<Integer> newTranslations = new ArrayList<Integer>();
+
+                    for (int j = ap.getChildren().size() - 1; j >= 0; --j)
+                    {
+                        newTranslations.add( (int) ( (-GameJFXController.RCARD_PREVIEW_TRANSLATION_X * (ap.getChildren().size() - 1 - j)) + Math.abs(ap.getChildren().get(j).getTranslateX())) );
+                        continue;
+                    }
+
+                    /* East translation cleanup. */
+                    if (finalI % 2 == 1)
+                    {
+                        for (int j = 0; j < ap.getChildren().size(); j++)
+                        {
+                            newTranslations.set(j, newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP));
+                            continue;
+                        }
+                    }
+
+                    for (int j = 0; j < ap.getChildren().size(); j++)
+                    {
+                        final Timeline t    = new Timeline();
+                        final KeyFrame kf   = new KeyFrame(Duration.millis(GameJFXController.RCARDS_TRANSLATION_DURATION), new KeyValue(ap.getChildren().get(j).translateXProperty(), newTranslations.get(j)));
+                        t.getKeyFrames().add(kf);
+                        t.play();
+
+                        continue;
+                    }
+
+                    for (final Rectangle r : GameJFXController.getHoverPCardBackgrounds(ap, newTranslations, finalI))
+                    {
+                        ap.getChildren().add(0, r);
+                        continue;
+                    }
+
+                    return;
+                }
+                );
+
+                ap.setOnMouseExited(e ->
+                {
+                    ap.getChildren().clear();
+                    ap.setStyle("");
+
+                    for (int j = 0; j < rp.getPlayedRCards().length; ++j)
+                    {
+                        final ImageView iv = new ImageView();
+
+                        iv.setFitWidth(GameJFXController.RCARD_WIDTH);
+                        iv.setFitHeight(GameJFXController.RCARD_HEIGHT);
+                        iv.setImage(TileModifier.loadCachedImage(String.format("%sSolid", rp.getPlayedRCards()[j])));
+                        iv.setTranslateX(j * GameJFXController.RCARD_TRANSLATION_DIFF_X * (finalI % 2 == 0 ? 1 : -1));
+
+                        if (finalI % 2 == 0)
+                        {
+                            AnchorPane.setLeftAnchor(iv, 10.0);
+                        }
+                        else
+                        {
+                            AnchorPane.setRightAnchor(iv, 10.0);
+                        }
+
+                        AnchorPane.setTopAnchor(iv, 6.0);
+
+                        ap.getChildren().add(iv);
+
+                        continue;
+                    }
+
+                    return;
+                }
+                );
+            }
 
             final HBox h = new HBox();
             h.getStyleClass().add("player-information-container");
@@ -1632,7 +2316,7 @@ public final class GameJFXController
                 h.getChildren().add(ap);
             }
 
-            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(h);
+            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1) ).getChildren().add(h);
 
             continue;
         }
@@ -1646,7 +2330,6 @@ public final class GameJFXController
      */
     public void renderHUD()
     {
-        this.renderHUDHeader();
         this.renderHUDFooter();
         this.renderPlayerInformationArea();
 
@@ -1758,6 +2441,36 @@ public final class GameJFXController
             for (int j = 0; j < this.ranks; j++)
             {
                 final Tile t            = this.tiles[i][j];
+
+                /* Check for checkpoints and add them. */
+                if (t.hasModifier(EModifier.CHECK_POINT))
+                {
+                    if (t.getCheckpointID() == -1)
+                    {
+                        l.fatal("Assumed checkpoint on state {}, but the checkpoint was missing.", t.getTileLocation());
+                        GameInstance.kill(GameInstance.EXIT_FATAL);
+                        return;
+                    }
+
+                    boolean bAddToArray = true;
+                    for (final RCheckpointMask mask : Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()))
+                    {
+                        if (Objects.equals(mask.id(), t.getCheckpointID()))
+                        {
+                            bAddToArray = false;
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    if (bAddToArray)
+                    {
+                        l.info("Found checkpoint {} on state {}.", t.getCheckpointID(), t.getTileLocation());
+                        Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).add(new RCheckpointMask(t.getTileLocation(), t.getCheckpointID()));
+                    }
+                }
+
                 final AnchorPane AP     = new AnchorPane();
                 /* Warning: This is not commutative. Do not change the order here. */
                 for (int k = t.getImageViews().length - 1; k >= 0; --k)
@@ -1868,6 +2581,49 @@ public final class GameJFXController
         return;
     }
 
+    private void renderCheckpoints()
+    {
+        if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
+        {
+            l.error("Tried to render checkpoints on game scene but no course data is available.");
+            return;
+        }
+
+        if (Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).isEmpty())
+        {
+            l.fatal("No checkpoints found. Every course must have at least one checkpoint.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return;
+        }
+
+        for (final AnchorPane ap : this.checkpoints)
+        {
+            this.courseScrollPaneContent.getChildren().remove(ap);
+            continue;
+        }
+
+        this.checkpoints.clear();
+
+        for (final RCheckpointMask mask : Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()))
+        {
+            l.trace("Rendering checkpoint {} on state {}.", mask.id(), mask.location());
+
+            final ImageView iv = Tile.getFormattedImageView(mask);
+            iv.setFitHeight(    this.tileDimensions );
+            iv.setFitWidth(     this.tileDimensions );
+
+            final AnchorPane ap = new AnchorPane(iv);
+
+            this.renderOnPosition(ap, mask.location());
+
+            this.checkpoints.add(ap);
+
+            continue;
+        }
+
+        return;
+    }
+
     /**
      * Updates player positions on the course view.
      * No re-renders must be done after this method.
@@ -1905,6 +2661,7 @@ public final class GameJFXController
     private void renderCourse()
     {
         this.renderCourseBoard();
+        this.renderCheckpoints();
         this.renderPlayerTransforms();
 
         return;
@@ -1954,7 +2711,12 @@ public final class GameJFXController
                 continue;
             }
 
-            for (final RLaserMask mask : rp.getRobotView().getLaserAffectedTiles(this.tiles, 1))
+            if (rp.hasRebooted())
+            {
+                continue;
+            }
+
+            for (final RLaserMask mask : rp.getRobotView().getLaserAffectedTiles(this.tiles, 1, rp.hasRearLaser()))
             {
                 final ImageView iv = Tile.getFormattedImageView(mask);
                 iv.setFitHeight(    this.tileDimensions );
@@ -2191,6 +2953,44 @@ public final class GameJFXController
         return;
     }
 
+    public void onCheckpointMoved()
+    {
+        Platform.runLater(() ->
+        {
+            this.renderCheckpoints();
+            return;
+        });
+
+        return;
+    }
+
+    public void onMemoryCardsReceived(final ArrayList<String> cards)
+    {
+        Platform.runLater(() ->
+        {
+            this.memorySwapCards.clear();
+            this.memorySwapDiscardedCards.clear();
+            this.memorySwapCards.addAll(cards);
+            this.renderHUDFooter();
+            return;
+        });
+
+        return;
+    }
+
+    public void onSpamBlockerCardsReceived(final ArrayList<String> cards)
+    {
+        EGameState.INSTANCE.onSpamBlockerCardsReceived(cards);
+
+        Platform.runLater(() ->
+        {
+            this.renderHUD();
+            return;
+        });
+
+        return;
+    }
+
     // endregion Update View Methods from outside
 
     // region Getters and Setters
@@ -2263,7 +3063,7 @@ public final class GameJFXController
 
             r.setWidth(GameJFXController.RCARD_PREVIEW_TRANSLATION_X + 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP);
             r.setHeight(target.getHeight());
-            r.setStyle(String.format("-fx-fill: %s", GameJFXController.COLOR_RCARD_PREVIEW_BG));
+            r.setStyle(String.format("-fx-fill: %s;", GameJFXController.COLOR_RCARD_PREVIEW_BG));
             r.setTranslateX(newTranslations.get(j) + (idx % 2 == 0 ? GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP : GameJFXController.RCARD_PREVIEW_TRANSLATION_X - RCARD_PREVIEW_TRANSLATION_X_CLEANUP - GameJFXController.RCARD_PREVIEW_TRANSLATION_X_ALPHA));
 
             rs.add(r);
@@ -2272,6 +3072,24 @@ public final class GameJFXController
         }
 
         return rs;
+    }
+
+    public ArrayList<RShopAction> getPendingShopActions()
+    {
+        return this.pendingShopActions;
+    }
+
+    public void resetProgrammingTimeline()
+    {
+        if (this.programmingTimeline == null)
+        {
+            return;
+        }
+
+        this.programmingTimeline.stop();
+        this.programmingTimeline = null;
+
+        return;
     }
 
     // endregion Getters and Setters

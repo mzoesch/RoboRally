@@ -3,6 +3,7 @@ package sep.view.viewcontroller;
 import sep.view.lib.    EModifier;
 import sep.view.lib.    ERotation;
 import sep.view.lib.    RLaserMask;
+import sep.view.lib.    RCheckpointMask;
 import sep.view.lib.    RCoordinate;
 
 import org.json.            JSONArray;
@@ -58,13 +59,32 @@ public final class Tile
         return iv;
     }
 
+    public static ImageView getFormattedImageView(final RCheckpointMask mask)
+    {
+        final ImageView iv = new ImageView();
+        iv.getStyleClass().add("tile-image");
+        iv.setPreserveRatio(true);
+        iv.setSmooth(true);
+        iv.setCache(true);
+        iv.setImage(TileModifier.loadCachedImage(String.format(("CheckPoint%d"), mask.id())));
+
+        return iv;
+
+    }
+
     public ImageView[] getImageViews()
     {
-        final ArrayList<Image> images = new ArrayList<Image>();
-        final ArrayList<ImageView> imageViews = new ArrayList<ImageView>();
+        final ArrayList<Image>      images      = new ArrayList<Image>();
+        final ArrayList<ImageView>  imageViews  = new ArrayList<ImageView>();
 
         for (int i = 0; i < this.tile.length(); i++)
         {
+            /* Checkpoints are rendered dynamically because they are not static. */
+            if (hasModifier(EModifier.CHECK_POINT))
+            {
+                continue;
+            }
+
             images.add(this.getModifier(i).loadCachedImage());
             continue;
         }
@@ -246,6 +266,19 @@ public final class Tile
     public RCoordinate getTileLocation()
     {
         return new RCoordinate(this.xTranslation, this.yTranslation);
+    }
+
+    public int getCheckpointID()
+    {
+        for (int i = 0; i < this.getModifierSize(); i++)
+        {
+            if (Objects.equals(this.getModifier(i).getType(), EModifier.CHECK_POINT.toString()))
+            {
+                return this.getModifier(i).getCount();
+            }
+        }
+
+        return -1;
     }
 
     // endregion Getters and Setters

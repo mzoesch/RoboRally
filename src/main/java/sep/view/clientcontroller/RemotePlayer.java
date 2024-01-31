@@ -3,8 +3,10 @@ package sep.view.clientcontroller;
 import sep.view.viewcontroller.     RobotView;
 import sep.view.lib.                RCoordinate;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                RRegisterCard;
 
 import java.util.                   ArrayList;
+import java.util.                   Objects;
 
 /**
  * Represents a player in a session. Not just remote players but also the client player.
@@ -19,19 +21,23 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     private boolean                     bReady;
 
     protected RCoordinate               startPos;
-    /** Only updates by Human Server Listeners. */
+    /** Only updated by Human Server Listeners. */
     private final RobotView             possessing;
 
     private static final int            REGISTER_SLOTS      = 5;
     @SuppressWarnings("MismatchedReadAndWriteOfArray")
     private final String[]              registerSlots;
+    private boolean                     bRebooted;
 
-    private int                         energyCubes         = 5;
+    private static final int            START_ENERGY        = 5;
+    private int                         energyCubes;
 
     private boolean                     bSelectionFinished;
     private int                         checkPointsReached;
 
     private final ArrayList<String>     playedRCards;
+
+    private final ArrayList<String>     boughtUpgradeCards;
 
     public RemotePlayer(final int playerID, final String playerName, final EFigure figure, final boolean bReady)
     {
@@ -43,12 +49,17 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         this.startPos               = null;
         this.possessing             = new RobotView(this);
 
-        this.registerSlots          = new String[REGISTER_SLOTS];
+        this.registerSlots          = new String[RemotePlayer.REGISTER_SLOTS];
+        this.bRebooted              = false;
+
+        this.energyCubes            = RemotePlayer.START_ENERGY;
 
         this.bSelectionFinished     = false;
         this.checkPointsReached     = 0;
 
         this.playedRCards           = new ArrayList<String>();
+
+        this.boughtUpgradeCards     = new ArrayList<String>();
 
         return;
     }
@@ -130,7 +141,7 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         return;
     }
 
-    public int getEnergyCubes()
+    public int getEnergy()
     {
         return this.energyCubes;
     }
@@ -150,12 +161,21 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
     public void clearPlayedRCards()
     {
         this.playedRCards.clear();
+        this.bRebooted = false;
         return;
     }
 
     public void addPlayedRCards(final String card)
     {
+        /* If a pawn has been rebooted. */
+        if (Objects.equals(card, RRegisterCard.NULL_CARD))
+        {
+            this.playedRCards.clear();
+            return;
+        }
+
         this.playedRCards.add(card);
+
         return;
     }
 
@@ -171,6 +191,33 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
 
     public int getCheckPointsReached() {
         return checkPointsReached;
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("RemotePlayer{id:%d,name:%s,figure:%s,ready:%b}", this.playerID, this.playerName, this.figure, this.bReady);
+    }
+
+    public boolean hasRebooted()
+    {
+        return this.bRebooted;
+    }
+
+    public void setHasRebooted(final boolean bRebooted)
+    {
+        this.bRebooted = bRebooted;
+        return;
+    }
+
+    public ArrayList<String> getBoughtUpgradeCards()
+    {
+        return this.boughtUpgradeCards;
+    }
+
+    public boolean hasRearLaser()
+    {
+        return this.boughtUpgradeCards.contains("RearLaser");
     }
 
     // endregion Getters and Setters

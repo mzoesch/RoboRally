@@ -35,7 +35,7 @@ public class CourseBuilder {
             case("Lost Bearings") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board1A = buildBoard("1A");
-                changeFieldType(boardStartA, 0, 0, new RestartPoint("top"));
+                changeFieldType(boardStartA, 0, 0, new RestartPoint("right"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board1A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
@@ -43,7 +43,7 @@ public class CourseBuilder {
             case("Extra Crispy") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board4A = buildBoard("4A");
-                changeFieldType(boardStartA, 0, 0, new RestartPoint("top"));
+                changeFieldType(boardStartA, 0, 0, new RestartPoint("right"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board4A);
                 settingCoordinates(entireCourse);
                 return entireCourse;
@@ -51,7 +51,7 @@ public class CourseBuilder {
             case("Death Trap") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board2A = buildBoard("2A");
-                changeFieldType(boardStartA, 0, 9, new RestartPoint("bottom"));
+                changeFieldType(boardStartA, 0, 9, new RestartPoint("left"));
                 changeFieldType(boardStartA, 2, 9, new ConveyorBelt(1, "left", new String[] {"right"}));
                 changeFieldType(boardStartA, 2, 0, new ConveyorBelt(1, "left", new String[] {"right"}));
                 changeFieldType(boardStartA, 2, 4, new Wall(new String[]{"left"}));
@@ -66,7 +66,7 @@ public class CourseBuilder {
             case("Twister") -> {
                 ArrayList<ArrayList<Tile>> boardStartA = buildBoard("StartA");
                 ArrayList<ArrayList<Tile>> board6B = buildBoard("6B");
-                changeFieldType(boardStartA, 0, 7, new RestartPoint("top"));
+                changeFieldType(boardStartA, 0, 7, new RestartPoint("right"));
                 ArrayList<ArrayList<Tile>> entireCourse = appendRight(boardStartA, board6B);
                 settingCoordinates(entireCourse);
                 return entireCourse;
@@ -149,8 +149,9 @@ public class CourseBuilder {
         switch(courseName){
             case("Dizzy Highway") -> {
                 return "clockwise";}
-            //TODO add other courses
-        }
+            case ("Death Trap") -> {
+                return "counterclockwise";}
+            }
         return "clockwise";
     }
 
@@ -3203,6 +3204,10 @@ public class CourseBuilder {
         fieldtypes.add(new Empty());
         arrayListY.add(new Tile("6B",new Coordinate(9,9), fieldtypes));
         fieldtypes = new ArrayList<>();
+
+        board.add(arrayListY);
+        arrayListY = new ArrayList<>();
+
         return board;
     }
 }

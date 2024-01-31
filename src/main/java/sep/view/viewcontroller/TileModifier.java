@@ -194,16 +194,16 @@ public final class TileModifier
                 switch (this.tile.getJSONArray("orientations").getString(0))
                 {
                     case "top":
-                        iv.setRotate(0);
+                        iv.setRotate(270);
                         break;
                     case "right":
-                        iv.setRotate(90);
+                        iv.setRotate(0);
                         break;
                     case "bottom":
-                        iv.setRotate(180);
+                        iv.setRotate(90);
                         break;
                     case "left":
-                        iv.setRotate(270);
+                        iv.setRotate(180);
                         break;
 
                     default:
@@ -284,10 +284,11 @@ public final class TileModifier
 
         if (Types.EConfigurations.isDev())
         {
-            final Image i = new Image(String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION));
+            final String    strURL  = String.format("%s%s%s", TileModifier.PATH_DEV, modName, TileModifier.EXTENSION);
+            final Image     i       = new Image(strURL);
             if (i.isError())
             {
-                l.error("Could not load image: {}", modName);
+                l.error("Could not load image: {}.", strURL);
                 l.error(i.getException().getMessage());
                 return i;
             }
@@ -297,12 +298,13 @@ public final class TileModifier
 
         if (Types.EConfigurations.isProd())
         {
-            final URL               url     = TileModifier.class.getResource(String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION));
+            final String            strURL  = String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION);
+            final URL               url     = TileModifier.class.getResource(strURL);
             final BufferedImage     awtImg;
 
             if (url == null)
             {
-                l.error("Could not load image because the calculated url does not exist: {}", modName);
+                l.error("Could not load image because the calculated url does not exist: {}.", strURL);
                 return null;
             }
 
@@ -312,7 +314,7 @@ public final class TileModifier
             }
             catch (final IOException e)
             {
-                l.fatal("Could not load image: {}", modName);
+                l.fatal("Could not load image: {}.", modName);
                 l.fatal(e.getMessage());
                 GameInstance.kill();
                 return null;
@@ -324,8 +326,9 @@ public final class TileModifier
             return SwingFXUtils.toFXImage(awtImg, null);
         }
 
-        l.fatal("Failed to detect application configuration.");
-        GameInstance.kill();
+        l.fatal("Failed to detect application configuration during image load task.");
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
         return null;
     }
 
@@ -339,6 +342,7 @@ public final class TileModifier
         l.debug("Loading and caching image: {}.", modName);
         final Image i = TileModifier.loadImage(modName);
         TileModifier.IMG_CACHE.put(modName, new RImageMask(i, Types.EConfigurations.isDev() ? null : String.format("%s%s%s", TileModifier.PATH_PROD, modName, TileModifier.EXTENSION)));
+
         return i;
     }
 
@@ -534,7 +538,12 @@ public final class TileModifier
         return TileModifier.loadCachedImage("Empty");
     }
 
-    private int getCount()
+    public static Image loadUpgradePreview(final String card)
+    {
+        return TileModifier.loadCachedImage(String.format("%sPreview", card));
+    }
+
+    public int getCount()
     {
         return this.tile.getInt("count");
     }

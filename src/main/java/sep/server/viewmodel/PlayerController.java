@@ -116,6 +116,7 @@ public final class PlayerController implements IOwnershipable
         this.player.setCardToRegister(selectedCard, selectedRegister);
     }
 
+    @Override
     public Player getPlayer()
     {
         return this.player;

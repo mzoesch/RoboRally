@@ -1,12 +1,14 @@
 package sep.view.clientcontroller;
 
 import sep.view.lib.                EGamePhase;
+import sep.view.lib.                RCheckpointMask;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EPopUp;
 import sep.view.viewcontroller.     ViewSupervisor;
 import sep.view.viewcontroller.     SceneController;
 
 import org.json.                    JSONException;
+import java.util.                   ArrayList;
 import java.util.stream.            Collectors;
 import java.util.stream.            IntStream;
 import java.io.                     BufferedReader;
@@ -90,7 +92,18 @@ public final class HumanSL extends ServerListener
     {
         l.debug("Game phase has changed to: {}.", EGamePhase.fromInt(this.dsrp.getPhase()));
 
+        EGameState.INSTANCE.setMemorySwapPlayed(false);
+        EGameState.INSTANCE.setSpamBlockerPlayed(false);
+
+        /* Because we can play this card both in the programming phase and the activation phase. */
+        if (EGamePhase.fromInt(this.dsrp.getPhase()) == EGamePhase.PROGRAMMING)
+        {
+            EGameState.INSTANCE.setAdminPrivilegePlayed(false);
+            EGameState.INSTANCE.setCurrentRegister(0);
+        }
+
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
+        EGameState.INSTANCE.setProgrammingTimerRunning(false);
 
         if (!ViewSupervisor.hasLoadedGameScene())
         {
@@ -98,11 +111,7 @@ public final class HumanSL extends ServerListener
             return false;
         }
 
-        /* TODO Remove if upgrade phase is playable. */
-        if (this.dsrp.getPhase() != 1)
-        {
-            ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
-        }
+        ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
 
         return true;
     }
@@ -127,15 +136,31 @@ public final class HumanSL extends ServerListener
             return true;
         }
 
+        if (EGameState.INSTANCE.getCurrentPhase() == EGamePhase.UPGRADE)
+        {
+            if (this.dsrp.getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
+            {
+                EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), true);
+                ViewSupervisor.updateCourseView();
+                ViewSupervisor.createShopDialogLater();
+
+                return true;
+            }
+
+            EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), false);
+            return true;
+        }
+
+        l.warn("Received player turn change, but the current phase is not registration or upgrade. Ignoring.");
         EGameState.INSTANCE.setCurrentPlayer(this.dsrp.getPlayerID(), false);
 
-        return true;
+        return false;
     }
 
     @Override
     protected boolean onErrorMsg() throws JSONException
     {
-        l.debug("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
+        l.error("The server run into an error. Message: {}.", this.dsrp.getErrorMessage());
         ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.ERROR, this.dsrp.getErrorMessage()));
         return true;
     }
@@ -143,33 +168,50 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onCardPlayed() throws JSONException
     {
-        /* We still need to figure out what this does. */
-        l.fatal("Server triggered onCardPlayedEvent. {}.", this.dsrp.request().toString(0));
-        GameInstance.kill(GameInstance.EXIT_FATAL);
-        return false;
+        l.info("Player {} has played card {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
+        EGameState.INSTANCE.executePostCardPlayedBehaviour(this.dsrp.getPlayerID(), this.dsrp.getCard());
+        return true;
     }
 
     @Override
     protected boolean onStartingPointTaken() throws JSONException
     {
-        // Very sketchy, but we get somehow a race condition even though we use the run later methods of the Platform.
-        // We should probably implement a custom event here that is being triggered by postGameLoad.
-        final int t = (int) (Math.random() * 300) + 200;
-        l.warn("Waiting {} ms for game to load scene.", t);
-        try
+        synchronized (ViewSupervisor.getLoadGameSceneLock())
         {
-            Thread.sleep(t);
-        }
-        catch (final InterruptedException e)
-        {
-            l.fatal("Failed to wait for game to load scene.");
-            GameInstance.kill(GameInstance.EXIT_FATAL);
-            return false;
+            while (!ViewSupervisor.isGameScenePostLoaded())
+            {
+                l.warn("A starting position taken request was issued, but the game scene has not been loaded yet. Thread is waiting to be notified.");
+
+                try
+                {
+                    // Note, that this is the server listener thread. If the game scene is kinda laggy on slower
+                    // end hardware, this might cause a server disconnect forced by the servers keep-alive service.
+                    ViewSupervisor.getLoadGameSceneLock().wait();
+                }
+                catch (final InterruptedException e)
+                {
+                    l.fatal("Failed to wait for game to load scene.");
+                    GameInstance.kill(GameInstance.EXIT_FATAL);
+                    return false;
+                }
+
+                continue;
+            }
+
+            /* We can just exit because we are using the thread safe Run Later methods of the Platform. */
+            ViewSupervisor.getLoadGameSceneLock().notifyAll();
         }
 
         l.debug("Player {} took starting point {}.", this.dsrp.getPlayerID(), this.dsrp.getCoordinate().toString());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setStartingPosition(this.dsrp.getCoordinate());
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getRobotView().addRotation("startingDirection");
         ViewSupervisor.handleChatInfo(String.format("Player %s has selected a starting Point.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName()));
+
+        if (EGameState.INSTANCE.getClientRemotePlayer() == null)
+        {
+            l.warn("Tried to update view for starting point, but the local player is not set yet (Player ID: {}).", EClientInformation.INSTANCE.getPlayerID());
+            return false;
+        }
 
         /* We must discard the hover effects. */
         if (this.dsrp.getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
@@ -213,23 +255,26 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onForcedFinishProgramming() throws JSONException
     {
-        l.debug("Player {} has been forced to finish programming because they did not submit their selection in time. Filling cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
+        l.info("Player {} has been forced to finish programming because they did not submit their selection in time. Filling cards: {}", EClientInformation.INSTANCE.getPlayerID(), String.join(", ", Arrays.asList(this.dsrp.getForcedCards())));
 
         EGameState.INSTANCE.setSelectionFinished(EClientInformation.INSTANCE.getPlayerID());
         EGameState.INSTANCE.clearGotRegisters();
 
-        for (String c : this.dsrp.getForcedCards())
+        cardSelection: for (final String c : this.dsrp.getForcedCards())
         {
             for (int i = 0; i < EGameState.INSTANCE.getRegisters().length; ++i)
             {
                 if (EGameState.INSTANCE.getRegisters()[i] == null)
                 {
                     EGameState.INSTANCE.addRegister(i, c);
-                    break;
+                    l.debug("Added card {} to register {}.", c, i);
+                    continue cardSelection;
                 }
 
                 continue;
             }
+
+            l.error("Could not add card {} to any register. Ignoring.", c);
 
             continue;
         }
@@ -260,25 +305,39 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onProgrammingTimerStart() throws JSONException
     {
-        /* TODO Implement timer. */
-        l.error("Programming phase timer has started.");
+        l.info("Programming phase timer has started.");
         ViewSupervisor.handleChatInfo("The programming phase timer has started. Submit your cards in time!");
+        EGameState.INSTANCE.setProgrammingTimerRunning(true);
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 
     @Override
     protected boolean onProgrammingTimerEnd() throws JSONException
     {
-        /* TODO Implement timer. */
-        l.debug("Programming phase timer has ended.");
+        l.info("Programming phase timer has ended. Forced to finish programming clients: {}.", this.dsrp.getForcedFinishedProgrammingClients());
         ViewSupervisor.handleChatInfo("The programming phase timer has ended.");
+        EGameState.INSTANCE.setProgrammingTimerRunning(false);
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 
     @Override
     protected boolean onProgrammingCardsReceived() throws JSONException
     {
-        l.debug("Received nine new programming cards from server: {}", String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+        l.debug("Received {} new programming cards from server: {}.", this.dsrp.getCardsInHand().length, String.join(", ", Arrays.asList(this.dsrp.getCardsInHand())));
+
+        if (EGameState.INSTANCE.isMemorySwapPlayed())
+        {
+            ViewSupervisor.onMemoryCardsReceived(this.dsrp.getCardsInHand());
+            return true;
+        }
+
+        if (EGameState.INSTANCE.isSpamBlockerPlayed())
+        {
+            ViewSupervisor.onSpamBlockerCardsReceived(this.dsrp.getCardsInHand());
+            return true;
+        }
 
         EGameState.INSTANCE.clearAllRegisters();
         for (final String c : this.dsrp.getCardsInHand())
@@ -346,15 +405,29 @@ public final class HumanSL extends ServerListener
         l.debug("Player {} has reached {} checkpoints.", this.dsrp.getPlayerID(), this.dsrp.getCheckpointNumber());
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setCheckPointsReached(this.dsrp.getCheckpointNumber());
         ViewSupervisor.handleChatInfo(String.format("Player %s has reached %s checkpoints.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCheckpointNumber()));
+        ViewSupervisor.updatePlayerInformationArea();
         return true;
     }
 
     @Override
     protected boolean onEnergyTokenChanged() throws JSONException
     {
-        l.debug("Player {}'s energy amount has been updated to {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount());
+        l.debug("Player {}'s energy amount has been updated to {}. Source: {}.", this.dsrp.getPlayerID(), this.dsrp.getEnergyCount(), this.dsrp.getEnergySource());
+        final int deprecatedEnergy = Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getEnergy();
         Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setEnergy(this.dsrp.getEnergyCount());
         ViewSupervisor.updatePlayerView();
+
+        /* If a client bought an upgrade card, for example. */
+        if (deprecatedEnergy - this.dsrp.getEnergyCount() >= 0)
+        {
+            return true;
+        }
+
+        if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+        {
+            ViewSupervisor.createEnergyTokenPopUpLater(this.dsrp.getEnergyCount() - deprecatedEnergy, this.dsrp.getEnergySource());
+        }
+
         return true;
     }
 
@@ -379,6 +452,8 @@ public final class HumanSL extends ServerListener
     protected boolean onPlayerReboot() throws JSONException
     {
         l.debug("Player {} has been rebooted.", this.dsrp.getPlayerID());
+
+        Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).setHasRebooted(true);
 
         if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
         {
@@ -431,36 +506,60 @@ public final class HumanSL extends ServerListener
     @Override
     protected boolean onExchangeShop() throws JSONException
     {
-        l.debug("Received exchange shop from server.");
+        l.debug("Upgrade shop was exchanged with the following cards: {}.", String.join(", ", Arrays.asList(this.dsrp.getExchangeShopCards())));
+        EGameState.INSTANCE.exchangeShop(new ArrayList<String>(Arrays.asList(this.dsrp.getExchangeShopCards())));
         return true;
     }
 
     @Override
     protected boolean onRefillShop() throws JSONException
     {
-        l.debug("Received refill shop from server.");
+        l.debug("Upgrade shop was refilled with the following cards: {}.", String.join(", ", Arrays.asList(this.dsrp.getRefillShopCards())));
+        EGameState.INSTANCE.refillShop(new ArrayList<String>(Arrays.asList(this.dsrp.getRefillShopCards())));
         return true;
     }
 
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        l.debug("Received upgrade bought from server.");
+        l.debug("Client {} has bought the following upgrade card: {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
+        EGameState.INSTANCE.onUpgradeCardBought(this.dsrp.getPlayerID(), this.dsrp.getCard());
+        ViewSupervisor.handleChatInfo(String.format("Player %s has bought the following upgrade card: %s.", Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(this.dsrp.getPlayerID())).getPlayerName(), this.dsrp.getCard()));
         return true;
     }
 
     @Override
     protected boolean onCheckpointMoved() throws JSONException
     {
-        l.debug("Received checkpoint moved from server.");
-        return true;
+        l.debug("Checkpoint {} has moved to {}.", this.dsrp.getCheckpointMovedID(), this.dsrp.getCoordinate().toString());
+
+        for (int i = 0; i < EGameState.INSTANCE.getCurrentCheckpointLocations().size(); ++i)
+        {
+            if (EGameState.INSTANCE.getCurrentCheckpointLocations().get(i) == null)
+            {
+                continue;
+            }
+
+            if (EGameState.INSTANCE.getCurrentCheckpointLocations().get(i).id() == this.dsrp.getCheckpointMovedID())
+            {
+                EGameState.INSTANCE.getCurrentCheckpointLocations().set(i, new RCheckpointMask(this.dsrp.getCoordinate(), this.dsrp.getCheckpointMovedID()));
+                ViewSupervisor.updateCheckpoints();
+                return true;
+            }
+
+            continue;
+        }
+
+        l.fatal("Could not find checkpoint {} in the current checkpoint list. Ignoring.", this.dsrp.getCheckpointMovedID());
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
+        return false;
     }
 
     @Override
     protected boolean onRegisterChosen() throws JSONException
     {
-        l.debug("Received register chosen from server.");
-        return true;
+        return false;
     }
 
     // endregion Server request handlers

@@ -22,6 +22,7 @@ public final class GI_Agent extends GameInstance
     private static void runAgentLoop()
     {
         int tries = 0;
+
         while (tries < GI_Agent.MAX_CONNECTION_TRIES)
         {
             try
@@ -40,6 +41,7 @@ public final class GI_Agent extends GameInstance
                 }
 
                 l.info("Retrying in five seconds. Failed {} times. Quitting after {} tries.", tries + 1, GI_Agent.MAX_CONNECTION_TRIES);
+
                 try
                 {
                     Thread.sleep(GI_Agent.RETRY_TIMEOUT);

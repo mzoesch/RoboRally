@@ -1,22 +1,27 @@
 package sep.view.viewcontroller;
 
-import sep.view.clientcontroller.   GameInstance    ;
-import sep.view.lib.                RPopUpMask      ;
-import sep.view.lib.                EPopUp          ;
+import sep.view.clientcontroller.   GameInstance;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
 
-import javafx.scene.                Scene           ;
-import java.util.                   Objects         ;
-import java.util.                   ArrayList       ;
-import javafx.scene.layout.         Pane            ;
-import javafx.scene.layout.         HBox            ;
-import javafx.scene.layout.         AnchorPane      ;
-import javafx.scene.layout.         BorderPane      ;
-import javafx.fxml.                 FXMLLoader      ;
-import javafx.scene.control.        Button          ;
-import javafx.scene.control.        Label           ;
-import java.io.                     IOException     ;
-import org.apache.logging.log4j.    LogManager      ;
-import org.apache.logging.log4j.    Logger          ;
+import javafx.scene.                Scene;
+import javafx.scene.                Node;
+import java.util.                   Objects;
+import java.util.                   ArrayList;
+import javafx.scene.layout.         Pane;
+import javafx.scene.layout.         HBox;
+import javafx.scene.layout.         AnchorPane;
+import javafx.scene.layout.         BorderPane;
+import javafx.scene.layout.         Region;
+import javafx.scene.layout.         VBox;
+import javafx.scene.layout.         Priority;
+import javafx.fxml.                 FXMLLoader;
+import javafx.scene.control.        Button;
+import javafx.scene.control.        Label;
+import java.io.                     IOException;
+import org.apache.logging.log4j.    LogManager;
+import org.apache.logging.log4j.    Logger;
+import javafx.scene.text.           TextAlignment;
 
 /**
  * Singleton object that implements high-level methods relevant for the Graphical User Interface and handles the
@@ -104,13 +109,31 @@ public final class SceneController
         container.setId("pop-up-container");
         container.setMouseTransparent(false);
 
+        final HBox outerContainer = new HBox(container);
+        outerContainer.setStyle("-fx-alignment: center;");
+
         final Label headerLabel = new Label(mask.header());
-        headerLabel.getStyleClass().add("text-2xl-error");
+        if (mask.type() == EPopUp.ERROR)
+        {
+            headerLabel.getStyleClass().add("text-2xl-error");
+        }
+        else if (mask.type() == EPopUp.WARNING)
+        {
+            headerLabel.getStyleClass().add("text-2xl-warning");
+        }
+        else
+        {
+            headerLabel.getStyleClass().add("text-2xl");
+        }
+        headerLabel.setWrapText(true);
+        headerLabel.setTextAlignment(TextAlignment.CENTER);
         final HBox header = new HBox(headerLabel);
         header.setId("pop-up-header");
 
         final Label msgLabel = new Label(mask.msg());
         msgLabel.getStyleClass().add("text-xl");
+        msgLabel.setWrapText(true);
+        msgLabel.setTextAlignment(TextAlignment.CENTER);
         final HBox body = new HBox(msgLabel);
         body.setId("pop-up-body");
         body.setMouseTransparent(true);
@@ -123,7 +146,19 @@ public final class SceneController
             b.getStyleClass().add("secondary-btn");
             b.setOnAction(e ->
             {
-                target.getChildren().remove(container);
+                target.getChildren().remove(outerContainer);
+                return;
+            });
+
+            form.getChildren().add(b);
+        }
+        else if (Objects.requireNonNull(mask.type()) == EPopUp.WARNING)
+        {
+            final Button b = new Button("OK");
+            b.getStyleClass().add("secondary-btn");
+            b.setOnAction(e ->
+            {
+                target.getChildren().remove(outerContainer);
                 return;
             });
 
@@ -147,12 +182,12 @@ public final class SceneController
         AnchorPane.setRightAnchor(  form,  0.0 );
         AnchorPane.setBottomAnchor( form,  0.0 );
 
-        AnchorPane.setLeftAnchor(   container,  0.0 );
-        AnchorPane.setRightAnchor(  container,  0.0 );
-        AnchorPane.setTopAnchor(    container,  0.0 );
-        AnchorPane.setBottomAnchor( container,  0.0 );
+        AnchorPane.setLeftAnchor(   outerContainer,  0.0 );
+        AnchorPane.setRightAnchor(  outerContainer,  0.0 );
+        AnchorPane.setTopAnchor(    outerContainer,  0.0 );
+        AnchorPane.setBottomAnchor( outerContainer,  0.0 );
 
-        return container;
+        return outerContainer;
     }
 
     public <T> void renderNewScreen(final String ID, final String path, final boolean bAutoKillAfterUse)
@@ -167,6 +202,11 @@ public final class SceneController
         {
             l.fatal("Failed to load FXML file at {}.", path);
             l.fatal(e.getMessage());
+            for (final StackTraceElement ste : e.getStackTrace())
+            {
+                l.fatal(ste.toString());
+                continue;
+            }
             GameInstance.kill();
             return;
         }
@@ -321,7 +361,7 @@ public final class SceneController
         if (this.screens.isEmpty())
         {
             l.fatal("No screens are loaded.");
-            GameInstance.kill();
+            GameInstance.kill(GameInstance.EXIT_FATAL);
             return null;
         }
 
@@ -348,6 +388,25 @@ public final class SceneController
     {
         //noinspection unchecked
         return (T) this.getCurrentScreen().controller();
+    }
+
+    private Node createHSpacer()
+    {
+        final Region s = new Region();
+        HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    public Pane getRenderTarget()
+    {
+        return this.getPopUpTarget();
     }
 
 }

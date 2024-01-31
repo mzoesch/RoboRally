@@ -42,7 +42,6 @@
                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
                 >
                     <Label
-                        styleClass="text-xl"
                         fx:id="programmingTimerLabel"
                     />
                     <HBox
@@ -107,6 +106,30 @@
                             >
                                 <Label
                                     text="Hand Cards"
+                                    styleClass="text-base" stylesheets="@game.css"
+                                />
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                    <VBox>
+                        <AnchorPane
+                            fx:id="memorySwapContainer"
+                            VBox.vgrow="ALWAYS"
+                        />
+                    </VBox>
+                    <VBox>
+                        <AnchorPane
+                            id="upgrade-container" stylesheets="@game.css"
+                            fx:id="upgradeSlotContainer"
+                            VBox.vgrow="ALWAYS"
+                        />
+                        <HBox>
+                            <VBox
+                                HBox.hgrow="ALWAYS"
+                                id="upgrade-slots-label-container" stylesheets="@game.css"
+                            >
+                                <Label
+                                    text="Upgrade"
                                     styleClass="text-base" stylesheets="@game.css"
                                 />
                             </VBox>

@@ -10,6 +10,9 @@ import sep.view.lib.                RRegisterCard;
 import org.json.                    JSONObject;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
+import java.util.                   ArrayList;
+import java.util.                   Arrays;
+import java.util.                   Objects;
 
 /** Mocking Game View with no server connection required. */
 public final class MockViewLauncher implements IMockView
@@ -17,6 +20,7 @@ public final class MockViewLauncher implements IMockView
     private static final Logger l = LogManager.getLogger(MockViewLauncher.class);
 
     private static final int    MOCK_PLAYER_COUNT      = 6;
+    /** Due to JFX error on Sonoma 14.x.x. */
     private static final int    INIT_TIMEOUT_OSX       = 7_000;
     private static final int    INIT_TIMEOUT_OTHER     = 1_000;
 
@@ -29,7 +33,7 @@ public final class MockViewLauncher implements IMockView
     public void run()
     {
         EClientInformation.INSTANCE.setMockView(true);
-        Thread t = new Thread(() ->
+        final Thread t = new Thread(() ->
         {
             l.info("Mock view started. Waiting for JavaFX thread to start.");
             try
@@ -978,19 +982,57 @@ public final class MockViewLauncher implements IMockView
             EGameState.INSTANCE.setCurrentServerCourseJSON(dsrp.getGameCourse());
             ViewSupervisor.updateCourseView();
             EGameState.INSTANCE.setCurrentPhase(EGamePhase.PROGRAMMING);
-            final String[] mockPCards = new String[] {"MoveI", "MoveI", "MoveI", "MoveII", "MoveII", "MoveII", "MoveIII", "MoveIII", "MoveIII"};
+            final String[] mockPCards = new String[] {"MoveI", "MoveII", "MoveIII", "PowerUp", "Again", "TurnLeft", "UTurn", "TurnRight", "BackUp"};
             for (final String s : mockPCards)
             {
                 EGameState.INSTANCE.addGotRegister(s);
+                continue;
             }
             EGameState.INSTANCE.setCurrentPlayer(0, false);
 
             for (int i = 0; i < 5; i++)
             {
-                EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{new RRegisterCard(0, "MoveI"), new RRegisterCard(1, "MoveI"), new RRegisterCard(2, "MoveI"), new RRegisterCard(3, "MoveII"), new RRegisterCard(4, "MoveII"), new RRegisterCard(5, "MoveII"), });
+                EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{new RRegisterCard(0, "MoveI"), new RRegisterCard(1, "MoveII"), new RRegisterCard(2, "MoveIII"), new RRegisterCard(3, "Again"), new RRegisterCard(4, "UTurn"), new RRegisterCard(5, "PowerUp"), });
                 continue;
             }
+
+            EClientInformation.INSTANCE.setPlayerID(0);
+
+//            EGameState.INSTANCE.refillShop(new ArrayList<String>(Arrays.asList("AdminPrivilege", "RearLaser", "MemorySwap", "SpamBlocker", "AdminPrivilege", "RearLaser")));
+//            EGameState.INSTANCE.exchangeShop(new ArrayList<String>(Arrays.asList("AdminPrivilege", null)));
+
+//            EGameState.INSTANCE.onUpgradeCardBought(0, "AdminPrivilege");
+//            EGameState.INSTANCE.onUpgradeCardBought(0, "SpamBlocker");
+//            EGameState.INSTANCE.onUpgradeCardBought(1, "RearLaser");
+
+            EGameState.INSTANCE.getBoughtUpgradeCards()[3] = "AdminPrivilege";
+            EGameState.INSTANCE.getBoughtUpgradeCards()[4] = "RearLaser";
+            EGameState.INSTANCE.getBoughtUpgradeCards()[0] = "MemorySwap";
+            EGameState.INSTANCE.getBoughtUpgradeCards()[1] = "SpamBlocker";
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getBoughtUpgradeCards().add("AdminPrivilege");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getBoughtUpgradeCards().add("RearLaser");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getBoughtUpgradeCards().add("MemorySwap");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getBoughtUpgradeCards().add("SpamBlocker");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getBoughtUpgradeCards().add("RearLaser");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("AdminPrivilege");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("RearLaser");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("MemorySwap");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getBoughtUpgradeCards().add("SpamBlocker");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getBoughtUpgradeCards().add("RearLaser");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getBoughtUpgradeCards().add("AdminPrivilege");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getBoughtUpgradeCards().add("RearLaser");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getBoughtUpgradeCards().add("MemorySwap");
+
             ViewSupervisor.updatePlayerInformationArea();
+
+//            ViewSupervisor.createShopDialogLater();
+
+//            ViewSupervisor.onMemoryCardsReceived(new ArrayList<String>(Arrays.asList("MoveI", "MoveI", "MoveI")).toArray(new String[0]));
 
             ViewSupervisor.centerGameCourseLater();
 

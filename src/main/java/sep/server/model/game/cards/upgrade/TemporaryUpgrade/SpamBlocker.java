@@ -25,6 +25,7 @@ public class SpamBlocker extends ATemporaryUpgrade{
      * Removes SpamDamage cards from the player's hand and adds them to the SpamDeck.
      *
      * @param player The player for whom the SpamBlocker upgrade is activated.
+     * @deprecated
      */
     public void activateUpgrade(Player player) {
         logger.info("UpgradeCard (SpamBlocker) activated for player '{}'. Removing SpamDamage card from hand.",

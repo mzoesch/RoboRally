@@ -1,9 +1,10 @@
 package sep.view.viewcontroller;
 
-import sep.view.json.game.ChooseRegisterModel;
-import sep.view.json.game.DiscardSomeModel;
+import sep.view.json.game.          ChooseRegisterModel;
+import sep.view.json.game.          DiscardSomeModel;
 import sep.view.json.game.          SelectedDamageModel;
 import sep.view.json.game.          RebootDirectionModel;
+import sep.view.json.game.          BuyUpgradeModel;
 import sep.                         Types;
 import sep.view.scenecontrollers.   LobbyJFXController_v2;
 import sep.view.scenecontrollers.   GameJFXController;
@@ -15,27 +16,47 @@ import sep.view.clientcontroller.   EGameState;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EAnimation;
+import sep.view.lib.                EShopAction;
+import sep.view.lib.                RShopAction;
+import sep.view.lib.                EUpgradeCard;
 
+import javafx.scene.text.           TextFlow;
+import javafx.scene.text.           Text;
 import javafx.scene.control.        Label;
 import javafx.scene.control.        Button;
+import javafx.scene.control.        OverrunStyle;
 import javafx.geometry.             Pos;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
 import javafx.application.          Platform;
 import javafx.application.          Application;
+import javafx.scene.                Node;
 import javafx.scene.                Parent;
 import javafx.scene.                Scene;
 import javafx.stage.                WindowEvent;
 import javafx.stage.                Stage;
 import javafx.scene.layout.         Pane;
 import javafx.scene.layout.         HBox;
+import javafx.scene.layout.         VBox;
+import javafx.scene.layout.         Region;
 import javafx.scene.layout.         AnchorPane;
+import javafx.scene.layout.         Priority;
 import java.util.                   ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.                   Arrays;
+import java.util.                   List;
+import java.util.                   Objects;
+import java.util.concurrent.atomic. AtomicBoolean;
 import java.util.concurrent.atomic. AtomicReference;
+import javafx.scene.image.          ImageView;
+import javafx.scene.effect.         GaussianBlur;
+import javafx.scene.effect.         ColorAdjust;
+
+@FunctionalInterface
+interface ImageViewCreator
+{
+    public abstract ImageView create(final int idx);
+}
 
 /**
  * This class is responsible for launching the JavaFX Application Thread and is the gate-way object for all
@@ -47,6 +68,10 @@ public final class ViewSupervisor extends Application
 {
     private static final Logger l = LogManager.getLogger(ViewSupervisor.class);
 
+    /** Used for transitions between scenes. Issued requests will be notified by the post-load behavior of the scene. */
+    private static final Object         lock                = new Object();
+    private static final AtomicBoolean  bGameSceneLoaded    = new AtomicBoolean(false);
+
     /** This instance is only valid on the JFX thread. */
     private static ViewSupervisor   INSTANCE;
     private SceneController         sceneController;
@@ -56,9 +81,13 @@ public final class ViewSupervisor extends Application
     public static final int     VIRTUAL_SPACE_HORIZONTAL    = 512;
     public static final int     REGISTER_SLOT_WIDTH         = 102;
     public static final int     REGISTER_SLOT_HEIGHT        = 180;
+    public static final int     SHOP_DIALOG_SLOT_WIDTH      = 82;
+    public static final int     SHOP_DIALOG_SLOT_HEIGHT     = 144;
     public static final int     GOT_REGISTER_SLOT_WIDTH     = 34;
     public static final int     GOT_REGISTER_SLOT_HEIGHT    = 58;
-    public static final int     PHASE_POPUP_TIME            = 5_000;
+    public static final int     UPGRADE_SLOT_WIDTH          = 34;
+    public static final int     UPGRADE_SLOT_HEIGHT         = 58;
+    public static final int     PHASE_POPUP_TIME            = 2_000;
 
     public ViewSupervisor()
     {
@@ -307,6 +336,20 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void updateCheckpoints()
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onCheckpointMoved();
+            return;
+        }
+        catch (final ClassCastException e) {
+            l.error("Could not cast current controller to GameJFXController during checkpoint update. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     public static <T> void onPlayerRemoved()
     {
         final T ctrl = ViewSupervisor.getSceneController().getCurrentController();
@@ -371,6 +414,40 @@ public final class ViewSupervisor extends Application
         return;
     }
 
+    public static void onMemoryCardsReceived(final String[] cards)
+    {
+        l.debug("Received memory swap cards: {}.", Arrays.toString(cards));
+
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onMemoryCardsReceived(new ArrayList<String>(Arrays.asList(cards)));
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during memory swap dialog creation. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    public static void onSpamBlockerCardsReceived(final String[] cards)
+    {
+        l.debug("Received spam blocker cards: {}.", Arrays.toString(cards));
+
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).onSpamBlockerCardsReceived(new ArrayList<String>(Arrays.asList(cards)));
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during memory swap dialog creation. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
     // endregion Game Events
 
     public static void createPopUp(final RPopUpMask mask)
@@ -432,17 +509,13 @@ public final class ViewSupervisor extends Application
                     return;
                 }
 
-                l.error("Failed to sleep thread for {}ms.", autoDestroyDelay);
+                l.error("Failed to sleep auto popup destroy thread for {}ms.", autoDestroyDelay);
                 l.error(e.getMessage());
 
                 return;
             }
 
-            Platform.runLater(() ->
-            {
-                ViewSupervisor.getSceneController().destroyPopUp(p, bSoftDestroy);
-                return;
-            });
+            ViewSupervisor.destroyPopUpLater(p, bSoftDestroy);
 
             return;
         });
@@ -450,6 +523,15 @@ public final class ViewSupervisor extends Application
         t.start();
 
         return t;
+    }
+
+    public static void destroyPopUpLater(final Pane target, final boolean bSoft)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.getSceneController().destroyPopUp(target, bSoft);
+            return;
+        });
     }
 
     public static AtomicReference<Thread> createPopUpLater(final Pane p, final int autoDestroyDelay)
@@ -484,7 +566,6 @@ public final class ViewSupervisor extends Application
             return;
         }
     }
-
 
     //Pop-Up für RegisterAuswahl bei AdminPriviledge UpgradeCard
     public static void createRegisterDialog(int selectedRegister) {
@@ -821,33 +902,27 @@ public final class ViewSupervisor extends Application
         final HBox h = new HBox();
         h.setAlignment(Pos.CENTER);
 
-        final Label header = new Label("Damage Cards drawn");
+        final Label header = new Label(String.format("You have drawn the following damage cards: %s.", drawnCards));
+        header.setStyle("-fx-alignment: center; -fx-text-alignment: center;");
         header.getStyleClass().add("text-xl");
-        header.setStyle("-fx-alignment: center;");
+        header.setWrapText(true);
 
-        AnchorPane.setLeftAnchor(       header, 0.0      );
         AnchorPane.setRightAnchor(      header, 0.0      );
-        AnchorPane.setTopAnchor(        header, 50.0     );
+        AnchorPane.setTopAnchor(        header, 0.0      );
+        AnchorPane.setBottomAnchor(     header, 0.0      );
+        AnchorPane.setLeftAnchor(       header, 0.0      );
 
-        final Label form = new Label("You have drawn following damage cards: " + drawnCards);
-        form.getStyleClass().add("text-base");
-        form.setStyle("-fx-alignment: center;");
+        final AnchorPane ap = new AnchorPane(header);
+        ap.setId("draw-damage-container");
+        ap.setMouseTransparent(true);
 
-        AnchorPane.setLeftAnchor(       form, 0.0      );
-        AnchorPane.setRightAnchor(      form, 0.0      );
-        AnchorPane.setBottomAnchor(     form, 50.0      );
-
-        final AnchorPane p = new AnchorPane(header, form);
-        p.setId("phase-update-container");
-
-        h.getChildren().add(p);
+        h.getChildren().add(ap);
 
         AnchorPane.setLeftAnchor(       h, 0.0      );
         AnchorPane.setRightAnchor(      h, 0.0      );
-        AnchorPane.setTopAnchor(        h, 0.0      );
-        AnchorPane.setBottomAnchor(     h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 50.0     );
 
-        ViewSupervisor.createPopUp(h, 2000, false);
+        ViewSupervisor.createPopUp(h, 4_000, false);
 
         return;
     }
@@ -867,6 +942,391 @@ public final class ViewSupervisor extends Application
         }
     }
 
+    public static void createShopDialog()
+    {
+        ViewSupervisor.clearPendingShopActions();
+
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Label header = new Label("Upgrade Your Robot");
+        header.getStyleClass().add("text-2xl");
+        header.setStyle("-fx-alignment: center;");
+
+        AnchorPane.setLeftAnchor(       header, 0.0      );
+        AnchorPane.setRightAnchor(      header, 0.0      );
+        AnchorPane.setTopAnchor(        header, 10.0     );
+
+        final Label lEnergy = new Label(String.format("%s", Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy()));
+        lEnergy.getStyleClass().add("text-xl");
+
+        final ImageView ivEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
+        ivEnergy.setFitHeight(25);
+        ivEnergy.setFitWidth(25);
+
+        final HBox hEnergy = new HBox(ivEnergy, lEnergy);
+        hEnergy.setAlignment(Pos.CENTER);
+        hEnergy.setSpacing(5);
+
+        AnchorPane.setRightAnchor(      hEnergy, 10.0      );
+        AnchorPane.setTopAnchor(        hEnergy, 10.0     );
+
+        final HBox availableCards = new HBox();
+        availableCards.setId("upgrade-shop-available-cards");
+
+        for (int i = 0; i < EGameState.INSTANCE.getUpgradeShop().size(); ++i)
+        {
+            final ImageView     iv  = ViewSupervisor.getUpgradeShopImageAtIndex(i);
+            final AnchorPane    ap  = ViewSupervisor.getAnchorPaneForShopSlot(iv, i);
+
+            availableCards.getChildren().add(ap);
+
+            continue;
+        }
+
+        final Region LeftSplitLine = new Region();
+        LeftSplitLine.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        final Region RightSplitLine = new Region();
+        RightSplitLine.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final HBox verticalSplitLineBox = new HBox(LeftSplitLine, ViewSupervisor.createHSpacer(), RightSplitLine);
+
+        final Region splitLineAvailableCards = new Region();
+        splitLineAvailableCards.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        final Region fiveGap = new Region();
+        fiveGap.setPrefHeight(5);
+
+        final VBox availableCardsWrapper = new VBox(availableCards, fiveGap, verticalSplitLineBox, splitLineAvailableCards);
+        availableCardsWrapper.setId("upgrade-shop-available-cards-wrapper");
+
+        final Label availableCardsLabel = new Label("SHOP CARDS");
+        availableCardsLabel.getStyleClass().add("text-xl");
+        availableCardsLabel.setStyle("-fx-alignment: center;");
+        availableCardsLabel.setWrapText(true);
+
+        final Label temporaryCardsLabel = new Label("TEMPORARY");
+        temporaryCardsLabel.getStyleClass().add("text-xl");
+        temporaryCardsLabel.setStyle("-fx-alignment: center;");
+        temporaryCardsLabel.setWrapText(true);
+        temporaryCardsLabel.setMaxWidth(Double.MAX_VALUE);
+
+        final Label permanentCardsLabel = new Label("PERMANENT");
+        permanentCardsLabel.getStyleClass().add("text-xl");
+        permanentCardsLabel.setStyle("-fx-alignment: center;");
+        permanentCardsLabel.setWrapText(true);
+        permanentCardsLabel.setMaxWidth(Double.MAX_VALUE);
+
+        HBox.setHgrow(temporaryCardsLabel, Priority.ALWAYS);
+        HBox.setHgrow(permanentCardsLabel, Priority.ALWAYS);
+
+        final HBox boughtCardsLabelWrapper = new HBox(temporaryCardsLabel, permanentCardsLabel);
+
+        final Region temporaryBoughtCardsHorizontalSplitter = new Region();
+        temporaryBoughtCardsHorizontalSplitter.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        final Region permanentBoughtCardsHorizontalSplitter = new Region();
+        permanentBoughtCardsHorizontalSplitter.getStyleClass().add("upgrade-shop-dialog-splitter");
+
+        HBox.setHgrow(temporaryBoughtCardsHorizontalSplitter, Priority.ALWAYS);
+        HBox.setHgrow(permanentBoughtCardsHorizontalSplitter, Priority.ALWAYS);
+
+        final HBox boughtCardsHorizontalSplitterWrapper = new HBox(temporaryBoughtCardsHorizontalSplitter, permanentBoughtCardsHorizontalSplitter);
+        boughtCardsHorizontalSplitterWrapper.setId("upgrade-shop-bought-cards-horizontal-splitter-wrapper");
+
+        final Region temporaryLeftBoughtCardsVerticalSplitter = new Region();
+        temporaryLeftBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final Region temporaryRightBoughtCardsVerticalSplitter = new Region();
+        temporaryRightBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final Region permanentLeftBoughtCardsVerticalSplitter = new Region();
+        permanentLeftBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final Region permanentRightBoughtCardsVerticalSplitter = new Region();
+        permanentRightBoughtCardsVerticalSplitter.getStyleClass().add("vertical-shop-dialog-splitter");
+
+        final HBox temporaryBoughtCardsVerticalSplitterWrapper = new HBox(temporaryLeftBoughtCardsVerticalSplitter, ViewSupervisor.createHSpacer(), temporaryRightBoughtCardsVerticalSplitter);
+
+        final HBox permanentBoughtCardsVerticalSplitterWrapper = new HBox(permanentLeftBoughtCardsVerticalSplitter, ViewSupervisor.createHSpacer(), permanentRightBoughtCardsVerticalSplitter);
+
+        HBox.setHgrow(temporaryBoughtCardsVerticalSplitterWrapper, Priority.ALWAYS);
+        HBox.setHgrow(permanentBoughtCardsVerticalSplitterWrapper, Priority.ALWAYS);
+
+        final HBox boughtCardsVerticalSplitterWrapper = new HBox(temporaryBoughtCardsVerticalSplitterWrapper, permanentBoughtCardsVerticalSplitterWrapper);
+        boughtCardsVerticalSplitterWrapper.setId("upgrade-shop-bought-cards-vertical-splitter-wrapper");
+
+        final HBox boughtCards = new HBox();
+        boughtCards.setId("upgrade-shop-bought-cards");
+
+        for (int i = 0; i < EGameState.INSTANCE.getBoughtUpgradeCard().length; ++i)
+        {
+            final ImageView iv = ViewSupervisor.getBoughtUpgradeImageAtIndex(i);
+
+            final AnchorPane ap = new AnchorPane(iv);
+            ap.setMinSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+            ap.setMaxSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+
+            /* TODO Are we allowed to discard purchased upgrade cards with protocol 2.0? */
+
+            // final int finalI = i;
+            iv.setOnMouseClicked(e ->
+            {
+                return;
+            });
+
+            iv.setOnMouseEntered(e ->
+            {
+            });
+
+            iv.setOnMouseExited(e ->
+            {
+            });
+
+            boughtCards.getChildren().add(ap);
+
+            continue;
+        }
+
+        final Region boughtFiveGap = new Region();
+        boughtFiveGap.setPrefHeight(5);
+
+        final VBox boughtWrapper = new VBox(boughtCardsHorizontalSplitterWrapper, boughtCardsVerticalSplitterWrapper, boughtFiveGap, boughtCards);
+
+        final Button b = new Button("Confirm");
+        b.getStyleClass().add("secondary-btn");
+        b.getStyleClass().add("upgrade-shop-confirm-btn");
+        b.setOnAction(e ->
+        {
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).isEmpty())
+            {
+                l.debug("Client {} decided to not take any actions in this upgrade phase.", EClientInformation.INSTANCE.getPlayerID());
+                new BuyUpgradeModel(false, null).send();
+
+                ViewSupervisor.getSceneController().destroyPopUp(h, false);
+
+                for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
+                {
+                    n.setEffect(null);
+                    continue;
+                }
+
+                return;
+            }
+
+            for (final RShopAction action : ViewSupervisor.getPendingShopActions())
+            {
+                l.debug("Client {} decided to take action {} in this upgrade phase.", EClientInformation.INSTANCE.getPlayerID(), action);
+
+                if (action.action() == EShopAction.BUY)
+                {
+                    new BuyUpgradeModel(true, EGameState.INSTANCE.getUpgradeShop(action.idx())).send();
+                    continue;
+                }
+
+                if (action.action() == EShopAction.SELL)
+                {
+                    /* TODO: Implement selling. */
+                    l.error("Selling is not yet implemented. Ignoring.");
+                    continue;
+                }
+
+                continue;
+            }
+
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
+
+            for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
+            {
+                n.setEffect(null);
+                continue;
+            }
+
+            return;
+        });
+
+        final HBox confirmButtonWrapper = new HBox(ViewSupervisor.createHSpacer(), b);
+
+        final VBox form = new VBox(availableCardsWrapper, availableCardsLabel, boughtCardsLabelWrapper, boughtWrapper, confirmButtonWrapper);
+        form.setId("upgrade-shop-form");
+
+        final HBox formWrapper = new HBox(form);
+        formWrapper.setId("upgrade-shop-form-wrapper");
+
+        AnchorPane.setLeftAnchor(       formWrapper, 0.0      );
+        AnchorPane.setRightAnchor(      formWrapper, 0.0      );
+        AnchorPane.setBottomAnchor(     formWrapper, 10.0      );
+
+        final AnchorPane p = new AnchorPane(header, hEnergy, formWrapper);
+        p.setId("upgrade-dialog-container");
+
+        final GaussianBlur  blur     = new GaussianBlur(7.0);
+        final ColorAdjust   adj      = new ColorAdjust(0.0, -0.3, -0.2, 0.0);
+        adj.setInput(blur);
+        for (final Node n : ViewSupervisor.getSceneController().getRenderTarget().getChildren())
+        {
+            n.setEffect(adj);
+            continue;
+        }
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 0.0      );
+        AnchorPane.setBottomAnchor(     h, 0.0      );
+
+        ViewSupervisor.createPopUp(h);
+
+        return;
+    }
+
+    public static void createShopDialogLater()
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createShopDialog();
+            return;
+        });
+
+        return;
+    }
+
+    public static void createEnergyTokenPopUp(final int energy, final String source)
+    {
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Text t1 = new Text("You gained ");
+        t1.getStyleClass().add("text-xl");
+        t1.setStyle("-fx-fill: #f5f5f5ff");
+
+        final ImageView iv = new ImageView(TileModifier.loadCachedImage("Energy"));
+        iv.setFitHeight(20);
+        iv.setFitWidth(20);
+
+        final Text t2 = new Text(String.format(" %s from %s.", energy, source));
+        t2.getStyleClass().add("text-xl");
+        t2.setStyle("-fx-fill: #f5f5f5ff");
+
+        final TextFlow flow = new TextFlow(t1, iv, t2);
+        flow.setStyle("-fx-alignment: center; -fx-text-alignment: center;");
+
+        AnchorPane.setRightAnchor(      flow, 0.0     );
+        AnchorPane.setLeftAnchor(       flow, 0.0     );
+        AnchorPane.setTopAnchor(        flow, 20.0     );
+        AnchorPane.setBottomAnchor(     flow, 0.0     );
+
+        final AnchorPane p = new AnchorPane(flow);
+        p.setMouseTransparent(true);
+        p.setId("energy-update-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(       h, 0.0      );
+        AnchorPane.setRightAnchor(      h, 0.0      );
+        AnchorPane.setTopAnchor(        h, 50.0      );
+
+        ViewSupervisor.createPopUp(h, 4_000, false);
+
+        return;
+    }
+
+    public static void createEnergyTokenPopUpLater(final int energy, final String source)
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createEnergyTokenPopUp(energy, source);
+            return;
+        });
+
+        return;
+    }
+
+    public static void createAdminPrivilegeDialog()
+    {
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Label l = new Label("Select Register Override Target");
+        l.getStyleClass().add("text-xl");
+
+        final HBox registers = new HBox(ViewSupervisor.createHSpacer());
+        registers.setSpacing(10.0);
+        registers.setAlignment(Pos.CENTER);
+
+        for (int i = 0; i < 5; ++i)
+        {
+            final Button b = new Button(String.format("%s", i + 1));
+            b.getStyleClass().add("secondary-btn-mini");
+
+            /* Current register is not zero based. */
+            if (i < EGameState.INSTANCE.getCurrentRegister() - 1)
+            {
+                b.setDisable(true);
+            }
+
+            final int finalI = i;
+            b.setOnAction(e ->
+            {
+                ViewSupervisor.getSceneController().destroyPopUp(h, false);
+                new ChooseRegisterModel(finalI).send();
+                return;
+            });
+
+            registers.getChildren().add(b);
+
+            continue;
+        }
+
+        final Button cancel = new Button("X");
+        cancel.getStyleClass().add("danger-btn-mini");
+        cancel.setOnAction(e ->
+        {
+            EGameState.INSTANCE.setAdminPrivilegePlayed(false);
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
+            ViewSupervisor.updatePlayerView();
+            return;
+        });
+
+        registers.getChildren().add(cancel);
+        registers.getChildren().add(ViewSupervisor.createHSpacer());
+
+        final VBox v = new VBox(l, registers);
+        v.setSpacing(30.0);
+        v.setAlignment(Pos.CENTER);
+
+        AnchorPane.setLeftAnchor(       v, 0.0      );
+        AnchorPane.setRightAnchor(      v, 0.0      );
+        AnchorPane.setTopAnchor(        v, 0.0      );
+        AnchorPane.setBottomAnchor(     v, 0.0      );
+
+        final AnchorPane p = new AnchorPane(v);
+        p.setId("admin-privilege-dialog-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(   h,  0.0     );
+        AnchorPane.setRightAnchor(  h,  0.0     );
+        AnchorPane.setTopAnchor(    h,  80.0    );
+
+        ViewSupervisor.createPopUp(h);
+
+        return;
+    }
+
+    public static void createAdminPrivilegeDialogLater()
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createAdminPrivilegeDialog();
+            return;
+        });
+
+        return;
+    }
+
     // endregion Updating methods
 
     /** Only valid on the JFX thread. */
@@ -878,6 +1338,353 @@ public final class ViewSupervisor extends Application
     public static boolean hasLoadedGameScene()
     {
         return Objects.equals(ViewSupervisor.getSceneController().getCurrentScreen().id(), SceneController.GAME_ID);
+    }
+
+    public synchronized static void setGameScenePostLoaded()
+    {
+        ViewSupervisor.bGameSceneLoaded.set(true);
+        return;
+    }
+
+    public synchronized static boolean isGameScenePostLoaded()
+    {
+        return ViewSupervisor.bGameSceneLoaded.get();
+    }
+
+    public static Object getLoadGameSceneLock()
+    {
+        return ViewSupervisor.lock;
+    }
+
+    private static ImageView getUpgradeShopImageAtIndex(final int idx)
+    {
+        final ImageViewCreator ivc = (idxImp) ->
+        {
+            final ImageView iv = new ImageView();
+
+            iv.setFitHeight(ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+            iv.setFitWidth(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH);
+            iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getUpgradeShop(idxImp) == null ? "EmptyRegisterSlot" : EGameState.INSTANCE.getUpgradeShop(idxImp)));
+
+            return iv;
+        };
+
+        return ivc.create(idx);
+    }
+
+    private static ImageView getBoughtUpgradeImageAtIndex(final int idx)
+    {
+        final ImageViewCreator ivc = (idxImp) ->
+        {
+            final ImageView iv = new ImageView();
+
+            iv.setFitHeight(ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+            iv.setFitWidth(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH);
+            iv.setImage(TileModifier.loadCachedImage(EGameState.INSTANCE.getBoughtUpgradeCard(idxImp) == null ? "EmptyRegisterSlot" : EGameState.INSTANCE.getBoughtUpgradeCard(idxImp)));
+
+            return iv;
+        };
+
+        return ivc.create(idx);
+    }
+
+    private static Node createHSpacer()
+    {
+        final Region s = new Region();
+        HBox.setHgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private static Node createVSpacer()
+    {
+        final Region s = new Region();
+        VBox.setVgrow(s, Priority.ALWAYS);
+        return s;
+    }
+
+    private static void clearPendingShopActions()
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().clear();
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions clear. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static void outputPendingShopActions()
+    {
+        try
+        {
+            l.debug("Pending shop actions: {}", ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().toString());
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions output. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static void addShopAction(final RShopAction action)
+    {
+        try
+        {
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().add(action);
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions add. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static void removeShopAction(final RShopAction action)
+    {
+        try
+        {
+            if (!( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().contains(action))
+            {
+                l.fatal("Tried to remove a shop action but the pending shop action list does not contain the specified action:; {}", action);
+                GameInstance.kill(GameInstance.EXIT_FATAL);
+                return;
+            }
+
+            ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().remove(action);
+
+            return;
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions remove. Ignoring.");
+            l.error(e.getMessage());
+            return;
+        }
+    }
+
+    private static ArrayList<RShopAction> getPendingShopActions()
+    {
+        try
+        {
+            return ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions();
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending shop actions get. Ignoring.");
+            l.error(e.getMessage());
+            return null;
+        }
+    }
+
+    private static AnchorPane getAnchorPaneForShopSlot(final ImageView iv, final int i)
+    {
+        final AnchorPane ap = new AnchorPane(iv);
+
+        ap.setMinSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+        ap.setMaxSize(ViewSupervisor.SHOP_DIALOG_SLOT_WIDTH, ViewSupervisor.SHOP_DIALOG_SLOT_HEIGHT);
+
+        ap.setOnMouseEntered(e ->
+        {
+            if (EGameState.INSTANCE.getUpgradeShop(i) == null)
+            {
+                return;
+            }
+
+            /* A client may only purchase one card for each upgrade phase. */
+            if (ViewSupervisor.containsPendingActions(EShopAction.BUY))
+            {
+                return;
+            }
+
+            final EUpgradeCard card = EUpgradeCard.fromString(EGameState.INSTANCE.getUpgradeShop(i));
+
+            assert card != null;
+
+            final boolean bCanAfford = Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() >= card.getEnergy();
+
+            ap.setStyle(String.format("-fx-border-color: %s; -fx-border-width: 2px;", bCanAfford ? "#00ff007f" : "#ff00007f"));
+
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, i)))
+            {
+                return;
+            }
+
+            final ImageView btnEnergy = new ImageView(TileModifier.loadCachedImage("Energy"));
+            btnEnergy.setFitHeight(20);
+            btnEnergy.setFitWidth(20);
+
+            final Label btnLabel = new Label(String.format("%s", bCanAfford ? card.getEnergy() : Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() - card.getEnergy()));
+            btnLabel.getStyleClass().add("text-base");
+            btnLabel.setStyle(String.format("-fx-text-fill: %s;", bCanAfford ? "#ffffffff" : "#ff50ffff"));
+            btnLabel.setMinWidth(15);
+            btnLabel.setTextOverrun(OverrunStyle.CLIP);
+
+            final HBox btnContent = new HBox(btnEnergy, btnLabel);
+            btnContent.setAlignment(Pos.CENTER);
+            btnContent.setSpacing(5);
+
+            AnchorPane.setLeftAnchor(       btnContent, 0.0      );
+            AnchorPane.setRightAnchor(      btnContent, 0.0      );
+            AnchorPane.setBottomAnchor(     btnContent, 0.0      );
+            AnchorPane.setTopAnchor(        btnContent, 0.0      );
+
+            final AnchorPane b = new AnchorPane(btnContent);
+            b.getStyleClass().add(bCanAfford ? "secondary-btn-mini" : "danger-btn-mini");
+            b.setDisable(!bCanAfford);
+            b.setStyle(String.format("-fx-background-color: %s;", bCanAfford ? "#53565dff" : "#53232aff"));
+            b.setMaxHeight(30);
+
+            b.setOnMouseEntered(btnEvent ->     {   b.setStyle("-fx-background-color: #3d4148ff;");     return;     });
+            b.setOnMouseExited(btnEvent ->      {   b.setStyle("-fx-background-color: #53565dff;");     return;     });
+
+            b.setOnMouseClicked(onBuy ->
+            {
+                final RShopAction action = new RShopAction(EShopAction.BUY, i);
+
+                ViewSupervisor.addShopAction(action);
+                ViewSupervisor.outputPendingShopActions();
+
+                for (final Node n : ap.getChildren())
+                {
+                    if (n instanceof final HBox wrapper)
+                    {
+                        ap.getChildren().remove(wrapper);
+                        break;
+                    }
+
+                    continue;
+                }
+
+                final Button        discardBtn  = new Button();
+                final ImageView     checkmark   = new ImageView(TileModifier.loadCachedImage("Checkmark"));
+                checkmark.setFitHeight(20);
+                checkmark.setFitWidth(20);
+                discardBtn.setGraphic(checkmark);
+                discardBtn.getStyleClass().add("secondary-btn-mini");
+                discardBtn.setStyle("-fx-background-color: #53565dff;");
+                discardBtn.setTextOverrun(OverrunStyle.CLIP);
+
+                discardBtn.setOnMouseEntered(btnEvent ->
+                {
+                    discardBtn.setStyle("-fx-background-color: #3d4148ff;");
+                    final ImageView cross = new ImageView(TileModifier.loadCachedImage("Cross"));
+                    cross.setFitHeight(20);
+                    cross.setFitWidth(20);
+                    discardBtn.setGraphic(cross);
+                    discardBtn.setTextOverrun(OverrunStyle.CLIP);
+                    return;
+                });
+
+                discardBtn.setOnMouseExited(btnEvent ->
+                {
+                    discardBtn.setStyle("-fx-background-color: #53565dff;");
+                    final ImageView eventCheckmark = new ImageView(TileModifier.loadCachedImage("Checkmark"));
+                    eventCheckmark.setFitHeight(20);
+                    eventCheckmark.setFitWidth(20);
+                    discardBtn.setGraphic(eventCheckmark);
+                    discardBtn.setTextOverrun(OverrunStyle.CLIP);
+                    return;
+                });
+
+                discardBtn.setOnAction(onDiscard ->
+                {
+                    ViewSupervisor.removeShopAction(new RShopAction(EShopAction.BUY, i));
+                    ViewSupervisor.outputPendingShopActions();
+
+                    for (final Node n : ap.getChildren())
+                    {
+                        if (n instanceof final HBox wrapper)
+                        {
+                            ap.getChildren().remove(wrapper);
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    ViewSupervisor.getAnchorPaneForShopSlot(ViewSupervisor.getUpgradeShopImageAtIndex(i), i);
+
+                    ap.setStyle("-fx-border-color: transparent; -fx-border-width: 2px;");
+
+                    return;
+                });
+
+                /* Kinda sketchy. */
+                discardBtn.setMinWidth(83);
+
+                final HBox discardWrapper = new HBox(discardBtn);
+                discardWrapper.setAlignment(Pos.CENTER);
+
+                AnchorPane.setLeftAnchor(       discardWrapper, 0.0      );
+                AnchorPane.setRightAnchor(      discardWrapper, 0.0      );
+                AnchorPane.setTopAnchor(        discardWrapper, 0.0      );
+                AnchorPane.setBottomAnchor(     discardWrapper, 0.0      );
+
+                ap.getChildren().add(discardWrapper);
+
+                return;
+            });
+
+            final HBox btnWrapper = new HBox(b);
+            btnWrapper.setAlignment(Pos.CENTER);
+            btnWrapper.setMaxWidth(40);
+
+            AnchorPane.setLeftAnchor(       btnWrapper, 10.0      );
+            AnchorPane.setRightAnchor(      btnWrapper, 10.0      );
+            AnchorPane.setBottomAnchor(     btnWrapper, 0.0      );
+            AnchorPane.setTopAnchor(        btnWrapper, 0.0      );
+
+            ap.getChildren().add(btnWrapper);
+
+            return;
+        });
+
+        ap.setOnMouseExited(e ->
+        {
+            if (Objects.requireNonNull(ViewSupervisor.getPendingShopActions()).contains(new RShopAction(EShopAction.BUY, i)))
+            {
+                return;
+            }
+
+            ap.setStyle("-fx-border-color: transparent; -fx-border-width: 2px;");
+
+            for (final Node n : ap.getChildren())
+            {
+                if (n instanceof final HBox wrapper)
+                {
+                    ap.getChildren().remove(wrapper);
+                    break;
+                }
+
+                continue;
+            }
+
+            return;
+        });
+
+        return ap;
+    }
+
+    private static boolean containsPendingActions(final EShopAction action)
+    {
+        try
+        {
+            return ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).getPendingShopActions().stream().anyMatch(a -> a.action() == action);
+        }
+        catch (final ClassCastException e)
+        {
+            l.error("Could not cast current controller to GameJFXController during pending {} shop actions check. Ignoring.", action.toString());
+            l.error(e.getMessage());
+            return false;
+        }
     }
 
 }

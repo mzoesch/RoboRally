@@ -6,10 +6,13 @@ import sep.server.model.game.builder.DeckBuilder;
 import sep.server.model.IOwnershipable;
 import sep.server.viewmodel.PlayerController;
 import sep.server.model.game.tiles.Coordinate;
+import sep.server.viewmodel.EServerInstance;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,20 +24,26 @@ public class Player {
     private final IOwnershipable ctrl;
     private final Robot playerRobot;
 
+    /** The cards a player can draw from his pillar. */
     private final ArrayList<IPlayableCard> playerDeck;
+    /**
+     * The cards that are being discarded in one phase.
+     * These cards will be shuffled and added to the {@link #playerDeck} in the next programming phase.
+     */
     private final ArrayList<IPlayableCard> discardPile;
     private final ArrayList<AUpgradeCard> upgradeCards;
     private final IPlayableCard[] registers;
+    /** The nine programming cards a player has drawn. */
     private final ArrayList<IPlayableCard> playerHand;
     private int energyCollected;
     private int checkpointsCollected;
     private Boolean hasAdminPrivilegeUpgrade;
 
-    private Integer chosenRegisterAdminPrivilegeUpgrade;
+    private RAdminPrivilegeMask chosenRegisterAdminPrivilegeUpgrade;
 
     private String[] memorySwapCards;
 
-
+    private final ArrayList<String> boughtUpgradeCards;
 
 
     public Player(final IOwnershipable ctrl, final Course currentCourse) {
@@ -51,9 +60,14 @@ public class Player {
         this.chosenRegisterAdminPrivilegeUpgrade = null;
 
         this.energyCollected = GameMode.STARTING_ENERGY;
-        //TODO: Make this work: this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
 
         this.checkpointsCollected = 0;
+
+        this.boughtUpgradeCards = new ArrayList<String>();
+
+        this.chosenRegisterAdminPrivilegeUpgrade = null;
+
+        return;
     }
 
     /**
@@ -91,6 +105,7 @@ public class Player {
             {
                 pc.getSession().sendCardSelected(this.ctrl.getPlayerID(), pos, false);
             }
+            l.debug("Player {} has removed card from register {}.", this.ctrl.getPlayerID(), pos);
             return;
         }
 
@@ -100,7 +115,9 @@ public class Player {
             pc.getSession().sendCardSelected(getController().getPlayerID(), pos, true);
         }
 
+        l.debug("Player {} has added card {} to register {}.", this.ctrl.getPlayerID(), this.registers[pos], pos);
 
+        l.debug("Checking if player {} has finished programming. Their current registers are: {}.", this.ctrl.getPlayerID(), this.registers);
         if (this.hasPlayerFinishedProgramming())
         {
             l.debug("Player {} has finished programming. Notifying session.", this.ctrl.getPlayerID());
@@ -108,15 +125,36 @@ public class Player {
 
             if (this.ctrl instanceof final PlayerController pc)
             {
-                if (pc.getSession().haveAllPlayersFinishedProgramming())
+                if (this.getAuthGameMode().getSession().haveAllPlayersFinishedProgramming())
                 {
-                    l.debug("All players have finished programming in time. Interrupting timer.");
-                    // TODO Interrupt timer
-                    pc.getSession().getGameState().getAuthGameMode().handleNewPhase(EGamePhase.ACTIVATION);
+                    l.info("All players have finished programming in time. Interrupting Programming Timer Service.");
+
+                    if (this.getAuthGameMode().getProgrammingTimerService() == null)
+                    {
+                        this.getAuthGameMode().executePostProgrammingPhaseTimerServiceBehavior();
+                        return;
+                    }
+
+                    this.getAuthGameMode().getProgrammingTimerService().interrupt();
+
+                    return;
                 }
 
-                // TODO We ignore this for now.
-                // this.session.getGameState().getAuthGameMode().startProgrammingTimer();
+                if (pc.isRemoteAgent())
+                {
+                    l.debug("Player {} is a remote agent. Therefore, the timer will not be started nor interrupted.", this.ctrl.getPlayerID());
+                    return;
+                }
+
+                if (this.getAuthGameMode().isProgrammingTimerServiceRunning())
+                {
+                    return;
+                }
+
+                l.debug("Player {} has finished programming and is the first player to do so. Starting programming timer.", this.ctrl.getPlayerID());
+                this.getAuthGameMode().startProgrammingTimerService();
+
+                return;
             }
 
             l.debug("Player {} is a local player. Therefore, the timer will not be started nor interrupted.", this.ctrl.getPlayerID());
@@ -126,23 +164,61 @@ public class Player {
 
     }
 
-    public void handleIncompleteProgramming() {
+    private IPlayableCard drawCardFromHand()
+    {
+        return this.playerHand.remove(0);
+    }
+
+    public void executeIncompleteProgrammingBehavior()
+    {
         if (this.ctrl instanceof PlayerController pc)
         {
-            discardPile.addAll(playerHand);
-            playerHand.clear();
-            shuffleAndRefillDeck();
+            l.debug("Player {} has not finished programming in time. Their current hand is: {}.", this.ctrl.getPlayerID(), this.registers);
 
-            for (int i = 0; i < registers.length; i++) {
-                if (registers[i] == null) {
-                    registers[i] = playerDeck.remove(0);
+            final ArrayList<IPlayableCard> addedCards = new ArrayList<IPlayableCard>();
+
+            for (int i = 0; i < this.registers.length; ++i)
+            {
+                if (this.registers[i] == null)
+                {
+                    while (true)
+                    {
+                        final IPlayableCard card = this.drawCardFromHand();
+                        if (i == 0 && Objects.equals(card.getCardType(), "Again"))
+                        {
+                            this.playerHand.add(card);
+                            continue;
+                        }
+
+                        this.registers[i] = card;
+                        break;
+                    }
+
+                    addedCards.add(this.registers[i]);
+
+                    continue;
                 }
+
+                continue;
             }
-            pc.getSession().sendCardsYouGotNow(pc, getRegistersAsStringArray());
+
+            if (addedCards.isEmpty())
+            {
+                l.warn("Player {}'s registers are full. No cards have been added while post incomplete programming behavior.", this.ctrl.getPlayerID());
+                return;
+            }
+
+            l.debug("Player {}'s hand cards after incomplete programming task execution: {}. Notifying them.", this.ctrl.getPlayerID(), this.registers);
+
+            pc.getSession().sendIncompleteProgrammingCards(pc, addedCards.stream().map(IPlayableCard::getCardType).toArray(String[]::new));
+
             return;
         }
 
-        l.error("A local player has not finished programming in time. This must never happen.");
+        l.fatal("A local player has not finished programming in time. This must never happen.");
+        EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+
+        return;
     }
 
     /**
@@ -188,12 +264,12 @@ public class Player {
                 newCardFromDeck.playCard(this, currentRoundNumber);
             }
 
+            assert newCardFromDeck != null;
             String newCardString = newCardFromDeck.getCardType();
             getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
         }
 
     }
-
 
     public IPlayableCard getCardByName(final String cardName) {
         for (IPlayableCard c : this.playerHand) {
@@ -201,6 +277,7 @@ public class Player {
                 return c;
             }
         }
+        l.error("Card " + cardName + " not found.");
         return null;
     }
 
@@ -247,14 +324,6 @@ public class Player {
         return registersArray;
     }
 
-    /*public String[] getPlayerHandAsStringArray() {
-        final String[] handArray = new String[this.playerHand.size()];
-        for (int i = 0; i < this.playerHand.size(); i++) {
-            handArray[i] = this.playerHand.get(i).getCardType();
-        }
-        return handArray;
-    }*/
-
     public String[] getPlayerHandAsStringArray() {
         final String[] handArray = new String[this.playerHand.size()];
         for (int i = 0; i < this.playerHand.size(); i++) {
@@ -274,7 +343,11 @@ public class Player {
         if (this.registers[idx] != null) {
             this.discardPile.add(this.registers[idx]);
         }
-        this.registers[idx] = newCard;
+        if(newCard != null) {
+            this.registers[idx] = newCard;
+        } else {
+            l.error("Card set to register is null");
+        }
     }
 
     public int getPriority()
@@ -315,13 +388,24 @@ public class Player {
         this.hasAdminPrivilegeUpgrade = hasAdminPrivilegeUpgrade;
     }
 
-    public Integer getChosenRegisterAdminPrivilegeUpgrade() {
-        return chosenRegisterAdminPrivilegeUpgrade;
+    public synchronized RAdminPrivilegeMask getChosenRegisterAdminPrivilegeUpgrade()
+    {
+        return this.chosenRegisterAdminPrivilegeUpgrade;
     }
 
-    public void setChosenRegisterAdminPrivilegeUpgrade(Integer chosenRegisterAdminPrivilegeUpgrade) {
-        this.chosenRegisterAdminPrivilegeUpgrade = chosenRegisterAdminPrivilegeUpgrade;
+    public synchronized void setChosenRegisterAdminPrivilegeUpgrade(final Integer chosenRegisterAdminPrivilegeUpgrade)
+    {
+        if (chosenRegisterAdminPrivilegeUpgrade == null)
+        {
+            this.chosenRegisterAdminPrivilegeUpgrade = null;
+            return;
+        }
+
+        this.chosenRegisterAdminPrivilegeUpgrade = new RAdminPrivilegeMask(System.currentTimeMillis(), chosenRegisterAdminPrivilegeUpgrade);
+
+        return;
     }
+
     public void setMemorySwapCards(String[] memorySwapCards) {
         this.memorySwapCards = memorySwapCards;
     }
@@ -344,7 +428,6 @@ public class Player {
         }
     }
 
-
     public void clearOldRegister() {
         if (Arrays.asList(registers).isEmpty()) {
             l.debug("P {} - Clearing old Register. {} Cards has been moved to discard pile: {}", getController().getName(), registers.length, getRegistersAsStringArray());
@@ -355,13 +438,49 @@ public class Player {
         }
     }
 
-
-
-
-
     public Coordinate getPosition()
     {
         return this.playerRobot.getCurrentTile().getCoordinate();
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("Player{%d,%s}",this.ctrl.getPlayerID(), this.playerRobot.getCurrentTile().getCoordinate());
+    }
+
+    public ArrayList<String> getBoughtUpgradeCards()
+    {
+        return this.boughtUpgradeCards;
+    }
+
+    public void onMemorySwapCardPlayed(final ArrayList<String> discardedCards)
+    {
+        l.debug("Player {}'s hand is: {}. Removing {}.", this.ctrl.getPlayerID(), this.playerHand, discardedCards);
+
+        for (final String card : discardedCards)
+        {
+            if (!this.playerHand.contains(this.getCardByName(card)))
+            {
+                l.fatal("Player {}'s hand does not contain card {} after MemorySwap card was played.", this.ctrl.getPlayerID(), card);
+                EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+                return;
+            }
+
+            this.playerHand.remove(this.getCardByName(card));
+            continue;
+        }
+
+        l.debug("Player {}'s hand after removing {} is: {}.", this.ctrl.getPlayerID(), discardedCards, this.playerHand);
+
+        if (this.playerHand.size() > 9)
+        {
+            l.fatal("Player {}'s hand is larger than 9 after MemorySwap card was played.", this.ctrl.getPlayerID());
+            EServerInstance.INSTANCE.kill(EServerInstance.EServerCodes.FATAL);
+            return;
+        }
+
+        return;
     }
 
 }

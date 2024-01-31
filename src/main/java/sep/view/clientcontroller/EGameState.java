@@ -1,18 +1,23 @@
 package sep.view.clientcontroller;
 
+import sep.view.scenecontrollers.   GameJFXController;
 import sep.view.json.               RDefaultServerRequestParser;
-import sep.view.lib.                EShopState;
 import sep.view.lib.                RRegisterCard;
 import sep.view.lib.                EGamePhase;
 import sep.view.lib.                EFigure;
+import sep.view.lib.                RPopUpMask;
+import sep.view.lib.                EPopUp;
+import sep.view.lib.                RCheckpointMask;
 import sep.view.viewcontroller.     ViewSupervisor;
 
 import java.util.                   ArrayList;
+import java.util.                   Arrays;
 import java.util.                   Objects;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import org.json.                    JSONArray;
 import org.json.                    JSONObject;
+import java.util.concurrent.atomic. AtomicBoolean;
 
 /**
  * Holds the state of the game. Like player positions, player names, cards in hand, cards on table, etc.
@@ -39,24 +44,27 @@ public enum EGameState
     private final ArrayList<RemotePlayer>   remotePlayers;
     private RemotePlayer                    currentPlayer;
 
-    private String[]                        serverCourses;
-    private String                          currentServerCourse;
-    private JSONArray                       currentServerCourseJSON;
+    private String[]                            serverCourses;
+    private String                              currentServerCourse;
+    private JSONArray                           currentServerCourseJSON;
+    private final ArrayList<RCheckpointMask>    currentCheckpointLocations;
 
     private final String[]                  registers;
     private final ArrayList<String>         gotRegisters;
-
-    public static final String[]            SHOP_STATES         = new String[] {"Upgrade", "Damage", "Reboot"};
-    private EShopState                      shopState;
-    private ArrayList<String>               temporayUpgradeCards;
-    private ArrayList<String>               permanentUpgradeCards;
-    private String[]                        shopSlots;
+    /** The first three slots represent the temporary upgrade cards, the last slots the permanent ones. */
+    private final String[]                  boughtUpgradeCards;
+    private final ArrayList<String>         upgradeShopCards;
 
     private int                             damageCardsCountToDraw;
     private ArrayList<String>               selectedDamageCards;
 
     private boolean                         shopActive;
     private RemotePlayer                    winner;
+
+    private final AtomicBoolean             bProgrammingTimerRunning;
+    private final AtomicBoolean             bMemorySwapPlayed;
+    private final AtomicBoolean             bSpamBlockerPlayed;
+    private final AtomicBoolean             bAdminPrivilegePlayed;
 
     private EGameState()
     {
@@ -69,20 +77,23 @@ public enum EGameState
         this.serverCourses              = new String[0];
         this.currentServerCourse        = "";
         this.currentServerCourseJSON    = null;
+        this.currentCheckpointLocations = new ArrayList<RCheckpointMask>();
 
         this.registers                  = new String[5];
         this.gotRegisters               = new ArrayList<String>();
-
-        this.shopState                  = EShopState.DEACTIVATED;
-        this.temporayUpgradeCards       = new ArrayList<String>();
-        this.permanentUpgradeCards      = new ArrayList<String>();
-        this.shopSlots                  = new String[5];
+        this.boughtUpgradeCards         = new String[6];
+        this.upgradeShopCards           = new ArrayList<String>();
 
         this.damageCardsCountToDraw     = 0;
         this.selectedDamageCards        = new ArrayList<String>();
 
-        this.shopActive                = false;
+        this.shopActive                 = false;
         this.winner                     = null;
+
+        this.bProgrammingTimerRunning   = new AtomicBoolean(false);
+        this.bMemorySwapPlayed          = new AtomicBoolean(false);
+        this.bSpamBlockerPlayed         = new AtomicBoolean(false);
+        this.bAdminPrivilegePlayed      = new AtomicBoolean(false);
 
         return;
     }
@@ -98,6 +109,7 @@ public enum EGameState
         EGameState.INSTANCE.serverCourses               = new String[0];
         EGameState.INSTANCE.currentServerCourse         = "";
         EGameState.INSTANCE.currentServerCourseJSON     = null;
+        EGameState.INSTANCE.currentCheckpointLocations   .clear();
 
         EGameState.INSTANCE.registers[0]                = null;
         EGameState.INSTANCE.registers[1]                = null;
@@ -106,20 +118,24 @@ public enum EGameState
         EGameState.INSTANCE.registers[4]                = null;
         EGameState.INSTANCE.gotRegisters                 .clear();
 
-        EGameState.INSTANCE.shopState                   = EShopState.DEACTIVATED;
-        EGameState.INSTANCE.temporayUpgradeCards         .clear();
-        EGameState.INSTANCE.permanentUpgradeCards        .clear();
-        EGameState.INSTANCE.shopSlots[0]                = null;
-        EGameState.INSTANCE.shopSlots[1]                = null;
-        EGameState.INSTANCE.shopSlots[2]                = null;
-        EGameState.INSTANCE.shopSlots[3]                = null;
-        EGameState.INSTANCE.shopSlots[4]                = null;
+        EGameState.INSTANCE.boughtUpgradeCards[0]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[1]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[2]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[3]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[4]       = null;
+        EGameState.INSTANCE.boughtUpgradeCards[5]       = null;
+        EGameState.INSTANCE.upgradeShopCards             .clear();
 
         EGameState.INSTANCE.damageCardsCountToDraw      = 0;
-        EGameState.INSTANCE.selectedDamageCards         .clear();
+        EGameState.INSTANCE.selectedDamageCards          .clear();
 
         EGameState.INSTANCE.shopActive                  = false;
         EGameState.INSTANCE.winner                      = null;
+
+        EGameState.INSTANCE.bProgrammingTimerRunning    .set(false);
+        EGameState.INSTANCE.bMemorySwapPlayed           .set(false);
+        EGameState.INSTANCE.bSpamBlockerPlayed          .set(false);
+        EGameState.INSTANCE.bAdminPrivilegePlayed       .set(false);
 
         return;
     }
@@ -295,7 +311,13 @@ public enum EGameState
             continue;
         }
 
-        l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored.");
+        if (EClientInformation.INSTANCE.hasPlayerID())
+        {
+            l.warn("Could not find the client remote player. If this was during initialization, this is can be ignored. Searched for {}, but found {}.", EClientInformation.INSTANCE.getPlayerID(), Arrays.toString(this.remotePlayers.toArray(new RemotePlayer[0])));
+            return null;
+        }
+
+        l.warn("Could not find the client remote player because the client player id has not been yet set.");
 
         return null;
     }
@@ -435,7 +457,7 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.registers.length)
         {
-            l.error("Tried getting a register card that is out of bounds [{}].", idx);
+            l.warn("Tried getting a register card that is out of bounds [{} / {}].", idx, this.registers.length);
             return null;
         }
 
@@ -446,10 +468,23 @@ public enum EGameState
     {
         if (idx < 0 || idx >= this.gotRegisters.size())
         {
+            /* This is normal, therefore, we may trace this. */
+            l.trace("Tried getting a got register card that is out of bounds [{} / {}].", idx, this.gotRegisters.size());
             return null;
         }
 
         return this.gotRegisters.get(idx);
+    }
+
+    public String getBoughtUpgradeCard(final int idx)
+    {
+        if (idx < 0 || idx >= this.boughtUpgradeCards.length)
+        {
+            l.warn("Tried getting a upgrade card that is out of bounds [{} / {}].", idx, this.boughtUpgradeCards.length);
+            return null;
+        }
+
+        return this.boughtUpgradeCards[idx];
     }
 
     public String[] getRegisters()
@@ -481,17 +516,6 @@ public enum EGameState
         return;
     }
 
-    public void clearShopSlots()
-    {
-        for (int i = 0; i < this.shopSlots.length; ++i)
-        {
-            this.shopSlots[i] = null;
-
-            continue;
-        }
-
-        return;
-    }
     public void addRegister(final int idx, final String register)
     {
         if (idx < 0 || idx >= this.registers.length)
@@ -509,7 +533,6 @@ public enum EGameState
         this.gotRegisters.add(register);
         return;
     }
-
 
     /**
      * Sets a register slot from a given got register slot.
@@ -616,119 +639,6 @@ public enum EGameState
         return;
     }
 
-    public String getTemporaryUpgradeCard(final int idx)
-    {
-        if (idx < 0 || idx >= this.temporayUpgradeCards.size())
-        {
-            return null;
-        }
-
-        return this.temporayUpgradeCards.get(idx);
-    }
-
-    public String getPermanentUpgradeCard(final int idx)
-    {
-        if (idx < 0 || idx >= this.permanentUpgradeCards.size())
-        {
-            return null;
-        }
-
-        return this.permanentUpgradeCards.get(idx);
-    }
-
-    public String getShopSlot(final int idx)
-    {
-        if (idx < 0 || idx > shopSlots.length)
-        {
-            l.debug("Tried getting content of shopSlot outside of range of Slots");
-            return null;
-        }
-
-        return this.shopSlots[idx];
-    }
-
-    public void addTemporaryUpgradeCards(final String temporaryUpgradeCard)
-    {
-        if (this.temporayUpgradeCards.size() >= 3)
-        {
-            l.warn("Tried adding temporaryUpgradeCard in Slot whilst filled");
-            return;
-        }
-
-        this.temporayUpgradeCards.add(temporaryUpgradeCard);
-
-        return;
-    }
-
-    public void addPermanentUpgradeCard(final String permanentUpgradeCard)
-    {
-        if (this.permanentUpgradeCards.size() <= 3)
-        {
-            l.warn("Tried adding permanentUpgradeCard in Slot whilst filled");
-            return;
-        }
-
-        this.permanentUpgradeCards.add(permanentUpgradeCard);
-
-        return;
-    }
-
-    public void addShopSlot(final int idx, final String elementName)
-    {
-        if (idx < 0 || idx >= this.shopSlots.length)
-        {
-            l.debug("Tried adding {} outside of shopSlotRange on Position {}.", elementName, idx);
-            return;
-        }
-
-        if (this.shopSlots[idx] != null)
-        {
-            l.debug("Tried adding {} on filled shopSlot {}", elementName, idx);
-            return;
-        }
-
-        this.shopSlots[idx] = elementName;
-
-        return;
-    }
-
-    public boolean isShopFull()
-    {
-        for (final String s : this.shopSlots)
-        {
-            if (s == null)
-            {
-                return false;
-            }
-
-            continue;
-        }
-
-        return true;
-    }
-
-    public boolean isShopActive()
-    {
-        return this.shopActive;
-    }
-
-    public void setShopActive(final boolean bActive)
-    {
-        this.shopActive = bActive;
-        return;
-    }
-
-    public void setShopState(final EShopState state)
-    {
-        this.shopState = state;
-        return;
-    }
-
-    public EShopState getShopState()
-    {
-        return this.shopState;
-    }
-
     public int getDamageCardsCountToDraw()
     {
         return this.damageCardsCountToDraw;
@@ -784,6 +694,260 @@ public enum EGameState
         }
 
         return;
+    }
+
+    public ArrayList<RCheckpointMask> getCurrentCheckpointLocations()
+    {
+        return this.currentCheckpointLocations;
+    }
+
+    public void refillShop(final ArrayList<String> cards)
+    {
+        for (int i = 0; i < this.upgradeShopCards.size(); ++i)
+        {
+            if (this.upgradeShopCards.get(i) == null)
+            {
+                this.upgradeShopCards.set(i, cards.get(0));
+                cards.remove(0);
+                continue;
+            }
+
+            continue;
+        }
+
+        /* If the ctrl count was decreased (e.g., through a disconnect), the shop size will also shrink. */
+        this.upgradeShopCards.removeIf(Objects::isNull);
+
+        /* The same if the ctrl count increases. */
+        if (!cards.isEmpty())
+        {
+            this.upgradeShopCards.addAll(cards);
+        }
+
+        return;
+    }
+
+    public void exchangeShop(final ArrayList<String> cards)
+    {
+        this.upgradeShopCards.clear();
+        this.refillShop(cards);
+        return;
+    }
+
+    public ArrayList<String> getUpgradeShop()
+    {
+        return this.upgradeShopCards;
+    }
+
+    public String getUpgradeShop(final int idx)
+    {
+        return this.upgradeShopCards.get(idx);
+    }
+
+    public String[] getBoughtUpgradeCard()
+    {
+        return this.boughtUpgradeCards;
+    }
+
+    private void addBoughtUpgradeCard(final String card)
+    {
+        /* A little bit cheeky. */
+        final boolean isTemporary = card.contains("MemorySwap") || card.contains("SpamBlocker");
+
+        for (int i = isTemporary ? 0 : 3; i < (isTemporary ? 3 : this.boughtUpgradeCards.length); ++i)
+        {
+            if (this.boughtUpgradeCards[i] == null)
+            {
+                this.boughtUpgradeCards[i] = card;
+                l.info("Added the {} upgrade card \"{}\" to bought upgrade cards. Total upgrades bought: {}.", isTemporary ? "temporary" : "permanent", card, Arrays.toString(this.boughtUpgradeCards));
+                return;
+            }
+
+            continue;
+        }
+
+        l.fatal("Could not add the {} upgrade card \"{}\" to bought upgrade cards. Bought upgrade cards are full.", isTemporary ? "temporary" : "permanent", card);
+        l.fatal(Arrays.toString(this.boughtUpgradeCards));
+        GameInstance.kill(GameInstance.EXIT_FATAL);
+
+        return;
+    }
+
+    private void removeUpgradeCardFromShop(final String card)
+    {
+        this.upgradeShopCards.set(this.upgradeShopCards.indexOf(card), null);
+        return;
+    }
+
+    public void onUpgradeCardBought(final int id, final String card)
+    {
+        final boolean bLocalOwner = id == EClientInformation.INSTANCE.getPlayerID();
+
+        this.removeUpgradeCardFromShop(card);
+
+        if (bLocalOwner)
+        {
+            this.addBoughtUpgradeCard(card);
+        }
+
+        Objects.requireNonNull(this.getRemotePlayerByPlayerID(id)).getBoughtUpgradeCards().add(card);
+
+        if (EClientInformation.INSTANCE.isAgent())
+        {
+            return;
+        }
+
+        ViewSupervisor.updatePlayerView();
+
+        return;
+    }
+
+    public void setProgrammingTimerRunning(final boolean bRunning)
+    {
+        this.bProgrammingTimerRunning.set(bRunning);
+
+        if (!bRunning)
+        {
+            try
+            {
+                ( (GameJFXController) ViewSupervisor.getSceneController().getCurrentController() ).resetProgrammingTimeline();
+                return;
+            }
+            catch (final ClassCastException e)
+            {
+                l.error("Could not cast the current scene controller to GameJFXController during programming timer reset. Ignoring.");
+                l.error(e.getMessage());
+                return;
+            }
+        }
+
+        return;
+    }
+
+    public boolean isProgrammingTimerRunning()
+    {
+        return this.bProgrammingTimerRunning.get();
+    }
+
+    /** For developing purposes only!
+     * @deprecated
+     */
+    public String[] getBoughtUpgradeCards()
+    {
+        return this.boughtUpgradeCards;
+    }
+
+    public boolean isMemorySwapPlayed()
+    {
+        return this.bMemorySwapPlayed.get();
+    }
+
+    public void setMemorySwapPlayed(final boolean bPlayed)
+    {
+        this.bMemorySwapPlayed.set(bPlayed);
+        return;
+    }
+
+    public void overrideGotRegister(final int idx, final String newCard)
+    {
+        this.gotRegisters.set(idx, newCard);
+        return;
+    }
+
+    public boolean isSpamBlockerPlayed()
+    {
+        return this.bSpamBlockerPlayed.get();
+    }
+
+    public void setSpamBlockerPlayed(final boolean bPlayed)
+    {
+        this.bSpamBlockerPlayed.set(bPlayed);
+        return;
+    }
+
+    public void executePostCardPlayedBehaviour(final int playerID, final String card)
+    {
+        final RemotePlayer rp = this.getRemotePlayerByPlayerID(playerID);
+
+        assert rp != null;
+
+        if (Objects.equals(card, "MemorySwap") || Objects.equals(card, "SpamBlocker"))
+        {
+            rp.getBoughtUpgradeCards().remove(card);
+
+            if (playerID == EClientInformation.INSTANCE.getPlayerID())
+            {
+                for (int i = 0; i < this.boughtUpgradeCards.length; ++i)
+                {
+                    if (this.boughtUpgradeCards[i] == null)
+                    {
+                        continue;
+                    }
+
+                    if (Objects.equals(this.boughtUpgradeCards[i], card))
+                    {
+                        this.boughtUpgradeCards[i] = null;
+                        break;
+                    }
+
+                    continue;
+                }
+            }
+
+            l.debug("Removed {} from bought upgrade cards of player {}. Their bought upgrade cards are now {}.", card, playerID, rp.getBoughtUpgradeCards());
+
+            return;
+        }
+
+        l.error("Could not execute post card played behaviour for card \"{}\". Ignoring.", card);
+
+        return;
+    }
+
+    public void onSpamBlockerCardsReceived(final ArrayList<String> cards)
+    {
+        if (cards.isEmpty())
+        {
+            l.warn("No spam blocker cards received. Ignoring.");
+            ViewSupervisor.createPopUpLater(new RPopUpMask(EPopUp.WARNING, "You played a Spam Blocker card, but it seems like you did not had any Spam cards in your hand."));
+            return;
+        }
+
+        spamBlockerCards: for (final String card : cards)
+        {
+            for (int i = 0; i < this.gotRegisters.size(); ++i)
+            {
+                if (this.gotRegisters.get(i) == null)
+                {
+                    continue;
+                }
+
+                if (this.gotRegisters.get(i).equals("SpamDamage"))
+                {
+                    this.gotRegisters.set(i, card);
+                    l.debug("Replaced spam card with spam blocker card {}.", card);
+                    continue spamBlockerCards;
+                }
+
+                continue;
+            }
+
+            l.error("Could not replace spam card with spam blocker card {}. The current got cards are: {}.", card, this.gotRegisters);
+            continue spamBlockerCards;
+        }
+
+        return;
+    }
+
+    public void setAdminPrivilegePlayed(final boolean bPlayed)
+    {
+        this.bAdminPrivilegePlayed.set(bPlayed);
+        return;
+    }
+
+    public boolean isAdminPrivilegePlayed()
+    {
+        return this.bAdminPrivilegePlayed.get();
     }
 
     // endregion Getters and Setters
