@@ -22,6 +22,7 @@ public final class GI_Agent extends GameInstance
     private static void runAgentLoop()
     {
         int tries = 0;
+
         while (tries < GI_Agent.MAX_CONNECTION_TRIES)
         {
             try

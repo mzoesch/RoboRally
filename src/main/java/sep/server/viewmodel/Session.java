@@ -893,6 +893,7 @@ public final class Session
 
     /**
      * Sends a notification to all  players to inform about the selection of a register because of the AdminPriviledge Card.
+     * @deprecated
      */
     public void sendRegisterChosenNotification(final int playerID, int register) {
         for (PlayerController playerController : getRemotePlayers()) {
@@ -901,10 +902,16 @@ public final class Session
         }
     }
 
+    public void broadcastAdminPrivilegeRegisterUpdate(final PlayerController source, final int register)
+    {
+        for (final PlayerController pc : this.getRemotePlayers())
+        {
+            new RegisterChosenModel(pc.getClientInstance(), source.getPlayerID(), register).send();
+            continue;
+        }
 
-
-
-
+        return;
+    }
 
     /**
      * Sends a shuffle notification to all remote players.

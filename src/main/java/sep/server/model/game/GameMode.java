@@ -609,54 +609,159 @@ public class GameMode {
 
     // region Activation Phase Helpers
 
+    private ArrayList<Player> getOverriddenPrioritiesPlayersASC()
+    {
+        final ArrayList<Player> out = new ArrayList<Player>();
+
+        for (final Player player : this.players)
+        {
+            if (player.getChosenRegisterAdminPrivilegeUpgrade() == null)
+            {
+                continue;
+            }
+
+            if (player.getChosenRegisterAdminPrivilegeUpgrade().register() == this.currentRegisterIndex)
+            {
+                out.add(player);
+                continue;
+            }
+
+            continue;
+        }
+
+        if (out.isEmpty() || out.size() == 1)
+        {
+            return out;
+        }
+
+        // If multiple players have set their override request for the current register.
+        // We sort all players by the time they have sent their request.
+        // The player with the lowest time passed will get the highest priority.
+        for (int i = 0; i < out.size(); ++i)
+        {
+            int min = i;
+
+            for (int j = i + 1; j < out.size(); ++j)
+            {
+                if (out.get(j).getChosenRegisterAdminPrivilegeUpgrade().in() < out.get(min).getChosenRegisterAdminPrivilegeUpgrade().in())
+                {
+                    min = j;
+                    continue;
+                }
+
+                continue;
+            }
+
+            final Player tmp = out.get(i);
+            out.set(i, out.get(min));
+            out.set(min, tmp);
+
+            continue;
+        }
+
+        return out;
+    }
+
+    private void resetOverriddenPrioritiesForRegister()
+    {
+        for (final Player player : this.players)
+        {
+            if (player.getChosenRegisterAdminPrivilegeUpgrade() == null)
+            {
+                continue;
+            }
+
+            if (player.getChosenRegisterAdminPrivilegeUpgrade().register() == this.currentRegisterIndex)
+            {
+                player.setChosenRegisterAdminPrivilegeUpgrade(null);
+                l.debug("Reset overridden priority for player {} for register {}.", player.getController().getPlayerID(), this.currentRegisterIndex);
+                continue;
+            }
+
+            continue;
+        }
+
+        return;
+    }
+
     /**
      * The following method calculates the priorities for all players: First the distance from each robot to the
      * antenna is calculated. Next the priorities are assigned. The closest player gets the highest priority.
      */
-    private void determinePriorities() {
+    private void determinePriorities()
+    {
         final Coordinate antennaCoordinate = this.course.getPriorityAntennaCoordinate();
         l.debug("Determining priorities for all players. Found Priority Antenna at {}.", antennaCoordinate.toString());
 
         final int[] distances = new int[this.players.size()];
-        for (int i = 0; i < this.players.size(); i++) {
-            Coordinate robotCoordinate = this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate();
-            distances[i] = Math.abs(antennaCoordinate.getX() - robotCoordinate.getX()) + Math.abs(antennaCoordinate.getY() - robotCoordinate.getY());
+        for (int i = 0; i < this.players.size(); ++i)
+        {
+            distances[i] = Math.abs(antennaCoordinate.getX() - this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate().getX()) + Math.abs(antennaCoordinate.getY() - this.players.get(i).getPlayerRobot().getCurrentTile().getCoordinate().getY());
+            continue;
         }
 
         int currentPriority = this.players.size();
-        for (int j = 0; j < this.players.size(); j++) {
-            int minDistance = Integer.MAX_VALUE;
-            int minIndex = -1;
 
-            for (int i = 0; i < distances.length; i++) {
-                if (distances[i] < minDistance) {
-                    minDistance = distances[i];
-                    minIndex = i;
+        /* Priorities with distance calculations. */
+
+        for (int i = 0; i < distances.length; ++i)
+        {
+            int min = 0;
+
+            for (int j = 0; j < distances.length; ++j)
+            {
+                if (distances[j] < distances[min])
+                {
+                    min = j;
+                    continue;
                 }
+
+                continue;
             }
 
-            //Leave until new code was tested
-            /*if (minIndex != -1) {
-                this.players.get(minIndex).setPriority(currentPriority);
-                currentPriority--;
-                distances[minIndex] = Integer.MAX_VALUE;
-            }*/
+            this.players.get(min).setPriority(currentPriority--);
+            distances[min] = Integer.MAX_VALUE;
 
-            //Now, includes AdminPrivilege logic. Still needs to be tested once shop is available.
-            if (minIndex != -1) {
-                Player currentPlayer = this.players.get(minIndex);
-
-                if (currentPlayer.getHasAdminPrivilegeUpgrade() && currentPlayer.getChosenRegisterAdminPrivilegeUpgrade() == currentRegisterIndex) {
-                    currentPlayer.setPriority(currentPriority);
-                    currentPriority--;
-                    distances[minIndex] = Integer.MAX_VALUE;
-                } else {
-                    currentPlayer.setPriority(currentPriority);
-                    currentPriority--;
-                    distances[minIndex] = Integer.MAX_VALUE;
-                }
-            }
+            continue;
         }
+
+        /* Priorities with admin privilege cards. */
+
+        final ArrayList<Player> overriddenPrioritiesPlayers = this.getOverriddenPrioritiesPlayersASC();
+
+        if (overriddenPrioritiesPlayers.isEmpty())
+        {
+            l.debug("No players have overridden priorities. The priorities are: {}.", this.getPrioritiesAsString().toString());
+            return;
+        }
+
+        l.debug("The following players have overridden priorities: {}.", overriddenPrioritiesPlayers.toString());
+
+        int priority = 1_000;
+        for (final Player player : overriddenPrioritiesPlayers)
+        {
+            player.setPriority(priority++);
+            continue;
+        }
+
+        l.debug("The priorities for register {} are: {}.", this.currentRegisterIndex, this.getPrioritiesAsString().toString());
+
+        this.resetOverriddenPrioritiesForRegister();
+
+        return;
+    }
+
+    private ArrayList<String> getPrioritiesAsString()
+    {
+        final ArrayList<String> out = new ArrayList<String>();
+
+        for (final Player player : this.players)
+        {
+            out.add(String.format("%d", player.getPriority()));
+            continue;
+        }
+
+        return out;
     }
 
     /**

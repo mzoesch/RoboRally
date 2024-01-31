@@ -1852,7 +1852,6 @@ public final class GameJFXController
             {
                 l.debug("User clicked on MemorySwap upgrade card.");
 
-
                 EGameState.INSTANCE.setMemorySwapPlayed(true);
 
                 ap.setOnMouseClicked(null);
@@ -1880,6 +1879,26 @@ public final class GameJFXController
                 ap.getChildren().remove(0, 1);
 
                 new PlayCardModel(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx)).send();
+
+                return;
+            });
+        }
+
+        if ((EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING || EGameState.INSTANCE.getCurrentPhase() == EGamePhase.ACTIVATION) && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "AdminPrivilege") && !EGameState.INSTANCE.isAdminPrivilegePlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on AdminPrivilege upgrade card.");
+
+                EGameState.INSTANCE.setAdminPrivilegePlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                ViewSupervisor.createAdminPrivilegeDialogLater();
 
                 return;
             });
@@ -2079,7 +2098,7 @@ public final class GameJFXController
 
             if (i % 2 == 1)
             {
-                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(GameJFXController.createHSpacer());
+                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1) ).getChildren().add(GameJFXController.createHSpacer());
             }
 
             final Label figureName = new Label(rp.getFigure().toString());
@@ -2297,7 +2316,7 @@ public final class GameJFXController
                 h.getChildren().add(ap);
             }
 
-            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(h);
+            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1) ).getChildren().add(h);
 
             continue;
         }

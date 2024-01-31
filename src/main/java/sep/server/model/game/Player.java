@@ -39,7 +39,7 @@ public class Player {
     private int checkpointsCollected;
     private Boolean hasAdminPrivilegeUpgrade;
 
-    private Integer chosenRegisterAdminPrivilegeUpgrade;
+    private RAdminPrivilegeMask chosenRegisterAdminPrivilegeUpgrade;
 
     private String[] memorySwapCards;
 
@@ -65,6 +65,10 @@ public class Player {
         this.checkpointsCollected = 0;
 
         this.boughtUpgradeCards = new ArrayList<String>();
+
+        this.chosenRegisterAdminPrivilegeUpgrade = null;
+
+        return;
     }
 
     /**
@@ -385,13 +389,24 @@ public class Player {
         this.hasAdminPrivilegeUpgrade = hasAdminPrivilegeUpgrade;
     }
 
-    public Integer getChosenRegisterAdminPrivilegeUpgrade() {
-        return chosenRegisterAdminPrivilegeUpgrade;
+    public synchronized RAdminPrivilegeMask getChosenRegisterAdminPrivilegeUpgrade()
+    {
+        return this.chosenRegisterAdminPrivilegeUpgrade;
     }
 
-    public void setChosenRegisterAdminPrivilegeUpgrade(Integer chosenRegisterAdminPrivilegeUpgrade) {
-        this.chosenRegisterAdminPrivilegeUpgrade = chosenRegisterAdminPrivilegeUpgrade;
+    public synchronized void setChosenRegisterAdminPrivilegeUpgrade(final Integer chosenRegisterAdminPrivilegeUpgrade)
+    {
+        if (chosenRegisterAdminPrivilegeUpgrade == null)
+        {
+            this.chosenRegisterAdminPrivilegeUpgrade = null;
+            return;
+        }
+
+        this.chosenRegisterAdminPrivilegeUpgrade = new RAdminPrivilegeMask(System.currentTimeMillis(), chosenRegisterAdminPrivilegeUpgrade);
+
+        return;
     }
+
     public void setMemorySwapCards(String[] memorySwapCards) {
         this.memorySwapCards = memorySwapCards;
     }
@@ -432,7 +447,7 @@ public class Player {
     @Override
     public String toString()
     {
-        return String.format("Player{%d,%s,%s}",this.ctrl.getPlayerID(), this.ctrl.getName(), this.playerRobot.getCurrentTile().getCoordinate());
+        return String.format("Player{%d,%s}",this.ctrl.getPlayerID(), this.playerRobot.getCurrentTile().getCoordinate());
     }
 
     public ArrayList<String> getBoughtUpgradeCards()

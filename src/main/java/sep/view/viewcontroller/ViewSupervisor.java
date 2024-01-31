@@ -87,7 +87,7 @@ public final class ViewSupervisor extends Application
     public static final int     GOT_REGISTER_SLOT_HEIGHT    = 58;
     public static final int     UPGRADE_SLOT_WIDTH          = 34;
     public static final int     UPGRADE_SLOT_HEIGHT         = 58;
-    public static final int     PHASE_POPUP_TIME            = 5_000;
+    public static final int     PHASE_POPUP_TIME            = 2_000;
 
     public ViewSupervisor()
     {
@@ -1238,6 +1238,89 @@ public final class ViewSupervisor extends Application
         Platform.runLater(() ->
         {
             ViewSupervisor.createEnergyTokenPopUp(energy, source);
+            return;
+        });
+
+        return;
+    }
+
+    public static void createAdminPrivilegeDialog()
+    {
+        final HBox h = new HBox();
+        h.setAlignment(Pos.CENTER);
+
+        final Label l = new Label("Select Register Override Target");
+        l.getStyleClass().add("text-xl");
+
+        final HBox registers = new HBox(ViewSupervisor.createHSpacer());
+        registers.setSpacing(10.0);
+        registers.setAlignment(Pos.CENTER);
+
+        for (int i = 0; i < 5; ++i)
+        {
+            final Button b = new Button(String.format("%s", i + 1));
+            b.getStyleClass().add("secondary-btn-mini");
+
+            /* Current register is not zero based. */
+            if (i < EGameState.INSTANCE.getCurrentRegister() - 1)
+            {
+                b.setDisable(true);
+            }
+
+            final int finalI = i;
+            b.setOnAction(e ->
+            {
+                ViewSupervisor.getSceneController().destroyPopUp(h, false);
+                new ChooseRegisterModel(finalI).send();
+                return;
+            });
+
+            registers.getChildren().add(b);
+
+            continue;
+        }
+
+        final Button cancel = new Button("X");
+        cancel.getStyleClass().add("danger-btn-mini");
+        cancel.setOnAction(e ->
+        {
+            EGameState.INSTANCE.setAdminPrivilegePlayed(false);
+            ViewSupervisor.getSceneController().destroyPopUp(h, false);
+            ViewSupervisor.updatePlayerView();
+            return;
+        });
+
+        registers.getChildren().add(cancel);
+        registers.getChildren().add(ViewSupervisor.createHSpacer());
+
+        final VBox v = new VBox(l, registers);
+        v.setSpacing(30.0);
+        v.setAlignment(Pos.CENTER);
+
+        AnchorPane.setLeftAnchor(       v, 0.0      );
+        AnchorPane.setRightAnchor(      v, 0.0      );
+        AnchorPane.setTopAnchor(        v, 0.0      );
+        AnchorPane.setBottomAnchor(     v, 0.0      );
+
+        final AnchorPane p = new AnchorPane(v);
+        p.setId("admin-privilege-dialog-container");
+
+        h.getChildren().add(p);
+
+        AnchorPane.setLeftAnchor(   h,  0.0     );
+        AnchorPane.setRightAnchor(  h,  0.0     );
+        AnchorPane.setTopAnchor(    h,  80.0    );
+
+        ViewSupervisor.createPopUp(h);
+
+        return;
+    }
+
+    public static void createAdminPrivilegeDialogLater()
+    {
+        Platform.runLater(() ->
+        {
+            ViewSupervisor.createAdminPrivilegeDialog();
             return;
         });
 
