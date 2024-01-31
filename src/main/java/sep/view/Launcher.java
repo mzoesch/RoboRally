@@ -52,7 +52,7 @@ public final class Launcher
 
                 if (Arrays.asList(args).contains("--isAgent"))
                 {
-                    l.info("Command line argument [--isAgent] detected. Starting in Agent View Mode.");
+                    l.info("Command line argument [--isAgent] detected. Starting in Agent Mock View Mode.");
 
                     EClientInformation.INSTANCE.setIsAgent(true);
                     new sep.view.viewcontroller.AgentMockViewLauncher().run();
@@ -62,7 +62,7 @@ public final class Launcher
                     return;
                 }
 
-                l.info("Starting mock game view.");
+                l.info("Starting Mock View.");
                 new sep.view.viewcontroller.MockViewLauncher().run();
 
                 l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
