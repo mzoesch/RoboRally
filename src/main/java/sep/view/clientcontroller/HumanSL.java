@@ -95,6 +95,13 @@ public final class HumanSL extends ServerListener
         EGameState.INSTANCE.setMemorySwapPlayed(false);
         EGameState.INSTANCE.setSpamBlockerPlayed(false);
 
+        /* Because we can play this card both in the programming phase and the activation phase. */
+        if (EGamePhase.fromInt(this.dsrp.getPhase()) == EGamePhase.PROGRAMMING)
+        {
+            EGameState.INSTANCE.setAdminPrivilegePlayed(false);
+            EGameState.INSTANCE.setCurrentRegister(0);
+        }
+
         EGameState.INSTANCE.setCurrentPhase(EGamePhase.fromInt(this.dsrp.getPhase()));
         EGameState.INSTANCE.setProgrammingTimerRunning(false);
 
