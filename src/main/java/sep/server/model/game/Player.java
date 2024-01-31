@@ -60,7 +60,6 @@ public class Player {
         this.chosenRegisterAdminPrivilegeUpgrade = null;
 
         this.energyCollected = GameMode.STARTING_ENERGY;
-        //TODO: Make this work: this.getAuthGameMode().setEnergyBank(this.getAuthGameMode().getEnergyBank() - GameMode.STARTING_ENERGY);
 
         this.checkpointsCollected = 0;
 
