@@ -1885,6 +1885,26 @@ public final class GameJFXController
             });
         }
 
+        if ((EGameState.INSTANCE.getCurrentPhase() == EGamePhase.PROGRAMMING || EGameState.INSTANCE.getCurrentPhase() == EGamePhase.ACTIVATION) && Objects.equals(EGameState.INSTANCE.getBoughtUpgradeCard(realIdx), "AdminPrivilege") && !EGameState.INSTANCE.isAdminPrivilegePlayed())
+        {
+            this.applyPlayableUpgradeEffect(ap);
+
+            ap.setOnMouseClicked(e ->
+            {
+                l.debug("User clicked on AdminPrivilege upgrade card.");
+
+                EGameState.INSTANCE.setAdminPrivilegePlayed(true);
+
+                ap.setOnMouseClicked(null);
+                ap.setStyle("");
+                ap.getChildren().remove(0, 1);
+
+                ViewSupervisor.createAdminPrivilegeDialogLater();
+
+                return;
+            });
+        }
+
         p.getChildren().add(ap);
 
         return;
