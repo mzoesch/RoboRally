@@ -104,11 +104,7 @@ public final class HumanSL extends ServerListener
             return false;
         }
 
-        /* TODO Remove if upgrade phase is playable. */
-        if (this.dsrp.getPhase() != 1)
-        {
-            ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
-        }
+        ViewSupervisor.createPhaseUpdatePopUpLater(EGamePhase.fromInt(this.dsrp.getPhase()));
 
         return true;
     }
