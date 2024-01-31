@@ -139,6 +139,7 @@ public final class GameState
         playerController.getPlayer().setMemorySwapCards(cards);
     }
 
+    /** @deprecated  */
     public void setRegisterForAdminPriviledge (PlayerController playerController, int register) {
         playerController.getPlayer().setChosenRegisterAdminPrivilegeUpgrade(register);
     }
