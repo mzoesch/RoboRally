@@ -1852,7 +1852,6 @@ public final class GameJFXController
             {
                 l.debug("User clicked on MemorySwap upgrade card.");
 
-
                 EGameState.INSTANCE.setMemorySwapPlayed(true);
 
                 ap.setOnMouseClicked(null);
@@ -2099,7 +2098,7 @@ public final class GameJFXController
 
             if (i % 2 == 1)
             {
-                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(GameJFXController.createHSpacer());
+                ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1) ).getChildren().add(GameJFXController.createHSpacer());
             }
 
             final Label figureName = new Label(rp.getFigure().toString());
@@ -2317,7 +2316,7 @@ public final class GameJFXController
                 h.getChildren().add(ap);
             }
 
-            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1)).getChildren().add(h);
+            ( (Pane) this.playerContainer.getChildren().get(this.playerContainer.getChildren().size() - 1) ).getChildren().add(h);
 
             continue;
         }
