@@ -64,6 +64,7 @@ public enum EGameState
     private final AtomicBoolean             bProgrammingTimerRunning;
     private final AtomicBoolean             bMemorySwapPlayed;
     private final AtomicBoolean             bSpamBlockerPlayed;
+    private final AtomicBoolean             bAdminPrivilegePlayed;
 
     private EGameState()
     {
@@ -92,6 +93,7 @@ public enum EGameState
         this.bProgrammingTimerRunning   = new AtomicBoolean(false);
         this.bMemorySwapPlayed          = new AtomicBoolean(false);
         this.bSpamBlockerPlayed         = new AtomicBoolean(false);
+        this.bAdminPrivilegePlayed      = new AtomicBoolean(false);
 
         return;
     }
@@ -133,6 +135,7 @@ public enum EGameState
         EGameState.INSTANCE.bProgrammingTimerRunning    .set(false);
         EGameState.INSTANCE.bMemorySwapPlayed           .set(false);
         EGameState.INSTANCE.bSpamBlockerPlayed          .set(false);
+        EGameState.INSTANCE.bAdminPrivilegePlayed       .set(false);
 
         return;
     }
@@ -934,6 +937,17 @@ public enum EGameState
         }
 
         return;
+    }
+
+    public void setAdminPrivilegePlayed(final boolean bPlayed)
+    {
+        this.bAdminPrivilegePlayed.set(bPlayed);
+        return;
+    }
+
+    public boolean isAdminPrivilegePlayed()
+    {
+        return this.bAdminPrivilegePlayed.get();
     }
 
     // endregion Getters and Setters
