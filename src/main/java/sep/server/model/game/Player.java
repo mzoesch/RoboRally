@@ -261,12 +261,12 @@ public class Player {
                 newCardFromDeck.playCard(this, currentRoundNumber);
             }
 
+            assert newCardFromDeck != null;
             String newCardString = newCardFromDeck.getCardType();
             getAuthGameMode().getSession().broadcastReplacedCard(getController().getPlayerID(), currentRoundNumber, newCardString);
         }
 
     }
-
 
     public IPlayableCard getCardByName(final String cardName) {
         for (IPlayableCard c : this.playerHand) {
@@ -274,6 +274,7 @@ public class Player {
                 return c;
             }
         }
+        l.error("Card " + cardName + " not found.");
         return null;
     }
 
@@ -320,14 +321,6 @@ public class Player {
         return registersArray;
     }
 
-    /*public String[] getPlayerHandAsStringArray() {
-        final String[] handArray = new String[this.playerHand.size()];
-        for (int i = 0; i < this.playerHand.size(); i++) {
-            handArray[i] = this.playerHand.get(i).getCardType();
-        }
-        return handArray;
-    }*/
-
     public String[] getPlayerHandAsStringArray() {
         final String[] handArray = new String[this.playerHand.size()];
         for (int i = 0; i < this.playerHand.size(); i++) {
@@ -347,7 +340,11 @@ public class Player {
         if (this.registers[idx] != null) {
             this.discardPile.add(this.registers[idx]);
         }
-        this.registers[idx] = newCard;
+        if(newCard != null) {
+            this.registers[idx] = newCard;
+        } else {
+            l.error("Card set to register is null");
+        }
     }
 
     public int getPriority()
