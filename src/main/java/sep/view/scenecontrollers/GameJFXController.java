@@ -3136,6 +3136,8 @@ public final class GameJFXController
         this.programmingTimeline.stop();
         this.programmingTimeline = null;
 
+        ViewSupervisor.getSceneController().clearSceneEffect();
+
         return;
     }
 
