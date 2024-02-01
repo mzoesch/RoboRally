@@ -9,8 +9,7 @@ public enum EFigure
     X90     (   3,  "Hulk x90"      ),
     SPIN    (   4,  "Spin Bot"      ),
     TWONKY  (   5,  "Twonky"        ),
-    TWITCH  (   6,  "Twitch"        ),
-    NUM     (   7,  "FALSE USE"     )
+    NUM     (   6,  "FALSE USE"     )
     ;
 
     public final int        i;
