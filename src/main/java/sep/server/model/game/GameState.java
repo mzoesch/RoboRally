@@ -1,14 +1,15 @@
 package sep.server.model.game;
 
-import sep.server.viewmodel.        PlayerController;
-import sep.server.viewmodel.        Session;
-import sep.server.model.            IOwnershipable;
-import sep.server.model.            Agent;
-import sep.server.model.            EServerInformation;
-import sep.server.model.game.tiles. Coordinate;
+import sep.server.viewmodel.            PlayerController;
+import sep.server.viewmodel.            Session;
+import sep.server.model.                IOwnershipable;
+import sep.server.model.                Agent;
+import sep.server.model.                EServerInformation;
+import sep.server.model.game.tiles.     Coordinate;
 
-import org.apache.logging.log4j.    LogManager;
-import org.apache.logging.log4j.    Logger;
+import org.apache.logging.log4j.        LogManager;
+import org.apache.logging.log4j.        Logger;
+import java.util.concurrent.atomic.     AtomicBoolean;
 
 /**
  * High-level supervisor for the entirety of a session. It manages the creation, destruction and activation of
@@ -25,14 +26,17 @@ public final class GameState
     public static final int         DEFAULT_MIN_REMOTE_PLAYER_COUNT_TO_START    = 1;
     public static final int         DEFAULT_MIN_HUMAN_PLAYER_COUNT_TO_START     = 1;
 
-    private String          courseName;
-    private GameMode        gameMode;
-    private final Session   session;
-    private boolean         bGameStarted;
+    private String                  courseName;
+    private GameMode                gameMode;
+    private final Session           session;
+    private boolean                 bGameStarted;
 
     /** @deprecated */
-    private final int       minRemotePlayerCountToStart;
-    private final int       minHumanPlayerCountToStart;
+    private final int               minRemotePlayerCountToStart;
+    private final int               minHumanPlayerCountToStart;
+
+    /** Used as a lookup for other services that are being interrupted to execute post-wait behavior or terminate. */
+    private final AtomicBoolean     bClosed;
 
     public GameState(final Session session)
     {
@@ -46,6 +50,8 @@ public final class GameState
         /* In the future, we might want to have this session independent. This is why we save the value here. */
         this.minRemotePlayerCountToStart    = EServerInformation.INSTANCE.getMinRemotePlayerCountToStart();
         this.minHumanPlayerCountToStart     = EServerInformation.INSTANCE.getMinHumanPlayerCountToStart();
+
+        this.bClosed                        = new AtomicBoolean(false);
 
         return;
     }
@@ -74,8 +80,16 @@ public final class GameState
         return;
     }
 
-    public void onClose() throws InterruptedException
+    public synchronized void onClose() throws InterruptedException
     {
+        if (this.bClosed.get())
+        {
+            l.warn("Game State of Session [{}] is already in the process of closing.", this.session.getSessionID());
+            return;
+        }
+
+        this.bClosed.set(true);
+
         if (this.gameMode != null)
         {
             this.gameMode.onClose();
@@ -190,6 +204,11 @@ public final class GameState
     public int getMinHumanPlayersToStart()
     {
         return this.minHumanPlayerCountToStart;
+    }
+
+    public boolean isClosed()
+    {
+        return this.bClosed.get();
     }
 
     // endregion Getters and Setters
