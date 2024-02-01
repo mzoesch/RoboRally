@@ -605,7 +605,7 @@ public final class LobbyJFXController_v2
                 //      but could cause unpredictable behavior in the future. The delay
                 //      must be higher than the {@link #addPlayerRobotSelector_v2} delay.
                 final PauseTransition p = new PauseTransition(Duration.millis(LobbyJFXController_v2.SCROLL_TO_END_DELAY * 2));
-                p.setOnFinished(f -> this.formScrollPane.setVvalue(0.9));
+                p.setOnFinished(f -> this.formScrollPane.setVvalue(0.53));
                 p.play();
                 return;
             }
