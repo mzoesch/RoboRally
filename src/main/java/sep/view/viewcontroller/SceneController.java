@@ -19,6 +19,7 @@ import javafx.fxml.                 FXMLLoader;
 import javafx.scene.control.        Button;
 import javafx.scene.control.        Label;
 import java.io.                     IOException;
+import javafx.scene.effect.         Effect;
 import org.apache.logging.log4j.    LogManager;
 import org.apache.logging.log4j.    Logger;
 import javafx.scene.text.           TextAlignment;
@@ -407,6 +408,18 @@ public final class SceneController
     public Pane getRenderTarget()
     {
         return this.getPopUpTarget();
+    }
+
+    public void clearSceneEffect()
+    {
+        this.getRenderTarget().setEffect(null);
+        return;
+    }
+
+    public void applySceneEffect(final Effect e)
+    {
+        this.getRenderTarget().setEffect(e);
+        return;
     }
 
 }
