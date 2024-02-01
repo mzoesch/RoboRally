@@ -75,26 +75,6 @@ public class Course {
         }
     }
 
-    public Tile getTopNeighbor(Tile tile){
-        Coordinate coordinate = tile.getCoordinate().getTopNeighbor();
-        return course.get(coordinate.getX()).get(coordinate.getY());
-    }
-
-    public Tile getRightNeighbor(Tile tile){
-        Coordinate coordinate = tile.getCoordinate().getRightNeighbor();
-        return course.get(coordinate.getX()).get(coordinate.getY());
-    }
-
-    public Tile getBottomNeighbor(Tile tile){
-        Coordinate coordinate = tile.getCoordinate().getBottomNeighbor();
-        return course.get(coordinate.getX()).get(coordinate.getY());
-    }
-
-    public Tile getLeftNeighbor(Tile tile){
-        Coordinate coordinate = tile.getCoordinate().getLeftNeighbor();
-        return course.get(coordinate.getX()).get(coordinate.getY());
-    }
-
     public String getStartingTurningDirection() {
         return startingTurningDirection;
     }
