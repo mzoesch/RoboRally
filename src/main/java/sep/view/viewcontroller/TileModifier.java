@@ -265,6 +265,29 @@ public final class TileModifier
             return;
         }
 
+        if (Objects.equals(this.tile.get("type"), "Antenna"))
+        {
+            switch (this.getOrientations().getString(0))
+            {
+                case "top":
+                    iv.setRotate(0);
+                    break;
+                case "right":
+                    iv.setRotate(90);
+                    break;
+                case "bottom":
+                    iv.setRotate(180);
+                    break;
+                case "left":
+                    iv.setRotate(270);
+                    break;
+
+                default:
+                    l.error("Unknown orientation: {}", this.tile.getJSONArray("orientations").getString(0));
+                    break;
+            }
+        }
+
         return;
     }
 
