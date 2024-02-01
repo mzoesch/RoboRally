@@ -6,7 +6,7 @@ To run the wrapper without any configuration, double-click the JAR file or run t
 You may add the flag `--help` to see the available options.
 
 ```bash
-java -jar sep-1.0.jar 
+java -jar sep-2.0.jar
 ```
 
 You then can configure everything from the graphical user interface as described in the [wrapper section](#wrapper).
@@ -19,7 +19,7 @@ You should instead use the wrapper cmd tools to start the server and clients.
 To start a server in default configuration:
 
 ```bash
-java -jar sep-1.0.jar --nocmd --sv
+java -jar sep-2.0.jar --nocmd --sv
 ```
 
 The server is now started at your localhost on port `8080`.
@@ -30,7 +30,7 @@ To change the port, add the `--port` flag as follows `--port 7000`.
 To start a 'human' client in default configuration:
 
 ```bash
-java -jar sep-1.0.jar --cl
+java -jar sep-2.0.jar --cl
 ```
 
 If you want to change to which server the 'human' client connects to,
@@ -41,7 +41,7 @@ change in the main menu the server address and port in the top right corner.
 To start an 'agent' client in default configuration:
 
 ```bash
-java -jar sep-1.0.jar --cl --isAgent --name <agent-name>
+java -jar sep-2.0.jar --cl --isAgent --name <agent-name>
 ```
 
 The agent is now started and will try its best to connect to the server at `localhost:8080`.
@@ -55,7 +55,7 @@ of the agent add the `--sid <session-id>` flag.
 A full example would be:
 
 ```bash
-java -jar sep-1.0.jar --cl --isAgent --name "My Agent" --addr localhost --port 7000 --sid my-special-id
+java -jar sep-2.0.jar --cl --isAgent --name "My Agent" --addr localhost --port 7000 --sid my-special-id
 ```
 
 <br />
