@@ -773,7 +773,8 @@ public class GameMode {
 
 
     /**
-     * activate the ConveyorBelts and broadcast player positions
+     * Method to activate the conveyor belts in the right order (first blue, then second) and
+     * broadcast the players movement to everybody
      */
     public void activateConveyorBelts() {
 
@@ -789,7 +790,8 @@ public class GameMode {
     }
 
     /**
-     * activates blue conveyor belts (but only one time)
+     * Method to activate all blue conveyor belts with a robot on top of it (only moves them one tile, so
+     * this method needs to be activated twice per activation phase).
      */
     private void activateBlueConveyorBelts() {
 
@@ -820,7 +822,7 @@ public class GameMode {
 
 
     /**
-     * activates green conveyor belts
+     * Method to activate all green conveyor belts with a robot on top of it.
      */
     public void activateGreenConveyorBelts(){
         for (Player player : players) {
