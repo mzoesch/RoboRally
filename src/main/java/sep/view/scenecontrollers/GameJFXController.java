@@ -64,6 +64,7 @@ import javafx.geometry.             Insets;
 import javafx.geometry.             Pos;
 import javafx.scene.paint.          Color;
 import java.util.concurrent.atomic. AtomicReference;
+import javafx.scene.effect.         ColorAdjust;
 
 public final class GameJFXController
 {
@@ -1494,6 +1495,7 @@ public final class GameJFXController
         }
 
         this.UIHeaderPhaseLabel.setText(EGameState.PHASE_NAMES[EGameState.INSTANCE.getCurrentPhase().i]);
+
         return;
     }
 
@@ -1556,18 +1558,39 @@ public final class GameJFXController
                     this.programmingTimeline = null;
                 }
 
+                ViewSupervisor.getSceneController().clearSceneEffect();
+
                 return;
             }
 
             if (this.programmingTimeline == null && EGameState.INSTANCE.isProgrammingTimerRunning())
             {
                 final long startTime = System.currentTimeMillis();
-                this.programmingTimerLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #ffffffff; -fx-alignment: center-left;");
 
-                this.programmingTimeline = new Timeline(new KeyFrame(Duration.millis(100), e ->
+                this.programmingTimeline = new Timeline(new KeyFrame(Duration.millis(10), re ->
                 {
                     final long timeLeft = GameJFXController.PROGRAMMING_TIMER_DURATION - (System.currentTimeMillis() - startTime);
+
                     this.programmingTimerLabel.setText(String.format(Locale.US, "%.2fs", ( (double) timeLeft ) / 1_000));
+                    this.programmingTimerLabel.setStyle(String.format("-fx-font-size: 13px; -fx-text-fill: %s; -fx-alignment: center-left;", timeLeft < 15_000L ? timeLeft < 10_000L ? "#ff0000ff" : "#ff8800ff" : "#ffffffff"));
+
+                    final double progress = 1 - ( (double) timeLeft ) / GameJFXController.PROGRAMMING_TIMER_DURATION;
+
+                    if (progress < 0.5)
+                    {
+                        final ColorAdjust splash = new ColorAdjust(0.0, 0.0, progress < 0.015625 ? 1 - progress * 64 : 0.0, 0.0);
+                        ViewSupervisor.getSceneController().applySceneEffect(splash);
+                        return;
+                    }
+
+                    final double    saturation      = (progress - 0.5) * 0.4;
+                    final double    brightness      = (progress - 0.5);
+                    final double    contrast        = (progress - 0.5) * 0.12;
+
+                    final ColorAdjust adj = new ColorAdjust(0, saturation, brightness, contrast);
+
+                    ViewSupervisor.getSceneController().applySceneEffect(adj);
+
                     return;
                 }
                 ));
@@ -1577,6 +1600,9 @@ public final class GameJFXController
 
                 return;
             }
+
+            this.programmingTimerLabel.setText("");
+            this.programmingTimerLabel.setStyle("");
 
             return;
         }
@@ -1595,6 +1621,10 @@ public final class GameJFXController
             return;
         }
 
+        l.warn("Unknown phase: {}.", EGameState.INSTANCE.getCurrentPhase());
+
+        this.programmingTimerLabel.setText("");
+        this.programmingTimerLabel.setStyle("");
 
         return;
     }
