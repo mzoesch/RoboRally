@@ -573,6 +573,11 @@ public final class TileModifier
 
     public static Image loadUpgradePreview(final String card)
     {
+        if (EUpgradeCard.fromString(card) != null)
+        {
+            return TileModifier.loadCachedImage(String.format("%sPreview", Objects.requireNonNull(EUpgradeCard.fromString(card)).getFormattedName()));
+        }
+
         return TileModifier.loadCachedImage(String.format("%sPreview", card));
     }
 
