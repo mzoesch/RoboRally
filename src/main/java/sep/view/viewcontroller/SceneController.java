@@ -191,10 +191,10 @@ public final class SceneController
         return outerContainer;
     }
 
-    public <T> void renderNewScreen(final String ID, final String path, final boolean bAutoKillAfterUse)
+    public <T> void renderNewScreen(final String id, final String path, final boolean bAutoKillAfterUse)
     {
-        final FXMLLoader ldr = new FXMLLoader(SceneController.class.getResource(path));
-        final Pane p;
+        final FXMLLoader    ldr     = new FXMLLoader(SceneController.class.getResource(path));
+        final Pane          p;
         try
         {
             p = ldr.load();
@@ -212,12 +212,11 @@ public final class SceneController
             return;
         }
 
-        final T ctrl = ldr.getController();
-
-        final RGameScene<T> rgs = new RGameScene<T>(ID, p, ctrl, bAutoKillAfterUse ? this.currentScreen : "");
+        final T                 ctrl    = ldr.getController();
+        final RGameScene<T>     rgs     = new RGameScene<T>(id, p, ctrl, bAutoKillAfterUse ? this.currentScreen : "");
 
         this.addScreen(rgs);
-        this.activateScreen(ID);
+        this.activateScreen(id);
 
         return;
     }
