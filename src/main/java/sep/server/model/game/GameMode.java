@@ -779,6 +779,9 @@ public class GameMode {
     public void activateConveyorBelts() {
 
         activateBlueConveyorBelts();
+        for (Player player : players) {
+            this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition().getX(), player.getPosition().getY());
+        }
         activateBlueConveyorBelts();
         for (Player player : players) {
             this.getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition().getX(), player.getPosition().getY());
@@ -927,6 +930,7 @@ public class GameMode {
                             //rotate robot counterclockwise
                             player.getPlayerRobot().rotateRobotOnTileToTheLeft();
 
+                            addDelay(3000);
                             this.getSession().broadcastRotationUpdate(player.getController().getPlayerID(), "counterclockwise");
 
                         } else if((Objects.equals(direction, "bottom") && outDirection.equals("left")) ||
