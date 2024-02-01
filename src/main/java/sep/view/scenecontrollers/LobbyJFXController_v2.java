@@ -6,6 +6,7 @@ import sep.view.json.lobby.         CourseSelectedModel;
 import sep.view.lib.                EFigure;
 import sep.view.lib.                OutErr;
 import sep.view.lib.                EPopUp;
+import sep.view.viewcontroller.     TileModifier;
 import sep.view.clientcontroller.   GameInstance;
 import sep.view.clientcontroller.   EGameState;
 import sep.view.clientcontroller.   RemotePlayer;
@@ -28,6 +29,7 @@ import javafx.scene.layout.         VBox;
 import javafx.scene.layout.         Region;
 import javafx.scene.layout.         AnchorPane;
 import javafx.scene.layout.         Pane;
+import javafx.scene.image.          ImageView;
 import java.io.                     IOException;
 import javafx.scene.input.          KeyCode;
 import java.util.concurrent.atomic. AtomicBoolean;
@@ -551,6 +553,10 @@ public final class LobbyJFXController_v2
                     this.serverCourseSelectorArea.getChildren().add(new HBox() {{ this.getStyleClass().add("server-course-selector-hbox"); }});
                 }
 
+                final ImageView iv = new ImageView(TileModifier.loadCachedImage(EGameState.INSTANCE.getServerCourses()[i].toLowerCase().replaceAll("\\s", "")));
+                iv.setFitHeight(120);
+                iv.setPreserveRatio(true);
+
                 final Button b = new Button(EGameState.INSTANCE.getServerCourses()[i]);
                 b.getStyleClass().add(
                       EGameState.INSTANCE.getCurrentServerCourse().isEmpty()
@@ -559,7 +565,10 @@ public final class LobbyJFXController_v2
                     ? "primary-btn-mini"
                     : "secondary-btn-mini"
                 );
-                b.setStyle("-fx-min-width: 250px;");
+                b.setStyle("-fx-min-width: 230px;");
+
+                final VBox v = new VBox(iv, b);
+                v.setId("server-course-selector-vbox");
 
                 final int finalI = i;
                 b.setOnAction(actionEvent ->
@@ -584,7 +593,7 @@ public final class LobbyJFXController_v2
                     return;
                 });
 
-                ( (HBox) this.serverCourseSelectorArea.getChildren().get(this.serverCourseSelectorArea.getChildren().size() - 1) ).getChildren().add(b);
+                ( (HBox) this.serverCourseSelectorArea.getChildren().get(this.serverCourseSelectorArea.getChildren().size() - 1) ).getChildren().add(v);
 
                 continue;
             }
