@@ -70,12 +70,11 @@ public final class GameJFXController
     private static final Logger l = LogManager.getLogger(GameJFXController.class);
 
     private static final String     COLOR_HAMMER                = "#ff000033";
-    private static final String     COLOR_TRUNDLE               = "#0078ff33";
-    private static final String     COLOR_SQUASH                = "#ffc0cb33";
+    private static final String     COLOR_TRUNDLE               = "#00ffff33";
+    private static final String     COLOR_SQUASH                = "#ff669260";
     private static final String     COLOR_X90                   = "#00ff0033";
-    private static final String     COLOR_SPIN                  = "#00ffff33";
+    private static final String     COLOR_SPIN                  = "#493c9133";
     private static final String     COLOR_TWONKY                = "#ffff0033";
-    private static final String     COLOR_TWITCH                = "#aaaaaa33";
     private static final String     COLOR_RCARD_PREVIEW_BG      = "#909090e5";
 
     private static final int    SHOOTING_ROBOT_LASER_DURATION   = 1_000 ;
