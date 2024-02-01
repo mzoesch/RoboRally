@@ -48,7 +48,6 @@ public class GameMode {
     private final ArrayList<Player> players;
     private Player curPlayerInRegistration;
 
-    /** TODO This may not be safe. Because clients may change behaviour during the activation phase. */
     private int currentRegisterIndex;
 
     private int energyBank;
@@ -164,7 +163,7 @@ public class GameMode {
     }
 
     /**
-     * Checks if setting a starting point is possibl and prints corresponding error messages.
+     * Checks if setting a starting point is possible and prints corresponding error messages.
      *
      * @param ctrl Player that wants to set a starting point
      * @return true if possible, false if not possible
@@ -586,8 +585,6 @@ public class GameMode {
                 continue;
             }
 
-            // TODO: Call a method on the agent and let them decide how they want to play this programming phase.
-
             if (p.getController() instanceof final Agent a) {
                 a.evaluateProgrammingPhase();
                 continue;
@@ -959,8 +956,6 @@ public class GameMode {
                             Coordinate oldCoordinate = currentTile.getCoordinate();
 
                             Coordinate targetCoordinate = calculateNewCoordinate(pushOrientation, oldCoordinate);
-
-                            //TODO refactor to use moveForward method from Robot class:
 
                             if (!player.getPlayerRobot().getCourse().isCoordinateWithinBounds(targetCoordinate) ||
                                     player.getPlayerRobot().getCourse().getTileByCoordinate(targetCoordinate).isPit()) {
@@ -1658,7 +1653,6 @@ public class GameMode {
                 continue;
             }
 
-            //Now, includes AdminPrivilege logic. Still needs to be tested once shop is available.
             if (minIndex == -1)
             {
                 l.fatal("Could not determine priority for upgrade phase.");
