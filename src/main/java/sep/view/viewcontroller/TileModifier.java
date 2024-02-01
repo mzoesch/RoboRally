@@ -5,6 +5,7 @@ import sep.view.lib.                ERotation;
 import sep.view.lib.                RGearMask;
 import sep.view.lib.                RImageMask;
 import sep.view.clientcontroller.   GameInstance;
+import sep.view.lib.                EUpgradeCard;
 
 import java.io.                     IOException;
 import java.util.                   Objects;
@@ -337,6 +338,15 @@ public final class TileModifier
         if (TileModifier.IMG_CACHE.containsKey(modName))
         {
             return TileModifier.IMG_CACHE.get(modName).i();
+        }
+
+        if (EUpgradeCard.fromString(modName) != null)
+        {
+            l.debug("Loading and caching image: {}.", Objects.requireNonNull(EUpgradeCard.fromString(modName)).getFormattedName());
+            final Image i = TileModifier.loadImage(Objects.requireNonNull(EUpgradeCard.fromString(modName)).getFormattedName());
+            TileModifier.IMG_CACHE.put(Objects.requireNonNull(EUpgradeCard.fromString(modName)).getFormattedName(), new RImageMask(i, Types.EConfigurations.isDev() ? null : String.format("%s%s%s", TileModifier.PATH_PROD, Objects.requireNonNull(EUpgradeCard.fromString(modName)).getFormattedName(), TileModifier.EXTENSION)));
+
+            return i;
         }
 
         l.debug("Loading and caching image: {}.", modName);
