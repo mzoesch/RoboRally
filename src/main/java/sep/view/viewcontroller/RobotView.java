@@ -47,7 +47,7 @@ public final class RobotView
         this.iv     = null;
         this.ap     = null;
 
-        this.bIsNextRotationLerp = false;
+        this.bIsNextRotationLerp = true;
 
         return;
     }
