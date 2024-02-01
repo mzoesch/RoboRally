@@ -154,6 +154,7 @@ public enum EServerInformation
 
         try
         {
+            l.debug("Server Instance is requesting to close session {}.", session.getSessionID());
             session.onClose();
         }
         catch (final InterruptedException e)
