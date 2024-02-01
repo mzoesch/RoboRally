@@ -31,6 +31,11 @@ public enum EUpgradeCard
         return this.name;
     }
 
+    public String getFormattedName()
+    {
+        return this.name.replaceAll("\\s+", "");
+    }
+
     public int getEnergy()
     {
         return this.energy;
@@ -53,8 +58,6 @@ public enum EUpgradeCard
                 return card;
             }
         }
-
-        l.warn("Could not find upgrade card with name: {}", name);
 
         return null;
     }
