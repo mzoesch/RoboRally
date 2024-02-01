@@ -140,14 +140,15 @@ public class CourseBuilder {
     }
 
     /**
-     * Gets the starting turning direction for a given course.
+     * Gets the starting turning direction for a given course. (The robot will always be placed with top direction,
+     * so it needs to turn in direction of the main board)
      *
      * @param courseName name of the course
      * @return starting turning direction
      */
     public String getStartingTurningDirection(String courseName){
         switch(courseName){
-            case("Dizzy Highway") -> {
+            case("Dizzy Highway"), ("Lost Bearings"), ("Twister"), ("Extra Crispy") -> {
                 return "clockwise";}
             case ("Death Trap") -> {
                 return "counterclockwise";}
