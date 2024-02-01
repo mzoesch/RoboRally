@@ -2210,7 +2210,6 @@ public final class GameJFXController
                 : rp.getFigure() == EFigure.  X90     ? GameJFXController.    COLOR_X90
                 : rp.getFigure() == EFigure.  SPIN    ? GameJFXController.    COLOR_SPIN
                 : rp.getFigure() == EFigure.  TWONKY  ? GameJFXController.    COLOR_TWONKY
-                : rp.getFigure() == EFigure.  TWITCH  ? GameJFXController.    COLOR_TWITCH
                 : ""
             ));
 
