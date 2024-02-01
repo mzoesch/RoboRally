@@ -52,7 +52,7 @@ public class GameMode {
     private int currentRegisterIndex;
 
     private int energyBank;
-    private ArrayList<AUpgradeCard> upgradeShop;
+    private final ArrayList<AUpgradeCard> upgradeShop;
 
     private Thread activationPhaseThread;
 
@@ -97,7 +97,6 @@ public class GameMode {
 
         this.programmingPhaseTimerService = null;
 
-        return;
     }
 
     // region Game Phases
@@ -219,7 +218,8 @@ public class GameMode {
     private static final class RefilledCards
     {
         public final ArrayList<String> out;
-        public RefilledCards() { super(); this.out = new ArrayList<String>(); return; }
+        public RefilledCards() { super(); this.out = new ArrayList<String>();
+        }
     }
 
     /**
@@ -321,7 +321,6 @@ public class GameMode {
 
         l.info("Upgrade shop refilled. The new cards are: {}.", this.upgradeShop.toString());
 
-        return;
     }
 
     /**
@@ -345,7 +344,6 @@ public class GameMode {
 
         l.info("Cards in upgrade shop slots exchanged. The new cards are: {}.", upgradeShop.toString());
 
-        return;
     }
 
     private void removeCardFromShop(final String card)
@@ -366,7 +364,6 @@ public class GameMode {
             continue;
         }
 
-        return;
     }
 
     //endregion Upgrade Phase helpers
@@ -401,7 +398,6 @@ public class GameMode {
         this.getSession().broadcastCurrentPlayer(this.upgradePhasePlayersSortedByPriority.get(0).getController().getPlayerID());
         this.upgradePhasePlayersSortedByPriority.remove(0);
 
-        return;
     }
 
     private void executePostBuyBehavior()
@@ -417,7 +413,6 @@ public class GameMode {
 
         this.handleNewPhase(EGamePhase.PROGRAMMING);
 
-        return;
     }
 
     public void onUpgradeCardBought(final PlayerController pc, final String card)
@@ -462,7 +457,6 @@ public class GameMode {
         this.getSession().broadcastEnergyUpdate(pc.getPlayerID(), pc.getPlayer().getEnergyCollected(), "EnergySpent");
         this.executePostBuyBehavior();
 
-        return;
     }
 
     public void onCardPlayed(final PlayerController pc, final String card)
@@ -560,7 +554,6 @@ public class GameMode {
         l.error("Player {} tried to play a card that is not allowed. They tried to play {}.", pc.getPlayerID(), card);
         new ErrorMsgModel(pc.getClientInstance(), String.format("You tried to play %s but that was not allowed.", card)).send();
 
-        return;
     }
 
     /**
@@ -681,7 +674,6 @@ public class GameMode {
             continue;
         }
 
-        return;
     }
 
     /**
@@ -748,7 +740,6 @@ public class GameMode {
 
         this.resetOverriddenPrioritiesForRegister();
 
-        return;
     }
 
     private ArrayList<String> getPrioritiesAsString()
@@ -1264,7 +1255,6 @@ public class GameMode {
             this.activationPhaseThread.interrupt();
             this.activationPhaseThread = null;
         }
-        return;
     }
 
     /**
@@ -1342,7 +1332,7 @@ public class GameMode {
      */
     public void addDelay(int milliseconds) {
         try {
-            this.activationPhaseThread.sleep(milliseconds);
+            Thread.sleep(milliseconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -1365,7 +1355,6 @@ public class GameMode {
         this.activationPhaseThread = this.createActivationThread();
         this.activationPhaseThread.start();
 
-        return;
     }
 
     /**
@@ -1441,13 +1430,11 @@ public class GameMode {
 
             this.executePostProgrammingPhaseTimerServiceBehavior();
 
-            return;
         });
 
         this.programmingPhaseTimerService.setName(String.format("ProgrammingPhaseTimerService-%s", this.getSession().getSessionID()));
         this.programmingPhaseTimerService.start();
 
-        return;
     }
 
     public void executePostProgrammingPhaseTimerServiceBehavior()
@@ -1463,7 +1450,6 @@ public class GameMode {
 
         this.handleNewPhase(EGamePhase.ACTIVATION);
 
-        return;
     }
 
     private int[] getUnfinishedPlayersDuringProgrammingPhase()
@@ -1491,7 +1477,6 @@ public class GameMode {
             continue;
         }
 
-        return;
     }
 
     /**
@@ -1515,7 +1500,6 @@ public class GameMode {
     public void removePlayer(final int playerID)
     {
         l.error("Removing player with ID {} from game. Not implemented yet.", playerID);
-        return;
     }
 
     public void onClose() throws InterruptedException
@@ -1536,7 +1520,6 @@ public class GameMode {
 
         l.debug("Game Mode of Session [{}] closed successfully.", this.getSession().getSessionID());
 
-        return;
     }
 
     // region Getters and Setters
@@ -1636,7 +1619,6 @@ public class GameMode {
             this.handleNewPhase(EGamePhase.UPGRADE);
             this.activationPhaseThread = null;
 
-            return;
         });
 
         t.setName(String.format("PhaseIIIService-%s", this.getSession().getSessionID()));
@@ -1695,7 +1677,6 @@ public class GameMode {
 
         l.debug("Upgrade Phase priorities determined: {}.", this.upgradePhasePlayersSortedByPriority);
 
-        return;
     }
 
     private boolean isUpgradeShopRightSize()
