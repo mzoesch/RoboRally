@@ -208,7 +208,7 @@ public final class SceneController
                 l.fatal(ste.toString());
                 continue;
             }
-            GameInstance.kill();
+            GameInstance.kill(GameInstance.EXIT_FATAL);
             return;
         }
 
