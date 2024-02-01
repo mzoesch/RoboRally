@@ -249,6 +249,8 @@ public final class GameJFXController
         EClientInformation.INSTANCE.setQuickTipCreated(true);
 
         final Label     l       = new Label("Quick Tips:");
+        final Label     lEKey   = new Label("H:");
+        final Label     lEDesc  = new Label("Shows this help.");
         final Label     lQKey   = new Label("Q:");
         final Label     lQDesc  = new Label("To toggle the footer.");
         final Label     lZKey   = new Label("W/S:");
@@ -262,6 +264,8 @@ public final class GameJFXController
 
         l.getStyleClass().add("text-base");
         l.setStyle("-fx-underline: true;");
+        lEKey   .getStyleClass().add(   "text-base" );
+        lEDesc  .getStyleClass().add(   "text-base" );
         lQKey   .getStyleClass().add(   "text-base" );
         lQDesc  .getStyleClass().add(   "text-base" );
         lZKey   .getStyleClass().add(   "text-base" );
@@ -273,10 +277,10 @@ public final class GameJFXController
         lCKey   .getStyleClass().add(   "text-base" );
         lCDesc  .getStyleClass().add(   "text-base" );
 
-        final VBox      hKey        = new VBox( lQKey, lZKey, lVKey, lHKey, lCKey       );
-        final VBox      hDesc       = new VBox( lQDesc, lZDesc, lVDesc, lHDesc, lCDesc  );
-        final HBox      list        = new HBox( hKey, hDesc                             );
-        final VBox      labels      = new VBox( l, list                                 );
+        final VBox      hKey        = new VBox( lEKey, lQKey, lZKey, lVKey, lHKey, lCKey        );
+        final VBox      hDesc       = new VBox( lEDesc, lQDesc, lZDesc, lVDesc, lHDesc, lCDesc  );
+        final HBox      list        = new HBox( hKey, hDesc                                     );
+        final VBox      labels      = new VBox( l, list                                         );
 
         final Button        b       = new Button("X");
         final AnchorPane    p       = new AnchorPane(labels, b);
@@ -339,6 +343,7 @@ public final class GameJFXController
 
             /* Zoom in. */
             case W:
+            {
                 if (this.tileDimensions + GameJFXController.RESIZE_AMOUNT > GameJFXController.MAX_ALLOW_ZOOM)
                 {
                     l.debug("User tried to zoom in but the zoom level is already above the max pixel threshold [{}].", this.tileDimensions);
@@ -349,9 +354,11 @@ public final class GameJFXController
                 this.renderCourse();
 
                 break;
+            }
 
             /* Zoom out. */
             case S:
+            {
                 if (this.tileDimensions - GameJFXController.RESIZE_AMOUNT < GameJFXController.MIN_ALLOW_ZOOM)
                 {
                     l.debug("User tried to zoom out but the zoom level is already below the min pixel threshold [{}].", this.tileDimensions);
@@ -362,6 +369,18 @@ public final class GameJFXController
                 this.renderCourse();
 
                 break;
+            }
+
+            /* Show Quick Tip. */
+            case H:
+            {
+                /* TODO Maybe spam protection? */
+                EClientInformation.INSTANCE.setQuickTipCreated(false);
+                this.createQuickTip();
+                break;
+
+            }
+
             }
 
             return;
