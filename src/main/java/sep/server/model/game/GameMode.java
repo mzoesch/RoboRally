@@ -1424,6 +1424,12 @@ public class GameMode {
             }
             catch (final InterruptedException e)
             {
+                if (this.gameState.isClosed())
+                {
+                    l.debug("Programming Phase Timer Service was interrupted successfully. Not executing post programming phase behavior. Cause: Session Closed.");
+                    return;
+                }
+
                 l.info("All Players have set their register cards in time. Time left [{}s].Starting next phase . . ." , ( (double) 30_000 - (System.currentTimeMillis() - startTime) ) / 1_000);
             }
 
@@ -1515,6 +1521,13 @@ public class GameMode {
             this.activationPhaseThread.interrupt();
             this.activationPhaseThread.join();
             this.activationPhaseThread = null;
+        }
+
+        if (this.programmingPhaseTimerService != null)
+        {
+            this.programmingPhaseTimerService.interrupt();
+            this.programmingPhaseTimerService.join();
+            this.programmingPhaseTimerService = null;
         }
 
         l.debug("Game Mode of Session [{}] closed successfully.", this.getSession().getSessionID());
