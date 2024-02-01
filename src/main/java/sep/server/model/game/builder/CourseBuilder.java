@@ -21,7 +21,7 @@ public class CourseBuilder {
      * Builds the corresponding course from the individual boards.
      *
      * @param courseName name of the course
-     * @return complete course as ArrayList<ArrayList<Tile>>
+     * @return complete course
      */
     public  ArrayList<ArrayList<Tile>> buildCourse(String courseName){
         switch(courseName){
