@@ -2904,7 +2904,7 @@ public final class GameJFXController
     }
 
     /** All energy spaces that currently have an active player on top will be deactivated. */
-    private void renderEnergySpaceAnimation()
+    private void renderEnergySpaceAnim()
     {
         boolean bRerender = false;
 
@@ -2995,7 +2995,7 @@ public final class GameJFXController
         }
         case ENERGY_SPACE ->
         {
-            this.renderEnergySpaceAnimation();
+            this.renderEnergySpaceAnim();
             break;
         }
 
