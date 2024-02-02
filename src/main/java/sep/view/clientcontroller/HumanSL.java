@@ -542,7 +542,7 @@ public final class HumanSL extends ServerListener
 
             if (EGameState.INSTANCE.getCurrentCheckpointLocations().get(i).id() == this.dsrp.getCheckpointMovedID())
             {
-                EGameState.INSTANCE.getCurrentCheckpointLocations().set(i, new RCheckpointMask(this.dsrp.getCoordinate(), this.dsrp.getCheckpointMovedID()));
+                EGameState.INSTANCE.getCurrentCheckpointLocations().set(i, new RCheckpointMask(this.dsrp.getCoordinate(), this.dsrp.getCheckpointMovedID(), true));
                 ViewSupervisor.updateCheckpoints();
                 return true;
             }
