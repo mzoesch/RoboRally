@@ -277,7 +277,6 @@ public class Player {
                 return c;
             }
         }
-        l.error("Card " + cardName + " not found.");
         return null;
     }
 
