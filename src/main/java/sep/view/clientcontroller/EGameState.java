@@ -347,6 +347,13 @@ public enum EGameState
     /** Only use for development. */
     public JSONObject getAssumedServerCourseRawJSON()
     {
+        if (this.currentServerCourseJSON == null)
+        {
+            l.fatal("Tried to get the assumed server course raw JSON, but it is null.");
+            GameInstance.kill(GameInstance.EXIT_FATAL);
+            return new JSONObject();
+        }
+
         return new JSONObject(String.format("{\"messageType\":\"GameStarted\",\"messageBody\":{\"gameMap\":%s}}", this.getCurrentServerCourseJSON().toString()));
     }
 
