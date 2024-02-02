@@ -17,10 +17,12 @@ import sep.view.lib.                EGamePhase;
 import sep.view.lib.                RLaserMask;
 import sep.view.lib.                EAnimation;
 import sep.view.lib.                RGearMask;
+import sep.view.lib.                RPushPanelMask;
 import sep.view.lib.                EFigure;
 import sep.view.lib.                EModifier;
 import sep.view.lib.                RCheckpointMask;
 import sep.view.lib.                RShopAction;
+import sep.view.lib.                RRotation;
 
 import javafx.application.          Platform;
 import java.util.                   ArrayList;
@@ -85,6 +87,7 @@ public final class GameJFXController
     private static final int    BLINK_DURATION                  = 800   ;
     private static final int    RCARDS_TRANSLATION_DURATION     = 130   ;
     private static final int    QUICK_TIP_DURATION              = 60_000;
+    private static final int    PUSH_PANEL_ANIMATION_DURATION   = 500   ;
 
     @FXML private AnchorPane    memorySwapContainer;
     @FXML private AnchorPane    upgradeSlotContainer;
@@ -136,6 +139,7 @@ public final class GameJFXController
     private int                                 ranks;
     private Tile[][]                            tiles;
     private final ArrayList<RGearMask>          gears;
+    private final ArrayList<RPushPanelMask>     pushPanels;
     private final ArrayList<AnchorPane>         checkpoints;
     private double                              minXTranslation;
     private double                              maxXTranslation;
@@ -169,6 +173,7 @@ public final class GameJFXController
         this.ranks                      = 0;
         this.tiles                      = null;
         this.gears                      = new ArrayList<RGearMask>();
+        this.pushPanels                 = new ArrayList<RPushPanelMask>();
         this.checkpoints                = new ArrayList<AnchorPane>();
         this.minXTranslation            = 0.0;
         this.maxXTranslation            = 0.0;
@@ -2819,6 +2824,79 @@ public final class GameJFXController
         return;
     }
 
+    private void renderPushPaneAnim()
+    {
+        if (!this.pushPanels.isEmpty())
+        {
+            l.debug("Checking {} push panels to render for register {}. ", this.pushPanels.size(), EGameState.INSTANCE.getCurrentRegister() - 1);
+        }
+
+        for (final RPushPanelMask mask : this.pushPanels)
+        {
+            if (mask == null || mask.iv() == null || mask.rot() == null)
+            {
+                continue;
+            }
+
+            l.trace("Checking push panel with registers {}.", mask.registers());
+
+            if (!mask.registers().contains(EGameState.INSTANCE.getCurrentRegister() - 1))
+            {
+                continue;
+            }
+
+            final Timeline t = new Timeline();
+
+            final KeyFrame kf;
+            if (mask.rot().rotation() == RRotation.NORTH)
+            {
+                kf   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION), new KeyValue(mask.iv().translateXProperty(),  20));
+            }
+            else if (mask.rot().rotation() == RRotation.EAST)
+            {
+                kf   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION), new KeyValue(mask.iv().translateYProperty(),  20));
+            }
+            else if (mask.rot().rotation() == RRotation.SOUTH)
+            {
+                kf   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION), new KeyValue(mask.iv().translateXProperty(), -20));
+            }
+            else
+            {
+                kf   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION), new KeyValue(mask.iv().translateYProperty(), -20));
+            }
+
+            t.getKeyFrames().add(kf);
+
+            final KeyFrame kf2;
+
+            if (mask.rot().rotation() == RRotation.NORTH)
+            {
+                kf2   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION * 2), new KeyValue(mask.iv().translateXProperty(), 0));
+            }
+            else if (mask.rot().rotation() == RRotation.EAST)
+            {
+                kf2   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION* 2), new KeyValue(mask.iv().translateYProperty(),  0));
+            }
+            else if (mask.rot().rotation() == RRotation.SOUTH)
+            {
+                kf2   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION * 2), new KeyValue(mask.iv().translateXProperty(), 0));
+            }
+            else
+            {
+                kf2   = new KeyFrame(Duration.millis(GameJFXController.PUSH_PANEL_ANIMATION_DURATION * 2), new KeyValue(mask.iv().translateYProperty(), 0));
+            }
+
+            t.getKeyFrames().add(kf2);
+
+            t.play();
+
+            continue;
+        }
+
+        return;
+
+    }
+
     /** All energy spaces that currently have an active player on top will be deactivated. */
     private void renderEnergySpaceAnimation()
     {
@@ -2886,7 +2964,7 @@ public final class GameJFXController
         }
         case PUSH_PANEL ->
         {
-            l.warn("Server requested to render push panel animation. Not implemented yet.");
+            this.renderPushPaneAnim();
             break;
         }
         case GEAR ->
