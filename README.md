@@ -170,10 +170,10 @@ To change the Session ID, type in the desired ID in the text field in the top ri
 Commands are prefixed with a `/` and are case-sensitive. `Enter` to send a message.
 
 ```
-/w "<player-name>" <message>    # Whisper to a player
-/h                              # Show all available commands
-/hide                           # Hide server infos (in game scene only)
-/show                           # Show server infos (in game scene only)
+/w "<player-name>" <message>    # Whisper to a player.
+/h                              # Show all available commands.
+/hide                           # Hide server infos (in game scene only).
+/show                           # Show server infos (in game scene only).
 ```
 
 # Documentation
