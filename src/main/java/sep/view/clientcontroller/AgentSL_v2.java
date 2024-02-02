@@ -2002,31 +2002,9 @@ public final class AgentSL_v2 extends ServerListener
 
     private void evaluateProgrammingPhaseAsync(final boolean bSetRegisterCards)
     {
-        final Thread eval = new Thread(() ->
-        {
-            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
-            {
-                if (!bSetRegisterCards)
-                {
-                    l.fatal("Agent is not allowed to set register cards, but the agent difficulty is set to RANDOM. There is no need to evaluate the programming phase.");
-                    GameInstance.kill(GameInstance.EXIT_FATAL);
-                    return;
-                }
+        final Thread eval = this.createEvaluationService(bSetRegisterCards);
 
-                this.evaluateProgrammingPhaseWithRandom();
-
-                return;
-            }
-
-            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
-            {
-                this.evaluateProgrammingPhaseWithQLearning(bSetRegisterCards);
-
-                return;
-            }
-
-            return;
-        });
+        eval.setName("EvaluationService");
 
         eval.start();
 
@@ -2558,6 +2536,35 @@ public final class AgentSL_v2 extends ServerListener
 
             return;
         });
+    }
+
+    private Thread createEvaluationService(final boolean bSetRegisterCards)
+    {
+        return new Thread(() ->
+        {
+            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.RANDOM)
+            {
+                if (!bSetRegisterCards)
+                {
+                    l.warn("Agent is not allowed to set register cards, but the agent difficulty is set to RANDOM. There is no need to evaluate the programming phase.");
+                    return;
+                }
+
+                this.evaluateProgrammingPhaseWithRandom();
+
+                return;
+            }
+
+            if (EClientInformation.INSTANCE.getAgentDifficulty() == EAgentDifficulty.QLEARNING)
+            {
+                this.evaluateProgrammingPhaseWithQLearning(bSetRegisterCards);
+
+                return;
+            }
+
+            return;
+        });
+
     }
 
     // endregion Getters and Setters
