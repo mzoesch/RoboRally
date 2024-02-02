@@ -341,7 +341,7 @@ public final class Launcher
             l.info("");
             l.info("##################### CLIENT HELP #####################");
             l.info("Valid view program arguments in descending order of precedence.");
-            l.info("Usage: java -cp {} sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]", f);
+            l.info("Usage: java -cp {} sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--difficulty DIFFICULTY] [--allowLegacyAgents] [--help]", f);
             l.info("  --dev                         Start mock game view (if also started with the [--isAgent] flag, the agent mock view will be called instead).");
             l.info("  --isAgent                     Start agent view.");
             l.info("  --addr <ADDR>                 The address to auto connect to (if [--isAgent] flag is set). Default is {}.", EArgs.PREF_SERVER_IP);
