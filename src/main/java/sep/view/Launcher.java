@@ -291,7 +291,7 @@ public final class Launcher
             {
                 l.info("##################### CLIENT HELP #####################");
                 l.info("Valid view program arguments in descending order of precedence.");
-                l.info("Usage: java -cp {} sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--allowLegacyAgents] [--help]", Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath().lastIndexOf("/") + 1));
+                l.info("Usage: java -cp {} sep.view.Launcher [--dev] [--isAgent] [--addr ADDR] [--port PORT] [--sid SID] [--name NAME] [--difficulty DIFFICULTY] [--allowLegacyAgents] [--help]", Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath().substring(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath().lastIndexOf("/") + 1));
                 l.info("  --dev                         Start mock game view (if also started with the [--isAgent] flag, the agent mock view will be called instead).");
                 l.info("  --isAgent                     Start agent view.");
                 l.info("  --addr <ADDR>                 The address to auto connect to (if [--isAgent] flag is set). Default is {}.", sep.EArgs.PREF_SERVER_IP);
