@@ -2479,6 +2479,7 @@ public final class GameJFXController
     {
         this.courseScrollPaneContent.getChildren().clear();
         this.gears.clear();
+        this.pushPanels.clear();
 
         if (EGameState.INSTANCE.getCurrentServerCourseJSON() == null)
         {
