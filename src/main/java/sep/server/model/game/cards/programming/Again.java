@@ -29,11 +29,14 @@ public class Again extends AProgrammingCard implements IPlayableCard {
     @Override
     public void playCard(Player player, int currentRoundNumber) {
         if (currentRoundNumber == 0) {
+            l.warn("Player {} played Again card in the first round, ignoring the card.", player.getController().getPlayerID());
             return;
         }
 
         IPlayableCard[] registers = player.getRegisters();
         IPlayableCard previousRoundCard = registers[currentRoundNumber];
+
+        l.debug("Player {} played Again card, repeating the action of the previous round's card: {}", player.getController().getPlayerID(), previousRoundCard.getCardType());
 
         if (previousRoundCard instanceof ADamageCard) {
             handleDamageCard(player, currentRoundNumber);
