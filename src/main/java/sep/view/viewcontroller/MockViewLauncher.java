@@ -1002,11 +1002,35 @@ public final class MockViewLauncher implements IMockView
             }
             EGameState.INSTANCE.setCurrentPlayer(0, false);
 
-            for (int i = 0; i < 5; i++)
-            {
-                EGameState.INSTANCE.addRCardsToRemotes(new RRegisterCard[]{new RRegisterCard(0, "MoveI"), new RRegisterCard(1, "MoveII"), new RRegisterCard(2, "MoveIII"), new RRegisterCard(3, "Again"), new RRegisterCard(4, "UTurn"), new RRegisterCard(5, "PowerUp"), });
-                continue;
-            }
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getPlayerRCardsInMockOnly().add("MoveI");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getPlayerRCardsInMockOnly().add("MoveII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getPlayerRCardsInMockOnly().add("MoveIII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getPlayerRCardsInMockOnly().add("PowerUp");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(0)).getPlayerRCardsInMockOnly().add("Again");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getPlayerRCardsInMockOnly().add("MoveI");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getPlayerRCardsInMockOnly().add("MoveII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getPlayerRCardsInMockOnly().add("MoveIII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getPlayerRCardsInMockOnly().add("PowerUp");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(2)).getPlayerRCardsInMockOnly().add("Again");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getPlayerRCardsInMockOnly().add("MoveI");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getPlayerRCardsInMockOnly().add("MoveII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getPlayerRCardsInMockOnly().add("MoveIII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getPlayerRCardsInMockOnly().add("PowerUp");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(4)).getPlayerRCardsInMockOnly().add("Again");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(1)).getPlayerRCardsInMockOnly().add("MoveI");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(1)).getPlayerRCardsInMockOnly().add("MoveII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(1)).getPlayerRCardsInMockOnly().add("MoveIII");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getPlayerRCardsInMockOnly().add("MoveI");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(3)).getPlayerRCardsInMockOnly().add("MoveII");
+
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getPlayerRCardsInMockOnly().add("MoveI");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getPlayerRCardsInMockOnly().add("MoveII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getPlayerRCardsInMockOnly().add("MoveIII");
+            Objects.requireNonNull(EGameState.INSTANCE.getRemotePlayerByPlayerID(5)).getPlayerRCardsInMockOnly().add("PowerUp");
 
             EClientInformation.INSTANCE.setPlayerID(0);
 

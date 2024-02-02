@@ -179,6 +179,11 @@ public sealed class RemotePlayer permits AgentRemotePlayerData
         return;
     }
 
+    public ArrayList<String> getPlayerRCardsInMockOnly()
+    {
+        return this.playedRCards;
+    }
+
     public String[] getPlayedRCards()
     {
         return this.playedRCards.toArray(new String[0]);
