@@ -1869,8 +1869,12 @@ public final class AgentSL_v2 extends ServerListener
 {
     private static final Logger l = LogManager.getLogger(AgentSL_v2.class);
 
-    private Thread  qualityLearningService;
-    private Thread  registerCardBroadcastService;
+    private Thread                      qualityLearningService;
+    private Thread                      registerCardBroadcastService;
+
+    private final ArrayList<String>     upgradeShop;
+    private final ArrayList<String>     selfUpgrades;
+
 
     public AgentSL_v2(final BufferedReader br)
     {
@@ -1878,6 +1882,9 @@ public final class AgentSL_v2 extends ServerListener
 
         this.qualityLearningService         = null;
         this.registerCardBroadcastService   = null;
+
+        this.upgradeShop                    = new ArrayList<String>();
+        this.selfUpgrades                   = new ArrayList<String>();
 
         return;
     }
@@ -2165,8 +2172,59 @@ public final class AgentSL_v2 extends ServerListener
                 return true;
             }
 
-            l.error("Agent {} was notified to buy an upgrade. But this is not implemented yet. Sending Mock JSON.", EClientInformation.INSTANCE.getPlayerID());
-            new BuyUpgradeModel(false, null).send();
+            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() < 2)
+            {
+                l.info("Agent {} was notified to buy an upgrade. But he does not have enough energy.", EClientInformation.INSTANCE.getPlayerID());
+                return true;
+            }
+
+            new Thread(() ->
+            {
+                try
+                {
+                    Thread.sleep(1000);
+                }
+                catch (final InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+
+                if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() >= 2 && this.upgradeShop.contains("RearLaser"))
+                {
+                    l.info("Agent {} was notified to buy an upgrade. Decided to buy Rear Laser.", EClientInformation.INSTANCE.getPlayerID());
+                    new BuyUpgradeModel(true, "RearLaser").send();
+                    return;
+                }
+
+                if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() >= 1 && this.upgradeShop.contains("MemorySwap"))
+                {
+                    l.info("Agent {} was notified to buy an upgrade. Decided to buy Memory Swap.", EClientInformation.INSTANCE.getPlayerID());
+                    new BuyUpgradeModel(true, "MemorySwap").send();
+                    return;
+                }
+
+                if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() >= 3 && this.upgradeShop.contains("SpamBlocker"))
+                {
+                    l.info("Agent {} was notified to buy an upgrade. Decided to buy Spam Blocker.", EClientInformation.INSTANCE.getPlayerID());
+                    new BuyUpgradeModel(true, "SpamBlocker").send();
+                    return;
+                }
+
+                if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() >= 3 && this.upgradeShop.contains("AdminPrivilege"))
+                {
+                    l.info("Agent {} was notified to buy an upgrade. Decided to buy Admin Privilege.", EClientInformation.INSTANCE.getPlayerID());
+                    new BuyUpgradeModel(true, "AdminPrivilege").send();
+                    return;
+                }
+
+                l.info("Agent {} was notified to buy an upgrade. But could not decide what to buy. The upgrade shop {}. The energy {}.", EClientInformation.INSTANCE.getPlayerID(), this.upgradeShop, Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy());
+
+                new BuyUpgradeModel(false, null).send();
+
+                return;
+            })
+                    .start();
+
             return true;
         }
 
@@ -2371,19 +2429,35 @@ public final class AgentSL_v2 extends ServerListener
     @Override
     protected boolean onExchangeShop() throws JSONException
     {
-        return false;
+        l.debug("Upgrade shop was exchanged with the following cards: {}.", String.join(", ", Arrays.asList(this.dsrp.getExchangeShopCards())));
+
+        this.upgradeShop.clear();
+        this.upgradeShop.addAll(Arrays.asList(this.dsrp.getExchangeShopCards()));
+
+        return true;
     }
 
     @Override
     protected boolean onRefillShop() throws JSONException
     {
-        return false;
+        l.debug("Upgrade shop was refilled with the following cards: {}.", String.join(", ", Arrays.asList(this.dsrp.getRefillShopCards())));
+        this.upgradeShop.addAll(Arrays.asList(this.dsrp.getRefillShopCards()));
+        return true;
     }
 
     @Override
     protected boolean onUpgradeBought() throws JSONException
     {
-        /* Ignored on purpose. */
+        l.debug("Player {} has bought an upgrade: {}.", this.dsrp.getPlayerID(), this.dsrp.getCard());
+
+        this.upgradeShop.remove(this.dsrp.getCard());
+
+        if (this.dsrp.getPlayerID() == EClientInformation.INSTANCE.getPlayerID())
+        {
+            this.selfUpgrades.add(this.dsrp.getCard());
+            l.info("Agent {} has bought an upgrade: {}. The new bought cards are: {}.", EClientInformation.INSTANCE.getPlayerID(), this.dsrp.getCard(), this.selfUpgrades.toString());
+        }
+
         return true;
     }
 
