@@ -1,10 +1,11 @@
 package sep.view.viewcontroller;
 
-import sep.view.lib.    EModifier;
-import sep.view.lib.    ERotation;
-import sep.view.lib.    RLaserMask;
-import sep.view.lib.    RCheckpointMask;
-import sep.view.lib.    RCoordinate;
+import sep.view.lib.                EModifier;
+import sep.view.lib.                ERotation;
+import sep.view.lib.                RLaserMask;
+import sep.view.lib.                RCheckpointMask;
+import sep.view.lib.                RCoordinate;
+import sep.view.clientcontroller.   EGameState;
 
 import org.json.            JSONArray;
 import javafx.scene.image.  Image;
@@ -95,6 +96,15 @@ public final class Tile
                 images.add(null);
 
                 continue;
+            }
+
+            if (Objects.equals(this.getModifier(i).getType(), EModifier.ENERGY_SPACE.toString()))
+            {
+                if (EGameState.INSTANCE.isEnergySpaceDeactivated(new RCoordinate(this.xTranslation, this.yTranslation)))
+                {
+                    images.add(TileModifier.loadCachedImage("EnergySpaceInactive"));
+                    continue;
+                }
             }
 
             images.add(this.getModifier(i).loadCachedImage());
@@ -304,6 +314,12 @@ public final class Tile
         }
 
         return -1;
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.tile.toString(0);
     }
 
     // endregion Getters and Setters
