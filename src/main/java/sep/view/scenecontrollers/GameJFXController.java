@@ -2519,14 +2519,14 @@ public final class GameJFXController
                     }
                 }
 
-                final AnchorPane AP     = new AnchorPane();
+                final AnchorPane tileAnchor     = new AnchorPane();
                 /* Warning: This is not commutative. Do not change the order here. */
                 for (int k = t.getImageViews().length - 1; k >= 0; --k)
                 {
                     final ImageView iv = t.getImageViews()[k];
                     iv.setFitHeight(    this.tileDimensions );
                     iv.setFitWidth(     this.tileDimensions );
-                    AP.getChildren().add(iv);
+                    tileAnchor.getChildren().add(iv);
 
                     if (TileModifier.isGear(iv.getImage()))
                     {
@@ -2535,7 +2535,7 @@ public final class GameJFXController
 
                     continue;
                 }
-                this.renderOnPosition(AP, t.getTileLocation());
+                this.renderOnPosition(tileAnchor, t.getTileLocation());
 
                 if (t.isClickable() && EGameState.INSTANCE.getCurrentPhase() == EGamePhase.REGISTRATION && EGameState.INSTANCE.getCurrentPlayer().getPlayerID() == Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getPlayerID())
                 {
@@ -2560,7 +2560,7 @@ public final class GameJFXController
                         continue;
                     }
 
-                    AP.setOnMouseClicked(e ->
+                    tileAnchor.setOnMouseClicked(e ->
                     {
                         l.info("User clicked on tile. Checking if valid move.");
 
@@ -2617,7 +2617,7 @@ public final class GameJFXController
                     ap.setOnMouseEntered(   e ->    ft.stop()   );
                     ap.setOnMouseExited(    e ->    ft.play()   );
 
-                    AP.getChildren().add(ap);
+                    tileAnchor.getChildren().add(ap);
                 }
 
                 continue;
