@@ -2467,7 +2467,8 @@ public final class GameJFXController
      *
      * <p>It will render everything that is static on the course board.
      *
-     * <p>You will have to re-render movable parts of the course view after this method (like player positions).
+     * <p>You will have to re-render movable parts of the
+     *    course view after this method (like player positions, checkpoints, etc.).
      */
     private void renderCourseBoard()
     {
@@ -2489,7 +2490,7 @@ public final class GameJFXController
             {
                 final Tile t            = this.tiles[i][j];
 
-                /* Check for checkpoints and add them. */
+                /* We render checkpoints only dynamically if they can move. */
                 if (t.hasModifier(EModifier.CHECK_POINT))
                 {
                     if (t.getCheckpointID() == -1)
@@ -2514,7 +2515,7 @@ public final class GameJFXController
                     if (bAddToArray)
                     {
                         l.info("Found checkpoint {} on state {}.", t.getCheckpointID(), t.getTileLocation());
-                        Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).add(new RCheckpointMask(t.getTileLocation(), t.getCheckpointID()));
+                        Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()).add(new RCheckpointMask(t.getTileLocation(), t.getCheckpointID(), t.hasModifier(EModifier.CONVEYOR_BELT)));
                     }
                 }
 
