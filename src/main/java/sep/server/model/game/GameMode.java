@@ -1525,7 +1525,7 @@ public class GameMode {
 
         IPlayableCard topCardFromDiscardPile = player.getPlayerDeck().get(0);
         String newCard = ((Card) topCardFromDiscardPile).getCardType();
-        player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile);
+        player.setCardInRegister(currentRegisterIndex, topCardFromDiscardPile, false);
 
         this.getSession().broadcastReplacedCard(player.getController().getPlayerID(), currentRegisterIndex, newCard);
     }
