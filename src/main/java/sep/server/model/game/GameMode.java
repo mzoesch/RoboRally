@@ -1190,24 +1190,41 @@ public class GameMode {
      * they receive an energy cube, and sends the corresponding JSON messages.
      */
     private void checkEnergySpaces() {
-        for(Player player : players) {
+        for (Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
-            for (FieldType fieldType : currentTile.getFieldTypes()) {
-                if(fieldType instanceof EnergySpace energySpace) {
-                    int availableEnergy = energySpace.getAvailableEnergy();
-                    int currentEnergy = player.getEnergyCollected();
-                    if(currentRegisterIndex == 4) {
-                        if(energyBank > 0) {
-                            player.setEnergyCollected(currentEnergy + 1);
-                            energyBank -= 1;
-                        }
-                    } else if(availableEnergy > 0) {
-                        player.setEnergyCollected(currentEnergy + 1);
+            for (FieldType fieldType : currentTile.getFieldTypes())
+            {
+                if (fieldType instanceof final EnergySpace energySpace)
+                {
+                    if (energySpace.getAvailableEnergy() > 0)
+                    {
+                        l.debug("Player {} is on energy space {} with {} available energy and receives an energy cube.", player.getController().getPlayerID(), energySpace.getAvailableEnergy(), currentTile.getCoordinate());
+
+                        energySpace.setAvailableEnergy(energySpace.getAvailableEnergy() - 1);
+                        player.setEnergyCollected(player.getEnergyCollected() + 1);
+
+                        this.getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), player.getEnergyCollected(), "EnergySpace");
+
+                        this.getSession().broadcastAnimation(EAnimation.ENERGY_SPACE);
+
+                        continue;
                     }
 
-                    this.getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), player.getEnergyCollected(), "EnergySpace");
+                    // If the player lands on an empty energy space at the end of the 5. register.
+                    // They pick up an energy cube from the bank.
+                    if (this.currentRegisterIndex == 4)
+                    {
+                        l.debug("Player {} is on an empty energy space at the end of the 5. register. They receive an energy cube.", player.getController().getPlayerID());
 
+                        player.setEnergyCollected(player.getEnergyCollected() + 1);
+
+                        this.getSession().broadcastEnergyUpdate(player.getController().getPlayerID(), player.getEnergyCollected(), "EnergySpace");
+
+                        continue;
+                    }
+
+                    continue;
                 }
             }
         }
@@ -1288,7 +1305,6 @@ public class GameMode {
     private boolean runActivationPhase() throws InterruptedException
     {
         l.debug("Starting register phase {}.", this.currentRegisterIndex + 1);
-
 
         this.determinePriorities();
         this.sortPlayersByPriorityInDesc();

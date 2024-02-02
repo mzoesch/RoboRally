@@ -21,4 +21,11 @@ public class EnergySpace implements FieldType {
         fieldInfo.put("type","EnergySpace");
         return fieldInfo;
     }
+
+    public void setAvailableEnergy(final int energy)
+    {
+        this.availableEnergy = energy;
+        return;
+    }
+
 }
