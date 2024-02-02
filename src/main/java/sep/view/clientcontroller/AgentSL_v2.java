@@ -333,7 +333,7 @@ enum EEnvironment implements ICourse
                     if (course[file][rank].isCheckpoint())
                     {
                         EEnvironment.INSTANCE.goals.add(new RCheckpointMask(course[file][rank].getLocation(), course[file][rank].getCheckpointCount()));
-                        l.info("Found goal {} at state {}.", EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).location(), EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).count());
+                        l.info("Found goal {} at state {}.", EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).count(), EEnvironment.INSTANCE.goals.get(EEnvironment.INSTANCE.goals.size() - 1).location());
                     }
 
                     continue;
