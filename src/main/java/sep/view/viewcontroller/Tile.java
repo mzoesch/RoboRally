@@ -322,6 +322,21 @@ public final class Tile
         return this.tile.toString(0);
     }
 
+    public ArrayList<Integer> getPushPanelRegisters()
+    {
+        for (int i = 0; i < this.getModifierSize(); i++)
+        {
+            if (Objects.equals(this.getModifier(i).getType(), EModifier.PUSH_PANEL.toString()))
+            {
+                return this.getModifier(i).getPushPanelRegisters();
+            }
+
+            continue;
+        }
+
+        return new ArrayList<Integer>();
+    }
+
     // endregion Getters and Setters
 
 }
