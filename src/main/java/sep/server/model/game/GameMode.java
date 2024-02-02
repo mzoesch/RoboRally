@@ -942,6 +942,8 @@ public class GameMode {
      * The robot is moved to the next field in the direction of the panel's pushOrientation.
      */
     private void activatePushPanels() {
+        this.getSession().broadcastAnimation(EAnimation.PUSH_PANEL);
+
         for(Player player : players) {
             Tile currentTile = player.getPlayerRobot().getCurrentTile();
 
