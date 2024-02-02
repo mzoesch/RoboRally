@@ -76,21 +76,41 @@ public final class Tile
     {
         final ArrayList<Image>      images      = new ArrayList<Image>();
         final ArrayList<ImageView>  imageViews  = new ArrayList<ImageView>();
+        /* Images that are always rendered first, but before the background. Warning: These images cannot be rotated. */
+        final ArrayList<Image>      renderFirst  = new ArrayList<Image>();
 
-        for (int i = 0; i < this.tile.length(); i++)
+        for (int i = 0; i < this.tile.length(); ++i)
         {
             /* Checkpoints are rendered dynamically because they are not static. */
-            if (hasModifier(EModifier.CHECK_POINT))
+            if (Objects.equals(this.getModifier(i).getType(), EModifier.CHECK_POINT.toString()))
             {
+                /* Moving checkpoints are rendered desperately as they are not static. */
+                if (this.hasModifier(EModifier.CONVEYOR_BELT))
+                {
+                    images.add(null);
+                    continue;
+                }
+
+                renderFirst.add(this.getModifier(i).loadCachedImage());
+                images.add(null);
+
                 continue;
             }
 
             images.add(this.getModifier(i).loadCachedImage());
+
             continue;
         }
 
-        for (int i = 0; i < images.size(); i++)
+        images.addAll(renderFirst);
+
+        for (int i = 0; i < images.size(); ++i)
         {
+            if (images.get(i) == null)
+            {
+                continue;
+            }
+
             final ImageView iv = new ImageView();
             iv.getStyleClass().add("tile-image");
             iv.setPreserveRatio(true);
@@ -98,12 +118,17 @@ public final class Tile
             iv.setCache(true);
             iv.setImage(images.get(i));
 
-            this.getModifier(i).rotateImage(iv);
+            if (i < this.getModifierSize())
+            {
+                this.getModifier(i).rotateImage(iv);
+            }
 
             imageViews.add(iv);
 
             continue;
         }
+
+        renderFirst.clear();
 
         /* Background */
         if (!Objects.equals(this.getModifier(0).getType(), EModifier.EMPTY.toString()))
