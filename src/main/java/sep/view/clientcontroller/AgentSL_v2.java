@@ -51,6 +51,10 @@ final class TileModifier
         return this.modifier.getInt("count");
     }
 
+    public boolean isWall()
+    {
+        return Objects.equals(this.modifier.getString("type"), "Wall");
+    }
 }
 
 final class Tile
@@ -136,14 +140,28 @@ final class Tile
         return false;
     }
 
-    public String getWallOrientation() {
-        if(this.hasWall()) {
-            for (int i = 0; i < this.tile.length(); ++i) {
-                if(this.getModifier(i).getFirstWallOrientation() != null) {
-                    return this.getModifier(i).getFirstWallOrientation();
-                }
-            }
+    public String getWallOrientation()
+    {
+        if (!this.hasWall())
+        {
+            return null;
         }
+
+        for (int i = 0; i < this.tile.length(); ++i)
+        {
+            if (!this.getModifier(i).isWall())
+            {
+                continue;
+            }
+
+            if (this.getModifier(i).getFirstWallOrientation() == null)
+            {
+                continue;
+            }
+
+            return this.getModifier(i).getFirstWallOrientation();
+        }
+
         return null;
     }
 
@@ -202,6 +220,13 @@ final class Tile
 
         return Objects.equals(this.coordinate, otherTile.coordinate);
     }
+
+    @Override
+    public String toString()
+    {
+        return this.getJSON().toString(0);
+    }
+
 }
 
 interface ICourse
