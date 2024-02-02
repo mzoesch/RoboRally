@@ -258,7 +258,7 @@ public class Player {
 
         if(!playerDeck.isEmpty()) {
             IPlayableCard newCardFromDeck = playerDeck.remove(0);
-            setCardInRegister(currentRoundNumber, newCardFromDeck);
+            setCardInRegister(currentRoundNumber, newCardFromDeck, false);
 
             if (newCardFromDeck != null) {
                 newCardFromDeck.playCard(this, currentRoundNumber);
@@ -339,13 +339,21 @@ public class Player {
     }
 
 
-    public void setCardInRegister(final int idx, final IPlayableCard newCard) {
+    public void setCardInRegister(final int idx, final IPlayableCard newCard, boolean bOverrideNullSafe) {
         if (this.registers[idx] != null) {
             this.discardPile.add(this.registers[idx]);
         }
         if(newCard != null) {
             this.registers[idx] = newCard;
         } else {
+
+            if (bOverrideNullSafe)
+            {
+                l.debug("Card set to register is null. But override is enabled.");
+                this.registers[idx] = null;
+                return;
+            }
+
             l.error("Card set to register is null");
         }
     }

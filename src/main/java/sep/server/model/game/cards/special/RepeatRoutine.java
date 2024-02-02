@@ -60,7 +60,7 @@ public class RepeatRoutine extends ASpecialProgrammingCard implements IPlayableC
         }
 
         IPlayableCard drawnCard = player.getPlayerDeck().remove(0);
-        player.setCardInRegister(currentRoundNumber-1, drawnCard);
+        player.setCardInRegister(currentRoundNumber-1, drawnCard, false);
         drawnCard.playCard(player, currentRoundNumber - 1);
     }
 
