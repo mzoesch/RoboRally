@@ -930,8 +930,13 @@ enum EEnvironment implements ICourse
 
     public void setRegisterCardsBasedOnExploredKnowledge()
     {
-        final AgentRemotePlayerData agent   = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
-        RCoordinate predictedState          = agent.getLocation();
+        if (EClientInformation.INSTANCE.isMockView())
+        {
+            l.info("The agent can choose between these cards: {}.", EGameState.INSTANCE.getGotRegisters().toString());
+        }
+
+        final AgentRemotePlayerData     agent               = (AgentRemotePlayerData) Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer());
+        RCoordinate                     predictedState      = agent.getLocation();
 
         int oldIterationI = -1;
 
@@ -1683,7 +1688,7 @@ enum EEnvironment implements ICourse
             }
 
             final String        direction;
-            final RCoordinate   actionState = RCoordinate.fromIndex(targetState, this.getFiles());
+            final RCoordinate   actionState     = RCoordinate.fromIndex(targetState, this.getFiles());
 
             if (state.x() == actionState.x() && state.y() == actionState.y() - 1)
             {
@@ -2030,6 +2035,16 @@ public final class AgentSL_v2 extends ServerListener
             try
             {
                 eval.join();
+
+                if (this.qualityLearningService != null && this.qualityLearningService.isAlive())
+                {
+                    this.qualityLearningService.join();
+                }
+
+                if (this.registerCardBroadcastService != null && this.registerCardBroadcastService.isAlive())
+                {
+                    this.registerCardBroadcastService.join();
+                }
             }
             catch (final InterruptedException e)
             {
