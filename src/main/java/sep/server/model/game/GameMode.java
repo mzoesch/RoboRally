@@ -558,43 +558,64 @@ public class GameMode {
     /**
      * The following method triggers the programming phase and prepares the player decks.
      */
-    private void triggerProgrammingPhase() {
-        for (Player p : players) {
+    private void triggerProgrammingPhase()
+    {
+        for (final Player p : this.players)
+        {
             p.clearOldHand();
             p.clearOldRegister();
 
             int maxCards = Math.min(GameMode.NEW_PROGRAMMING_CARDS, p.getPlayerDeck().size());
 
-            for (int i = 0; i < maxCards; i++) {
-                p.getPlayerHand().add(p.getPlayerDeck().remove(0));
-            }
+            for (int i = 0; i < 9; ++i)
+            {
+                while (true)
+                {
+                    if (p.getPlayerDeck().isEmpty())
+                    {
+                        l.debug("Player {} has no cards in their deck. Refilling it.", p.getController().getPlayerID());
+                        p.shuffleAndRefillDeck();
+                        this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
+                        continue;
+                    }
 
-            p.shuffleAndRefillDeck();
-            l.debug("Client {}'s deck is being shuffled and refilled.", p.getController().getPlayerID());
-            this.getSession().sendShuffleCodingNotification(p.getController().getPlayerID());
+                    if (p.getPlayerDeck().get(0) == null)
+                    {
+                        p.getPlayerDeck().remove(0);
+                        l.warn("Player {} has a null card in their deck. Removing it. The new deck: {}.", p.getController().getPlayerID(), p.getPlayerDeck().toString());
+                        continue;
+                    }
 
-            int remainingCards = 9 - maxCards;
-            for (int i = 0; i < remainingCards; i++) {
+                    break;
+                }
+
                 p.getPlayerHand().add(p.getPlayerDeck().remove(0));
+
+                continue;
             }
 
             l.debug("Client {} has following programming cards in his Hand: {}", p.getController().getPlayerID(), Arrays.toString(p.getPlayerHandAsStringArray()));
 
-            if (p.getController() instanceof PlayerController pc) {
+            if (p.getController() instanceof final PlayerController pc)
+            {
                 pc.getSession().sendHandCardsToPlayer(pc, p.getPlayerHandAsStringArray());
                 continue;
             }
 
-            if (p.getController() instanceof final Agent a) {
+            if (p.getController() instanceof final Agent a)
+            {
                 a.evaluateProgrammingPhase();
                 continue;
             }
 
             l.error("No matching instance found for handling the programming phase for player {}.", p.getController().getPlayerID());
+
             continue;
         }
 
         l.debug("Programming Phase started. All remote controllers have received their cards. Waiting for them to set their cards . . .");
+
+        return;
     }
 
     // region Activation Phase Helpers
