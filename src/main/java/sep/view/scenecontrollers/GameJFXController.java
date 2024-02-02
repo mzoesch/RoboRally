@@ -3011,6 +3011,10 @@ public final class GameJFXController
         Platform.runLater(() ->
         {
             this.renderCheckpoints();
+
+            /* So that the players are rendered on top of the checkpoints. */
+            this.renderPlayerTransforms();
+
             return;
         });
 
