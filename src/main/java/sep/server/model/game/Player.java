@@ -105,7 +105,7 @@ public class Player {
             {
                 pc.getSession().sendCardSelected(this.ctrl.getPlayerID(), pos, false);
             }
-            l.debug("Player {} has removed card from register {}.", this.ctrl.getPlayerID(), pos);
+            l.debug("Player {} has removed card from register {}. Their new registers are: {}.", this.ctrl.getPlayerID(), pos, Arrays.toString(this.registers));
             return;
         }
 
@@ -115,7 +115,7 @@ public class Player {
             pc.getSession().sendCardSelected(getController().getPlayerID(), pos, true);
         }
 
-        l.debug("Player {} has added card {} to register {}.", this.ctrl.getPlayerID(), this.registers[pos], pos);
+        l.debug("Player {} has added card {} to register {}. Their new registers are: {}.", this.ctrl.getPlayerID(), this.registers[pos], pos, Arrays.toString(this.registers));
 
         l.debug("Checking if player {} has finished programming. Their current registers are: {}.", this.ctrl.getPlayerID(), this.registers);
         if (this.hasPlayerFinishedProgramming())
