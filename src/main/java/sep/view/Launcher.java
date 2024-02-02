@@ -24,19 +24,23 @@ public final class Launcher
      *
      * @param args Valid program arguments in descending order of precedence:
      *             <ul>
-     *              <li>[--dev]                 - Start mock game view (if also started with the [--isAgent] flag, the
-     *                                            agent mock view will be called instead).
-     *              <li>[--isAgent]             - Start agent view.
-     *              <li>[--addr ADDR]           - The address to auto connect to (if [--isAgent] flag is set). Default is
-     *                                            {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
-     *              <li>[--port PORT]           - The port number to auto connect to (if [--isAgent] flag is set). Default is
-     *                                            {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
-     *              <li>[--sid SID]             - The session ID to auto connect to (if [--isAgent] flag is set). Default is
-     *                                            {@link sep.Types.EProps#DESCRIPTION EProps.DESCRIPTION}.
-     *              <li>[--name NAME]           - The name of the agent (if [--isAgent] flag is set).
-     *              <li>[--allowLegacyAgents]   - Allow legacy agent logic to be displayed in the client Graphical User
-     *                                            Interface (the deprecated server agent logic will be used).
-     *              <li>[--help]                - Print view help message.
+     *              <li>[--dev]                     - Start mock game view (if also started with the [--isAgent] flag, the
+     *                                                agent mock view will be called instead).
+     *              <li>[--isAgent]                 - Start agent view.
+     *              <li>[--addr ADDR]               - The address to auto connect to (if [--isAgent] flag is set). Default is
+     *                                                {@link sep.EArgs#PREF_SERVER_IP EArgs.PREF_SERVER_IP}.
+     *              <li>[--port PORT]               - The port number to auto connect to (if [--isAgent] flag is set). Default is
+     *                                                {@link sep.EArgs#PREF_SERVER_PORT EArgs.PREF_SERVER_PORT}.
+     *              <li>[--sid SID]                 - The session ID to auto connect to (if [--isAgent] flag is set). Default is
+     *                                                {@link sep.Types.EProps#DESCRIPTION EProps.DESCRIPTION}.
+     *              <li>[--name NAME]               - The name of the agent (if [--isAgent] flag is set).
+     *              <li>[--difficulty DIFFICULTY]   - The difficulty of the agent (if [--isAgent] flag is set)
+     *                                                (0 = Random, 1 = Q-Learning). Default is
+     *                                                {@link sep.view.clientcontroller.EClientInformation#DEFAULT_AGENT_DIFFICULTY
+     *                                                EClientInformation.DEFAULT_AGENT_DIFFICULTY}.
+     *              <li>[--allowLegacyAgents]       - Allow legacy agent logic to be displayed in the client Graphical User
+     *                                                Interface (the deprecated server agent logic will be used).
+     *              <li>[--help]                    - Print view help message.
      *             </ul>
      */
     public static void main(String[] args)
@@ -55,6 +59,48 @@ public final class Launcher
                     l.info("Command line argument [--isAgent] detected. Starting in Agent Mock View Mode.");
 
                     EClientInformation.INSTANCE.setIsAgent(true);
+
+                    if (Arrays.asList(args).contains("--difficulty"))
+                    {
+                        l.info("Command line argument [--difficulty] detected.");
+
+                        if (Arrays.asList(args).indexOf("--difficulty") + 1 < args.length)
+                        {
+                            final int d;
+                            try
+                            {
+                                d = Integer.parseInt(args[Arrays.asList(args).indexOf("--difficulty") + 1]);
+                            }
+                            catch (final NumberFormatException e)
+                            {
+                                l.fatal("Invalid difficulty for agent mock view..");
+                                l.fatal(e.getMessage());
+                                l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                                System.exit(sep.EArgs.ERR);
+                                return;
+                            }
+
+                            if (d < 0 || d > 1)
+                            {
+                                l.fatal("Invalid difficulty for agent mock view. Must be between {} and {}.", 0, 1);
+                                l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                                System.exit(sep.EArgs.ERR);
+                                return;
+                            }
+
+                            l.info("Setting agent difficulty to {}.", d);
+                            EClientInformation.INSTANCE.setAgentDifficulty(EAgentDifficulty.fromInt(d));
+                        }
+                        else
+                        {
+                            l.fatal("Invalid difficulty.");
+                            l.info("Type --help for more information.");
+                            l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                            System.exit(sep.EArgs.ERR);
+                            return;
+                        }
+                    }
+
                     new sep.view.viewcontroller.AgentMockViewLauncher().run();
 
                     l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
@@ -193,6 +239,47 @@ public final class Launcher
                 }
             }
 
+            if (Arrays.asList(args).contains("--difficulty"))
+            {
+                l.info("Command line argument [--difficulty] detected.");
+
+                if (Arrays.asList(args).indexOf("--difficulty") + 1 < args.length)
+                {
+                    final int d;
+                    try
+                    {
+                        d = Integer.parseInt(args[Arrays.asList(args).indexOf("--difficulty") + 1]);
+                    }
+                    catch (final NumberFormatException e)
+                    {
+                        l.fatal("Invalid difficulty.");
+                        l.fatal(e.getMessage());
+                        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(sep.EArgs.ERR);
+                        return;
+                    }
+
+                    if (d < 0 || d > 1)
+                    {
+                        l.fatal("Invalid difficulty. Must be between {} and {}.", 0, 1);
+                        l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                        System.exit(sep.EArgs.ERR);
+                        return;
+                    }
+
+                    l.info("Setting agent difficulty to {}.", d);
+                    EClientInformation.INSTANCE.setAgentDifficulty(EAgentDifficulty.fromInt(d));
+                }
+                else
+                {
+                    l.fatal("Invalid difficulty.");
+                    l.info("Type --help for more information.");
+                    l.debug("The client application took {} seconds to run.", (System.currentTimeMillis() - t0) / 1000);
+                    System.exit(sep.EArgs.ERR);
+                    return;
+                }
+            }
+
             if (Arrays.asList(args).contains("--allowLegacyAgents"))
             {
                 l.info("Command line argument [--allowLegacyAgents] detected.");
@@ -230,6 +317,7 @@ public final class Launcher
             for (final StackTraceElement ste : e.getStackTrace())
             {
                 l.fatal(ste.toString());
+                continue;
             }
         }
         finally
