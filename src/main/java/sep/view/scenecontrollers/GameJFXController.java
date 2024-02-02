@@ -2654,6 +2654,11 @@ public final class GameJFXController
 
         for (final RCheckpointMask mask : Objects.requireNonNull(EGameState.INSTANCE.getCurrentCheckpointLocations()))
         {
+            if (!mask.bRenderDynamically())
+            {
+                continue;
+            }
+
             l.trace("Rendering checkpoint {} on state {}.", mask.id(), mask.location());
 
             final ImageView iv = Tile.getFormattedImageView(mask);
