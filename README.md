@@ -178,4 +178,4 @@ Commands are prefixed with a `/` and are case-sensitive. `Enter` to send a messa
 
 # Documentation
 
-The java-docs can be found [here](/docs/index.html).
+The java-docs can be found [here](docs/index.html).
