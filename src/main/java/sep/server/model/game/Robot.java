@@ -215,7 +215,22 @@ public class Robot {
         String restartDirection = "top";
         this.rebootTriggered = true;
 
-        this.getAuthGameMode().getSession().broadcastReboot(robotOwner.getController().getPlayerID());
+        final Thread rebootAsync = new Thread(() ->
+        {
+            /* We do this to let the client finish their animations. */
+            try
+            {
+                Thread.sleep(2_000);
+            } catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+
+            this.getAuthGameMode().getSession().broadcastReboot(robotOwner.getController().getPlayerID());
+
+        });
+
+        rebootAsync.start();
 
         if(this.getAuthGameMode().getSpamDeck().size() >= 2) {
             robotOwner.getDiscardPile().add(this.getAuthGameMode().getSpamDeck().get(0));
@@ -241,12 +256,12 @@ public class Robot {
 
             for (int i = 0; i < 5; i++) {
                 robotOwner.getDiscardPile().add(robotOwner.getCardByRegisterIndex(i));
-                robotOwner.setCardInRegister(i, null);
+                robotOwner.setCardInRegister(i, null, true);
             }
             l.debug("Registers were emptied.");
 
         } else {
-            l.error("Registers can't be emptied.");
+            l.warn("Registers can't be emptied.");
         }
 
         switch (sourceTile.getBoardName()) {
@@ -281,14 +296,27 @@ public class Robot {
 
             //TODO brauchen wir das so? Oder ist das eher hard-coded im client?
 
-            switch(this.direction) {
-                case "right" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
-                case "bottom" -> {
-                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
-                    this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
+            final Thread rotAsync = new Thread(() ->
+            {
+                /* We do this to let the client finish their animations. */
+                try
+                {
+                    Thread.sleep(2_000);
+                } catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
                 }
-                case "left" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
-            }
+
+                switch(this.direction) {
+                    case "right" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
+                    case "bottom" -> {
+                        this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
+                        this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "counterclockwise");
+                    }
+                    case "left" -> this.getSession().broadcastRotationUpdate(robotOwner.getController().getPlayerID(), "clockwise");
+                }
+            });
+            rotAsync.start();
 
             if(restartPoint.isOccupied() && restartPoint.hasUnmovableRobot(restartDirection, 0)) {
                 restartPoint = startingPoint;
@@ -301,7 +329,24 @@ public class Robot {
             this.setCurrentTile(restartPoint);
             this.getCurrentTile().setOccupiedBy(this);
             this.determineRobotOwner().getAuthGameMode().addDelay(1000);
-            this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), restartPoint.getCoordinate().getX(), restartPoint.getCoordinate().getY());
+
+
+            final Tile finalRestartPoint = restartPoint;
+            final Thread posAsync = new Thread(() ->
+            {
+                /* We do this to let the client finish their animations. */
+                try
+                {
+                    Thread.sleep(2_000);
+                } catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+
+                this.getSession().broadcastPositionUpdate(robotOwner.getController().getPlayerID(), finalRestartPoint.getCoordinate().getX(), finalRestartPoint.getCoordinate().getY());
+            });
+            posAsync.start();
+
             this.determineRobotOwner().getAuthGameMode().addDelay(1000);
             l.debug("Player {} was assigned a restart point.", this.determineRobotOwner().getController().getPlayerID());
 
