@@ -2282,6 +2282,11 @@ public final class GameJFXController
             {
                 ap.setOnMouseEntered(e ->
                 {
+                    if (ap.getChildren().size() < 2)
+                    {
+                        return;
+                    }
+
                     final ArrayList<Integer> newTranslations = new ArrayList<Integer>();
 
                     for (int j = ap.getChildren().size() - 1; j >= 0; --j)
