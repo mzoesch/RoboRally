@@ -8,6 +8,7 @@ import sep.view.lib.                EFigure;
 import sep.view.lib.                RPopUpMask;
 import sep.view.lib.                EPopUp;
 import sep.view.lib.                RCheckpointMask;
+import sep.view.lib.                RCoordinate;
 import sep.view.viewcontroller.     ViewSupervisor;
 
 import java.util.                   ArrayList;
@@ -41,8 +42,8 @@ public enum EGameState
      * be stored here in the Game State. Information that is not unique for one player like their selected robot or
      * their name is stored in the {@link RemotePlayer} object.
      */
-    private final ArrayList<RemotePlayer>   remotePlayers;
-    private RemotePlayer                    currentPlayer;
+    private final ArrayList<RemotePlayer>       remotePlayers;
+    private RemotePlayer                        currentPlayer;
 
     private String[]                            serverCourses;
     private String                              currentServerCourse;
@@ -65,6 +66,8 @@ public enum EGameState
     private final AtomicBoolean             bMemorySwapPlayed;
     private final AtomicBoolean             bSpamBlockerPlayed;
     private final AtomicBoolean             bAdminPrivilegePlayed;
+
+    private final ArrayList<RCoordinate>    energySpacesDisabled;
 
     private EGameState()
     {
@@ -94,6 +97,8 @@ public enum EGameState
         this.bMemorySwapPlayed          = new AtomicBoolean(false);
         this.bSpamBlockerPlayed         = new AtomicBoolean(false);
         this.bAdminPrivilegePlayed      = new AtomicBoolean(false);
+
+        this.energySpacesDisabled       = new ArrayList<RCoordinate>();
 
         return;
     }
@@ -136,6 +141,8 @@ public enum EGameState
         EGameState.INSTANCE.bMemorySwapPlayed           .set(false);
         EGameState.INSTANCE.bSpamBlockerPlayed          .set(false);
         EGameState.INSTANCE.bAdminPrivilegePlayed       .set(false);
+
+        EGameState.INSTANCE.energySpacesDisabled        .clear();
 
         return;
     }
@@ -955,6 +962,26 @@ public enum EGameState
     public boolean isAdminPrivilegePlayed()
     {
         return this.bAdminPrivilegePlayed.get();
+    }
+
+    public ArrayList<RCoordinate> getEnergySpacesDisabled()
+    {
+        return this.energySpacesDisabled;
+    }
+
+    public boolean isEnergySpaceDeactivated(final RCoordinate location)
+    {
+        for (final RCoordinate ec : this.energySpacesDisabled)
+        {
+            if (Objects.equals(ec, location))
+            {
+                return true;
+            }
+
+            continue;
+        }
+
+        return false;
     }
 
     // endregion Getters and Setters
