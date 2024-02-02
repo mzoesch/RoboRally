@@ -70,10 +70,12 @@ public enum EClientInformation
     private boolean                 bAllowLegacyAgents;
     private EAgentDifficulty        agentDifficulty;
 
-    private final AtomicBoolean     bQuickTipCreated    = new AtomicBoolean(false);
+    private final AtomicBoolean     bQuickTipCreated            = new AtomicBoolean(false);
 
-    private static final int        PREF_EXIT_CODE      = GameInstance.EXIT_OK;
+    private static final int        PREF_EXIT_CODE              = GameInstance.EXIT_OK;
     private int                     exitCode;
+
+    public static final  int        DEFAULT_AGENT_DIFFICULTY    = 1;
 
     private EClientInformation()
     {
@@ -99,7 +101,7 @@ public enum EClientInformation
         this.bIsAgent               = false;
         this.prefAgentName          = "";
         this.bAllowLegacyAgents     = false;
-        this.agentDifficulty        = EAgentDifficulty.QLEARNING;
+        this.agentDifficulty        = EAgentDifficulty.fromInt(EClientInformation.DEFAULT_AGENT_DIFFICULTY);
 
         this.bQuickTipCreated        .set(false);
 
