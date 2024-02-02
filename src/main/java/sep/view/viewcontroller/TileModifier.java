@@ -759,6 +759,12 @@ public final class TileModifier
         return null;
     }
 
+    @Override
+    public String toString()
+    {
+        return this.tile.toString(0);
+    }
+
     // endregion Getters and Setters
 
 }
