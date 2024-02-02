@@ -59,10 +59,6 @@
                             onAction="#onJoinBtn"
                         />
                         <Button
-                            text="CREDITS"
-                            styleClass="secondary-btn" style="-fx-min-width: 300px;"
-                        />
-                        <Button
                             text="EXIT GAME"
                             styleClass="danger-btn" style="-fx-min-width: 300px;"
                             onAction="#onExitBtn"
