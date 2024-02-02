@@ -2300,7 +2300,16 @@ public final class GameJFXController
                     {
                         for (int j = 0; j < ap.getChildren().size(); j++)
                         {
-                            newTranslations.set(j, newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP));
+                            newTranslations.set(j,
+                                newTranslations.get(j) - (GameJFXController.RCARD_PREVIEW_TRANSLATION_X - 2 * GameJFXController.RCARD_PREVIEW_TRANSLATION_X_CLEANUP)
+                                -
+                                (
+                                    ap.getChildren().size() == 4 ? - 5
+                                :   ap.getChildren().size() == 3 ? - 8
+                                :   ap.getChildren().size() == 2 ? - 25
+                                :   0
+                                )
+                            );
                             continue;
                         }
                     }
