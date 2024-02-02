@@ -27,7 +27,11 @@ public class MoveII extends AProgrammingCard implements IPlayableCard {
     @Override
     public void playCard(Player player, int currentRoundNumber) {
         player.getPlayerRobot().moveRobotOneTileForwards();
-        player.getPlayerRobot().moveRobotOneTileForwards();
+
+        if (!player.getPlayerRobot().isRebootTriggered())
+        {
+            player.getPlayerRobot().moveRobotOneTileForwards();
+        }
 
         if(!player.getPlayerRobot().isRebootTriggered()) {
             player.getAuthGameMode().getSession().broadcastPositionUpdate(player.getController().getPlayerID(), player.getPosition());
