@@ -132,24 +132,24 @@ public final class GameJFXController
     private static final int    FOOTER_PEEK_HEIGHT  = 50;
     private static final int    NULL_FOOTER_HEIGHT  = 265;
 
-    private int                         files;
-    private int                         ranks;
-    private Tile[][]                    tiles;
-    private final ArrayList<RGearMask>  gears;
-    private final ArrayList<AnchorPane> checkpoints;
-    private double                      minXTranslation;
-    private double                      maxXTranslation;
-    private double                      centralXTranslation;
+    private int                                 files;
+    private int                                 ranks;
+    private Tile[][]                            tiles;
+    private final ArrayList<RGearMask>          gears;
+    private final ArrayList<AnchorPane>         checkpoints;
+    private double                              minXTranslation;
+    private double                              maxXTranslation;
+    private double                              centralXTranslation;
 
-    private final ArrayList<RShopAction>    pendingShopActions;
-    private static final int                PROGRAMMING_TIMER_DURATION      = 30_000;
-    private Timeline                        programmingTimeline;
+    private final ArrayList<RShopAction>        pendingShopActions;
+    private static final int                    PROGRAMMING_TIMER_DURATION      = 30_000;
+    private Timeline                            programmingTimeline;
 
     /** The new three cards a player gets after playing the memory swap card. */
-    private final ArrayList<String>         memorySwapCards;
+    private final ArrayList<String>             memorySwapCards;
     /** The three cards a player has to discard from his hand. */
-    private final ArrayList<Integer>        memorySwapDiscardedCards;
-    private HBox                            memorySwapHBox;
+    private final ArrayList<Integer>            memorySwapDiscardedCards;
+    private HBox                                memorySwapHBox;
 
     public GameJFXController()
     {
@@ -2488,7 +2488,7 @@ public final class GameJFXController
         {
             for (int j = 0; j < this.ranks; j++)
             {
-                final Tile t            = this.tiles[i][j];
+                final Tile t = this.tiles[i][j];
 
                 /* We render checkpoints only dynamically if they can move. */
                 if (t.hasModifier(EModifier.CHECK_POINT))
@@ -2819,21 +2819,69 @@ public final class GameJFXController
         return;
     }
 
+    /** All energy spaces that currently have an active player on top will be deactivated. */
+    private void renderEnergySpaceAnimation()
+    {
+        boolean bRerender = false;
+
+        for (final RemotePlayer rp : EGameState.INSTANCE.getRemotePlayers())
+        {
+            if (!rp.getRobotView().hasPosition())
+            {
+                continue;
+            }
+
+            if (rp.hasRebooted())
+            {
+                continue;
+            }
+
+            for (final Tile[] ts : this.tiles)
+            {
+                for (final Tile t : ts)
+                {
+                    if (t.hasModifier(EModifier.ENERGY_SPACE) && t.getTileLocation().equals(rp.getRobotView().getPosition()))
+                    {
+                        l.debug("Deactivating energy space on state {}.", t.getTileLocation());
+                        EGameState.INSTANCE.getEnergySpacesDisabled().add(t.getTileLocation());
+                        bRerender = true;
+                        continue;
+                    }
+
+                    continue;
+                }
+            }
+
+            continue;
+        }
+
+        l.debug("Energy space animation finished. The new disabled energy spaces are: {}", EGameState.INSTANCE.getEnergySpacesDisabled());
+
+        if (bRerender)
+        {
+            this.renderCourse();
+        }
+
+        return;
+    }
+
     // endregion Animation Rendering
 
     private void renderAnimation(final EAnimation anim)
     {
         l.debug("Rendering animation: {}", anim);
+
         switch (anim)
         {
+
         case BLUE_CONVEYOR_BELT ->
         {
-            l.warn("Server requested to render blue conveyor belt animation. Not implemented yet.");
+            l.warn("Server requested to render blue conveyor belt animation. But there are no animations to play.");
             break;
         }
         case GREEN_CONVEYOR_BELT ->
         {
-            l.warn("Server requested to render green conveyor belt animation. Not implemented yet.");
+            l.warn("Server requested to render green conveyor belt animation. But there are no animations to play.");
             break;
         }
         case PUSH_PANEL ->
@@ -2848,7 +2896,7 @@ public final class GameJFXController
         }
         case CHECK_POINT ->
         {
-            l.warn("Server requested to render check point animation. Not implemented yet.");
+            l.warn("Server requested to render check point animation. But there are no animations to play.");
             break;
         }
         case PLAYER_SHOOTING ->
@@ -2863,9 +2911,10 @@ public final class GameJFXController
         }
         case ENERGY_SPACE ->
         {
-            l.warn("Server requested to render energy space animation. Not implemented yet.");
+            this.renderEnergySpaceAnimation();
             break;
         }
+
         }
 
         return;
