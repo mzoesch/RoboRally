@@ -70,6 +70,8 @@ public final class TileModifier
                 return;
             }
 
+            l.warn("Wall has more than one orientation: {}.", this.tile.getJSONArray("orientations").toString(0));
+
             return;
         }
 
