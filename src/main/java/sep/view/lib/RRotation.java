@@ -12,6 +12,9 @@ public final record RRotation(int rotation)
     private static final Logger l = LogManager.getLogger(RRotation.class);
 
     public static final int NORTH = 0;
+    public static final int EAST  = 90;
+    public static final int SOUTH = 180;
+    public static final int WEST  = 270;
 
     public RRotation(final int rotation)
     {
