@@ -2539,6 +2539,11 @@ public final class GameJFXController
                         this.gears.add(TileModifier.generateGearMask(iv));
                     }
 
+                    if (TileModifier.isPushPanel(iv.getImage()))
+                    {
+                        this.pushPanels.add(TileModifier.generatePushPanelMask(iv, t.getPushPanelRegisters()));
+                    }
+
                     continue;
                 }
                 this.renderOnPosition(tileAnchor, t.getTileLocation());
