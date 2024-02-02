@@ -4,8 +4,10 @@ import sep.                         Types;
 import sep.view.lib.                ERotation;
 import sep.view.lib.                RGearMask;
 import sep.view.lib.                RImageMask;
-import sep.view.clientcontroller.   GameInstance;
+import sep.view.lib.                RPushPanelMask;
+import sep.view.lib.                RRotation;
 import sep.view.lib.                EUpgradeCard;
+import sep.view.clientcontroller.   GameInstance;
 
 import java.io.                     IOException;
 import java.util.                   Objects;
@@ -21,6 +23,7 @@ import org.json.                    JSONException;
 import javafx.embed.swing.          SwingFXUtils;
 import java.awt.image.              BufferedImage;
 import java.util.                   HashMap;
+import java.util.                   ArrayList;
 
 public final class TileModifier
 {
@@ -723,6 +726,23 @@ public final class TileModifier
         return rim.getSanitizedURL().contains("GearClockwise") || rim.getSanitizedURL().contains("GearCounterclockwise");
     }
 
+    public static boolean isPushPanel(final Image i)
+    {
+        if (Types.EConfigurations.isDev())
+        {
+            return i.getUrl().contains("PushPanel");
+        }
+
+        final RImageMask rim = TileModifier.getCachedImageMask(i);
+        if (rim == null)
+        {
+            l.error("Could not check if image is push panel because the image mask could not be found.");
+            return false;
+        }
+
+        return rim.getSanitizedURL().contains("PushPanel");
+    }
+
     public static RGearMask generateGearMask(final ImageView iv)
     {
         l.debug("Generating gear mask for image: {}.", iv);
@@ -733,6 +753,12 @@ public final class TileModifier
         }
 
         return new RGearMask(iv, Objects.requireNonNull(TileModifier.getCachedImageMask(iv.getImage())).getSanitizedURL().contains("GearClockwise"), 0);
+    }
+
+    public static RPushPanelMask generatePushPanelMask(final ImageView iv, ArrayList<Integer> registers)
+    {
+        l.debug("Generating push panel mask for image: {}.", iv);
+        return new RPushPanelMask(iv, new RRotation( (int) iv.getRotate() ), registers);
     }
 
     private static RImageMask getCachedImageMask(final Image i)
@@ -763,6 +789,19 @@ public final class TileModifier
     public String toString()
     {
         return this.tile.toString(0);
+    }
+
+    public ArrayList<Integer> getPushPanelRegisters()
+    {
+        final ArrayList<Integer> registers = new ArrayList<Integer>();
+
+        for (int i = 0; i < this.getRegisters().length(); i++)
+        {
+            registers.add(this.getRegisters().getInt(i));
+            continue;
+        }
+
+        return registers;
     }
 
     // endregion Getters and Setters
