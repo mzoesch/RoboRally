@@ -5,6 +5,19 @@ This is a project developed in a practical course at the Ludwig-Maximilians-Univ
 The goal was to develop a networked game that can be played by multiple clients and / or bots. 
 The requirements to be implemented may be found [here](http://media.wizards.com/2017/rules/roborally_rules.pdf). 
 
+Some sample screenshots of the game are shown below.
+
+### The front end
+![FrontEnd](/FrontEnd.png)
+### Session setup
+![Selection](/Selection.png)
+### Game view
+![Game](/Game.png)
+
+### More
+The project contains a lot more screens, for example, a dev screen to automatically set up a
+game-server, with child processes for bots and a client-front-end to play the game, etc.
+
 # Getting up and running
 
 ## Windows
