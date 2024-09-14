@@ -2172,11 +2172,11 @@ public final class AgentSL_v2 extends ServerListener
                 return true;
             }
 
-            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() < 2)
-            {
-                l.info("Agent {} was notified to buy an upgrade. But he does not have enough energy.", EClientInformation.INSTANCE.getPlayerID());
-                return true;
-            }
+//            if (Objects.requireNonNull(EGameState.INSTANCE.getClientRemotePlayer()).getEnergy() < 2)
+//            {
+//                l.info("Agent {} was notified to buy an upgrade. But he does not have enough energy.", EClientInformation.INSTANCE.getPlayerID());
+//                return true;
+//            }
 
             new Thread(() ->
             {

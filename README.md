@@ -1,3 +1,10 @@
+# About
+
+This is a project developed in a practical course at the Ludwig-Maximilians-Universität München over the course of a semester.
+
+The goal was to develop a networked game that can be played by multiple clients and / or bots. 
+The requirements to be implemented may be found [here](http://media.wizards.com/2017/rules/roborally_rules.pdf). 
+
 # Getting up and running
 
 ## Windows
@@ -178,4 +185,4 @@ Commands are prefixed with a `/` and are case-sensitive. `Enter` to send a messa
 
 # Documentation
 
-The java-docs can be found [here](docs/index.html).
+The java-docs can be found [here](docs/index.html) (only available inside the private repo on gitlab).
